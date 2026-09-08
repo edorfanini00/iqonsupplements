@@ -1,0 +1,19 @@
+{
+  "project": "IQON supplements and skincare",
+  "packagingStatus": "Concept artwork. Product names, quantities and packaging require final brand approval.",
+  "generators": [
+    "Higgsfield",
+    "Blender"
+  ],
+  "assets": [
+    "public/images/hero.webp",
+    "public/images/precision.webp",
+    "public/images/skincare.webp",
+    "public/images/supplements.webp"
+  ],
+  "blender": {
+    "editable_scene": "creative/iqon-precision-detail.blend",
+    "source_script": "creative/create-precision-scene.py"
+  },
+  "provenanceNote": "Public export includes the artwork and editable sources. Internal job identifiers, source-service URLs, reference uploads and generation logs are omitted."
+}

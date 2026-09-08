@@ -1,0 +1,25 @@
+{
+  "project": "IQON supplements and skincare",
+  "packagingStatus": "Concept artwork. Product names, quantities and packaging require final brand approval.",
+  "generators": [
+    "Higgsfield",
+    "Blender"
+  ],
+  "assets": [
+    "public/images/store/barrier-cream.webp",
+    "public/images/store/campaign-lifestyle.webp",
+    "public/images/store/campaign-skincare.webp",
+    "public/images/store/campaign-supplements.webp",
+    "public/images/store/daily-complex.webp",
+    "public/images/store/gentle-cleanser.webp",
+    "public/images/store/mineral-complex.webp",
+    "public/images/store/omega-complex.webp",
+    "public/images/store/peptide-serum.webp",
+    "public/images/store/precision.webp"
+  ],
+  "blender": {
+    "editable_scene": "creative/iqon-precision-detail-v2.blend",
+    "source_script": "creative/create-precision-scene-v2.py"
+  },
+  "provenanceNote": "Public export includes the artwork and editable sources. Internal job identifiers, source-service URLs, reference uploads and generation logs are omitted."
+}

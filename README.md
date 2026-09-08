@@ -1,6 +1,6 @@
 # IQON Supplements & Skincare Store
 
-A complete ecommerce design preview in React, Vinext and TypeScript. Intended GitHub repository: `iqon-supplements`. The private Site identity is retained in `.openai/hosting.json`.
+A complete ecommerce design preview in React, Vinext and TypeScript. GitHub repository: https://github.com/edorfanini00/iqonsupplements. The public hosting configuration contains resource flags only; the private deployment identifier is omitted.
 
 ## Store experience
 
