@@ -1,12 +1,18 @@
 # IQON Supplements & Skincare Store
 
-A complete ecommerce design preview in React, Vinext and TypeScript. GitHub repository: https://github.com/edorfanini00/iqonsupplements. The public hosting configuration contains resource flags only; the private deployment identifier is omitted.
+IQON’s supplements and skincare storefront, built with React, Vinext and TypeScript. Repository: https://github.com/edorfanini00/iqonsupplements. Private hosting identifiers are omitted from the public GitHub export.
+
+## Shopify integration status
+
+Shopify catalog, product variants, stock status, persistent cart operations and a secure checkout handoff are implemented. The merchant store has not been connected, and the original supplement assets have not yet been supplied through an accessible folder. No products, payment settings, shipping rules, taxes, or orders have been created in Shopify. See [the connection notes](docs/shopify-connection.md) for the remaining setup and supported scope.
+
+The site reads real products when its Shopify connection is configured. Without it, the explicitly labelled design preview remains active. A configured store error shows an unavailable state; sample products are never substituted into live commerce.
 
 ## Store experience
 
 - Homepage with direct shopping, featured collection tabs, skincare ritual merchandising, material detail and lifestyle content.
 - Separate supplements, skincare and all-product collection routes, format filtering and price/name sorting.
-- Six product routes with gallery selection, image enlargement, product information, quantity controls, one-time and illustrative subscription choices, delivery frequency, related products and a sticky purchase bar.
+- Product routes with gallery selection, image enlargement, product information, quantity controls, one-time and illustrative subscription choices, delivery frequency, related products and a sticky purchase bar.
 - Search, accessible navigation, a shopping bag with quantity/removal/cross-sell behavior and browser persistence, and a checkout summary preview.
 - Brand approach, help and missing-page views.
 
@@ -24,7 +30,7 @@ The full Timeline supplement and skincare stores and product pages, Skye Tides h
 
 The referenced IQON supplement folder was not accessible. Names, quantities, packaging, USD prices and subscription options in `lib/catalog.ts` are explicitly labelled sample design data throughout the preview. None is an approved SKU or commercial offer. Skincare is a proposed collection.
 
-This site does not process payments, submit orders, create subscriptions, collect customer contact data, or claim clinical outcomes. Replace the sample catalog with approved product information, original artwork and evidence, then connect a commerce service and publish real policies before enabling sales. Browser local storage holds only the sample bag.
+The unconnected preview does not accept orders or create subscriptions. Once connected, the server loads approved Shopify products and hands checkout to Shopify. Payment, customer contact details, delivery, taxes and policies are handled there. The sample subscription choice is not offered in live commerce. Browser local storage holds only the preview bag; live cart identity uses an HttpOnly cookie.
 
 ## Development
 
@@ -36,8 +42,8 @@ npm run dev
 npm run build
 ```
 
-`app/store-shell.tsx` owns navigation, search and bag state. `app/shop-pages.tsx` contains collection and product layouts. `app/site.tsx` contains the homepage. `app/globals.css` contains the responsive theme.
+`lib/shopify.server.ts` owns the server-side Shopify connection. `lib/shopify-operations.ts` contains validated Storefront operations. `app/store-shell.tsx` owns navigation, search and bag state. `app/shop-pages.tsx` contains collection and product layouts. `app/site.tsx` contains the homepage. `app/globals.css` contains the responsive theme.
 
 ## Verification
 
-The production build completed for the new route tree. Direct assertions passed for sample subscription pricing, line totals and invalid persisted-cart data. Standalone TypeScript checking reports missing Cloudflare runtime declarations in the retained starter (`cloudflare:workers`, `Fetcher`, `D1Database`); no new storefront type errors were reported. The image assets were visually inspected and source-level shopping behavior was reviewed. The cloud browser currently blocks the running local preview with ERR_BLOCKED_BY_CLIENT, so a fresh visual/browser interaction review and new screenshots could not be completed for this revision. This limitation is not represented as a passed browser test.
+The production build completed for the Shopify route tree. Shopify’s supplied validator accepted all six catalog/cart operations. Seven focused tests passed for request security, product mapping, stock/currency handling, error privacy, and cart-secret protection. Live merchant-store and checkout verification remain pending authentication. Direct assertions passed for sample subscription pricing, line totals and invalid persisted-cart data. Standalone TypeScript checking reports missing Cloudflare runtime declarations in the retained starter (`cloudflare:workers`, `Fetcher`, `D1Database`); the new Shopify server file encounters the same missing runtime-module declaration, with no other storefront type errors reported. The image assets were visually inspected and source-level shopping behavior was reviewed. The cloud browser currently blocks the running local preview with ERR_BLOCKED_BY_CLIENT, so a fresh visual/browser interaction review and new screenshots could not be completed for this revision. This limitation is not represented as a passed browser test.

@@ -1,4 +1,4 @@
 import { notFound } from "next/navigation";
-import { findProduct } from "@/lib/catalog";
+import { getStoreCatalog } from "@/lib/shopify.server";
 import { ProductPage } from "../../shop-pages";
-export default async function ProductRoute({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const product=findProduct(slug);if(!product)notFound();return <ProductPage key={slug} product={product}/>;}
+export default async function ProductRoute({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const catalog=await getStoreCatalog();if(catalog.mode==="unavailable")return <main id="main" className="section-pad"><h1>We’ll be back shortly.</h1><p>The collection is temporarily unavailable. Please try again in a moment.</p></main>;const product=catalog.products.find(p=>p.id===slug);if(!product)notFound();return <ProductPage key={slug} product={product}/>;}

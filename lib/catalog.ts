@@ -1,10 +1,14 @@
 export type Category = "supplements" | "skincare";
 export type Purchase = "once" | "subscription";
+export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean};
 export type Product = {
   id: string; name: string; category: Category; type: string; number: string;
   price: number; size: string; descriptor: string; description: string;
   image: string; campaign: string; tone: string; ritual: string;
+  currency?: string; available?: boolean; variants?: ProductVariant[];
+  images?: {src:string; alt:string}[]; requiresSellingPlan?: boolean;
 };
+export type StoreCatalog = {mode:"preview"|"live"|"unavailable"; products:Product[]; currency:string};
 
 // Provisional products and USD prices for the explicitly labelled store preview.
 // Replace this catalog with approved product records before enabling commerce.
@@ -18,10 +22,10 @@ export const products: Product[] = [
 ];
 
 export const findProduct = (id: string) => products.find(p => p.id === id);
-export const money = (amount: number) => new Intl.NumberFormat("en-US", {style:"currency",currency:"USD",maximumFractionDigits:amount % 1 ? 2 : 0}).format(amount);
-export const unitPrice = (p: Product, purchase: Purchase) => purchase === "subscription" ? Math.round(p.price * 85) / 100 : p.price;
-export type CartItem = {id: string; quantity: number; purchase: Purchase; frequency: string};
-export const lineKey = (item: Pick<CartItem,"id"|"purchase"|"frequency">) => `${item.id}:${item.purchase}:${item.frequency}`;
+export const money = (amount: number, currency="USD") => new Intl.NumberFormat("en-US", {style:"currency",currency,maximumFractionDigits:amount % 1 ? 2 : 0}).format(amount);
+export const unitPrice = (p: Product, purchase: Purchase) => purchase === "subscription" && !p.variants ? Math.round(p.price * 85) / 100 : p.price;
+export type CartItem = {id: string; quantity: number; purchase: Purchase; frequency: string; lineId?:string; variantId?:string; variantTitle?:string; name?:string; image?:string; amount?:number; currency?:string};
+export const lineKey = (item: Pick<CartItem,"id"|"purchase"|"frequency"|"lineId">) => item.lineId || `${item.id}:${item.purchase}:${item.frequency}`;
 export function validateCart(input: unknown): CartItem[] {
   if (!Array.isArray(input)) return [];
   return input.filter((i): i is CartItem => !!i && typeof i === "object" && typeof i.id === "string" && !!findProduct(i.id) && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 20 && ["once","subscription"].includes(i.purchase) && ["once","30","60","90"].includes(i.frequency));

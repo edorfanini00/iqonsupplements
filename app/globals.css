@@ -32,3 +32,11 @@
 
 /* Keep essential supporting text legible on the light store surfaces. */
 .product-description,.product-preview-note,.product-card>p,.product-card-meta,.collection-intro>div>p:last-child,.checkout-heading p,.checkout-summary>p,.bag-summary>p,.sheet-heading [data-slot="sheet-description"],.search-sheet [data-slot="sheet-description"],.mobile-sheet [data-slot="sheet-description"],.everyday-copy p:not(.eyebrow),.routine-grid>article>div:last-child p{color:#656b70}
+
+/* Commerce states */
+.commerce-message {padding:1rem 1.5rem;background:#eef0ef;color:#202524;font-size:.875rem;line-height:1.5;}
+.commerce-message p {margin:0 0 .5rem;}
+.product-variant-picker {display:grid;gap:.75rem;margin:1.5rem 0;font-size:.875rem;}
+.product-variant-picker select {width:100%;padding:1rem;border:1px solid #c8cdca;background:transparent;color:inherit;font:inherit;}
+.catalog-empty {grid-column:1/-1;padding:3rem 0;font-size:1rem;}
+button:disabled {cursor:not-allowed;opacity:.48;}
