@@ -40,3 +40,15 @@
 .product-variant-picker select {width:100%;padding:1rem;border:1px solid #c8cdca;background:transparent;color:inherit;font:inherit;}
 .catalog-empty {grid-column:1/-1;padding:3rem 0;font-size:1rem;}
 button:disabled {cursor:not-allowed;opacity:.48;}
+/* Supplied IQON photography: preserve every pack and its label in the frame. */
+.hero-image-wrap img[src^='/images/supplements/']{object-fit:contain;background:#f8f8f8}
+.hero-product-link{width:36px;height:36px;border:1px solid #9e9fa0;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.collection-intro>img[src^='/images/supplements/'],.catalog-crosslink>img[src^='/images/supplements/'],.supplied-editorial>img{object-fit:contain;background:#f8f8f8}
+.supplied-product .product-visual{background:#f8f8f8}
+.supplied-product .product-card-title{align-items:flex-start;flex-direction:column;gap:7px}
+.product-card-title>.price-pending,.product-title-row>.price-pending{font-size:12px;letter-spacing:.4px;color:#777;white-space:nowrap}
+.product-discover{display:flex;align-items:center;justify-content:center;min-width:32px;min-height:32px}
+.supplied-product-detail .gallery-main{aspect-ratio:4/5;background:#f8f8f8}
+.supplied-product-detail .gallery-main>img{object-fit:contain}
+.product-launch-note{padding:25px 0;margin:8px 0 22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.product-launch-note>p:not(.eyebrow){font-size:14px;line-height:1.8;color:#777;margin:13px 0 20px}
