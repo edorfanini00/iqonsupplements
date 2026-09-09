@@ -22,14 +22,20 @@ No prices or inventory were supplied. These records display Coming soon and cann
 
 The powders group appears in the homepage hero; the complete lineup appears on supplement/all collection banners and the skincare cross-link. Capsule and powder group images appear in the relevant product editorials.
 
-## Studio consistency pass — September 9, 2026
+## Current scope — product photography only
+
+After the studio pass, the user asked to restore the previous hero, banners, and group scenes exactly. Images 19–25 are restored from the pre-pass version, including their original lighting. Keep these editorial assets unchanged unless the user explicitly requests changes to them.
+
+The improved individual photographs remain. Product-card images and individual product-gallery photographs receive a 9% inset inside the existing frames so containers appear approximately 18% smaller with more breathing room. Card sizes, grids, page spacing, typography, logo, hero layout, and skincare are unchanged. Group photographs in product galleries retain their original presentation.
+
+## Studio consistency pass — September 9, 2026 (superseded scope)
 
 All 26 photographs were visually reviewed. The unflavored collagen packshot is the lighting and material reference: white seamless sweep, soft dimensional light, muted label gradients, a thin IQON wordmark, and restrained reflections.
 
 - Retained matching original primary shots: unflavored collagen, chocolate collagen, colostrum, colon cleanse, Keto-5, and resveratrol. The NMN hand photograph also remains.
 - Rebuilt primary shots: creatine, GLP-1, liver support, NMN, and gummies. Creatine's final flat label and final reference render were inspected to replace its older centered label layout. The other existing primary shots supplied product identity references; this is not a certification that every production dieline was checked.
 - Refined alternate scenes for creatine, chocolate collagen, liver, gummies, colon cleanse, and colostrum. Removed visible marks and corrected inconsistent label treatments. Small printed text in generated scenes remains illustrative; approved label artwork and commerce records remain authoritative.
-- Replaced all seven group scenes with compositions made from the selected individual product photographs. Label pixels and container shapes are reused rather than generated again. Resveratrol's alternate image uses the same faithful packshot with new framing and a soft white setting.
+- Initially replaced all seven group scenes with compositions made from the selected individual product photographs; these group changes have since been reverted at the user's request. Resveratrol's alternate individual image uses the same faithful packshot with new framing and a soft white setting.
 - Higgsfield supplied the image refinements. Its media sandbox performed label-area compositing, white-background cleanup, framing, group assembly, and WebP export. Rejected generations that redesigned packaging were not installed.
 
 The image paths stay stable so every catalog, gallery, search, and editorial placement receives the corrected artwork together. No product availability, price, ingredients, or purchase behavior changed.
