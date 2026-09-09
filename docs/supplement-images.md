@@ -1,6 +1,6 @@
 # Supplied supplement photography
 
-The 26 PNGs from the user-supplied IQON_supplement_images folder were converted to WebP, preserving composition and labels. Individual images are up to 1800px tall; landscape collection images are up to 2400px wide. Originals were left intact.
+The catalog started with 26 images from the user-supplied IQON_supplement_images folder. The September 9 studio consistency pass retains the matching originals and replaces inconsistent packshots, alternate views, and group compositions. Individual images are 1800px tall; the complete eleven-product lineup is 4000px wide. Source files on the user's disk were left intact.
 
 All placeholder supplement catalog entries are replaced with these 11 products. Names and sizes come from the individual packshots. Group scenes are used as editorial imagery, not as sources for specification data.
 
@@ -21,6 +21,18 @@ No prices or inventory were supplied. These records display Coming soon and cann
 | Hair, Skin & Nails Gummies | 60 gummies · Passion fruit | hair-skin-nails-gummies | 10_pack_hair_and_skin_gummies.webp, 14_hero_gummies_falling.webp, 23_group_beauty_trio.webp |
 
 The powders group appears in the homepage hero; the complete lineup appears on supplement/all collection banners and the skincare cross-link. Capsule and powder group images appear in the relevant product editorials.
+
+## Studio consistency pass — September 9, 2026
+
+All 26 photographs were visually reviewed. The unflavored collagen packshot is the lighting and material reference: white seamless sweep, soft dimensional light, muted label gradients, a thin IQON wordmark, and restrained reflections.
+
+- Retained matching original primary shots: unflavored collagen, chocolate collagen, colostrum, colon cleanse, Keto-5, and resveratrol. The NMN hand photograph also remains.
+- Rebuilt primary shots: creatine, GLP-1, liver support, NMN, and gummies. Creatine's final flat label and final reference render were inspected to replace its older centered label layout. The other existing primary shots supplied product identity references; this is not a certification that every production dieline was checked.
+- Refined alternate scenes for creatine, chocolate collagen, liver, gummies, colon cleanse, and colostrum. Removed visible marks and corrected inconsistent label treatments. Small printed text in generated scenes remains illustrative; approved label artwork and commerce records remain authoritative.
+- Replaced all seven group scenes with compositions made from the selected individual product photographs. Label pixels and container shapes are reused rather than generated again. Resveratrol's alternate image uses the same faithful packshot with new framing and a soft white setting.
+- Higgsfield supplied the image refinements. Its media sandbox performed label-area compositing, white-background cleanup, framing, group assembly, and WebP export. Rejected generations that redesigned packaging were not installed.
+
+The image paths stay stable so every catalog, gallery, search, and editorial placement receives the corrected artwork together. No product availability, price, ingredients, or purchase behavior changed.
 
 ## Framing and original logo
 
