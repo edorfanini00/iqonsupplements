@@ -21,3 +21,9 @@ No prices or inventory were supplied. These records display Coming soon and cann
 | Hair, Skin & Nails Gummies | 60 gummies · Passion fruit | hair-skin-nails-gummies | 10_pack_hair_and_skin_gummies.webp, 14_hero_gummies_falling.webp, 23_group_beauty_trio.webp |
 
 The powders group appears in the homepage hero; the complete lineup appears on supplement/all collection banners and the skincare cross-link. Capsule and powder group images appear in the relevant product editorials.
+
+## Framing and original logo
+
+The original transparent `low height logo.png` is embedded unchanged as `public/images/brand/iqon-logo.png`. The Wordmark SVG viewport removes transparent margins without redrawing the letterforms.
+
+Product card and portrait gallery frames use the packshot’s actual 145:180 aspect ratio. Landscape campaign images use their own proportions. The hero product note sits below the image, and gallery thumbnails contain the full photograph. This corrects clipping and side bands without regenerating packaging or changing label text.
