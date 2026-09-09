@@ -1,3 +1,4 @@
+import { productContent } from "./product-content";
 export type Category = "supplements" | "skincare";
 export type Purchase = "once" | "subscription";
 export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean};
@@ -20,7 +21,7 @@ function supplement(
   description: string, pack: string, detail: string, group: string, index: number,
 ): Product {
   return {
-    id, name, category: "supplements", type, size, descriptor, description,
+    id, name, category: "supplements", type, size, descriptor: productContent[id]?.descriptor || descriptor, description: productContent[id]?.description || description,
     number: String(index + 1).padStart(2, "0"), price: 0, pricePending: true,
     available: false, image: asset(pack), tone: "silver", ritual: "",
     campaign: type === "Powder" ? SUPPLEMENT_HERO_IMAGE
@@ -31,7 +32,7 @@ function supplement(
     })),
   };
 }
-export const products: Product[] = [
+const previewProducts: Product[] = [
   supplement("creatine-monohydrate", "Creatine Monohydrate", "Powder", "281 g",
     "A focused powder essential.", "Creatine monohydrate in a 281 g powder format. Part of the IQON supplement collection.",
     "00_pack_creatine", "12_hero_creatine_scoop", "22_group_powders_row", 0),
@@ -70,6 +71,8 @@ export const products: Product[] = [
   {id:"barrier-cream",name:"Barrier Cream",category:"skincare",type:"Moisturizer",number:"13",price:72,size:"50 mL",descriptor:"The finishing touch.",description:"A cream concept for the final moisturizing step in a simple skincare routine. A tactile glass jar and restrained finish bring the IQON approach to an everyday essential.",image:"/images/store/barrier-cream.webp",campaign:"/images/store/campaign-skincare.webp",tone:"ivory",ritual:"Moisturize"},
   {id:"gentle-cleanser",name:"Gentle Cleanser",category:"skincare",type:"Cleanser",number:"14",price:38,size:"150 mL",descriptor:"Begin with the essentials.",description:"The first step in the IQON skincare collection. This cleanser concept uses a practical pump format and pairs with the serum and cream as a three-part ritual.",image:"/images/store/gentle-cleanser.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Cleanse"},
 ];
+
+export const products: Product[] = previewProducts.map(p => ({...p, descriptor: productContent[p.id]?.descriptor || p.descriptor, description: productContent[p.id]?.description || p.description}));
 
 export const findProduct = (id: string) => products.find(p => p.id === id);
 export const money = (amount: number, currency="USD") => new Intl.NumberFormat("en-US", {style:"currency",currency,maximumFractionDigits:amount % 1 ? 2 : 0}).format(amount);
