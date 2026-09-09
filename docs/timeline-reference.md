@@ -34,3 +34,25 @@ Only product identity, pack format, net weight/count and explicitly identified f
 - Final prices, stock, shipping and return terms from the connected store.
 
 Timeline's statistics, customer reviews, before/after results and certifications are references for information architecture only. They are not IQON evidence. No numerical results, reviews, directions, doses, medical benefits or certifications were manufactured to fill sections.
+
+
+## Department and catalog follow-up — September 9, 2026
+
+Additional live navigation research covered `/shop`, `/skincare`, `/skincare/shop`, the department switch, both Shop mega menus, supplement Science/About menus and skincare Explore navigation. This follows the earlier supplement and skincare PDP inspection above.
+
+| Timeline structure observed | IQON implementation |
+| --- | --- |
+| Top segmented switch changes the homepage, logo destination and shopping navigation | Supplements `/` and Skincare `/skincare`, contextual logo and Shop all destinations, active state on collection and product routes |
+| Full-width Shop menu with collection links, categories and featured products | Department-specific Shop menus, format/category links, two real catalog products, backdrop and keyboard dismissal |
+| Editorial links grouped under Science / About / Explore | Explore and About IQON menus link to actual product guides, approach and care content; no invented studies or customer proof |
+| Shop all heading with left navigation and product grid | Compact heading, sticky desktop category rail, mobile category chips, product grid, shareable filters and sorting |
+| Skincare catalog editorial introduction | Existing IQON skincare campaign photograph and a concise routine introduction |
+| Format/routine comparisons after catalog | Powder/capsule/sachet/gummy guide, and cleanser/serum/moisturizer routine guide |
+| Cross-department discovery below catalog | Existing approved IQON campaign images link to the other department |
+
+The original root homepage and its hero asset remain untouched. A separate skincare landing page uses the existing approved skincare campaign image. Current three skincare concepts are retained; no products from the separate skincare artwork project were introduced. The supplemental guides are preview-only so unapproved copy cannot be attached to live Shopify records.
+
+The exact Suisse font remains pending licensed files. Menu architecture, spacing and control treatment were adapted without copying Timeline assets, reviews, claims, certifications or proprietary product content.
+
+
+Validation: native Next/Vercel production build and TypeScript pass; new navigation/catalog modules pass ESLint. Browser checks covered both desktop department switches and menu contents, Escape dismissal, collection counts, category filtering, ascending skincare price sorting with filter-state preservation, and the mobile drawer at a 390px frame width. Fixed and rechecked mobile horizontal overflow. Original homepage source and hero/group/lifestyle binaries are unchanged.

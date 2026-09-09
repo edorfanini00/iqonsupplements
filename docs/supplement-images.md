@@ -45,3 +45,10 @@ The image paths stay stable so every catalog, gallery, search, and editorial pla
 The original transparent `low height logo.png` is embedded unchanged as `public/images/brand/iqon-logo.png`. The Wordmark SVG viewport removes transparent margins without redrawing the letterforms.
 
 Product card and portrait gallery frames use the packshot’s actual 145:180 aspect ratio. Landscape campaign images use their own proportions. The hero product note sits below the image, and gallery thumbnails contain the full photograph. This corrects clipping and side bands without regenerating packaging or changing label text.
+
+
+## Catalog consistency follow-up — September 9, 2026
+
+Audited all 11 primary supplement photographs and the three existing skincare images at catalog-card size. Retained seven supplement primaries and all skincare originals. Applied conservative source-pixel tonal and edge-clarity corrections to primary files 00 (creatine), 05 (Keto-5), 08 (NMN) and 09 (resveratrol), using Higgsfield's media sandbox. The unflavored collagen primary remains the lighting reference.
+
+Eight generated alternatives were rejected for backdrop, scale or tiny-letter drift. None was installed. Chosen corrections retain the source labels, geometry, image dimensions, crop and reflections. No new photographic detail is claimed: residual source softness and NMN's different camera perspective remain. The existing 9% inset remains. All hero, group, alternate and lifestyle assets are unchanged in this follow-up.
