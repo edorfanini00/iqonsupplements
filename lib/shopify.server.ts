@@ -1,12 +1,19 @@
-import { env } from "cloudflare:workers";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
-function config() { return shopifyConfig(env as unknown as Record<string,unknown>); }
-async function buyerIP() { return (await headers()).get("cf-connecting-ip") || undefined; }
+// Standard server environment variables work on Vercel and on the retained
+// Worker target with nodejs_compat_populate_process_env enabled.
+function config() { return shopifyConfig(process.env); }
+async function buyerIP() {
+  const requestHeaders=await headers();
+  // Vercel overwrites x-forwarded-for at its edge; Cloudflare sets cf-connecting-ip.
+  return process.env.VERCEL
+    ? requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined
+    : requestHeaders.get("cf-connecting-ip") || undefined;
+}
 async function readCatalog():Promise<StoreCatalog> {
   const settings=config();
   if(!settings) return {mode:"preview",products,currency:"USD"};

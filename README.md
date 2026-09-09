@@ -34,7 +34,26 @@ The unconnected preview does not accept orders or create subscriptions. Once con
 
 ## Development
 
-Requires the Node version supported by the retained starter.
+Requires Node.js 22.x.
+
+### Vercel
+
+Import `edorfanini00/iqonsupplements` with the repository root as the project root. The checked-in `vercel.json` selects Next.js, runs `npm run build:vercel`, and uses the native `.next` output. Do not set the output directory to `dist`: that directory belongs to the separate Worker build and cannot provide Next.js server routes on Vercel.
+
+```sh
+npm ci
+npm run dev:vercel
+npm run build:vercel
+npm run start:vercel
+```
+
+Set the Shopify values listed in `.env.example` as server-side Vercel environment variables when the store is ready to connect. No Shopify credentials are required to deploy the labelled design preview. Changing hosted environment variables requires a new deployment. The storefront and cart routes remain dynamic so product availability and each buyer’s bag are resolved at request time.
+
+The native Next.js build checks `tsconfig.next.json`, which covers the application and its imported dependencies. Unused Cloudflare deployment/database tooling belongs to the separate Worker target. TypeScript validation remains enabled.
+
+### Existing Worker / Sites target
+
+The original local and private-hosting commands remain available:
 
 ```sh
 npm ci
@@ -46,4 +65,4 @@ npm run build
 
 ## Verification
 
-The production build completed for the Shopify route tree. Shopify’s supplied validator accepted all six catalog/cart operations. Seven focused tests passed for request security, product mapping, stock/currency handling, error privacy, and cart-secret protection. Live merchant-store and checkout verification remain pending authentication. Direct assertions passed for sample subscription pricing, line totals and invalid persisted-cart data. Standalone TypeScript checking reports missing Cloudflare runtime declarations in the retained starter (`cloudflare:workers`, `Fetcher`, `D1Database`); the new Shopify server file encounters the same missing runtime-module declaration, with no other storefront type errors reported. The image assets were visually inspected and source-level shopping behavior was reviewed. The cloud browser currently blocks the running local preview with ERR_BLOCKED_BY_CLIENT, so a fresh visual/browser interaction review and new screenshots could not be completed for this revision. This limitation is not represented as a passed browser test.
+The native Next.js production build and its TypeScript checks pass, with `.next` output and all storefront/API routes present. The separate Worker build also remains available. Shopify’s supplied validator accepted all six catalog/cart operations. Seven focused tests passed for request security, product mapping, stock/currency handling, error privacy, and cart-secret protection. Live merchant-store and checkout verification remain pending authentication. Direct assertions passed for sample subscription pricing, line totals and invalid persisted-cart data. Checking the entire legacy Worker/tooling tree with the original root TypeScript configuration still requires its Cloudflare runtime declarations. The image assets were visually inspected and source-level shopping behavior was reviewed. The cloud browser previously blocked the local preview with ERR_BLOCKED_BY_CLIENT; no new visual/browser test is claimed for this hosting compatibility fix.

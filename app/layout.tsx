@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "IQON — Supplements & Skincare",
   description: "Explore the IQON collection. A considered approach to supplements, skincare and the everyday.",

@@ -12,7 +12,7 @@ Provide the merchant's actual `handle.myshopify.com` or Shopify admin URL. Compl
 | `SHOPIFY_STOREFRONT_PRIVATE_TOKEN` | The private Storefront token from the Headless channel; store as a secret |
 | `SHOPIFY_API_VERSION` | `2026-07` |
 
-The website never needs an Admin API token. The private Storefront token must remain on the server. Never put token values in Git, browser code, a screenshot, or a public issue. Local `.env` is ignored; `.env.example` contains names only.
+The website never needs an Admin API token. The private Storefront token must remain on the server. Never put token values in Git, browser code, a screenshot, or a public issue. Local `.env` is ignored; `.env.example` contains names only. On Vercel, configure these in the project's Environment Variables for the appropriate deployment environments, then deploy again. The server reads `process.env`; no `NEXT_PUBLIC_` prefix is used. On the retained Worker target, Node.js environment compatibility exposes the same runtime settings.
 
 ## Product import
 
@@ -31,7 +31,7 @@ The catalog supports paginated products and up to 100 variants per product. Prod
 
 ## Checkout and hosting
 
-Cart writes validate the same-origin request, product/variant membership, availability, quantities, and line ownership. Shopify sets the prices and authoritative cart totals. Full cart IDs stay in HttpOnly, SameSite cookies and are excluded from response bodies. Responses are not publicly cached. Buyer IP is forwarded from Cloudflare's connecting-IP header. Checkout obtains a fresh checkout URL from Shopify; payment and delivery-address entry take place there.
+Cart writes validate the same-origin request, product/variant membership, availability, quantities, and line ownership. Shopify sets the prices and authoritative cart totals. Full cart IDs stay in HttpOnly, SameSite cookies and are excluded from response bodies. Responses are not publicly cached. Buyer IP is forwarded from Vercel's forwarded-IP header on Vercel and Cloudflare's connecting-IP header on the Worker target. Checkout obtains a fresh checkout URL from Shopify; payment and delivery-address entry take place there.
 
 Without a store connection, the site remains an explicitly labelled design preview. Incomplete credentials or Shopify failures show an unavailable state, never a fallback catalog of purchasable sample products.
 
