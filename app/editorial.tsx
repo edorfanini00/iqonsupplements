@@ -15,7 +15,7 @@ export function EverydayNote({skincare=false}:{skincare?:boolean}) {
 
 export function JournalPreview({skincare=false}:{skincare?:boolean}) {
  const articles=skincare?[...journalArticles].sort((a,b)=>Number(b.slug==="a-simple-skincare-routine")-Number(a.slug==="a-simple-skincare-routine")):journalArticles;
- return <section className="journal-preview section-pad"><div className="section-heading"><div><p className="eyebrow">THE IQON JOURNAL</p><h2>A little more understanding.</h2></div><Link className="under-link" href="/journal">All stories<ArrowUpRight size={16}/></Link></div><div className="journal-grid">{articles.map(a=><Link className="journal-card" key={a.slug} href={`/journal/${a.slug}`}><div><img src={a.image} alt={a.imageAlt} width={900} height={675} loading="lazy"/></div><p className="eyebrow">{a.category} <span>{a.readTime}</span></p><h3>{a.title}<ArrowUpRight size={21}/></h3><p>{a.dek}</p></Link>)}</div></section>;
+ return <section className="journal-preview section-pad"><div className="section-heading"><div><p className="eyebrow">LATEST NEWS</p><h2>A little more understanding.</h2></div><Link className="under-link" href="/journal">All stories<ArrowUpRight size={16}/></Link></div><div className="journal-grid">{articles.map(a=><Link className="journal-card" key={a.slug} href={`/journal/${a.slug}`}><div><img src={a.image} alt={a.imageAlt} width={900} height={675} loading="lazy"/></div><p className="eyebrow">{a.category} <span>{a.readTime}</span></p><h3>{a.title}<ArrowUpRight size={21}/></h3><p>{a.dek}</p></Link>)}</div></section>;
 }
 
 /** One continuous photograph, with copy positioned inside its natural negative space. */
