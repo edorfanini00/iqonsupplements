@@ -11,7 +11,7 @@ export type Product = {
 };
 export type StoreCatalog = {mode:"preview"|"live"|"unavailable"; products:Product[]; currency:string};
 
-// Product photography supplied by IQON. Sizes are transcribed from individual
+// Studio images regenerated from supplied IQON packaging. Sizes are transcribed from individual
 // packshots; no price, inventory, formula, or dosage is inferred from an image.
 export const SUPPLEMENT_COLLECTION_IMAGE = "/images/supplements/20_group_all_row.webp";
 export const SUPPLEMENT_HERO_IMAGE = "/images/supplements/22_group_powders_row.webp";
@@ -27,7 +27,7 @@ function supplement(
     campaign: type === "Powder" ? SUPPLEMENT_HERO_IMAGE
       : type === "Capsules" ? asset("21_group_capsules_row") : SUPPLEMENT_COLLECTION_IMAGE,
     images: [...new Set([pack, detail, group])].map((file, i) => ({
-      src: asset(file), alt: i === 0 ? `IQON ${name} packaging`
+      src: i===1 && ["nmn","resveratrol"].includes(id) ? asset(`${id}-detail`) : i===2 && ["nmn","resveratrol"].includes(id) ? "/images/editorial/daily-water.webp" : asset(file), alt: i===2 && ["nmn","resveratrol"].includes(id) ? "A moment of water in an everyday routine" : i === 0 ? `IQON ${name} packaging`
         : i === 1 ? `IQON ${name} product detail` : `IQON collection featuring ${name}`,
     })),
   };

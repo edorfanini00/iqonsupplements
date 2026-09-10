@@ -8,7 +8,9 @@ export function comparisonFor(product:Product, products:Product[]) {
   const preferred = product.category==='skincare'
     ? ['gentle-cleanser','peptide-serum','barrier-cream']
     : ['nmn','resveratrol'].includes(product.id)
-      ? [product.id,product.id==='nmn'?'resveratrol':'nmn','creatine-monohydrate']
+      ? [product.id,product.id==='nmn'?'resveratrol':'nmn']
+      : ['hydrolyzed-collagen-peptides','collagen-peptides-chocolate'].includes(product.id)
+        ? [product.id,product.id==='hydrolyzed-collagen-peptides'?'collagen-peptides-chocolate':'hydrolyzed-collagen-peptides']
       : product.type==='Powder'
         ? [product.id,...['creatine-monohydrate','hydrolyzed-collagen-peptides','collagen-peptides-chocolate','colostrum-powder'].filter(id=>id!==product.id)]
         : product.type==='Capsules'
@@ -22,11 +24,11 @@ export function ProductStory({product:p,products}:{product:Product;products:Prod
   if(!content) return null;
   const comparison=comparisonFor(p,products);
   const photo=p.images?.[1] || {src:p.campaign,alt:`IQON ${p.category} collection`};
-  const landscape=/\/(19_|2[0-5]_)/.test(photo.src)||p.category==='skincare';
+  const landscape=photo.src.endsWith('-detail.webp')||/\/(19_|2[0-5]_)/.test(photo.src)||p.category==='skincare';
   const skincare=p.category==='skincare';
   return <>
     <nav className="pdp-section-nav" aria-label="Product information">
-      <a href="#overview">Overview</a><a href="#product-details">Product details</a><a href="#compare">{skincare?'The routine':'Compare products'}</a><a href="#product-questions">Questions</a>
+      <a href="#overview">Overview</a><a href="#product-details">Product details</a>{content.education&&<a href="#ingredient-science">Ingredient science</a>}<a href="#compare">{skincare?'The routine':'Compare products'}</a><a href="#reviews">Reviews</a><a href="#product-questions">Questions</a>
     </nav>
     <section className="pdp-story section-pad" aria-labelledby="product-story-title">
       <div className={`pdp-story-photo ${landscape?'landscape':''}`}><img src={photo.src} alt={photo.alt} loading="lazy" width={1200} height={1400}/></div>
@@ -36,6 +38,7 @@ export function ProductStory({product:p,products}:{product:Product;products:Prod
       <div className="pdp-section-heading"><div><p className="eyebrow">AT A GLANCE</p><h2 id="product-details-title">The product details.</h2></div><p>{skincare?'The format and proposed routine step for this skincare concept.':'The name, format and amount in the pack, in one place.'}</p></div>
       <div className="pdp-facts-grid">{content.facts.map(f=><div className="pdp-fact" key={f.label}><span>{f.label}</span><strong>{f.value}</strong><p>{f.detail}</p></div>)}</div>
     </section>
+    {content.education&&<section className="ingredient-education section-pad" id="ingredient-science" aria-labelledby="ingredient-science-title"><div><p className="eyebrow">{content.education.eyebrow}</p><h2 id="ingredient-science-title">{content.education.title}</h2></div><div><p>{content.education.body}</p><p className="evidence-context">{content.education.scope}</p><div className="ingredient-sources">{content.education.sources.map(source=><a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">{source.label}<ArrowUpRight size={14}/></a>)}</div></div></section>}
     {comparison.length>1&&<section id="compare" className="pdp-comparison section-pad" aria-labelledby="compare-title">
       <div className="pdp-section-heading"><div><p className="eyebrow">{skincare?'CLEANSE · TREAT · MOISTURIZE':'FIND YOUR FORMAT'}</p><h2 id="compare-title">{skincare?'Three steps, side by side.':'See how they compare.'}</h2></div><p>{skincare?'Explore the place of each product in our upcoming skincare routine.':'Different products, clearly identified. Compare the format and pack size before you choose.'}</p></div>
       <div className="pdp-table-wrap" role="region" aria-label="Product comparison table" tabIndex={0}><table className="pdp-compare-table"><caption>{skincare?'IQON skincare routine':'IQON product formats and pack sizes'}</caption><thead><tr><th scope="col">{skincare?'Your routine':'The collection'}</th>{comparison.map(q=><th key={q.id} scope="col" className={q.id===p.id?'current':''}><small>{q.id===p.id?'You’re viewing':'Explore IQON'}</small><Link href={`/products/${q.id}`}><img src={q.image} alt={q.name} width={250} height={300} loading="lazy"/>{q.name}</Link></th>)}</tr></thead><tbody>
