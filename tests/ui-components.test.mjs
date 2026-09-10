@@ -57,6 +57,16 @@ test("forwards progress semantics to the primitive", async () => {
   assert.match(html, /data-state="loading"/);
 });
 
+test("labels the interactive slider thumb for assistive technology", async () => {
+  const { Slider } = await vite.ssrLoadModule("/components/ui/slider.tsx");
+  const html = renderToStaticMarkup(React.createElement(Slider, {
+    value: [50], "aria-label": "Before and after photo comparison",
+  }));
+  const thumb = html.match(/<[^>]+role="slider"[^>]*>/)?.[0];
+  assert.ok(thumb);
+  assert.match(thumb, /aria-label="Before and after photo comparison"/);
+});
+
 test("emits chart themes for the starter's media dark mode", async () => {
   const { ChartStyle } = await vite.ssrLoadModule("/components/ui/chart.tsx");
   const html = renderToStaticMarkup(
