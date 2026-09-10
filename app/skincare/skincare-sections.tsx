@@ -42,7 +42,7 @@ export function SkinResults({results, products,designPreview=false}:{results:Ski
   const product=products.find(p=>p.id===result.productId);
   return <section className={`skin-results ${isSample?'skin-results-sample':''}`} id="skincare-results" aria-labelledby={headingId}>
     <div className="skin-results-gallery">
-      <div className="skin-comparison" data-inset={isSample&&result.id==="design-sample-texture"}>
+      <div className="skin-comparison">
         <div className="skin-comparison-layer"><img src={result.after.src} alt={result.after.alt} width={1200} height={1200} loading="lazy"/></div>
         <div className="skin-comparison-layer skin-comparison-before" style={{clipPath:`inset(0 ${100-reveal}% 0 0)`}}><img src={result.before.src} alt={result.before.alt} width={1200} height={1200} loading="lazy"/></div>
         <span className="skin-comparison-label label-before">Before</span><span className="skin-comparison-label label-after">After{!isSample&&<span className="skin-comparison-brand">IQON</span>}</span>
@@ -50,7 +50,7 @@ export function SkinResults({results, products,designPreview=false}:{results:Ski
         <Slider className="skin-comparison-control" value={[reveal]} min={0} max={100} step={1} onValueChange={value=>setReveal(value[0])} role="group" aria-label="Before and after photo comparison" aria-describedby={helpId}/>
         {product&&<Link className="skin-result-product" href={`/products/${product.id}`}><img src={product.image} alt="" width={44} height={56}/><span>{isSample?'Explore the product':'Results from'}<strong>{product.name}</strong></span><ArrowRight size={18}/></Link>}
       </div>
-      {entries.length>1&&<div className="skin-result-thumbnails" role="group" aria-label={isSample?"Choose a skin detail":"Choose a skin result"}>{entries.map((item,index)=><button key={item.id} data-inset={isSample&&item.id==="design-sample-texture"} aria-label={item.label} aria-pressed={index===selected} onClick={()=>{setSelected(index);setReveal(50);}}><img src={item.after.src} alt="" width={80} height={80} loading="lazy"/><img className="skin-thumbnail-before" src={item.before.src} alt="" width={80} height={80} loading="lazy"/><span aria-hidden="true"/></button>)}</div>}
+      {entries.length>1&&<div className="skin-result-thumbnails" role="group" aria-label={isSample?"Choose a skin detail":"Choose a skin result"}>{entries.map((item,index)=><button key={item.id} aria-label={item.label} aria-pressed={index===selected} onClick={()=>{setSelected(index);setReveal(50);}}><img src={item.after.src} alt="" width={80} height={80} loading="lazy"/><img className="skin-thumbnail-before" src={item.before.src} alt="" width={80} height={80} loading="lazy"/><span aria-hidden="true"/></button>)}</div>}
       <p className="sr-only" id={helpId}>Drag to compare. You can also use the arrow keys.</p>
       {isSample&&<p className="skin-comparison-caption">{result.methodology}</p>}
     </div>
@@ -103,9 +103,9 @@ export function SkincareReviews({reviews,products,designPreview=false}:{reviews:
       </div>
       <div className="skin-review-controls"><Link className="button button-outline" href="/reviews?collection=skincare">Read all reviews</Link></div>
     </>:<div className="skin-community-intro" tabIndex={0} role="region" aria-label="IQON skincare brand stories">
-      <figure><img src="/images/editorial/skincare-hands-v7.webp" alt="IQON brand photography of Peptide Serum as part of a daily skincare ritual" width={1792} height={2400} loading="lazy"/><figcaption>The daily ritual</figcaption></figure>
+      <figure><img src="/images/editorial/community-serum-iqon-v11.webp" alt="Hands holding IQON Peptide Serum as part of a daily skincare ritual" width={1086} height={1448} loading="lazy"/><figcaption>The daily ritual</figcaption></figure>
       <div className="skin-community-note"><p className="eyebrow">CUSTOMER REVIEWS</p><h3>Every skin.<br/>A story to tell.</h3><p>Customer reviews will appear here after launch.</p><Link className="under-link" href="/reviews?collection=skincare">Visit customer reviews<ArrowUpRight size={15}/></Link></div>
-      <figure><img src="/images/editorial/skincare-campaign-mobile.webp" alt="IQON brand photography of Peptide Serum and Barrier Cream" width={1792} height={2400} loading="lazy"/><figcaption>The everyday essentials</figcaption></figure>
+      <figure><img src="/images/editorial/community-cream-iqon-v11.webp" alt="IQON Barrier Cream with its silver lid and a cream texture detail" width={1086} height={1448} loading="lazy"/><figcaption>The everyday essentials</figcaption></figure>
     </div>}
   </section>;
 }

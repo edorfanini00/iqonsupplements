@@ -57,7 +57,6 @@
 .skin-comparison { position:relative; aspect-ratio:1; overflow:hidden; border-radius:3px; background:#bf8f79; isolation:isolate; }
 .skin-comparison-layer { position:absolute; inset:0; background:#b98c77; }
 .skin-comparison-layer>img { width:100%; height:100%; object-fit:cover; }
-.skin-comparison[data-inset="true"] .skin-comparison-layer>img { position:absolute; inset:15%; width:70%; height:70%; border-radius:18px; }
 .skin-comparison-label { position:absolute; z-index:3; top:24px; padding:6px 13px; border-radius:20px; background:#fff; color:#263037; font-size:12px; line-height:1.25; letter-spacing:.06em; text-transform:uppercase; pointer-events:none; }
 .label-before { left:24px; }.label-after { right:24px; display:flex; align-items:center; gap:8px; }.skin-comparison-brand { font-family:var(--serif); letter-spacing:-.04em; padding:2px 7px; background:#263037; border-radius:12px; color:#fff; }
 .skin-comparison-divider { position:absolute; top:0; bottom:0; width:1px; background:#fff; z-index:2; pointer-events:none; }
@@ -89,8 +88,6 @@
 .skin-result-metrics p { font-size:14px; line-height:1.5; color:#747b7e; margin-top:9px; }
 .skin-result-methodology { font-size:12px; line-height:1.6; color:#718087; margin:24px 0 0; }
 .skin-result-source .under-link { font-size:12px; margin-top:10px; }
-.skin-result-thumbnails button[data-inset="true"] { background:#b98c77; }
-.skin-result-thumbnails button[data-inset="true"] img { inset:15%; width:70%; height:70%; border-radius:3px; }
 @media(min-width:761px) and (max-width:1100px) {
  .skin-results { gap:5%; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); }
  .skin-result-thumbnails button { width:52px; height:52px; }
