@@ -40,23 +40,23 @@ export function SkinResults({results, products,designPreview=false}:{results:Ski
   const result=entries[selected]||entries[0];
   if(!result)return null;
   const product=products.find(p=>p.id===result.productId);
-  return <section className={`skin-results section-pad ${isSample?'skin-results-sample':''}`} id="skincare-results" aria-labelledby={headingId}>
+  return <section className={`skin-results ${isSample?'skin-results-sample':''}`} id="skincare-results" aria-labelledby={headingId}>
     <div className="skin-results-gallery">
       <div className="skin-comparison">
         <img src={result.after.src} alt={result.after.alt} width={1200} height={1200} loading="lazy"/>
         <img className="skin-comparison-before" src={result.before.src} alt={result.before.alt} width={1200} height={1200} loading="lazy" style={{clipPath:`inset(0 ${100-reveal}% 0 0)`}}/>
-        <span className="skin-comparison-label label-before">Before</span><span className="skin-comparison-label label-after">After</span>
+        <span className="skin-comparison-label label-before">Before</span><span className="skin-comparison-label label-after">After{!isSample&&<span className="skin-comparison-brand">IQON</span>}</span>
         <span className="skin-comparison-divider" style={{left:`${reveal}%`}} aria-hidden="true"><span><ChevronsLeftRight size={22}/></span></span>
         <Slider className="skin-comparison-control" value={[reveal]} min={0} max={100} step={1} onValueChange={value=>setReveal(value[0])} role="group" aria-label="Before and after photo comparison" aria-describedby={helpId}/>
-        {isSample&&<span className="skin-comparison-sample-label">Layout sample · identical photos</span>}
+        {isSample&&<span className="skin-comparison-sample-label">AI-GENERATED ILLUSTRATION</span>}
         {product&&<Link className="skin-result-product" href={`/products/${product.id}`}><img src={product.image} alt="" width={44} height={56}/><span>{isSample?'Explore the product':'Results from'}<strong>{product.name}</strong></span><ArrowRight size={18}/></Link>}
       </div>
-      {entries.length>1&&<div className="skin-result-thumbnails" role="group" aria-label="Choose a skin result">{entries.map((item,index)=><button key={item.id} aria-label={item.label} aria-pressed={index===selected} onClick={()=>{setSelected(index);setReveal(50);}}><img src={item.after.src} alt="" width={80} height={80} loading="lazy"/><span aria-hidden="true"/></button>)}</div>}
+      {entries.length>1&&<div className="skin-result-thumbnails" role="group" aria-label={isSample?"Choose a skin detail":"Choose a skin result"}>{entries.map((item,index)=><button key={item.id} aria-label={item.label} aria-pressed={index===selected} onClick={()=>{setSelected(index);setReveal(50);}}><img src={item.after.src} alt="" width={80} height={80} loading="lazy"/><img className="skin-thumbnail-before" src={item.before.src} alt="" width={80} height={80} loading="lazy"/><span aria-hidden="true"/></button>)}</div>}
       <p className="skin-comparison-help" id={helpId}>Drag to compare. You can also use the arrow keys.</p>
     </div>
     <div className="skin-results-copy">
-      <div className="skin-results-summary"><p className="eyebrow">{isSample?'RESULTS · DESIGN PREVIEW':'PRODUCT RESULTS'}</p><h2 id={headingId}>{result.headline}</h2><p className="skin-result-timeframe">{result.timeframe}</p></div>
-      {result.metrics.length>0&&<div className="skin-results-measurements"><p className="eyebrow">{isSample?'RESULTS TO BE ADDED':'REPORTED RESULTS'}</p><div className="skin-result-metrics">{result.metrics.map(metric=><div key={metric.description}><strong>{metric.value}</strong><p>{metric.description}</p></div>)}</div></div>}
+      <div className="skin-results-summary"><p className="eyebrow">{isSample?'SKIN IN DETAIL':'PRODUCT RESULTS'}</p><h2 id={headingId}>{result.headline}</h2><p className="skin-result-timeframe">{result.timeframe}</p></div>
+      {result.metrics.length>0&&<div className="skin-results-measurements"><p className="eyebrow">{isSample?'EXPLORE YOUR SKIN':'REPORTED RESULTS'}</p><div className="skin-result-metrics">{result.metrics.map(metric=><div key={metric.description}><strong>{metric.value}</strong><p>{metric.description}</p></div>)}</div></div>}
       <div className="skin-result-source"><p className="skin-result-methodology">{result.methodology}</p>{result.source.url&&<a className="under-link" href={result.source.url} target="_blank" rel="noopener noreferrer">{result.source.label}<ArrowUpRight size={14}/></a>}</div>
     </div>
   </section>;

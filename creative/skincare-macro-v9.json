@@ -1,0 +1,30 @@
+{
+  "provider": "Higgsfield",
+  "model": "FLUX.2 Max",
+  "resolution": "2k",
+  "purpose": "Clearly labeled synthetic skin illustrations for the existing development/Vercel preview comparison, not IQON clinical evidence.",
+  "processing": "Native diptychs split into before/after WebP files at quality 90. Fair cheek halves swapped to put drier state first; 8px inner seam removed from tone and eye pairs. No retouching.",
+  "limitations": "Generated pairs have approximate alignment, with some shifts in hairs/freckles and eye anatomy. They are not documentation of a treatment response.",
+  "assets": [
+    {
+      "detail": "texture",
+      "before": "/images/editorial/skin-detail-texture-before.webp",
+      "after": "/images/editorial/skin-detail-texture-after.webp"
+    },
+    {
+      "detail": "cheek",
+      "before": "/images/editorial/skin-detail-cheek-before.webp",
+      "after": "/images/editorial/skin-detail-cheek-after.webp"
+    },
+    {
+      "detail": "tone",
+      "before": "/images/editorial/skin-detail-tone-before.webp",
+      "after": "/images/editorial/skin-detail-tone-after.webp"
+    },
+    {
+      "detail": "eye",
+      "before": "/images/editorial/skin-detail-eye-before.webp",
+      "after": "/images/editorial/skin-detail-eye-after.webp"
+    }
+  ]
+}

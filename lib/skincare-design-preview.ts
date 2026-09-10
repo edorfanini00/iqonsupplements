@@ -3,15 +3,26 @@
 import type { SkinResult } from "./skincare-results";
 
 const portrait="/images/editorial/skincare-touch-v7.webp";
-export const sampleSkinResults: SkinResult[]=["Skin texture","Skin tone","Radiance","Skin feel"].map((label,index)=>({
- id:`design-sample-${index}`,productId:"barrier-cream",label:`${label} layout sample`,
- before:{src:portrait,alt:"Design sample: unchanged IQON editorial portrait"},
- after:{src:portrait,alt:"Design sample: the same unchanged portrait, not a treatment result"},
- headline:"The results. Up close.",timeframe:"Study timeframe and baseline to be supplied.",
- methodology:"Design preview only. The same editorial photograph appears on both sides. IQON study results and before-and-after photographs have not been supplied.",
- source:{label:"",url:""},
- metrics:["Skin texture","Skin tone","Radiance","Skin feel"].map(description=>({value:"—",description})),
- approvedForPublication:false,photographyConsentConfirmed:false,
+const skinDetails = [
+  { id: "texture", label: "Skin texture", productId: "barrier-cream", headline: "Skin texture. In closer detail.", detail: "An illustrated look at dry and moisturized skin.", area: "macro forearm skin" },
+  { id: "cheek", label: "Cheek detail", productId: "barrier-cream", headline: "The small details of skin.", detail: "Explore the surface, from fine texture to natural pores.", area: "fair cheek skin" },
+  { id: "tone", label: "Skin tone", productId: "peptide-serum", headline: "Every tone. Every detail.", detail: "A close-up exploration of skin tone and surface texture.", area: "warm-toned cheek skin" },
+  { id: "eye", label: "Eye-area detail", productId: "peptide-serum", headline: "A closer look at fine lines.", detail: "Explore the delicate texture around the eye.", area: "the outer eye area" },
+];
+export const sampleSkinResults: SkinResult[] = skinDetails.map(item => ({
+  id: `design-sample-${item.id}`, productId: item.productId, label: item.label,
+  before: { src: `/images/editorial/skin-detail-${item.id}-before.webp`, alt: `AI-generated illustration of ${item.area}, before state` },
+  after: { src: `/images/editorial/skin-detail-${item.id}-after.webp`, alt: `AI-generated illustration of ${item.area}, simulated after state` },
+  headline: item.headline, timeframe: item.detail,
+  methodology: "AI-generated skin illustrations. Not clinical photographs or evidence of IQON product results.",
+  source: { label: "", url: "" },
+  metrics: [
+    { value: "Texture", description: "The fine detail of the skin’s surface" },
+    { value: "Tone", description: "Natural variations in skin color" },
+    { value: "Radiance", description: "The way light meets the skin" },
+    { value: "Fine lines", description: "The delicate contours of the skin" },
+  ],
+  approvedForPublication: false, photographyConsentConfirmed: false,
 }));
 
 export type SampleReviewCard={id:string;title?:string;image?:string;alt?:string};
