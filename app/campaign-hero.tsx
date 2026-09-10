@@ -5,15 +5,15 @@ import type { Product } from "@/lib/catalog";
 /** Shared dimensions keep the two departments steady when switching. */
 export function CampaignHero({ skincare = false, featured }: { skincare?: boolean; featured?: Product }) {
   return <section className={`campaign-hero ${skincare ? "campaign-hero-skin" : ""}`}>
-    <div className="campaign-image"><img
+    <picture className="campaign-image">{!skincare&&<source media="(max-width:760px)" srcSet="/images/editorial/iqon-coastal-mobile.webp"/>}<img
       src={skincare ? "/images/editorial/iqon-skincare-hero.webp" : "/images/editorial/iqon-coastal-hero.webp"}
       alt={skincare ? "An everyday moment of skincare in soft window light" : "A shared moment beside the ocean after a run"}
       width={1536} height={1024} fetchPriority="high" />
-    </div>
+    </picture>
     <div className="campaign-copy">
       <p className="eyebrow">IQON / {skincare ? "SKINCARE" : "DAILY ESSENTIALS"}</p>
       <h1>{skincare ? <>A little care.<br />A lot of you.</> : <>For the life<br />you want to live.</>}</h1>
-      <p>{skincare ? "Cleanse. Treat. Moisturize. Find a few familiar steps to make your own." : "Thoughtfully chosen supplements. Everyday rituals. More room for what matters to you."}</p>
+      <p>{skincare ? "Cleanse. Treat. Moisturize. A routine that’s yours." : "Everyday essentials, made to fit your life."}</p>
       <Link href={`/collections/${skincare ? "skincare" : "supplements"}`} className="button button-light">Explore {skincare ? "skincare" : "supplements"}<ArrowRight size={18}/></Link>
     </div>
     {featured && <Link className="campaign-feature" href={`/products/${featured.id}`}>

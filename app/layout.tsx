@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./experience.css";
 import "./refinement.css";
+import "./commerce.css";
 import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
 export const dynamic = "force-dynamic";
