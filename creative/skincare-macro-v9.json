@@ -1,10 +1,10 @@
 {
   "provider": "Higgsfield",
-  "model": "FLUX.2 Max",
+  "model": "Nano Banana Pro",
   "resolution": "2k",
-  "purpose": "Clearly labeled synthetic skin illustrations for the existing development/Vercel preview comparison, not IQON clinical evidence.",
-  "processing": "Native diptychs split into before/after WebP files at quality 90. Fair cheek halves swapped to put drier state first; 8px inner seam removed from tone and eye pairs. No retouching.",
-  "limitations": "Generated pairs have approximate alignment, with some shifts in hairs/freckles and eye anatomy. They are not documentation of a treatment response.",
+  "purpose": "Illustrative hair-free skin details for the development/Vercel preview comparison, not IQON clinical evidence.",
+  "processing": "Four original diptychs; three refined through Higgsfield to remove fine hair. Central skin crops exclude remaining outer-edge hair. WebP quality 88; no scripted retouching. The first pair uses a CSS terracotta surround.",
+  "limitations": "Synthetic skin variations; not documentation of a treatment response.",
   "assets": [
     {
       "detail": "texture",
@@ -26,5 +26,6 @@
       "before": "/images/editorial/skin-detail-eye-before.webp",
       "after": "/images/editorial/skin-detail-eye-after.webp"
     }
-  ]
+  ],
+  "revision": "v10"
 }

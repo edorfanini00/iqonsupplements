@@ -74,9 +74,9 @@ test("keeps skincare layout samples separate from publishable customer evidence"
   const publicReviews=render(SkincareReviews,{reviews:[],products:[]});
   assert.doesNotMatch(publicReviews,/skin-review-stars|Design sample|Verified buyer/);
   const draftResults=render(SkinResults,{results:[],products:[],designPreview:true});
-  assert.match(draftResults,/AI-GENERATED ILLUSTRATION/);
-  assert.match(draftResults,/EXPLORE YOUR SKIN/);
-  assert.match(draftResults,/Not clinical photographs or evidence of IQON product results/);
+  assert.doesNotMatch(draftResults,/AI-GENERATED ILLUSTRATION|skin-comparison-sample-label/);
+  assert.match(draftResults,/A CLOSER LOOK/);
+  assert.match(draftResults,/Illustrative comparison. Not measured product results/);
   const { sampleSkinResults } = await vite.ssrLoadModule("/lib/skincare-design-preview.ts");
   assert.equal(new Set(sampleSkinResults.flatMap(result => [result.before.src, result.after.src])).size, 8);
   for (const result of sampleSkinResults) {

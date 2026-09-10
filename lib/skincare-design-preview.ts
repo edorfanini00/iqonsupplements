@@ -4,23 +4,23 @@ import type { SkinResult } from "./skincare-results";
 
 const portrait="/images/editorial/skincare-touch-v7.webp";
 const skinDetails = [
-  { id: "texture", label: "Skin texture", productId: "barrier-cream", headline: "Skin texture. In closer detail.", detail: "An illustrated look at dry and moisturized skin.", area: "macro forearm skin" },
-  { id: "cheek", label: "Cheek detail", productId: "barrier-cream", headline: "The small details of skin.", detail: "Explore the surface, from fine texture to natural pores.", area: "fair cheek skin" },
-  { id: "tone", label: "Skin tone", productId: "peptide-serum", headline: "Every tone. Every detail.", detail: "A close-up exploration of skin tone and surface texture.", area: "warm-toned cheek skin" },
-  { id: "eye", label: "Eye-area detail", productId: "peptide-serum", headline: "A closer look at fine lines.", detail: "Explore the delicate texture around the eye.", area: "the outer eye area" },
+  { id: "texture", label: "Skin texture", productId: "barrier-cream", headline: "Your skin. In its best light.", detail: "Texture, tone and the small details that make your skin yours.", area: "smooth cheek skin" },
+  { id: "cheek", label: "Cheek detail", productId: "barrier-cream", headline: "A little care. A softer touch.", detail: "Make space for a simple ritual, morning and evening.", area: "fair cheek skin" },
+  { id: "tone", label: "Skin tone", productId: "peptide-serum", headline: "Every tone. Naturally yours.", detail: "A closer look at your skin’s warmth and natural luminosity.", area: "warm-toned cheek skin" },
+  { id: "eye", label: "Fine-line detail", productId: "peptide-serum", headline: "Care for the finer details.", detail: "A moment for the delicate texture that makes skin unique.", area: "hair-free temple skin" },
 ];
 export const sampleSkinResults: SkinResult[] = skinDetails.map(item => ({
   id: `design-sample-${item.id}`, productId: item.productId, label: item.label,
-  before: { src: `/images/editorial/skin-detail-${item.id}-before.webp`, alt: `AI-generated illustration of ${item.area}, before state` },
-  after: { src: `/images/editorial/skin-detail-${item.id}-after.webp`, alt: `AI-generated illustration of ${item.area}, simulated after state` },
+  before: { src: `/images/editorial/skin-detail-${item.id}-before.webp`, alt: `Illustrative ${item.area}, before state` },
+  after: { src: `/images/editorial/skin-detail-${item.id}-after.webp`, alt: `Illustrative ${item.area}, simulated after state` },
   headline: item.headline, timeframe: item.detail,
-  methodology: "AI-generated skin illustrations. Not clinical photographs or evidence of IQON product results.",
+  methodology: "Illustrative comparison. Not measured product results.",
   source: { label: "", url: "" },
   metrics: [
-    { value: "Texture", description: "The fine detail of the skin’s surface" },
-    { value: "Tone", description: "Natural variations in skin color" },
-    { value: "Radiance", description: "The way light meets the skin" },
-    { value: "Fine lines", description: "The delicate contours of the skin" },
+    { value: "Texture", description: "A smooth, soft-looking surface" },
+    { value: "Tone", description: "An even-looking complexion" },
+    { value: "Radiance", description: "A fresh, luminous appearance" },
+    { value: "Hydration", description: "A supple, dewy-looking finish" },
   ],
   approvedForPublication: false, photographyConsentConfirmed: false,
 }));
