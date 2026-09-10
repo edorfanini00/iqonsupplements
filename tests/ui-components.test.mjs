@@ -90,6 +90,21 @@ test("keeps skincare layout samples separate from publishable customer evidence"
   assert.doesNotMatch(draftReviews,/Verified buyer|<video/);
 });
 
+test("uses the shared community carousel with supplement-specific content", async () => {
+  const { CommunityReviews } = await vite.ssrLoadModule("/app/community-reviews.tsx");
+  const props = { reviews:[], products:[], category:"supplements" };
+  const preview = renderToStaticMarkup(React.createElement(CommunityReviews, { ...props, designPreview:true }));
+  assert.equal((preview.match(/class="skin-review-card/g)||[]).length, 8);
+  assert.match(preview, /Previous supplements reviews/);
+  assert.match(preview, /href="\/reviews\?collection=supplements"/);
+  assert.match(preview, /IQON Creatine Monohydrate/);
+  assert.match(preview, /Brand copy · not a customer review/);
+  assert.doesNotMatch(preview, /Peptide Serum|Barrier Cream|community-serum|community-cream/);
+  const published = renderToStaticMarkup(React.createElement(CommunityReviews, props));
+  assert.match(published, /Every routine/);
+  assert.doesNotMatch(published, /skin-review-stars|Design sample|Verified buyer/);
+});
+
 test("keeps product rating samples out of published customer reviews", async () => {
   const { ProductReviewLink, CustomerReviews } = await vite.ssrLoadModule("/app/customer-reviews.tsx");
   const { products } = await vite.ssrLoadModule("/lib/catalog.ts");

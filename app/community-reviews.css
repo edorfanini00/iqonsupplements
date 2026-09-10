@@ -1,0 +1,69 @@
+.skin-community { padding:0 0 86px; }
+.skin-community-heading { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:12px; padding:0 24px; margin-bottom:42px; }
+.skin-community-heading h2 { font-family:Inter,Arial,sans-serif; font-size:14px; line-height:1.4; font-weight:500; letter-spacing:-.01em; }
+.skin-community-heading>span:last-child:not(.skin-review-stars) { font-size:12px; color:#667278; }
+.skin-review-preview-note { margin:-25px 24px 32px; text-align:center; font-size:12px; line-height:1.6; color:#687278; }
+.skin-review-stars { display:inline-flex; gap:3px; color:#303637; }
+.skin-review-star { position:relative; display:block; width:14px; height:14px; }
+.skin-review-star>span { position:absolute; inset:0 auto 0 0; overflow:hidden; }
+.skin-review-star svg { max-width:none; }
+.skin-review-carousel { position:relative; }
+.skin-review-rail { display:flex; gap:22px; overflow-x:auto; overscroll-behavior-inline:contain; scroll-snap-type:x proximity; scrollbar-width:none; padding:0 24px; }
+.skin-review-rail::-webkit-scrollbar { display:none; }
+.skin-review-card { flex:0 0 282px; min-width:0; scroll-snap-align:center; }
+.skin-review-card.skin-review-with-media { flex-basis:232px; }
+.skin-review-quote { min-height:346px; border-radius:10px; background:#f2f3ed; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px 22px; }
+.skin-review-quote>.skin-review-stars { margin-bottom:20px; }
+.skin-review-quote blockquote { font-family:var(--serif); font-size:34px; line-height:1.06; letter-spacing:-.035em; margin:0; overflow-wrap:break-word; }
+.skin-review-quote blockquote::before { content:'“'; }.skin-review-quote blockquote::after { content:'”'; }
+.skin-review-media { height:346px; overflow:hidden; background:#e5e9eb; border-radius:10px; }
+.skin-review-media img,.skin-review-media video { width:100%; height:100%; object-fit:cover; }
+.skin-review-card footer { text-align:center; display:flex; flex-direction:column; align-items:center; gap:3px; color:#7a7e7c; font-size:12px; line-height:1.45; }
+.skin-review-card>footer { padding:9px 4px 0; }
+.skin-review-quote footer { margin-top:22px; }
+.skin-review-card footer>strong { color:#303637; font-size:12px; font-weight:500; letter-spacing:.055em; text-transform:uppercase; }
+.skin-review-card footer>span { font-size:11px; letter-spacing:.035em; text-transform:uppercase; display:flex; align-items:center; gap:5px; }
+.skin-review-product { display:flex; justify-content:center; align-items:center; gap:5px; color:#647178; font-size:12px; padding:7px 4px 0; }
+.skin-review-arrows { position:absolute; top:173px; left:16%; right:16%; display:flex; justify-content:space-between; pointer-events:none; transform:translateY(-50%); }
+.skin-review-arrows>button { width:46px; height:46px; border:1px solid #818981; display:grid; place-items:center; border-radius:3px; background:#fffef9f5; pointer-events:auto; color:#464d49; }
+.skin-review-arrows>button:disabled { visibility:hidden; }
+.skin-review-controls { display:flex; justify-content:center; margin:30px 24px 0; }
+.skin-review-controls>.button { justify-content:center; min-height:44px; min-width:250px; font-size:12px!important; font-weight:500; letter-spacing:.055em; text-transform:uppercase; border-color:#646b66; border-radius:3px; }
+.skin-community-intro { display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:20px; padding:0 var(--space-gutter); align-items:stretch; }
+.skin-community-intro figure { margin:0; min-width:0; }
+.skin-community-intro figure>img { width:100%; aspect-ratio:4/4.5; object-fit:cover; border-radius:8px; }
+.skin-community-intro figcaption { text-align:center; font-size:11px; color:#758087; margin-top:13px; }
+.skin-community-note { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:#eef1ee; border-radius:8px; padding:35px 24px; margin-bottom:28px; }
+.skin-community-note .eyebrow { font-size:11px; margin-bottom:28px; color:#647178; }
+.skin-community-note h3 { font-family:var(--serif); font-size:clamp(28px,2.8vw,42px); letter-spacing:-.045em; line-height:1.1; font-weight:400; }
+.skin-community-note>p:not(.eyebrow) { font-size:13px; line-height:1.7; color:#637078; margin:24px 0; }
+.skin-community-note .under-link { font-size:12px; gap:15px; }
+.supplement-community .skin-review-card.skin-review-with-media { flex-basis:277px; }
+@media(max-width:760px) {
+  .skin-community { padding-bottom:54px; }
+  .skin-community-heading { gap:9px; margin-bottom:26px; }
+  .skin-community-heading h2 { font-size:14px; }
+  .skin-community-heading>span:last-child:not(.skin-review-stars) { flex-basis:100%; text-align:center; }
+  .skin-review-preview-note { margin:-12px 25px 23px; font-size:12px; }
+  .skin-review-rail { gap:14px; padding:0 22px; scroll-snap-type:x mandatory; }
+  .skin-review-card,.skin-review-card.skin-review-with-media { flex-basis:68vw; }
+  .skin-review-quote { min-height:330px; padding:26px 20px; }
+  .skin-review-media { height:330px; }
+  .skin-review-quote blockquote { font-size:30px; }
+  .skin-review-quote footer { margin-top:23px; }
+  .skin-review-card footer>span { font-size:10px; }
+  .skin-review-arrows { position:static; transform:none; justify-content:center; gap:14px; margin-top:22px; }
+  .skin-review-arrows>button { width:44px; height:44px; }
+  .skin-review-arrows>button:disabled { visibility:visible; }
+  .skin-review-controls { margin-top:18px; }
+  .skin-review-controls>.button { min-width:230px; font-size:11px!important; }
+  .skin-community-intro { display:grid; grid-auto-flow:column; grid-auto-columns:68vw; grid-template-columns:none; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; gap:14px; padding:0 22px; }
+  .skin-community-intro>* { scroll-snap-align:center; }
+  .skin-community-intro figure>img { height:330px; aspect-ratio:auto; }
+  .skin-community-note { height:330px; padding:25px 19px; }
+  .skin-community-note .eyebrow { margin-bottom:22px; font-size:10px; }
+  .skin-community-note h3 { font-size:30px; }
+  .skin-community-note>p:not(.eyebrow) { font-size:12px; margin:21px 0; }
+  .skin-community-note .under-link { font-size:11px; gap:8px; }
+  .supplement-community .skin-review-card.skin-review-with-media { flex-basis:68vw; }
+}

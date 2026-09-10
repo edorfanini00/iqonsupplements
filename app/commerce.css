@@ -464,3 +464,12 @@ body { background:#fafbfb; }
  .knowledge-facts strong { font-size:16px; }
  .knowledge-accordion [data-slot='accordion-trigger'] { font-size:15px; line-height:1.4; }
 }
+
+/* Supplement stories share the campaign's typography and full-frame photography. */
+.iqon-home .human-story-copy h2 { font-family:var(--display); font-size:clamp(29px,2.6vw,42px); line-height:1.16; font-weight:400; letter-spacing:-.025em; }
+.iqon-home .human-story-copy h2>span { color:#d1d8dc; }
+.product-campaign-supplements { aspect-ratio:3; min-height:0; }
+@media(max-width:760px) {
+ .product-campaign-supplements { aspect-ratio:3/4; height:auto; min-height:0; }
+ .iqon-home .human-story-copy h2 { font-size:29px; }
+}
