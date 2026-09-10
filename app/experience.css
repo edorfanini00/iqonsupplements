@@ -127,7 +127,7 @@ body{background:#fcfdfd}
 .gallery-main,.supplied-product-detail .gallery-main{aspect-ratio:4/5;border-radius:6px;min-width:0;background:#f4f5f5}
 .supplied-product-detail .gallery-main>img[src^='/images/supplements/']{padding:0;background:#f4f5f5}
 .gallery-thumbs{margin-top:20px!important;gap:12px!important}
-.gallery-thumbs button,.supplied-product-detail .gallery-thumbs button{width:74px;height:90px;border-radius:4px;overflow:hidden}
+.gallery-thumbs button,.supplied-product-detail .gallery-thumbs button{width:74px;height:auto;aspect-ratio:4/5;border-radius:4px;overflow:hidden}
 .gallery-note{margin-top:22px;font-size:12px}
 .purchase-panel{position:sticky;top:152px;padding:6px 0 0!important;min-width:0}
 .product-title-row{display:block!important;margin-top:20px!important}

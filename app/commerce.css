@@ -100,7 +100,7 @@ body { background:#fff; color:#252b2e; }
 .product-page .product-detail { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)!important; gap:6%!important; padding-bottom:65px!important; }
 .product-page .product-gallery { position:static; }
 .product-page .gallery-human { display:none; }
-.product-page .gallery-main { aspect-ratio:4/4.6; }
+.product-page .gallery-main { aspect-ratio:4/5; }
 .product-page .gallery-thumbs { margin-top:16px!important; }
 .product-page .gallery-note { display:none; }
 .product-page .purchase-panel { padding-top:0!important; }
@@ -134,7 +134,7 @@ body { background:#fff; color:#252b2e; }
 .visual-comparison .section-heading h2 { font-size:43px; }
 .comparison-cards { display:flex; gap:25px; overflow-x:auto; scroll-snap-type:x mandatory; }
 .comparison-card { flex:1; min-width:0; scroll-snap-align:start; }
-.comparison-card>div { position:relative; aspect-ratio:4/4.5; overflow:hidden; border-radius:4px; }
+.comparison-card>div { position:relative; aspect-ratio:4/5; overflow:hidden; border-radius:4px; }
 .comparison-card img { width:100%; height:100%; object-fit:cover; }
 .comparison-card>div>span { position:absolute; top:15px; left:15px; background:#fff; padding:8px 12px; border-radius:3px; font-size:12px; }
 .comparison-card h3 { font-size:24px; font-weight:500; margin:22px 0 13px; line-height:1.2; }
@@ -240,9 +240,9 @@ body { background:#fff; color:#252b2e; }
  .product-page .product-title-row>span { font-size:16px; margin-top:12px; }
  .product-page .product-size { font-size:16px!important; margin-top:7px!important; }
  .product-page .product-gallery { order:-1; padding:0 10px!important; }
- .product-page .gallery-main { aspect-ratio:4/4.2!important; }
+ .product-page .gallery-main { aspect-ratio:4/5!important; }
  .product-page .gallery-thumbs { gap:10px!important; padding:0 12px; margin-bottom:22px; }
- .product-page .gallery-thumbs button { width:58px; height:66px; }
+ .product-page .gallery-thumbs button { width:58px; height:auto; aspect-ratio:4/5; }
  .purchase-panel>*:not(.product-summary) { margin-left:22px!important; margin-right:22px!important; }
  .product-page .product-review-link { display:inline-flex;flex-wrap:wrap;gap:8px;margin-bottom:12px; }
  .product-page .product-lead { font-size:22px!important; margin-top:0!important; margin-bottom:20px!important; }
