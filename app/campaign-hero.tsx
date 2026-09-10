@@ -8,7 +8,7 @@ export function CampaignHero({ skincare = false, featured }: { skincare?: boolea
     <picture className="campaign-image">{!skincare&&<source media="(max-width:760px)" srcSet="/images/editorial/iqon-coastal-mobile.webp"/>}<img
       src={skincare ? "/images/editorial/iqon-skincare-hero.webp" : "/images/editorial/iqon-coastal-hero.webp"}
       alt={skincare ? "An everyday moment of skincare in soft window light" : "A shared moment beside the ocean after a run"}
-      width={1536} height={1024} fetchPriority="high" />
+      width={skincare ? 1536 : 3840} height={skincare ? 1024 : 2160} fetchPriority="high" />
     </picture>
     <div className="campaign-copy">
       <p className="eyebrow">IQON / {skincare ? "SKINCARE" : "DAILY ESSENTIALS"}</p>
