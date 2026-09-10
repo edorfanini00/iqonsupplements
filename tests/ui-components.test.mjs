@@ -122,8 +122,8 @@ test("keeps product rating samples out of published customer reviews", async () 
     counts.add(count);
     assert.ok(previewSection.includes(`Sample rating: ${rating} out of 5 stars`));
     assert.ok(previewSection.includes(`${count}+ reviews`));
-    assert.match(previewLink, /Sample data/);
-    assert.match(previewSection, /Sample data/);
+    assert.doesNotMatch(previewLink, /Sample data|review-sample-label/);
+    assert.doesNotMatch(previewSection, /Sample data|Sample rating and review count for this design preview/);
     for (const component of [ProductReviewLink, CustomerReviews]) {
       const published = render(component, props);
       assert.match(published, /No customer ratings yet/);

@@ -93,7 +93,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
   return <StoreContext.Provider value={value}>
     <a className="skip-link" href="#main">Skip to content</a>
-    {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span>Orders are not enabled · Skincare concepts & sample pricing</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}
+    {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span className="preview-review-notice">Illustrative ratings &amp; review counts</span><span>Orders are not enabled · Skincare concepts & sample pricing</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
     {children}
     <Footer/>

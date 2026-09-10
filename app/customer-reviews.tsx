@@ -23,7 +23,6 @@ export function ProductReviewLink({productId,designPreview=false}:{productId:str
  return <a href="#reviews" className="product-review-link">
   <RatingStars rating={average} sample={isSample}/>
   <span>{average===undefined?"Customer reviews":`${average.toFixed(1)} / 5 · ${countLabel}`}</span>
-  {isSample&&<span className="review-sample-label">Sample data</span>}
   <ArrowUpRight size={13} aria-hidden="true"/>
  </a>;
 }
@@ -37,10 +36,9 @@ export function CustomerReviews({productId,productName,category,designPreview=fa
    <div className="review-summary">
     <RatingStars rating={average} sample={isSample}/>
     <span className="review-count">{countLabel}</span>
-    {isSample&&<span className="review-sample-label">Sample data</span>}
    </div>
   </div>
-  {average!==undefined&&<p className="review-average">{average.toFixed(1)} / 5 <span>{isSample?"Sample rating and review count for this design preview.":`From ${reviews.length} customer reviews`}</span></p>}
+  {average!==undefined&&<p className="review-average">{average.toFixed(1)} / 5{!isSample&&<span>From {reviews.length} customer reviews</span>}</p>}
   {reviews.length>0?<div className="review-grid">{reviews.map(review=><article key={review.id}>
    <RatingStars rating={review.rating}/><h3>{review.title}</h3><p>{review.text}</p>
    <footer><span>{review.author}{review.verifiedPurchase&&<small>Verified purchase</small>}</span><time dateTime={review.date}>{new Date(review.date).toLocaleDateString("en-US",{month:"short",year:"numeric",timeZone:"UTC"})}</time></footer>
