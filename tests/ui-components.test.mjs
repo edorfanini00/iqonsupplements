@@ -67,6 +67,22 @@ test("labels the interactive slider thumb for assistive technology", async () =>
   assert.match(thumb, /aria-label="Before and after photo comparison"/);
 });
 
+test("keeps skincare layout samples separate from publishable customer evidence", async () => {
+  const { SkinResults, SkincareReviews } = await vite.ssrLoadModule("/app/skincare/skincare-sections.tsx");
+  const render = (component,props) => renderToStaticMarkup(React.createElement(component,props));
+  assert.equal(render(SkinResults,{results:[],products:[]}),"");
+  const publicReviews=render(SkincareReviews,{reviews:[],products:[]});
+  assert.doesNotMatch(publicReviews,/skin-review-stars|Design sample|Verified buyer/);
+  const draftResults=render(SkinResults,{results:[],products:[],designPreview:true});
+  assert.match(draftResults,/Layout sample · identical photos/);
+  assert.match(draftResults,/RESULTS TO BE ADDED/);
+  assert.doesNotMatch(draftResults,/CLINICAL RESULTS|2.1x|83%/);
+  const draftReviews=render(SkincareReviews,{reviews:[],products:[],designPreview:true});
+  assert.match(draftReviews,/Brand copy · not a customer review/);
+  assert.equal((draftReviews.match(/class="skin-review-card/g)||[]).length,8);
+  assert.doesNotMatch(draftReviews,/Verified buyer|<video/);
+});
+
 test("emits chart themes for the starter's media dark mode", async () => {
   const { ChartStyle } = await vite.ssrLoadModule("/components/ui/chart.tsx");
   const html = renderToStaticMarkup(
