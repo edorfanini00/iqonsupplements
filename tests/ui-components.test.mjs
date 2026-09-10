@@ -90,6 +90,48 @@ test("keeps skincare layout samples separate from publishable customer evidence"
   assert.doesNotMatch(draftReviews,/Verified buyer|<video/);
 });
 
+test("keeps product rating samples out of published customer reviews", async () => {
+  const { ProductReviewLink, CustomerReviews } = await vite.ssrLoadModule("/app/customer-reviews.tsx");
+  const { products } = await vite.ssrLoadModule("/lib/catalog.ts");
+  const { customerReviews } = await vite.ssrLoadModule("/lib/reviews.ts");
+  const render = (component, props) => renderToStaticMarkup(React.createElement(component, props));
+  const counts = new Set();
+  for (const product of products) {
+    const props = { productId:product.id, productName:product.name };
+    const previewLink = render(ProductReviewLink, { ...props, designPreview:true });
+    const previewSection = render(CustomerReviews, { ...props, designPreview:true });
+    const rating = previewLink.match(/Sample rating: ([\d.]+) out of 5 stars/)?.[1];
+    const count = previewLink.match(/(\d+)\+ reviews/)?.[1];
+    assert.ok(Number(rating) >= 4.5 && Number(rating) <= 5, product.id);
+    assert.ok(Number(count) >= 150, product.id);
+    counts.add(count);
+    assert.ok(previewSection.includes(`Sample rating: ${rating} out of 5 stars`));
+    assert.ok(previewSection.includes(`${count}+ reviews`));
+    assert.match(previewLink, /Sample data/);
+    assert.match(previewSection, /Sample data/);
+    for (const component of [ProductReviewLink, CustomerReviews]) {
+      const published = render(component, props);
+      assert.match(published, /No customer ratings yet/);
+      assert.doesNotMatch(published, /Sample data|\d+\+ reviews/);
+    }
+  }
+  assert.equal(counts.size, products.length);
+
+  const review = { id:"render-test", productId:products[0].id, author:"Test customer", rating:3,
+    title:"Test review", text:"Test review body", date:"2026-09-10", verifiedPurchase:false };
+  customerReviews.push(review);
+  try {
+    for (const component of [ProductReviewLink, CustomerReviews]) {
+      const html = render(component, { productId:review.productId, designPreview:true });
+      assert.match(html, /3.0 out of 5 stars/);
+      assert.match(html, /1 review/);
+      assert.doesNotMatch(html, /Sample data|\d+\+ reviews/);
+    }
+  } finally {
+    customerReviews.splice(customerReviews.indexOf(review), 1);
+  }
+});
+
 test("emits chart themes for the starter's media dark mode", async () => {
   const { ChartStyle } = await vite.ssrLoadModule("/components/ui/chart.tsx");
   const html = renderToStaticMarkup(
