@@ -117,12 +117,9 @@ body{background:#fcfdfd}
 .product-breadcrumbs{font-size:13px!important;padding-top:28px!important;padding-bottom:28px!important;line-height:1.5}
 .product-detail{grid-template-columns:1.45fr 1fr!important;gap:5.5%!important;align-items:start;padding-top:0!important;padding-bottom:var(--space-section)!important}
 .product-gallery{position:static!important;min-width:0}
-.gallery-stage{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gallery-stage{display:block}
 .gallery-main,.supplied-product-detail .gallery-main{aspect-ratio:4/5;border-radius:6px;min-width:0;background:#f4f5f5}
 .supplied-product-detail .gallery-main>img[src^='/images/supplements/']{padding:0;background:#f4f5f5}
-.gallery-human{position:relative;min-width:0;border-radius:6px;overflow:hidden}
-.gallery-human>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:43% center}
-.gallery-human>span{position:absolute;bottom:20px;left:18px;right:18px;color:white;font-size:11px;letter-spacing:.08em;text-shadow:0 1px 10px #000}
 .gallery-thumbs{margin-top:20px!important;gap:12px!important}
 .gallery-thumbs button,.supplied-product-detail .gallery-thumbs button{width:74px;height:90px;border-radius:4px;overflow:hidden}
 .gallery-note{margin-top:22px;font-size:12px}
@@ -313,10 +310,9 @@ body{background:#fcfdfd}
  .product-breadcrumbs{font-size:12px!important;padding-top:24px!important;padding-bottom:24px!important;flex-wrap:wrap;gap:8px!important}
  .product-detail{display:flex!important;flex-direction:column;gap:0!important;padding-left:0;padding-right:0}
  .product-gallery{width:100%}
- .gallery-stage{display:grid;grid-template-columns:calc(100vw - 70px) calc(100vw - 70px);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 22px;scroll-padding-left:22px;scrollbar-width:none}
+ .gallery-stage{display:block;padding:0 22px}
  .gallery-main,.supplied-product-detail .gallery-main{aspect-ratio:1/1.12;scroll-snap-align:start}
  .gallery-main>img{object-fit:contain}
- .gallery-human{scroll-snap-align:start}
  .gallery-thumbs{padding:0 22px;gap:10px!important;margin-top:16px!important}
  .gallery-thumbs button,.supplied-product-detail .gallery-thumbs button{width:54px;height:66px}
  .gallery-note{display:none}
@@ -377,3 +373,20 @@ body{background:#fcfdfd}
  .footer-main>div:not(.footer-brand)>a{font-size:15px!important;line-height:1.8}
 }
 @media(prefers-reduced-motion:reduce){.journal-card img{transition:none}.journal-card:hover img{transform:none}}
+
+/* Product formula details supplied with the collection. */
+.supplement-formula,.supplement-directions,.supplement-cautions{font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+.supplement-formula p,.supplement-directions p,.supplement-cautions p{margin:0 0 16px}
+.supplement-subheading{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-primary)}
+.supplement-amounts{width:100%;border-collapse:collapse;margin:0 0 24px;text-align:left}
+.supplement-amounts caption{text-align:left;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px;color:var(--text-primary)}
+.supplement-amounts th,.supplement-amounts td{padding:11px 0;border-bottom:1px solid var(--border);vertical-align:top}
+.supplement-amounts thead th{font-size:12px;font-weight:500;color:var(--text-secondary)}
+.supplement-amounts tbody th{font-size:14px;font-weight:500;padding-right:18px}
+.supplement-amounts th:last-child,.supplement-amounts td{text-align:right;white-space:nowrap}
+.supplement-amounts small{display:block;font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.5;margin-top:4px}
+.supplement-allergens{border-left:2px solid #929c91;padding-left:15px;margin:22px 0}
+.supplement-allergens strong{display:block;margin-bottom:8px;color:var(--text-primary)}
+.supplement-dietary{display:flex;flex-wrap:wrap;gap:7px;list-style:none;padding:0;margin:22px 0 4px}
+.supplement-dietary li{font-size:11px;line-height:1.3;border:1px solid var(--border);border-radius:3px;padding:6px 9px}
+.supplement-disclaimer{padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--text-secondary)}

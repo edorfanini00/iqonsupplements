@@ -1,10 +1,10 @@
 {
   "provider": "Higgsfield",
-  "model": "Nano Banana Pro",
+  "model": "GPT Image 2",
   "resolution": "2k",
-  "purpose": "Illustrative hair-free skin details for the development/Vercel preview comparison, not IQON clinical evidence.",
-  "processing": "Four original diptychs; three refined through Higgsfield to remove fine hair. Central skin crops exclude remaining outer-edge hair. WebP quality 88; no scripted retouching. The first pair uses a CSS terracotta surround.",
-  "limitations": "Synthetic skin variations; not documentation of a treatment response.",
+  "purpose": "Photographic skin illustrations for the existing development/Vercel preview comparison, not IQON clinical evidence.",
+  "processing": "Four individual before masters, each followed by a reference-based after edit of that same master. Matte neutral lighting, recognizable skin contours and natural pore variation. After edits reduce mild dryness and unevenness while preserving texture and avoiding added gloss. WebP quality 90; no scripted skin retouching.",
+  "limitations": "Synthetic cosmetic illustrations; not documentation of a treatment response. Appearance is not a measurement of product performance.",
   "assets": [
     {
       "detail": "texture",
@@ -27,5 +27,5 @@
       "after": "/images/editorial/skin-detail-eye-after.webp"
     }
   ],
-  "revision": "v10"
+  "revision": "v11"
 }

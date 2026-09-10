@@ -1,5 +1,5 @@
 import content from "./product-copy.json";
-/** Preview copy based on supplied packaging and clearly separated ingredient research.
+/** Catalog copy based on supplied packaging and supplier specifications, with separate ingredient research.
  * Live Shopify product descriptions remain authoritative. */
 export type ProductContent = {
   descriptor: string; description: string; highlights: string[];

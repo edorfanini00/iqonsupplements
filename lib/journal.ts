@@ -6,8 +6,8 @@ export const journalArticles:JournalArticle[]=[
     "dek": "A few details make a supplement easier to understand, compare and choose.",
     "category": "UNDERSTANDING SUPPLEMENTS",
     "readTime": "3 MIN READ",
-    "image": "/images/supplements/12_hero_creatine_scoop.webp",
-    "imageAlt": "IQON creatine powder and scoop",
+    "image": "/images/editorial/news-reading-labels.webp",
+    "imageAlt": "A supplement bottle, capsules and reading glasses on a pale desk",
     "sections": [
       {
         "heading": "Begin with the full name",
@@ -108,8 +108,8 @@ export const journalArticles:JournalArticle[]=[
     "dek": "Give cleansing, treatment, moisture and sun protection a clear place in your day.",
     "category": "SKINCARE NOTES",
     "readTime": "3 MIN READ",
-    "image": "/images/editorial/skin-ritual.webp",
-    "imageAlt": "A woman applying skincare at home",
+    "image": "/images/editorial/news-skincare-routine.webp",
+    "imageAlt": "Hands being rinsed in a pale ceramic basin",
     "sections": [
       {
         "heading": "Start with a routine you understand",
