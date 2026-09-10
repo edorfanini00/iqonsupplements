@@ -473,3 +473,16 @@ body { background:#fafbfb; }
  .product-campaign-supplements { aspect-ratio:3/4; height:auto; min-height:0; }
  .iqon-home .human-story-copy h2 { font-size:29px; }
 }
+
+/* Match campaign typography and keep wide-screen gutters outside text limits. */
+@media(min-width:761px) {
+ .human-story-copy h2,.knowledge-copy h2,.everyday-note h2 {
+  font-family:var(--display);
+  font-size:clamp(29px,2.6vw,42px);
+  line-height:1.16;
+  font-weight:400;
+  letter-spacing:-.025em;
+ }
+ .content-heading,.article-heading { max-width:none; }
+ .content-heading h1 { max-width:860px; }
+}
