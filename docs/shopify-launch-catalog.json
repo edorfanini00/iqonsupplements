@@ -1,0 +1,402 @@
+{
+  "researchDate": "2026-09-10",
+  "storeDomain": "nr9zd0-t5.myshopify.com",
+  "currency": "USD",
+  "status": "Draft import; proposed prices pending merchant approval. No live checkout credentials configured.",
+  "products": [
+    {
+      "handle": "creatine-monohydrate",
+      "name": "Creatine Monohydrate",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392972329255",
+      "variantId": "gid://shopify/ProductVariant/52051058819367",
+      "sku": "IQON-CREATINE-MONOHYDRATE",
+      "size": "281 g",
+      "proposedPrice": "29.00",
+      "proposedSubscriptionPrice": "24.65",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Creatine Monohydrate packaging",
+          "source": "/images/supplements/00_pack_creatine.webp",
+          "fileId": "gid://shopify/MediaImage/45558472311079",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-creatine-monohydrate.webp?v=1789079788"
+        },
+        {
+          "alt": "IQON Creatine Monohydrate product detail",
+          "source": "/images/supplements/12_hero_creatine_scoop.webp",
+          "fileId": "gid://shopify/MediaImage/45558598762791",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-creatine-monohydrate-detail.webp?v=1789080177"
+        }
+      ]
+    },
+    {
+      "handle": "hydrolyzed-collagen-peptides",
+      "name": "Hydrolyzed Collagen Peptides",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392974360871",
+      "variantId": "gid://shopify/ProductVariant/52051062849831",
+      "sku": "IQON-HYDROLYZED-COLLAGEN-PEPTIDES",
+      "size": "280 g",
+      "proposedPrice": "32.00",
+      "proposedSubscriptionPrice": "27.20",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Hydrolyzed Collagen Peptides packaging",
+          "source": "/images/supplements/01_pack_collagen_no_flavor.webp",
+          "fileId": "gid://shopify/MediaImage/45558604333351",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrolyzed-collagen-peptides.webp?v=1789080219"
+        },
+        {
+          "alt": "IQON Hydrolyzed Collagen Peptides product detail",
+          "source": "/images/supplements/product-collagen-detail.webp",
+          "fileId": "gid://shopify/MediaImage/45558605414695",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrolyzed-collagen-peptides-detail.webp?v=1789080228"
+        }
+      ]
+    },
+    {
+      "handle": "collagen-peptides-chocolate",
+      "name": "Grass-Fed Collagen Peptides",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392974852391",
+      "variantId": "gid://shopify/ProductVariant/52051063341351",
+      "sku": "IQON-COLLAGEN-PEPTIDES-CHOCOLATE",
+      "size": "378 g · Chocolate",
+      "proposedPrice": "36.00",
+      "proposedSubscriptionPrice": "30.60",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Grass-Fed Collagen Peptides packaging",
+          "source": "/images/supplements/02_pack_collagen_chocolate.webp",
+          "fileId": "gid://shopify/MediaImage/45558606692647",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-collagen-peptides-chocolate.webp?v=1789080238"
+        },
+        {
+          "alt": "IQON Grass-Fed Collagen Peptides product detail",
+          "source": "/images/supplements/13_hero_collagen_choc_scoop.webp",
+          "fileId": "gid://shopify/MediaImage/45558607675687",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-collagen-peptides-chocolate-detail.webp?v=1789080248"
+        }
+      ]
+    },
+    {
+      "handle": "colostrum-powder",
+      "name": "Colostrum Powder",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392975278375",
+      "variantId": "gid://shopify/ProductVariant/52051064029479",
+      "sku": "IQON-COLOSTRUM-POWDER",
+      "size": "69 g",
+      "proposedPrice": "49.00",
+      "proposedSubscriptionPrice": "41.65",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Colostrum Powder packaging",
+          "source": "/images/supplements/03_pack_colostrum_powder.webp",
+          "fileId": "gid://shopify/MediaImage/45558608757031",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colostrum-powder.webp?v=1789080255"
+        },
+        {
+          "alt": "IQON Colostrum Powder product detail",
+          "source": "/images/supplements/16_hero_colostrum_open.webp",
+          "fileId": "gid://shopify/MediaImage/45558609903911",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colostrum-powder-detail.webp?v=1789080263"
+        }
+      ]
+    },
+    {
+      "handle": "colon-gentle-cleanse",
+      "name": "Colon Gentle Cleanse",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392975638823",
+      "variantId": "gid://shopify/ProductVariant/52051064455463",
+      "sku": "IQON-COLON-GENTLE-CLEANSE",
+      "size": "30 sachets",
+      "proposedPrice": "29.00",
+      "proposedSubscriptionPrice": null,
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Colon Gentle Cleanse packaging",
+          "source": "/images/supplements/04_pack_colon_cleanse.webp",
+          "fileId": "gid://shopify/MediaImage/45558611050791",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colon-gentle-cleanse.webp?v=1789080271"
+        },
+        {
+          "alt": "IQON Colon Gentle Cleanse product detail",
+          "source": "/images/supplements/15_hero_colon_sachet.webp",
+          "fileId": "gid://shopify/MediaImage/45558611935527",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colon-gentle-cleanse-detail.webp?v=1789080281"
+        }
+      ]
+    },
+    {
+      "handle": "keto-5",
+      "name": "Keto-5",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392976032039",
+      "variantId": "gid://shopify/ProductVariant/52051064848679",
+      "sku": "IQON-KETO-5",
+      "size": "60 capsules",
+      "proposedPrice": "24.00",
+      "proposedSubscriptionPrice": null,
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Keto-5 packaging",
+          "source": "/images/supplements/05_pack_keto5.webp",
+          "fileId": "gid://shopify/MediaImage/45558613311783",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-keto-5.webp?v=1789080291"
+        },
+        {
+          "alt": "IQON Keto-5 product detail",
+          "source": "/images/supplements/product-keto5-detail.webp",
+          "fileId": "gid://shopify/MediaImage/45558614032679",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-keto-5-detail.webp?v=1789080300"
+        }
+      ]
+    },
+    {
+      "handle": "glp-1-support",
+      "name": "GLP-1 Support",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392976326951",
+      "variantId": "gid://shopify/ProductVariant/52051065143591",
+      "sku": "IQON-GLP-1-SUPPORT",
+      "size": "60 capsules",
+      "proposedPrice": "44.00",
+      "proposedSubscriptionPrice": "37.40",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON GLP-1 Support packaging",
+          "source": "/images/supplements/06_pack_glp1_support.webp",
+          "fileId": "gid://shopify/MediaImage/45558615638311",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-glp-1-support.webp?v=1789080309"
+        },
+        {
+          "alt": "IQON GLP-1 Support product detail",
+          "source": "/images/supplements/product-glp1-detail.webp",
+          "fileId": "gid://shopify/MediaImage/45558616949031",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-glp-1-support-detail.webp?v=1789080322"
+        }
+      ]
+    },
+    {
+      "handle": "liver-support",
+      "name": "Liver Support",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392976523559",
+      "variantId": "gid://shopify/ProductVariant/52051065569575",
+      "sku": "IQON-LIVER-SUPPORT",
+      "size": "60 capsules",
+      "proposedPrice": "29.00",
+      "proposedSubscriptionPrice": "24.65",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Liver Support packaging",
+          "source": "/images/supplements/07_pack_liver_support.webp",
+          "fileId": "gid://shopify/MediaImage/45558617899303",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-liver-support.webp?v=1789080331"
+        },
+        {
+          "alt": "IQON Liver Support product detail",
+          "source": "/images/supplements/11_hero_liver_capsules.webp",
+          "fileId": "gid://shopify/MediaImage/45558619373863",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-liver-support-detail.webp?v=1789080339"
+        }
+      ]
+    },
+    {
+      "handle": "nmn",
+      "name": "NMN",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392976884007",
+      "variantId": "gid://shopify/ProductVariant/52051066028327",
+      "sku": "IQON-NMN",
+      "size": "30 capsules",
+      "proposedPrice": "49.00",
+      "proposedSubscriptionPrice": "41.65",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON NMN packaging",
+          "source": "/images/supplements/08_pack_nmn.webp",
+          "fileId": "gid://shopify/MediaImage/45558621110567",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-nmn.webp?v=1789080348"
+        },
+        {
+          "alt": "IQON NMN product detail",
+          "source": "/images/supplements/nmn-detail.webp",
+          "fileId": "gid://shopify/MediaImage/45558622093607",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-nmn-detail.webp?v=1789080357"
+        }
+      ]
+    },
+    {
+      "handle": "resveratrol",
+      "name": "Resveratrol",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392977277223",
+      "variantId": "gid://shopify/ProductVariant/52051066487079",
+      "sku": "IQON-RESVERATROL",
+      "size": "60 capsules",
+      "proposedPrice": "24.00",
+      "proposedSubscriptionPrice": "20.40",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Resveratrol packaging",
+          "source": "/images/supplements/09_pack_resveratrol.webp",
+          "fileId": "gid://shopify/MediaImage/45558623437095",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-resveratrol.webp?v=1789080365"
+        },
+        {
+          "alt": "IQON Resveratrol product detail",
+          "source": "/images/supplements/resveratrol-detail.webp",
+          "fileId": "gid://shopify/MediaImage/45558624026919",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-resveratrol-detail.webp?v=1789080372"
+        }
+      ]
+    },
+    {
+      "handle": "hair-skin-nails-gummies",
+      "name": "Hair, Skin & Nails Gummies",
+      "category": "supplements",
+      "productId": "gid://shopify/Product/10392977604903",
+      "variantId": "gid://shopify/ProductVariant/52051066814759",
+      "sku": "IQON-HAIR-SKIN-NAILS-GUMMIES",
+      "size": "60 gummies · Passion fruit",
+      "proposedPrice": "24.00",
+      "proposedSubscriptionPrice": "20.40",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Hair, Skin & Nails Gummies packaging",
+          "source": "/images/supplements/10_pack_hair_and_skin_gummies.webp",
+          "fileId": "gid://shopify/MediaImage/45558624649511",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hair-skin-nails-gummies.webp?v=1789080380"
+        },
+        {
+          "alt": "IQON Hair, Skin & Nails Gummies product detail",
+          "source": "/images/supplements/14_hero_gummies_falling.webp",
+          "fileId": "gid://shopify/MediaImage/45558625698087",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hair-skin-nails-gummies-detail.webp?v=1789080389"
+        }
+      ]
+    },
+    {
+      "handle": "peptide-serum",
+      "name": "Peptide Serum",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10392978129191",
+      "variantId": "gid://shopify/ProductVariant/52051067765031",
+      "sku": "IQON-PEPTIDE-SERUM",
+      "size": "30 mL",
+      "proposedPrice": "58.00",
+      "proposedSubscriptionPrice": "49.30",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Peptide Serum packaging",
+          "source": "/images/store/peptide-serum.webp",
+          "fileId": "gid://shopify/MediaImage/45558627303719",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-peptide-serum.webp?v=1789080401"
+        },
+        {
+          "alt": "A close look at the IQON Peptide Serum bottle",
+          "source": "/images/editorial/iqon-serum-mobile.webp",
+          "fileId": "gid://shopify/MediaImage/45558628352295",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-peptide-serum-detail.webp?v=1789080411"
+        }
+      ]
+    },
+    {
+      "handle": "barrier-cream",
+      "name": "Barrier Cream",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10392978456871",
+      "variantId": "gid://shopify/ProductVariant/52051068092711",
+      "sku": "IQON-BARRIER-CREAM",
+      "size": "50 mL",
+      "proposedPrice": "48.00",
+      "proposedSubscriptionPrice": "40.80",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Barrier Cream packaging",
+          "source": "/images/store/barrier-cream.webp",
+          "fileId": "gid://shopify/MediaImage/45558630121767",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-barrier-cream.webp?v=1789080422"
+        }
+      ]
+    },
+    {
+      "handle": "gentle-cleanser",
+      "name": "Gentle Cleanser",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10392978882855",
+      "variantId": "gid://shopify/ProductVariant/52051068616999",
+      "sku": "IQON-GENTLE-CLEANSER",
+      "size": "150 mL",
+      "proposedPrice": "28.00",
+      "proposedSubscriptionPrice": "23.80",
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Gentle Cleanser packaging",
+          "source": "/images/store/gentle-cleanser.webp",
+          "fileId": "gid://shopify/MediaImage/45558631104807",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-gentle-cleanser.webp?v=1789080432"
+        }
+      ]
+    }
+  ]
+}
