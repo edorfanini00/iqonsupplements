@@ -11,7 +11,7 @@
     "ingredients": "Peptides, glycerin and panthenol",
     "directions": "Massage a small amount onto damp skin, then rinse thoroughly. Use morning and evening.",
     "source": "https://www.globalbeauty.net/product/anti-aging-cleanser-with-peptides/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-anti-aging-peptide-cleanser.jpg?v=1789092104",
+    "image": "/images/skincare/products/anti-aging-peptide-cleanser.webp",
     "number": "12"
   },
   {
@@ -26,7 +26,7 @@
     "ingredients": "Aloe, glycerin and sodium PCA",
     "directions": "Sweep over the face and neck with a cotton pad after cleansing. Use morning and evening.",
     "source": "https://www.globalbeauty.net/product/hydrating-tonic/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrating-tonic.jpg?v=1789092121",
+    "image": "/images/skincare/products/hydrating-tonic.webp",
     "number": "13"
   },
   {
@@ -41,7 +41,7 @@
     "ingredients": "Mandelic, lactic and salicylic acids",
     "directions": "Sweep a pad over the areas you want to exfoliate, avoiding eyes. Follow the product label for frequency. Use sunscreen and limit sun exposure during use and for a week afterwards.",
     "source": "https://www.globalbeauty.net/product/exfoliating-pads/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-exfoliating-pads.jpg?v=1789092081",
+    "image": "/images/skincare/products/exfoliating-pads.webp",
     "number": "14"
   },
   {
@@ -56,7 +56,7 @@
     "ingredients": "Vitamin C, ferulic acid and sodium hyaluronate",
     "directions": "Apply a small amount to the face and neck after cleansing and toning. Follow with moisturizer and daytime SPF. May be used morning and evening.",
     "source": "https://www.globalbeauty.net/product/hydra-c-plus-ferulic-serum/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydra-c-ferulic-serum.jpg?v=1789092149",
+    "image": "/images/skincare/products/hydra-c-ferulic-serum.webp",
     "number": "15"
   },
   {
@@ -71,7 +71,7 @@
     "ingredients": "Encapsulated retinol, niacinamide and squalane",
     "directions": "Use in the evening, introducing gradually as tolerated and following the product label. Wear SPF 30 or higher during the day. Do not use when pregnant or breastfeeding.",
     "source": "https://www.globalbeauty.net/product/retinol-rx/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-retinol-rx.jpg?v=1789092131",
+    "image": "/images/skincare/products/retinol-rx.webp",
     "number": "16"
   },
   {
@@ -86,7 +86,7 @@
     "ingredients": "Peptides, aloe and cucumber water",
     "directions": "Gently apply a small amount around the eye area after cleansing, avoiding direct contact with eyes. Use morning and evening.",
     "source": "https://www.globalbeauty.net/product/firming-peptide-eye-gel/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-firming-peptide-eye-gel.jpg?v=1789092141",
+    "image": "/images/skincare/products/firming-peptide-eye-gel.webp",
     "number": "17"
   },
   {
@@ -101,7 +101,7 @@
     "ingredients": "Copper peptide, shea butter and sodium hyaluronate",
     "directions": "Apply to face and neck after cleansing and serum. Follow with SPF in the morning. Contains retinol; consider your other active products when building a routine.",
     "source": "https://www.globalbeauty.net/product/copper-peptide-restore-cream/",
-    "image": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-copper-peptide-restore-cream.jpg?v=1789092113",
+    "image": "/images/skincare/products/copper-peptide-restore-cream.webp",
     "number": "18"
   }
 ]

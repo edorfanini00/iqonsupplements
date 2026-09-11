@@ -18,8 +18,8 @@ export function CommunityReviews({reviews,products,designPreview=false,category=
   const cards=skin?sampleReviewCards:supplementReviewCards;
   const reviewHref=`/reviews?collection=${category}`;
   const introImages=skin?[
-    {src:"/images/editorial/community-serum-iqon-v11.webp",alt:"Hands holding IQON Peptide Serum as part of a daily skincare ritual"},
-    {src:"/images/editorial/community-cream-iqon-v11.webp",alt:"IQON Barrier Cream with its silver lid and a cream texture detail"},
+    {src:"/images/skincare/editorial/community-serum-iqon-v11.webp",alt:"Hands holding IQON Hydra C + Ferulic Serum as part of a daily skincare ritual"},
+    {src:"/images/skincare/editorial/community-cream-iqon-v11.webp",alt:"IQON Copper Peptide Restore Cream bottle beside a cream texture detail"},
   ]:[
     {src:"/images/supplements/12_hero_creatine_scoop.webp",alt:"IQON Creatine Monohydrate with an open jar and a measured scoop"},
     {src:"/images/supplements/16_hero_colostrum_open.webp",alt:"An open IQON Colostrum Powder jar with its scoop"},

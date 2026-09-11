@@ -18,7 +18,7 @@ export function SkincareDiscovery() {
     <p className="eyebrow skin-discovery-label">THE SKINCARE COLLECTION</p>
     <div className="skin-discovery-grid">
       <Link href="/collections/skincare" className="skin-discovery-card">
-        <img src="/images/store/campaign-skincare.webp" alt="The IQON Gentle Cleanser, Peptide Serum and Barrier Cream collection" width={1920} height={1080} loading="lazy"/>
+        <img src="/images/skincare/editorial/campaign-skincare.webp" alt="IQON Anti-Aging Cleanser with Peptides, Hydra C + Ferulic Serum and Copper Peptide Restore Cream" width={1920} height={1072} loading="lazy"/>
         <div><h2>A few essentials.</h2><span className="under-link">Shop all skincare<ArrowUpRight size={16}/></span></div>
       </Link>
       <Link href="/journal/a-simple-skincare-routine" className="skin-discovery-card">

@@ -14,14 +14,18 @@ export function EverydayNote({skincare=false}:{skincare?:boolean}) {
 }
 
 export function JournalPreview({skincare=false}:{skincare?:boolean}) {
- const articles=skincare?[...journalArticles].sort((a,b)=>Number(b.slug==="a-simple-skincare-routine")-Number(a.slug==="a-simple-skincare-routine")):journalArticles;
+ const skincareImages:Record<string,{image:string;imageAlt:string}>={
+  "a-simple-skincare-routine":{image:"/images/skincare/editorial/news-skincare-ritual-iqon-v11.webp",imageAlt:"A woman applying cream while holding IQON Copper Peptide Restore Cream"},
+  "reading-a-supplement-label":{image:"/images/skincare/editorial/news-reading-labels-iqon-v11.webp",imageAlt:"IQON Hydra C + Ferulic Serum and cosmetic pads on a silver desk"},
+ };
+ const articles=skincare?[...journalArticles].map(a=>({...a,...skincareImages[a.slug]})).sort((a,b)=>Number(b.slug==="a-simple-skincare-routine")-Number(a.slug==="a-simple-skincare-routine")):journalArticles;
  return <section className="journal-preview section-pad"><div className="section-heading"><div><p className="eyebrow">LATEST NEWS</p><h2>A little more understanding.</h2></div><Link className="under-link" href="/journal">All stories<ArrowUpRight size={16}/></Link></div><div className="journal-grid">{articles.map(a=><Link className="journal-card" key={a.slug} href={`/journal/${a.slug}`}><div><img src={a.image} alt={a.imageAlt} width={900} height={675} loading="lazy"/></div><p className="eyebrow">{a.category} <span>{a.readTime}</span></p><h3>{a.title}<ArrowUpRight size={21}/></h3><p>{a.dek}</p></Link>)}</div></section>;
 }
 
 /** One continuous photograph, with copy positioned inside its natural negative space. */
 export function SkincareCampaign({crosslink=false}:{crosslink?:boolean}) {
  return <section className="product-campaign product-campaign-skin">
-  <picture><source media="(max-width:760px)" srcSet="/images/editorial/skincare-campaign-mobile.webp"/><img src="/images/editorial/skincare-campaign-desktop.webp" alt="IQON Peptide Serum and Barrier Cream in a silver and glass studio study" width={3168} height={1344} loading="lazy"/></picture>
+  <picture><source media="(max-width:760px)" srcSet="/images/skincare/editorial/skincare-campaign-mobile.webp"/><img src="/images/skincare/editorial/skincare-campaign-desktop.webp" alt="IQON Hydra C + Ferulic Serum and Copper Peptide Restore Cream on a cool blue-gray surface" width={3168} height={1344} loading="lazy"/></picture>
   <div className="product-campaign-copy"><p className="eyebrow">{crosslink?"ALSO FROM IQON":"THE SKINCARE COLLECTION"}</p><h2>A few essentials.<br/><span>A moment for you.</span></h2><Link className="button button-light" href={crosslink?"/skincare":"/collections/skincare"}>{crosslink?"Explore skincare":"Discover the collection"}<ArrowUpRight size={16}/></Link></div>
  </section>;
 }

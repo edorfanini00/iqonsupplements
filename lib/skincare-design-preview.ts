@@ -29,9 +29,9 @@ export const sampleReviewCards:SampleReviewCard[]=[
  {id:"serum",image:"/images/editorial/community-serum-fingertip.webp",alt:"A clear serum droplet resting on a fingertip in soft daylight"},
  {id:"ritual",title:"A few essentials. A moment for you."},
  {id:"daily",title:"A little care. Every day."},
- {id:"touch",image:"/images/editorial/community-serum-iqon-v11.webp",alt:"Hands holding the IQON Peptide Serum bottle with its silver collar and black pump"},
+ {id:"touch",image:"/images/skincare/editorial/community-serum-iqon-v11.webp",alt:"Hands holding the IQON Hydra C + Ferulic Serum bottle with its silver cap and base"},
  {id:"collection",image:"/images/editorial/community-cream-glass.webp",alt:"A soft white cream texture on clear glass"},
  {id:"rhythm",title:"Find your skincare rhythm."},
  {id:"moment",title:"Make a little time for you."},
- {id:"essentials",image:"/images/editorial/community-cream-iqon-v11.webp",alt:"An open IQON Barrier Cream jar and its silver lid on a cool gray surface"},
+ {id:"essentials",image:"/images/skincare/editorial/community-cream-iqon-v11.webp",alt:"IQON Copper Peptide Restore Cream beside a cream texture on a cool blue-gray surface"},
 ];

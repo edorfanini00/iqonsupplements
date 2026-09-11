@@ -42,3 +42,20 @@ test("all seven approved skincare prices match the recorded Shopify variants",()
     assert.equal(prices[p.id],p.price);
   }
 });
+
+test("approved skincare photography replaces only its primary image and preserves live commerce and other galleries",()=>{
+  const approved="/images/skincare/products/hydra-c-ferulic-serum.webp";
+  const skin={...upcoming,id:"hydra-c-ferulic-serum",name:"Hydra C + Ferulic Serum",price:72,
+    currency:"EUR",available:false,variants:[{id:"live-variant",available:false}],
+    image:"https://merchant/skin.webp",campaign:"https://merchant/skin.webp",
+    images:[{src:"https://merchant/skin.webp",alt:"Original"},{src:"https://merchant/back.webp",alt:"Back label"}]};
+  const supplement={...skin,id:"nmn",category:"supplements",image:"https://merchant/nmn.webp"};
+  const approvedCopy={...upcoming,id:skin.id,name:skin.name,image:approved,images:[{src:approved,alt:"Approved IQON serum"}]};
+  const result=mergeCatalogMerchandise([skin,supplement],[approvedCopy,{...approvedCopy,id:"nmn",category:"supplements"}]);
+  assert.equal(result[0].image,approved);
+  assert.equal(result[0].campaign,approved);
+  assert.deepEqual(result[0].images,[approvedCopy.images[0],skin.images[1]]);
+  for(const key of ["price","currency","available","variants"]) assert.deepEqual(result[0][key],skin[key]);
+  assert.equal(result[1].image,supplement.image);
+  assert.deepEqual(result[1].images,supplement.images);
+});
