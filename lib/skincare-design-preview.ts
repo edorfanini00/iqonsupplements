@@ -1,5 +1,5 @@
-// Layout samples only. Never add these to customerReviews or approvedSkincareResults.
-// The server enables them only in development or a Vercel preview deployment.
+// Illustrative skin comparisons and review layout samples, never verified product results.
+// Skincare explicitly displays the captioned comparisons; review samples remain preview-only.
 import type { SkinResult } from "./skincare-results";
 
 const skinDetails = [

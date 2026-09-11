@@ -29,12 +29,12 @@ export function SkincareDiscovery() {
   </section>;
 }
 
-export function SkinResults({results, products,designPreview=false}:{results:SkinResult[];products:Product[];designPreview?:boolean}) {
+export function SkinResults({results, products,showIllustrations=false}:{results:SkinResult[];products:Product[];showIllustrations?:boolean}) {
   const [selected,setSelected]=useState(0);
   const [reveal,setReveal]=useState(50);
   const headingId=useId();
   const helpId=useId();
-  const isSample=designPreview&&results.length===0;
+  const isSample=showIllustrations&&results.length===0;
   const entries=isSample?sampleSkinResults:results;
   const result=entries[selected]||entries[0];
   if(!result)return null;
