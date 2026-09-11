@@ -1,4 +1,5 @@
 import { productContent } from "./product-content";
+import skincareRange from "./skincare-range.json";
 import approvedPrices from "./approved-prices.json";
 export type Category = "supplements" | "skincare";
 export type Purchase = "once" | "subscription";
@@ -66,10 +67,8 @@ const previewProducts: Product[] = [
   supplement("hair-skin-nails-gummies", "Hair, Skin & Nails Gummies", "Gummies", "60 gummies · Passion fruit",
     "A different kind of daily ritual.", "Passion-fruit-flavored Hair, Skin & Nails Gummies in a clear bottle of 60 gummies.",
     "10_pack_hair_and_skin_gummies", "14_hero_gummies_falling", 10),
-  // Approved skincare prices; the local catalog does not imply live inventory.
-  {id:"peptide-serum",name:"Peptide Serum",category:"skincare",type:"Serum",number:"12",price:approvedPrices["peptide-serum"],available:false,size:"30 mL",descriptor:"Your daily treatment step.",description:"A serum concept at the heart of the IQON skincare ritual. Presented in frosted glass with a precise dispenser, it is designed as the treatment step between cleansing and moisturizing.",image:"/images/store/peptide-serum.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Treat",images:[{src:"/images/store/peptide-serum.webp",alt:"IQON Peptide Serum packaging"},{src:"/images/editorial/iqon-serum-mobile.webp",alt:"A close look at the IQON Peptide Serum bottle"}]},
-  {id:"barrier-cream",name:"Barrier Cream",category:"skincare",type:"Moisturizer",number:"13",price:approvedPrices["barrier-cream"],available:false,size:"50 mL",descriptor:"The finishing touch.",description:"A cream concept for the final moisturizing step in a simple skincare routine. A tactile glass jar and restrained finish bring the IQON approach to an everyday essential.",image:"/images/store/barrier-cream.webp",campaign:"/images/store/campaign-skincare.webp",tone:"ivory",ritual:"Moisturize",images:[{src:"/images/store/barrier-cream.webp",alt:"IQON Barrier Cream packaging"}]},
-  {id:"gentle-cleanser",name:"Gentle Cleanser",category:"skincare",type:"Cleanser",number:"14",price:approvedPrices["gentle-cleanser"],available:false,size:"150 mL",descriptor:"Begin with the essentials.",description:"The first step in the IQON skincare collection. This cleanser concept uses a practical pump format and pairs with the serum and cream as a three-part ritual.",image:"/images/store/gentle-cleanser.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Cleanse",images:[{src:"/images/store/gentle-cleanser.webp",alt:"IQON Gentle Cleanser packaging"}]},
+  ...skincareRange.map(p => ({...p, category: "skincare" as const, available: false, currency: "USD", tone: "silver", campaign: p.image,
+    images: [{src:p.image, alt:`IQON ${p.name}, ${p.size}`}]})),
 ];
 
 export const products: Product[] = previewProducts.map(p => ({...p, descriptor: productContent[p.id]?.descriptor || p.descriptor, description: productContent[p.id]?.description || p.description}));

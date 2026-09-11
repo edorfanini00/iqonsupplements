@@ -6,7 +6,7 @@ import { productContent } from '@/lib/product-content';
 
 export function comparisonFor(product:Product, products:Product[]) {
   const preferred = product.category==='skincare'
-    ? ['gentle-cleanser','peptide-serum','barrier-cream']
+    ? [product.id,...['anti-aging-cleanser-with-peptides','hydra-c-ferulic-serum','copper-peptide-restore-cream'].filter(id=>id!==product.id)]
     : ['nmn','resveratrol'].includes(product.id)
       ? [product.id,product.id==='nmn'?'resveratrol':'nmn']
       : ['hydrolyzed-collagen-peptides','collagen-peptides-chocolate'].includes(product.id)

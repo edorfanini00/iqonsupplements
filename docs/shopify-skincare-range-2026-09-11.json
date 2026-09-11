@@ -1,0 +1,233 @@
+[
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>A peptide-enriched facial cleanser with glycerin and panthenol. Cleanses away daily buildup while helping skin feel comfortable.</p><p>207 mL · Cleanse</p><h3>How to use</h3><p>Massage a small amount onto damp skin, then rinse thoroughly. Use morning and evening.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-anti-aging-peptide-cleanser.jpg?v=1789092104",
+    "handle": "anti-aging-cleanser-with-peptides",
+    "id": "gid://shopify/Product/10393654231335",
+    "images": [
+      {
+        "altText": "IQON Anti-Aging Cleanser with Peptides, 207 mL",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-anti-aging-peptide-cleanser.jpg?v=1789092104"
+      }
+    ],
+    "productType": "Cleanser",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Anti-Aging Cleanser with Peptides",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052012237095",
+        "inventoryQuantity": 0,
+        "price": "36.00",
+        "sku": "IQON-ANTI-AGING-CLEANSER-WITH-PEPTIDES",
+        "title": "207 mL"
+      }
+    ],
+    "vendor": "IQON"
+  },
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>An aloe-based tonic with glycerin and sodium PCA. A light hydration step after cleansing, before your chosen serum.</p><p>198 mL · Hydrate</p><h3>How to use</h3><p>Sweep over the face and neck with a cotton pad after cleansing. Use morning and evening.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrating-tonic.jpg?v=1789092121",
+    "handle": "hydrating-tonic",
+    "id": "gid://shopify/Product/10393654821159",
+    "images": [
+      {
+        "altText": "IQON Hydrating Tonic, 198 mL",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrating-tonic.jpg?v=1789092121"
+      }
+    ],
+    "productType": "Toner",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Hydrating Tonic",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052013056295",
+        "inventoryQuantity": 0,
+        "price": "32.00",
+        "sku": "IQON-HYDRATING-TONIC",
+        "title": "198 mL"
+      }
+    ],
+    "vendor": "IQON"
+  },
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>Pre-moistened pads with mandelic, lactic and salicylic acids. A focused exfoliating step for uneven texture and congested-looking skin.</p><p>50 pads · Refine</p><h3>How to use</h3><p>Sweep a pad over the areas you want to exfoliate, avoiding eyes. Follow the product label for frequency. Use sunscreen and limit sun exposure during use and for a week afterwards.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-exfoliating-pads.jpg?v=1789092081",
+    "handle": "exfoliating-pads",
+    "id": "gid://shopify/Product/10393655345447",
+    "images": [
+      {
+        "altText": "IQON Exfoliating Pads, 50 pads",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-exfoliating-pads.jpg?v=1789092081"
+      }
+    ],
+    "productType": "Exfoliant",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Exfoliating Pads",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052013744423",
+        "inventoryQuantity": 0,
+        "price": "48.00",
+        "sku": "IQON-EXFOLIATING-PADS",
+        "title": "50 pads"
+      }
+    ],
+    "vendor": "IQON"
+  },
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>A vitamin C and ferulic acid serum with sodium hyaluronate. Designed to bring antioxidant care and hydration to a routine for dull or uneven-looking skin.</p><p>30 mL · Brighten</p><h3>How to use</h3><p>Apply a small amount to the face and neck after cleansing and toning. Follow with moisturizer and daytime SPF. May be used morning and evening.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydra-c-ferulic-serum.jpg?v=1789092149",
+    "handle": "hydra-c-ferulic-serum",
+    "id": "gid://shopify/Product/10393656066343",
+    "images": [
+      {
+        "altText": "IQON Hydra C + Ferulic Serum, 30 mL",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydra-c-ferulic-serum.jpg?v=1789092149"
+      }
+    ],
+    "productType": "Serum",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Hydra C + Ferulic Serum",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052014727463",
+        "inventoryQuantity": 0,
+        "price": "68.00",
+        "sku": "IQON-HYDRA-C-FERULIC-SERUM",
+        "title": "30 mL"
+      }
+    ],
+    "vendor": "IQON"
+  },
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.</p><p>30 mL · Renew</p><h3>How to use</h3><p>Use in the evening, introducing gradually as tolerated and following the product label. Wear SPF 30 or higher during the day. Do not use when pregnant or breastfeeding.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-retinol-rx.jpg?v=1789092131",
+    "handle": "retinol-rx",
+    "id": "gid://shopify/Product/10393656656167",
+    "images": [
+      {
+        "altText": "IQON Retinol Rx, 30 mL",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-retinol-rx.jpg?v=1789092131"
+      }
+    ],
+    "productType": "Serum",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Retinol Rx",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052015710503",
+        "inventoryQuantity": 0,
+        "price": "64.00",
+        "sku": "IQON-RETINOL-RX",
+        "title": "30 mL"
+      }
+    ],
+    "vendor": "IQON"
+  },
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>A cooling peptide eye gel with aloe and cucumber water. A light, targeted step for smoother-looking skin around the eyes.</p><p>15 mL · Eye care</p><h3>How to use</h3><p>Gently apply a small amount around the eye area after cleansing, avoiding direct contact with eyes. Use morning and evening.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-firming-peptide-eye-gel.jpg?v=1789092141",
+    "handle": "firming-peptide-eye-gel",
+    "id": "gid://shopify/Product/10393657245991",
+    "images": [
+      {
+        "altText": "IQON Firming Peptide Eye Gel, 15 mL",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-firming-peptide-eye-gel.jpg?v=1789092141"
+      }
+    ],
+    "productType": "Eye care",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Firming Peptide Eye Gel",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052016955687",
+        "inventoryQuantity": 0,
+        "price": "48.00",
+        "sku": "IQON-FIRMING-PEPTIDE-EYE-GEL",
+        "title": "15 mL"
+      }
+    ],
+    "vendor": "IQON"
+  },
+  {
+    "currencyCode": "USD",
+    "descriptionHtml": "<p>A rich multi-peptide moisturizer with copper peptide, shea butter and sodium hyaluronate. Delivers moisture for dry-feeling skin and a smoother, firmer-looking finish.</p><p>50 mL · Moisturize</p><h3>How to use</h3><p>Apply to face and neck after cleansing and serum. Follow with SPF in the morning. Contains retinol; consider your other active products when building a routine.</p>",
+    "featuredImageUrl": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-copper-peptide-restore-cream.jpg?v=1789092113",
+    "handle": "copper-peptide-restore-cream",
+    "id": "gid://shopify/Product/10393657737511",
+    "images": [
+      {
+        "altText": "IQON Copper Peptide Restore Cream, 50 mL",
+        "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-copper-peptide-restore-cream.jpg?v=1789092113"
+      }
+    ],
+    "productType": "Moisturizer",
+    "status": "DRAFT",
+    "tags": [
+      "iqon-skincare",
+      "iqon-skincare-range-2026-09-11",
+      "iqon-stock-pending"
+    ],
+    "title": "Copper Peptide Restore Cream",
+    "totalInventory": 0,
+    "totalVariants": 1,
+    "variants": [
+      {
+        "id": "gid://shopify/ProductVariant/52052017971495",
+        "inventoryQuantity": 0,
+        "price": "68.00",
+        "sku": "IQON-COPPER-PEPTIDE-RESTORE-CREAM",
+        "title": "50 mL"
+      }
+    ],
+    "vendor": "IQON"
+  }
+]

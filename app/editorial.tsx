@@ -22,7 +22,7 @@ export function JournalPreview({skincare=false}:{skincare?:boolean}) {
 export function SkincareCampaign({crosslink=false}:{crosslink?:boolean}) {
  return <section className="product-campaign product-campaign-skin">
   <picture><source media="(max-width:760px)" srcSet="/images/editorial/skincare-campaign-mobile.webp"/><img src="/images/editorial/skincare-campaign-desktop.webp" alt="IQON Peptide Serum and Barrier Cream in a silver and glass studio study" width={3168} height={1344} loading="lazy"/></picture>
-  <div className="product-campaign-copy"><p className="eyebrow">{crosslink?"ALSO FROM IQON":"THE SKINCARE COLLECTION"}</p><h2>A few essentials.<br/><span>A moment for you.</span></h2><Link className="button button-light" href={crosslink?"/skincare":"/products/peptide-serum"}>{crosslink?"Explore skincare":"Discover Peptide Serum"}<ArrowUpRight size={16}/></Link></div>
+  <div className="product-campaign-copy"><p className="eyebrow">{crosslink?"ALSO FROM IQON":"THE SKINCARE COLLECTION"}</p><h2>A few essentials.<br/><span>A moment for you.</span></h2><Link className="button button-light" href={crosslink?"/skincare":"/collections/skincare"}>{crosslink?"Explore skincare":"Discover the collection"}<ArrowUpRight size={16}/></Link></div>
  </section>;
 }
 

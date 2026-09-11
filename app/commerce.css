@@ -486,3 +486,9 @@ body { background:#fafbfb; }
  .content-heading,.article-heading { max-width:none; }
  .content-heading h1 { max-width:860px; }
 }
+
+/* Match the supplied skincare photographs without cropping the packaging. */
+.skincare-product .product-visual{aspect-ratio:1407/1759!important}
+.skincare-product .product-visual>img{width:100%;height:100%;object-fit:contain;padding:0}
+.skincare-product-detail .gallery-main{aspect-ratio:1407/1759;background:#e7e8e9}
+.skincare-product-detail .gallery-main>img{object-fit:contain;padding:0}

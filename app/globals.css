@@ -375,3 +375,7 @@ h1,h2{font-family:var(--display);font-weight:450;letter-spacing:-.025em;line-hei
  .skincare-department-hero .button{align-self:flex-start}
  .skincare-step-rail{height:57px;padding-top:0;padding-bottom:0;margin:0 22px;align-items:center}
 }
+
+/* Supplied skincare photographs retain their complete 4:5 composition. */
+.skincare-product-detail .gallery-main{aspect-ratio:1407/1759;background:#e7e8e9}
+.skincare-product-detail .gallery-main>img{object-fit:contain;padding:0}
