@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
-import { mergeSkincareMerchandise } from "./merchandise";
+import { mergeCatalogMerchandise } from "./merchandise";
 import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
@@ -26,7 +26,7 @@ async function readCatalog():Promise<StoreCatalog> {
     after=data.products.pageInfo.hasNextPage?data.products.pageInfo.endCursor:null;
     if(data.products.pageInfo.hasNextPage&&!after) throw new CommerceError("The collection is temporarily unavailable.");
   } while(after);
-  return {mode:"live",products:mergeSkincareMerchandise(list,products),currency:list[0]?.currency||"USD"};
+  return {mode:"live",products:mergeCatalogMerchandise(list,products),currency:list[0]?.currency||"USD"};
 }
 // Request-scoped memoization only; no buyer-specific data in global caches.
 export const getStoreCatalog=cache(async():Promise<StoreCatalog>=>{
