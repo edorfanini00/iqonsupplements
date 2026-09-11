@@ -8,7 +8,9 @@ export function comparisonFor(product:Product, products:Product[]) {
   const preferred = product.category==='skincare'
     ? ['gentle-cleanser','peptide-serum','barrier-cream']
     : ['nmn','resveratrol'].includes(product.id)
-      ? [product.id,product.id==='nmn'?'resveratrol':'nmn','creatine-monohydrate']
+      ? [product.id,product.id==='nmn'?'resveratrol':'nmn']
+      : ['hydrolyzed-collagen-peptides','collagen-peptides-chocolate'].includes(product.id)
+        ? [product.id,product.id==='hydrolyzed-collagen-peptides'?'collagen-peptides-chocolate':'hydrolyzed-collagen-peptides']
       : product.type==='Powder'
         ? [product.id,...['creatine-monohydrate','hydrolyzed-collagen-peptides','collagen-peptides-chocolate','colostrum-powder'].filter(id=>id!==product.id)]
         : product.type==='Capsules'
@@ -18,33 +20,11 @@ export function comparisonFor(product:Product, products:Product[]) {
 }
 
 export function ProductStory({product:p,products}:{product:Product;products:Product[]}) {
-  const content=productContent[p.id];
-  if(!content) return null;
-  const comparison=comparisonFor(p,products);
-  const photo=p.images?.[1] || {src:p.campaign,alt:`IQON ${p.category} collection`};
-  const landscape=/\/(19_|2[0-5]_)/.test(photo.src)||p.category==='skincare';
-  const skincare=p.category==='skincare';
-  return <>
-    <nav className="pdp-section-nav" aria-label="Product information">
-      <a href="#overview">Overview</a><a href="#product-details">Product details</a><a href="#compare">{skincare?'The routine':'Compare products'}</a><a href="#product-questions">Questions</a>
-    </nav>
-    <section className="pdp-story section-pad" aria-labelledby="product-story-title">
-      <div className={`pdp-story-photo ${landscape?'landscape':''}`}><img src={photo.src} alt={photo.alt} loading="lazy" width={1200} height={1400}/></div>
-      <div className="pdp-story-copy"><p className="eyebrow">{skincare?'THE IQON SKINCARE COLLECTION':'A CLOSER LOOK'}</p><h2 id="product-story-title">{content.title}</h2><p>{content.story}</p><a className="under-link" href="#product-details">See the details <ArrowUpRight size={16}/></a></div>
-    </section>
-    <section id="product-details" className="pdp-facts section-pad" aria-labelledby="product-details-title">
-      <div className="pdp-section-heading"><div><p className="eyebrow">AT A GLANCE</p><h2 id="product-details-title">The product details.</h2></div><p>{skincare?'The format and proposed routine step for this skincare concept.':'The name, format and amount in the pack, in one place.'}</p></div>
-      <div className="pdp-facts-grid">{content.facts.map(f=><div className="pdp-fact" key={f.label}><span>{f.label}</span><strong>{f.value}</strong><p>{f.detail}</p></div>)}</div>
-    </section>
-    {comparison.length>1&&<section id="compare" className="pdp-comparison section-pad" aria-labelledby="compare-title">
-      <div className="pdp-section-heading"><div><p className="eyebrow">{skincare?'CLEANSE · TREAT · MOISTURIZE':'FIND YOUR FORMAT'}</p><h2 id="compare-title">{skincare?'Three steps, side by side.':'See how they compare.'}</h2></div><p>{skincare?'Explore the place of each product in our upcoming skincare routine.':'Different products, clearly identified. Compare the format and pack size before you choose.'}</p></div>
-      <div className="pdp-table-wrap" role="region" aria-label="Product comparison table" tabIndex={0}><table className="pdp-compare-table"><caption>{skincare?'IQON skincare routine':'IQON product formats and pack sizes'}</caption><thead><tr><th scope="col">{skincare?'Your routine':'The collection'}</th>{comparison.map(q=><th key={q.id} scope="col" className={q.id===p.id?'current':''}><small>{q.id===p.id?'You’re viewing':'Explore IQON'}</small><Link href={`/products/${q.id}`}><img src={q.image} alt={q.name} width={250} height={300} loading="lazy"/>{q.name}</Link></th>)}</tr></thead><tbody>
-      <tr><th scope="row">Format</th>{comparison.map(q=><td key={q.id} className={q.id===p.id?'current':''}>{q.type}</td>)}</tr>
-      <tr><th scope="row">Pack size</th>{comparison.map(q=><td key={q.id} className={q.id===p.id?'current':''}>{q.size}</td>)}</tr>
-      {skincare&&<tr><th scope="row">Step</th>{comparison.map(q=><td key={q.id} className={q.id===p.id?'current':''}>{q.ritual}</td>)}</tr>}
-      <tr><th scope="row">Discover</th>{comparison.map(q=><td key={q.id} className={q.id===p.id?'current':''}>{q.id===p.id?'Current product':<Link href={`/products/${q.id}`}>View product <span aria-hidden="true">↗</span></Link>}</td>)}</tr>
-      </tbody></table></div>
-    </section>}
-    <section id="product-questions" className="pdp-faq section-pad" aria-labelledby="product-questions-title"><div className="faq-intro"><p className="eyebrow">GOOD TO KNOW</p><h2 id="product-questions-title">Your questions,<br/>answered.</h2><p>Looking for something else?<br/><Link className="under-link" href="/help">Visit questions & care <ArrowUpRight size={15}/></Link></p></div><Accordion type="single" collapsible>{content.faqs.map((f,i)=><AccordionItem key={f.question} value={`question-${i}`}><AccordionTrigger>{f.question}</AccordionTrigger><AccordionContent>{f.answer}</AccordionContent></AccordionItem>)}</Accordion></section>
-  </>;
+ const content=productContent[p.id];if(!content)return null;
+ const comparison=comparisonFor(p,products);
+ return <>
+  <nav className="pdp-section-nav" aria-label="Product information"><a href="#overview">Overview</a><a href="#product-details">Details & research</a><a href="#compare">Explore the collection</a><a href="#reviews">Reviews</a></nav>
+  <section id="product-details" className="product-knowledge section-pad"><div className="knowledge-copy"><p className="eyebrow">A CLOSER LOOK</p><h2>{content.title}</h2><div className="knowledge-facts">{content.facts.map(f=><div key={f.label}><small>{f.label}</small><strong>{f.value}</strong></div>)}</div><Accordion type="single" collapsible className="knowledge-accordion"><AccordionItem value="about"><AccordionTrigger>About {p.name}</AccordionTrigger><AccordionContent><p>{content.story}</p></AccordionContent></AccordionItem>{content.education&&<AccordionItem value="research" id="ingredient-science"><AccordionTrigger>Ingredient research</AccordionTrigger><AccordionContent><p>{content.education.body}</p><p className="evidence-context">{content.education.scope}</p><div className="ingredient-sources">{content.education.sources.map(source=><a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer">{source.label}<ArrowUpRight size={14}/></a>)}</div></AccordionContent></AccordionItem>}{content.faqs.map((f,i)=><AccordionItem key={f.question} value={`faq-${i}`}><AccordionTrigger>{f.question}</AccordionTrigger><AccordionContent>{f.answer}</AccordionContent></AccordionItem>)}</Accordion></div></section>
+  {comparison.length>1&&<section id="compare" className="visual-comparison section-pad"><div className="section-heading"><h2>{p.category==='skincare'?'Complete the routine.':'A closer look, side by side.'}</h2><Link className="button button-outline" href={`/collections/${p.category}`}>View all {p.category}<ArrowUpRight size={17}/></Link></div><div className="comparison-cards">{comparison.map(q=><Link className={`comparison-card ${p.id===q.id?'is-current':''}`} href={`/products/${q.id}`} key={q.id}><div><img src={q.image} alt={q.name} loading="lazy" width={1122} height={1402}/>{p.id===q.id&&<span>YOU’RE VIEWING</span>}</div><h3>{q.name}</h3><p>{q.category==='skincare'?q.ritual:q.type}<span>{q.size}</span></p><strong>{p.id===q.id?'Current product':'View product'}<ArrowUpRight size={17}/></strong></Link>)}</div></section>}
+ </>;
 }

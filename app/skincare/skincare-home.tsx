@@ -1,10 +1,22 @@
 "use client";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { ProductCard, useStore } from "../store-shell";
-import { CollectionGuide } from "../collection-guide";
-
-export function SkincareHome(){
-  const {products}=useStore();const skin=products.filter(p=>p.category==="skincare");
-  return <main id="main" className="skincare-home"><section className="skincare-department-hero"><div><p className="eyebrow">IQON SKINCARE</p><h1>Start with skin.<br/>Keep it simple.</h1><p>A cleanser, a serum, a moisturizer.<br/>A new expression of IQON.</p><Link className="button button-dark" href="/collections/skincare">Shop skincare<ArrowRight size={17}/></Link></div><div className="skincare-hero-image"><img src="/images/store/campaign-skincare.webp" alt="The IQON skincare collection with silver details and serum texture" width={1920} height={1080} fetchPriority="high"/></div></section><div className="skincare-step-rail"><a href="#routine">01 / Cleanse</a><a href="#routine">02 / Treat</a><a href="#routine">03 / Moisturize</a></div><section className="skincare-home-products section-pad"><div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2>Your skincare essentials.</h2></div><Link href="/collections/skincare" className="under-link">Shop all skincare<ArrowUpRight size={16}/></Link></div><div className="product-grid">{skin.map(p=><ProductCard key={p.id} product={p}/>)}</div></section><div id="routine"><CollectionGuide department="skincare"/></div><section className="department-discovery"><img src="/images/store/precision.webp" alt="IQON material study in serum and silver" width={1600} height={1200} loading="lazy"/><div><p className="eyebrow">THE IQON APPROACH</p><h2>The details<br/>make the difference.</h2><p>From the product to its place in your routine. Get to know the collection before you choose.</p><Link href="/approach" className="under-link">Discover IQON<ArrowUpRight size={16}/></Link></div></section><section className="skincare-supplement-link section-pad"><p className="eyebrow">ALSO FROM IQON</p><h2>Meet the supplement collection.</h2><Link href="/" className="button button-dark">Explore supplements<ArrowRight size={17}/></Link></section></main>;
+import { ArrowRight } from "lucide-react";
+import { useStore } from "../store-shell";
+import { ProductRail } from "../product-rail";
+import { JournalPreview, SkincareCampaign } from "../editorial";
+import { CampaignHero } from "../campaign-hero";
+import { customerReviews } from "@/lib/reviews";
+import { approvedSkincareResults } from "@/lib/skincare-results";
+import { SkincareDiscovery, SkincareReviews, SkinResults } from "./skincare-sections";
+import "./skincare.css";
+export function SkincareHome({designPreview=false}:{designPreview?:boolean}){
+ const {products}=useStore();const skin=products.filter(p=>p.category==="skincare");
+ return <main id="main" className="skincare-home"><CampaignHero skincare featured={skin.find(p=>p.type==="Serum")||skin[0]}/><div className="skincare-step-rail"><Link href="/products/gentle-cleanser">Cleanse</Link><Link href="/products/peptide-serum">Treat</Link><Link href="/products/barrier-cream">Moisturize</Link></div>
+ <section className="skincare-home-products section-pad commerce-featured" id="routine"><div className="section-heading"><div><p className="eyebrow">THE SKINCARE COLLECTION</p><h2>The everyday skincare ritual.</h2></div><Link href="/collections/skincare" className="button button-outline">Shop all skincare<ArrowRight size={18}/></Link></div><ProductRail products={skin} label="skincare products"/><Link href="/collections/skincare" className="button button-outline mobile-collection-action">Shop all skincare<ArrowRight size={18}/></Link></section>
+ <SkincareCampaign/>
+ <SkinResults results={approvedSkincareResults} products={skin} designPreview={designPreview}/>
+ <SkincareReviews reviews={customerReviews.filter(r=>skin.some(p=>p.id===r.productId))} products={skin} designPreview={designPreview}/>
+ <SkincareDiscovery/>
+ <JournalPreview skincare/>
+ </main>;
 }

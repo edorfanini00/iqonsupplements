@@ -1,27 +1,25 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { productPrice, SUPPLEMENT_HERO_IMAGE } from "@/lib/catalog";
-import { ProductCard, useStore } from "./store-shell";
+import { ArrowRight } from "lucide-react";
+import { CampaignHero } from "./campaign-hero";
+import { useStore } from "./store-shell";
+import { ProductRail } from "./product-rail";
+import { HumanStory, JournalPreview, SupplementCampaign } from "./editorial";
+import { CommunityReviews } from "./community-reviews";
+import { customerReviews } from "@/lib/reviews";
 
-export function IQONSite(){
- const {add,products,mode,busy,ready}=useStore();const featured=products.find(p=>p.category==="supplements")||products[0];const skin=products.filter(p=>p.category==="skincare"); const supplements=products.filter(p=>p.category==="supplements"); const essentials=[...supplements.slice(0,2),...skin.slice(0,2)]; const [tab,setTab]=useState("all");
- return <main id="main">
-  <section className={`home-hero ${mode==="preview"?"supplied-hero":""}`}>
-   <div className="hero-image-wrap"><img src={mode==="preview"?SUPPLEMENT_HERO_IMAGE:featured?.campaign||"/images/store/precision.webp"} alt="IQON creatine, collagen and colostrum powder collection" width={2400} height={1340} fetchPriority="high"/></div>
-   <div className="hero-copy"><p className="eyebrow">SUPPLEMENTS & SKINCARE</p><h1>Your health.<br/><em>Your daily routine.</em></h1><p className="hero-description">From creatine and collagen to your next skincare routine. Explore the IQON collection.</p><div className="hero-actions"><Link href="/collections/supplements" className="button button-light">Shop supplements <ArrowRight size={17}/></Link><Link href="/collections/skincare" className="hero-secondary">Explore skincare <ArrowUpRight size={16}/></Link></div></div>
-   {featured&&<div className="hero-product-note"><div><span className="eyebrow">IN THE COLLECTION</span><Link href={`/products/${featured.id}`}>{featured.name} <span>{productPrice(featured)}</span></Link></div>{featured.pricePending?<Link className="hero-product-link" aria-label={`View ${featured.name}`} href={`/products/${featured.id}`}><ArrowUpRight size={21}/></Link>:<button disabled={busy||!ready||featured.available===false} aria-label={`Add ${featured.name} to bag`} onClick={()=>add(featured.id)}><Plus size={23} strokeWidth={1.25}/></button>}</div>}
-  </section>
+export function IQONSite({designPreview=false}:{designPreview?:boolean}){
+ const {products,mode}=useStore();
+ const supplements=products.filter(p=>p.category==="supplements");
+ const featured=supplements[0]||products[0];
+ return <main id="main" className="iqon-home">
+  <CampaignHero featured={featured}/>
   <div className="collection-rail"><Link href="/collections/supplements"><span>01</span> Supplements <ArrowRight size={16}/></Link><p>Supplements and skincare. Together, IQON.</p><Link href="/collections/skincare"><span>02</span> Skincare <ArrowRight size={16}/></Link></div>
-  <section className="featured section-pad" id="collection">
-   <Tabs value={tab} onValueChange={setTab}><div className="section-heading"><div><p className="eyebrow">DISCOVER IQON</p><h2>Find your daily essentials.</h2></div><div className="section-heading-actions"><TabsList variant="line" className="collection-tabs"><TabsTrigger value="all">The essentials</TabsTrigger><TabsTrigger value="supplements">Supplements</TabsTrigger><TabsTrigger value="skincare">Skincare</TabsTrigger></TabsList><Link href="/collections/all" className="under-link">Shop all <ArrowUpRight size={16}/></Link></div></div>{["all","supplements","skincare"].map(value=><TabsContent key={value} value={value}><div className="product-grid home-product-grid">{(value==="all"?essentials:products.filter(p=>p.category===value)).map(p=><ProductCard key={p.id} product={p}/>)}</div></TabsContent>)}</Tabs>
-  </section>
-  <section className="skin-story"><div className="skin-story-photo"><img src={mode==="preview"?"/images/store/campaign-skincare.webp":skin[0]?.campaign||"/images/store/precision.webp"} alt="IQON serum and cream with tactile skincare texture and precise silver details" width={1920} height={1080} loading="lazy"/><span className="photo-caption">THE IQON SKINCARE COLLECTION</span></div><div className="skin-story-copy"><p className="eyebrow">A NEW EXPRESSION OF IQON</p><h2>Start with skin.<br/><em>Keep it simple.</em></h2><p>{!skin.length?"A new expression of IQON. Our skincare collection is in development.":"A cleanser, a serum, a moisturizer. Get to know the three products in our upcoming skincare collection."}</p><Link href="/collections/skincare" className="button button-dark">Explore skincare <ArrowRight size={18}/></Link><div className="ritual-mini"><span>01 / CLEANSE</span><span>02 / TREAT</span><span>03 / MOISTURIZE</span></div></div></section>
-  {!!skin.length&&<section className="routine-shop section-pad"><div className="section-heading"><div><p className="eyebrow">A ROUTINE THAT’S YOUR OWN</p><h2>Three steps. <em>Your skincare routine.</em></h2></div><Link href="/collections/skincare" className="under-link">Build your ritual <ArrowUpRight size={16}/></Link></div><div className="routine-grid">{skin.slice(0,3).map((p,i)=><article key={p.id}><div className="routine-step"><span>0{i+1}</span><p>{p.ritual}</p></div><Link href={`/products/${p.id}`} className="routine-product"><img src={p.image} alt={p.name} loading="lazy"/></Link><div><Link href={`/products/${p.id}`}><h3>{p.name}</h3><p>{p.descriptor}</p></Link><button disabled={busy||!ready||p.available===false} aria-label={`Add ${p.name} to bag`} onClick={()=>add(p.id)}><Plus size={20}/></button></div></article>)}</div></section>}
-  <section className="material-story"><div className="material-copy"><p className="eyebrow">THE IQON APPROACH</p><h2>Know what<br/>you’re choosing.</h2><p>The ingredient, the format, the amount in each pack. The details that help you compare products should be easy to find.</p><Accordion type="single" collapsible defaultValue="clarity" className="brand-principles">{[{id:"clarity",title:"Start with the product",text:"See the product up close and compare its size and format before you choose."},{id:"detail",title:"Find your format",text:"Powders, capsules, sachets and gummies offer different ways to build a routine. Explore them side by side."},{id:"routine",title:"Build at your own pace",text:"Start with the products you came for. There is no need to build your whole routine at once."}].map((item,i)=><AccordionItem key={item.id} value={item.id}><AccordionTrigger><span className="principle-label"><small>0{i+1}</small>{item.title}</span></AccordionTrigger><AccordionContent>{item.text}</AccordionContent></AccordionItem>)}</Accordion><Link href="/approach" className="under-link">Discover our approach <ArrowUpRight size={16}/></Link></div><div className="material-image"><img src="/images/store/precision.webp" alt="Macro study of clear serum and precisely machined silver" width={1600} height={1200} loading="lazy"/><span className="photo-caption">MATERIAL STUDY / 01</span></div></section>
-  <section className="everyday-story section-pad"><div className="everyday-photo"><img src="/images/store/campaign-lifestyle.webp" alt="Two adults enjoying an unhurried moment in natural daylight" width={1920} height={1080} loading="lazy"/></div><div className="everyday-copy"><p className="eyebrow">MADE FOR THE EVERYDAY</p><h2>Made to fit<br/><em>your day.</em></h2><p>A morning at home. Time at the gym. The end of a long day. Your routine belongs to you.</p><Link href="/collections/all" className="under-link">Find your essentials <ArrowUpRight size={16}/></Link></div></section>
+
+  <section className="featured section-pad commerce-featured" id="collection"><div className="section-heading"><div><p className="eyebrow">THE SUPPLEMENT COLLECTION</p><h2>Your routine starts here.</h2></div><Link href="/collections/supplements" className="button button-outline">Shop all supplements<ArrowRight size={18}/></Link></div><ProductRail products={supplements}/><Link href="/collections/supplements" className="button button-outline mobile-collection-action">Shop all supplements<ArrowRight size={18}/></Link></section>
+  <HumanStory movement/>
+  <JournalPreview/>
+  <SupplementCampaign/>
+  <CommunityReviews category="supplements" products={supplements} reviews={customerReviews.filter(review=>supplements.some(product=>product.id===review.productId))} designPreview={designPreview&&mode==="preview"}/>
  </main>;
 }

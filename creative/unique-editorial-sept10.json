@@ -1,0 +1,17 @@
+{
+  "provider": "Higgsfield",
+  "model": "GPT Image 2",
+  "purpose": "Distinct product details, skincare editorial cards and news photography replacing reused scenes.",
+  "processing": "Three product reference generations preserve the supplied IQON packshot designs. Six independent editorial photographs use unbranded materials and natural daylight. Resized to 896 by 1200 for portraits or 1440 by 814 for landscapes; WebP quality 90 for product images and 88 for editorial images.",
+  "assets": [
+    "/images/supplements/product-collagen-detail.webp",
+    "/images/supplements/product-keto5-detail.webp",
+    "/images/supplements/product-glp1-detail.webp",
+    "/images/editorial/community-water-hands.webp",
+    "/images/editorial/community-cream-glass.webp",
+    "/images/editorial/community-cotton-towel.webp",
+    "/images/editorial/community-serum-fingertip.webp",
+    "/images/editorial/news-reading-labels.webp",
+    "/images/editorial/news-skincare-routine.webp"
+  ]
+}

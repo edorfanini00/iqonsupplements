@@ -1,0 +1,57 @@
+{
+  "set": "IQON skincare editorial v7",
+  "date": "2026-09-10",
+  "classification": "AI-generated brand editorial assets; not customer evidence",
+  "references": [
+    "https://raw.githubusercontent.com/edorfanini00/iqonsupplements/8292eaa5354c9966916c10bd4b34631c1c7819ca/public/images/store/gentle-cleanser.webp",
+    "https://raw.githubusercontent.com/edorfanini00/iqonsupplements/8292eaa5354c9966916c10bd4b34631c1c7819ca/public/images/store/peptide-serum.webp",
+    "https://raw.githubusercontent.com/edorfanini00/iqonsupplements/8292eaa5354c9966916c10bd4b34631c1c7819ca/public/images/store/barrier-cream.webp"
+  ],
+  "generation_policy": "Exactly one generation for each of three assets; no variants, retries or refinements",
+  "requests": [
+    {
+      "index": 1,
+      "params": {
+        "model": "nano_banana_pro",
+        "prompt": "Create a premium editorial beauty photograph, vertical 4:5, of an adult dark-skinned Black woman around 30 years old gently applying one small dab of white cream to her cheek. This is a fictional brand editorial photograph depicting a skincare ritual, without any comparison, testimonial or implication about product results.\n\n[FRAMING AND GESTURE]\nTight intimate macro portrait at a subtle three-quarter angle. Her face occupies the top and middle of the image, with one eye, the bridge of her nose, cheek, relaxed closed lips and natural jawline clearly legible. The top of the head may crop naturally. Face runs from the top edge to approximately 70 percent of the frame; direct attention to the visible cheek near the center. One hand enters naturally from the right edge: the pad of her index finger lightly touches a pea-sized dab of cream on the cheek; the other fingers are relaxed and gently curved beside it, distinct and anatomically plausible. The hand connects naturally to its wrist. No oversized cream smear. Her gaze is softly downward, calm and absorbed in an everyday gesture; no advertising smile. Hair is naturally pulled back from the face. No product container.\n\n[ENVIRONMENT AND COMPOSITION FOR TEXT OVERLAY]\nUnderstated charcoal and cool silver-gray bathroom atmosphere with softly blurred architectural light. The bottom quarter consists of the naturally dark, softly defocused shoulder and charcoal robe against the same softly lit environment, quietly continuous with the photograph. Compose the face and applying gesture above this lower quarter so white HTML copy can later sit there. No hard-edged empty band, no artificial rectangle, no added text, no logo.\n\n[LIGHTING AND CAMERA]\n100mm macro portrait lens, f/4, large diffused window key from 45 degrees camera-left at 5500K with very soft frontal fill, restrained sculptural highlights across cheekbone and forehead, gentle deep shadow falloff. Skin remains rich deep brown with accurate undertones in this cool gray setting; no blue or gray cast on skin. Sharp eye, cheek microtexture, cream and fingertip at the shared plane of focus, gently soft background.\n\n[SKIN AND PHOTOGRAPHIC REGISTER]\nVisible natural pores, fine facial hair, tiny normal skin variations and realistic lip texture. Adult anatomy, precise natural finger and nail proportions, short unpolished nails. A tactile candid moment with controlled editorial framing, premium photographic detail and natural skin. This is a scene of application only, no transformation or results assertion.\n\n[AVOID]\nno AI artifacts, no warped or smeared text, no fake words baked into the image, no plastic look, no waxy surface, no cartoonish rendering, no extra fingers, no extra limbs, no melted geometry, no doubled subjects, no oversaturated HDR, no HDR halos, no oversharpened look, no flat fluorescent lighting, no harsh on-camera flash, no generic stock photography poses, no clich\u00e9 compositions, no random unrelated brand logos, no watermarks, no signatures, no AI sheen on hair or skin, no doll-like rendering, no airbrush look, no flat solid color bands, no empty rectangular areas, no dull gradient zones that look out of place from the rest of the scene. no AI uncanny faces, no warped facial geometry, no asymmetric eyes, no extra teeth, no melted facial features, no warped fingers or hands, no plastic skin, no orange-tan skin, no over-smoothed retouching, no doll eyes, no misaligned facial features, no rubber-like skin texture, no warped jewelry or glasses, no stiff unnatural posture. The calm lower area must blend naturally into the scene as part of the actual environment, NOT a hard-edged solid-color rectangle, NOT an artificial flat band, NOT a cropped-looking empty zone disconnected from the rest of the image.\nNo words, logos, product jars, before-and-after layout, split screen, results charts, clinical imagery, testimonial graphic, beauty filter, beauty retouching, oily exaggerated shine, distorted fingertips, impossible hand position, extra hand, plastic skin, heavy makeup, elaborate jewelry, flowers, plants, pink backdrop or gold decor.\n\nresolution: 4k",
+        "aspect_ratio": "4:5",
+        "resolution": "4k",
+        "count": 1
+      }
+    },
+    {
+      "index": 2,
+      "params": {
+        "model": "nano_banana_pro",
+        "prompt": "[FRAMING]\nVertical 3:4 tight real-life product closeup in an understated cool gray bathroom. The exact supplied PEPTIDE SERUM bottle is the dominant visual anchor, large and crisp, filling about 60 percent of frame height and placed slightly left of center. Only an adult woman's two hands and forearms are visible. No face, no torso portrait. Intimate product-in-use framing with plausible space for the dispensing gesture beside the pump. Label completely readable.\n\n[PRODUCT]\nUse the supplied product image as the authoritative reference: upright frosted clear cylindrical glass bottle, subtly rounded shoulders, brushed silver cylindrical collar, intact black pump with a short horizontal spout pointing to image-right, ivory textured rectangular label bearing the distinctive uppercase serif IQON wordmark and PEPTIDE SERUM below. Preserve bottle shape, height-to-width proportions, cap mechanism, materials, label layout and typography exactly. This is a pump, never a dropper.\n\n[PERSON CONTEXT]\nTwo adult hands with warm medium-brown natural skin, short unpolished nails, visible fine creases and texture, no jewelry. Hands are supporting context; the product stays the crisp visual anchor.\n\n[INTERACTION]\nHer left hand holds the serum bottle upright securely around its upper body from camera-left, with thumb and gently curved supporting fingers on the sides so they do not cover the front label. Her left index finger rests on and gently depresses the black pump top. Her right hand is palm-up immediately beneath the right-facing nozzle, with the index and middle fingertips together below the nozzle and the remaining fingers naturally curled. Show one tiny clear serum bead just leaving the nozzle and landing on these fingertips. The two wrists enter from separate natural frame edges, visibly distinct; the gesture is physically possible and unforced. The pump stays attached to the bottle and retains its original shape.\n\n[LIGHTING]\nLarge diffused bathroom window light from 45 degrees camera-left at 5500K. Soft side raking light reveals skin creases, a narrow controlled catchlight reveals the serum bead, rim separation on frosted glass, gentle directional shadow falloff and quiet ambient fill. Realistic skin highlight without plasticity.\n\n[LENS & CAMERA]\n100mm macro lens, f/4, controlled shallow depth of field, sharp focus on product label, intact pump and dispensing fingertips in a coherent focal plane, understated bathroom environment falls into gentle bokeh.\n\n[SKIN & DETAIL]\nReal skin texture with pores, faint fine hairs and natural micro-imperfections. Anatomically correct adult hands, five fingers on each hand, natural thumb joints, accurate nail beds. Clear fluid is tiny and physically plausible, never an exaggerated long stream.\n\n[COLOR PALETTE]\nCool soft gray, brushed silver and graphite bathroom with ivory label. Preserve natural skin undertones. Blurred edge of a real gray sink and one subdued brushed metal fitting in the background, minimal authentic lived-in environment.\n\n[STYLE REFERENCE]\nNatural-feeling intimate beauty ritual, precise commercial still-life treatment of the product, soft architectural light, carefully controlled material detail and relaxed human gesture. Photographed premium editorial standard.\n\n[PRODUCT FIDELITY DIRECTIVE]\nThe product remains identical to the supplied reference, same color, frosted glass, brushed metal collar, black attached pump, ivory label and serif wordmark. Product is the visual anchor and the human gesture provides context. No customer review or results claim is depicted.\n\n[QUALITY MARKERS]\nHyper-detailed photorealistic product photography, realistic natural skin and serum texture, precise packaging, premium beauty editorial standard.\n\n[AVOID]\nno AI artifacts, no warped or smeared text, no fake words baked into the image, no plastic look, no waxy surface, no cartoonish rendering, no extra fingers, no extra limbs, no melted geometry, no doubled subjects, no oversaturated HDR, no HDR halos, no oversharpened look, no flat fluorescent lighting, no harsh on-camera flash, no generic stock photography poses, no clich\u00e9 compositions, no random unrelated brand logos, no watermarks, no signatures, no AI sheen on hair or skin, no doll-like rendering, no airbrush look, no flat solid color bands, no empty rectangular areas, no dull gradient zones that look out of place from the rest of the scene. no AI uncanny faces, no warped facial geometry, no asymmetric eyes, no extra teeth, no melted facial features, no warped fingers or hands, no plastic skin, no orange-tan skin, no over-smoothed retouching, no doll eyes, no misaligned facial features, no rubber-like skin texture, no warped jewelry or glasses, no stiff unnatural posture. no warped product label text, no garbled letters, no fake brand names, no melted typography, no doubled labels, no fictional logos.\nNo stale stock photography aesthetic, no over-staged feeling, no unrealistically clean environments, no perfect symmetry, no obviously composited backgrounds. No face dominating the frame, no person taking focus from product, no clinical sterile feel, no detached pump, no dropper, no extra bottle, no floating bottle, no covered label, no incompatible grip, no extra hand, no merged fingers, no invented product text, no claims or captions or graphics.\n\nresolution: 2k",
+        "aspect_ratio": "3:4",
+        "resolution": "2k",
+        "count": 1,
+        "medias": [
+          {
+            "role": "image",
+            "value": "https://raw.githubusercontent.com/edorfanini00/iqonsupplements/8292eaa5354c9966916c10bd4b34631c1c7819ca/public/images/store/peptide-serum.webp"
+          }
+        ]
+      }
+    }
+  ],
+  "selected_files": [
+    {
+      "path": "public/images/editorial/skincare-touch-v7.webp",
+      "dimensions": [
+        3712,
+        4608
+      ]
+    },
+    {
+      "path": "public/images/editorial/skincare-hands-v7.webp",
+      "dimensions": [
+        1792,
+        2400
+      ]
+    }
+  ],
+  "fallback": "The generated three-product still life was rejected for label/pump changes. The paired collection card reuses public/images/store/campaign-skincare.webp, the existing approved collection photograph.",
+  "publication_scope": "Editorial imagery only, never customer media or before-and-after evidence."
+}

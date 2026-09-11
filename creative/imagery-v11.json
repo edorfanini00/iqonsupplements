@@ -1,0 +1,272 @@
+{
+  "project": "iqonsupplements",
+  "batch": "v11",
+  "created_date": "2026-09-10",
+  "provenance": "AI-generated using built-in image_gen.imagegen. Product images are reference-guided compositions of existing IQON packaging. Skin comparisons are fictional cosmetic illustrations for design preview and are not clinical results or evidence.",
+  "brand_assets": [
+    {
+      "name": "news-reading-labels-iqon",
+      "prompt": "Use case: product-mockup. Create one finished landscape 3:2 premium editorial product photograph, 1536x1024 or larger. The input is an exact PACKAGING REFERENCE. Preserve this actual IQON NMN white supplement bottle, dimensions, rounded shoulders, simple white cap, muted grey-mauve gradient label, prominent existing IQON logo, large outlined Q and all supplied label typography. Do not redesign packaging. Place the bottle on its side at a slight diagonal on a cool silver-gray desk, photographed from above at an oblique angle, front label facing the viewer and readable. Include exactly two loose white capsules near the bottle, no hands. Product prominent but breathing room. Sophisticated real commercial photograph, natural material microtexture, soft directional daylight, subtle crisp shadow, cool silver charcoal blue-gray palette, meaningful depth and focus. Preserve visible label text: \"IQON\", \"NMN\", \"500 mg\", \"PER CAPSULE\", \"Supports cellular energy production*\", \"DIETARY SUPPLEMENT\", \"30 CAPSULES\". No overlay text, no unbranded vessels, no marble, no podiums, no beige spa setting, no glow or CGI plastic appearance.",
+      "refs": [
+        "images/supplements/08_pack_nmn.webp"
+      ],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "reference-guided generation",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "review": "Inspected final image: logo/product name readable; packaging, material and brand palette preserved; composition survives intended center crop.",
+      "web_assets": [
+        {
+          "path": "/images/editorial/news-reading-labels-iqon-v11.webp",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "1b5c639d7c9b1ca9947edecf06afbdfe045998dbc2f6de92e8cce0e3d352ab89"
+        }
+      ]
+    },
+    {
+      "name": "news-skincare-ritual-iqon",
+      "prompt": "Use case: photorealistic-natural. Create one landscape 3:2 editorial lifestyle photograph, 1536x1024 or larger, for IQON skincare. Input is exact PACKAGING REFERENCE only. A woman around 35 with natural realistic unretouched skin, visible pores and tiny natural irregularities, applies a small dab of cream to one cheek with two fingers at home. Her other hand holds the actual open IQON BARRIER CREAM jar from the reference prominently in the lower foreground, front label readable. Preserve exact frosted glass wide squat cylindrical jar, ivory rectangular label, black serif IQON logo and exact text \"BARRIER CREAM\", size proportions and original materials. Detached brushed-silver lid can be absent from crop. Close natural portrait crop, charcoal knit top, hair simply pulled away from face, relaxed candid expression, cool dark-grey domestic background softly out of focus. Editorial product use, no sink or washing scene. Soft window daylight with controlled shadow, subtle blue-gray and charcoal palette. Product and applying fingers in clear focus, plausible fingers and hands, skin looks human with texture. No unbranded jar, no invented branding, no marble, no podiums, no beige bathroom, no handwashing, no water splash, no makeup smoothing, no airbrush, no words outside packaging.",
+      "refs": [
+        "images/store/barrier-cream.webp"
+      ],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "reference-guided generation",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "review": "Inspected final image: logo/product name readable; packaging, material and brand palette preserved; composition survives intended center crop.",
+      "web_assets": [
+        {
+          "path": "/images/editorial/news-skincare-ritual-iqon-v11.webp",
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "30aa2d324113d354db4818191f24435b4ae6a9b84e7f2204c933f944e2933e0d"
+        }
+      ]
+    },
+    {
+      "name": "community-serum-iqon",
+      "prompt": "Use case: photorealistic-natural. Create one portrait 3:4 photograph, 1536x2048 or high resolution, for IQON skincare community editorial. The input is exact PACKAGING REFERENCE. Thoughtful close-up of natural human hands gently holding the actual IQON PEPTIDE SERUM bottle against the person's charcoal cotton clothing. No face in frame. Match the original frosted cylindrical glass bottle, black pump head with short rightward spout, tall brushed silver collar, ivory paper label and tall black serif \"IQON\" logo with exact \"PEPTIDE SERUM\" product name. Preserve dimensions, proportions, label layout and cap/pump design accurately, no redesign. Hands have real fine creases, short clean natural nails, five plausible digits each, relaxed grip not covering the logo or product text. Bottle dominant and entirely in frame. Natural soft daylight from side with texture in glass, skin and fabric, premium but intimate editorial photograph, silver charcoal blue-gray palette, subtly asymmetrical composition. No other bottles, no label substitutions, no jewelry distraction, no marble, no beige setting, no words outside packaging, no airbrushed plastic hands.",
+      "refs": [
+        "images/store/peptide-serum.webp"
+      ],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "reference-guided generation",
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "review": "Inspected final image: logo/product name readable; packaging, material and brand palette preserved; composition survives intended center crop.",
+      "web_assets": [
+        {
+          "path": "/images/editorial/community-serum-iqon-v11.webp",
+          "dimensions": [
+            1086,
+            1448
+          ],
+          "sha256": "c882bd6bf5456d86267208e6d31e14937d3a92a9f763815862958e7a74a8d196"
+        }
+      ]
+    },
+    {
+      "name": "community-cream-iqon",
+      "prompt": "Use case: product-mockup. Create one portrait 3:4 high-resolution premium still life photograph for IQON skincare. Input is exact PACKAGING REFERENCE. Show actual IQON BARRIER CREAM jar from reference OPEN on a cool blue-gray silver surface, with original brushed-silver round lid resting face-up beside it, and a small elegant natural cream swirl on the surface nearby. Preserve the squat wide frosted cylindrical glass jar shape, real thick glass base, ivory paper rectangular label with exact tall black serif \"IQON\" and smaller \"BARRIER CREAM\". The jar is open with softly swirled white cream visible, and the detached lid retains its original shallow silver cylinder and black rim. Three-quarter angle slightly above, label readable, jar large in lower central frame, lid offset to upper right, small cream swirl near lower right. Controlled soft directional light, realistic brushed metal, cool subtle shadows, premium quietly technical product editorial, no CGI rendering. No podium, no marble, no beige spa props, no other products, no hands, no text outside label, no unbranded vessels. Composition must feel like a close independent community still life, not a wide campaign banner.",
+      "refs": [
+        "images/store/barrier-cream.webp"
+      ],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "reference-guided generation",
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "review": "Inspected final image: logo/product name readable; packaging, material and brand palette preserved; composition survives intended center crop.",
+      "web_assets": [
+        {
+          "path": "/images/editorial/community-cream-iqon-v11.webp",
+          "dimensions": [
+            1086,
+            1448
+          ],
+          "sha256": "7f416914b0550e90f421dff8f8ff674de6c9d9319c377aa253dfe1145f9d848e"
+        }
+      ]
+    }
+  ],
+  "skin_assets": [
+    {
+      "name": "skin-texture-pair-v11",
+      "prompt": "Use case: photorealistic-natural. Asset: FICTIONAL COSMETIC SKIN ILLUSTRATION for a website design preview, not clinical evidence. Generate one high-resolution horizontal 2:1 diptych ideally 3072x1536 pixels, consisting of TWO IDENTICAL SIZE SQUARE PANELS flush adjacent, left before and right after. NO TEXT, no labels, no borders, no graphic divider. Both panels must be the SAME HAIR-FREE CHEEK PATCH of the SAME fictional person, identical camera angle, skin curvature, patch extent, magnification, exposure, white balance, light direction and focus. Imagine lock-off macro photographs with exact feature registration: the same individual freckles and pore constellations at matching x/y coordinates within each square. ONLY tight macro hair-free cheek skin fills 100 percent of frame. No visible eye, eyelid edge, eyelashes, eyebrows, lips, nostril, scalp, hair, facial hair or peach fuzz anywhere, and no full face. At most a tiny soft nose-side curvature at far left edge in each panel provides an anatomical landmark. Crisp in-focus ORGANIC irregular pores of varying size and orientation and tiny creases BOTH halves, fine natural speckles. Fine texture is irregular living human skin, not generated grain or uniform repeated pinholes. The after skin must look substantially improved yet HUMAN: visible pores, stable freckles and minute irregularities all remain; do not airbrush, blur, smooth away pores, lighten skin or change color grading. Improvement through decreased superficial dryness and calmer texture only, under exactly identical lighting. No plastic, waxy, CGI texture. Subject variation: LIGHT SKIN cheek with sparse tiny freckles, neutral pink-beige undertone, extreme close macro showing ~3cm of skin. LEFT before: clearly visible fine dry microflakes, patchy roughness, a few tiny shallow dehydration lines, realistic enlarged irregular pores. RIGHT after: noticeably much less flaking and softer shallow dehydration lines, hydrated calmer more supple surface, but sharply resolved pores and exact same freckles are still visible. Improvement is clear at thumbnail size without changing brightness. Realistic pores must occupy skin naturally, not a stippled artificial pattern. Both halves equally sharp.",
+      "refs": [],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "new fictional cosmetic illustration",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "review": "Inspected final diptych. Crisp pores and stable features retained on both sides. Use identical square crop on each half to exclude lower facial-feature edge.",
+      "web_crop": {
+        "split_x": 887,
+        "within_each_half": {
+          "left": 40,
+          "top": 0,
+          "width": 830,
+          "height": 830
+        }
+      },
+      "web_assets": [
+        {
+          "path": "/images/editorial/skin-detail-texture-before-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "f820fc7f60fc751450c1517a4468e9d10907437d30bdc45436f25f974ed1a651"
+        },
+        {
+          "path": "/images/editorial/skin-detail-texture-after-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "c043b835c8b381fd7768f85c34e452ddb3c9132ced7596823152b68ceb34f1f0"
+        }
+      ]
+    },
+    {
+      "name": "skin-cheek-pair-v11",
+      "prompt": "Use case: photorealistic-natural. Asset: FICTIONAL COSMETIC SKIN ILLUSTRATION for a website design preview, not clinical evidence. Generate one high-resolution horizontal 2:1 diptych ideally 3072x1536 pixels, consisting of TWO IDENTICAL SIZE SQUARE PANELS flush adjacent, left before and right after. NO TEXT, no labels, no borders, no graphic divider. Both panels must be the SAME HAIR-FREE CHEEK PATCH of the SAME fictional person, identical camera angle, skin curvature, patch extent, magnification, exposure, white balance, light direction and focus. Imagine lock-off macro photographs with exact feature registration: the same individual freckles and pore constellations at matching x/y coordinates within each square. ONLY tight macro hair-free cheek skin fills 100 percent of frame. No visible eye, eyelid edge, eyelashes, eyebrows, lips, nostril, scalp, hair, facial hair or peach fuzz anywhere, and no full face. At most a tiny soft nose-side curvature at far left edge in each panel provides an anatomical landmark. Crisp in-focus ORGANIC irregular pores of varying size and orientation and tiny creases BOTH halves, fine natural speckles. Fine texture is irregular living human skin, not generated grain or uniform repeated pinholes. The after skin must look substantially improved yet HUMAN: visible pores, stable freckles and minute irregularities all remain; do not airbrush, blur, smooth away pores, lighten skin or change color grading. Improvement through decreased superficial dryness and calmer texture only, under exactly identical lighting. No plastic, waxy, CGI texture. Subject variation: MEDIUM OLIVE SKIN cheek, neutral olive-beige undertone, extreme close macro showing ~3cm of skin. LEFT before: visible irregular pores, rough surface, mild blemish-associated redness and a few small dry areas. RIGHT after: clearly calmer, clearer and supple skin with reduced mild redness and roughness while retaining visible pores, subtle marks and natural fine texture at the same level of detail. Same underlying olive skin tone in both halves. Both halves equally sharp, not a brightness change. No active wounds or severe acne.",
+      "refs": [],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "new fictional cosmetic illustration",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "review": "Inspected final diptych. Crisp pores and stable features retained on both sides. Use identical square crop on each half to exclude lower facial-feature edge.",
+      "web_crop": {
+        "split_x": 887,
+        "within_each_half": {
+          "left": 40,
+          "top": 0,
+          "width": 830,
+          "height": 830
+        }
+      },
+      "web_assets": [
+        {
+          "path": "/images/editorial/skin-detail-cheek-before-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "a9a81d18d2b96fd8846182fc6a2c81dc9e1bdf261234884ac659d429eb595f4d"
+        },
+        {
+          "path": "/images/editorial/skin-detail-cheek-after-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "5024530bb761155c4be6de935a353072e7a52b1044379247db83ea35d4aef564"
+        }
+      ]
+    },
+    {
+      "name": "skin-tone-pair-v11",
+      "prompt": "Use case: photorealistic-natural. Asset: FICTIONAL COSMETIC SKIN ILLUSTRATION for a website design preview, not clinical evidence. Generate one high-resolution horizontal 2:1 diptych ideally 3072x1536 pixels, consisting of TWO IDENTICAL SIZE SQUARE PANELS flush adjacent, left before and right after. NO TEXT, no labels, no borders, no graphic divider. Both panels must be the SAME HAIR-FREE CHEEK PATCH of the SAME fictional person, identical camera angle, skin curvature, patch extent, magnification, exposure, white balance, light direction and focus. Imagine lock-off macro photographs with exact feature registration: the same individual freckles and pore constellations at matching x/y coordinates within each square. ONLY tight macro hair-free cheek skin fills 100 percent of frame. No visible eye, eyelid edge, eyelashes, eyebrows, lips, nostril, scalp, hair, facial hair or peach fuzz anywhere, and no full face. At most a tiny soft nose-side curvature at far left edge in each panel provides an anatomical landmark. Crisp in-focus ORGANIC irregular pores of varying size and orientation and tiny creases BOTH halves, fine natural speckles. Fine texture is irregular living human skin, not generated grain or uniform repeated pinholes. The after skin must look substantially improved yet HUMAN: visible pores, stable freckles and minute irregularities all remain; do not airbrush, blur, smooth away pores, lighten skin or change color grading. Improvement through decreased superficial dryness and calmer texture only, under exactly identical lighting. No plastic, waxy, CGI texture. Subject variation: MEDIUM BROWN SKIN cheek with a few stable sparse freckles, warm brown undertone, extreme close macro showing ~3cm of skin. LEFT before: mild blotchy uneven pigmentation and slightly dehydrated uneven surface, realistic natural irregular pores and fine speckles. RIGHT after: clearly more even pigmentation distribution and supple texture while retaining the EXACT SAME base brown skin tone, stable individual freckles in precisely matching positions, and all natural crisp pores. The after is NOT lighter, brighter or desaturated. Underlying average brown shade identical; only scattered mild uneven patches become closer to surrounding brown tone. Neither panel blurry. Texture has irregular natural pore geometry not random noise.",
+      "refs": [],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "new fictional cosmetic illustration",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "review": "Inspected targeted correction: left has clearer local diffuse brown pigmentation patches, right more even tone, same base shade, stable freckles and sharp pores. No lip visible after corrected crop.",
+      "web_crop": {
+        "split_x": 887,
+        "within_each_half": {
+          "left": 40,
+          "top": 0,
+          "width": 830,
+          "height": 830
+        }
+      },
+      "revision_prompt": "Use case: precise-object-edit. Revise this FICTIONAL COSMETIC SKIN ILLUSTRATION only. It is an illustrative design preview, not clinical evidence. Keep the two equal square panels flush adjacent, 2:1 horizontal high-resolution diptych without any text, border or graphics. Preserve camera angle, geometry, freckle positions, detailed organic pores, identical sharpness, and medium brown base skin color across both panels. Targeted change: the LEFT before cheek should have more clearly visible mild patchy uneven pigmentation: several diffuse slightly darker brown patches spread across upper/central cheek, with fine superficial dryness. This unevenness should be clearly visible at thumbnail scale but still plausible everyday uneven skin, not a disease or injury. The RIGHT after should retain natural pores and the same distinct freckles but have visibly more even medium-brown tone and supple fine texture. Do not lighten the skin or alter exposure, saturation or underlying base shade in either half. Both panels keep identical detailed sharpness, no blur or airbrush. Also shift the crop slightly upward/tighter in EXACTLY THE SAME WAY on both halves to remove the tiny lip corner at the bottom entirely: final frame must contain ONLY HAIR-FREE CHEEK SKIN, no lips, eye, lashes, eyebrows, facial hair or peach fuzz. Realistic microtexture must be crisp and irregular, not stippled or synthetic. Keep photographic skin texture at least as detailed as input. Output requested 3072x1536 if supported, otherwise highest sensible native 2:1 size.",
+      "web_assets": [
+        {
+          "path": "/images/editorial/skin-detail-tone-before-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "9999b4132801b73c8378ac9c0548fb1dbb81741ece17e1cdf15d6f283b99e70f"
+        },
+        {
+          "path": "/images/editorial/skin-detail-tone-after-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "1bdb963d4de770618afeaae97010e610ed5facc790b994ac0b561dfcd5cd1049"
+        }
+      ]
+    },
+    {
+      "name": "skin-lines-pair-v11",
+      "prompt": "Use case: photorealistic-natural. Asset: FICTIONAL COSMETIC SKIN ILLUSTRATION for a website design preview, not clinical evidence. Generate one high-resolution horizontal 2:1 diptych ideally 3072x1536 pixels, consisting of TWO IDENTICAL SIZE SQUARE PANELS flush adjacent, left before and right after. NO TEXT, no labels, no borders, no graphic divider. Both panels must be the SAME HAIR-FREE CHEEK PATCH of the SAME fictional person, identical camera angle, skin curvature, patch extent, magnification, exposure, white balance, light direction and focus. Imagine lock-off macro photographs with exact feature registration: the same individual freckles and pore constellations at matching x/y coordinates within each square. ONLY tight macro hair-free cheek skin fills 100 percent of frame. No visible eye, eyelid edge, eyelashes, eyebrows, lips, nostril, scalp, hair, facial hair or peach fuzz anywhere, and no full face. At most a tiny soft nose-side curvature at far left edge in each panel provides an anatomical landmark. Crisp in-focus ORGANIC irregular pores of varying size and orientation and tiny creases BOTH halves, fine natural speckles. Fine texture is irregular living human skin, not generated grain or uniform repeated pinholes. The after skin must look substantially improved yet HUMAN: visible pores, stable freckles and minute irregularities all remain; do not airbrush, blur, smooth away pores, lighten skin or change color grading. Improvement through decreased superficial dryness and calmer texture only, under exactly identical lighting. No plastic, waxy, CGI texture. Subject variation: MATURE LIGHT-MEDIUM SKIN cheek closeup directly below under-eye area, but crop must exclude the actual eye, eyelashes and any facial hair completely. Only cheek skin with a gentle cheekbone curvature fills frame. LEFT before: several shallow fine dehydration creases crossing the cheek, small dry microflakes and roughness, believable mature texture with irregular pores. RIGHT after: visibly reduced superficial fine crease depth and substantially less flaking, more supple hydrated surface, but mature natural texture, fine irregular pores, a few deeper creases and stable tiny freckles remain. Keep age credible; no age reversal or erased mature texture. Both equally detailed and sharply focused, same shadow and exposure. This is cosmetic illustrative variation, no actual treatment claim.",
+      "refs": [],
+      "tool": "image_gen.imagegen",
+      "mode": "built-in",
+      "generation_type": "new fictional cosmetic illustration",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "review": "Inspected final diptych. Crisp pores and stable features retained on both sides. Use identical square crop on each half to exclude lower facial-feature edge.",
+      "web_crop": {
+        "split_x": 887,
+        "within_each_half": {
+          "left": 40,
+          "top": 0,
+          "width": 830,
+          "height": 830
+        }
+      },
+      "web_assets": [
+        {
+          "path": "/images/editorial/skin-detail-eye-before-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "9768cc866c1d7ff4b846aa3d1a08c1dcef735d9d4d7170839c1c02dafd6d590e"
+        },
+        {
+          "path": "/images/editorial/skin-detail-eye-after-v11.webp",
+          "dimensions": [
+            830,
+            830
+          ],
+          "sha256": "bd5072130bb0955407e701690faeaf3d9aa45ee45dbc774f511f4a4b036461fa"
+        }
+      ]
+    }
+  ],
+  "processing": "Matched 830px square panel crops for skin pairs; WebP conversion quality 96 for skin and 94 for brand images. No post-generation smoothing, sharpening, color grading or skin retouching."
+}

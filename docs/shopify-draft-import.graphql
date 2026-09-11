@@ -1,0 +1,12 @@
+# Validated Admin API operation used for the draft import.
+# Do not rerun without checking existing handles/IDs: this operation creates a product.
+mutation IQONDraftProduct($input: ProductSetInput!) {
+  productSet(input: $input, synchronous: true) {
+    product {
+      id handle title status
+      variants(first: 10) { nodes { id title price inventoryPolicy inventoryQuantity } }
+      media(first: 10) { nodes { id alt mediaContentType status } }
+    }
+    userErrors { field message }
+  }
+}

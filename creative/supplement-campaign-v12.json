@@ -1,0 +1,23 @@
+{
+  "generator": "built-in imagegen",
+  "purpose": "Supplement adaptation of the existing IQON skincare campaign",
+  "references": [
+    "public/images/editorial/skincare-campaign-desktop.webp",
+    "public/images/supplements/00_pack_creatine.webp",
+    "public/images/supplements/06_pack_glp1_support.webp"
+  ],
+  "assets": [
+    {
+      "path": "public/images/editorial/supplement-campaign-desktop-v12.webp",
+      "width": 2172,
+      "height": 724,
+      "prompt": "Use case: precise-object-edit / product-mockup. Create a premium IQON supplements website campaign photograph, landscape exactly 3072x1024 (3:1). Image 1 is the visual and lighting reference: preserve its exact cool silver-blue subtly textured flat surface, dark charcoal left negative space fading to silver-blue light on the right, raking studio sunlight from upper left, sophisticated tactile texture, deep soft-edged directional shadows, overhead flat-lay camera, ultra realistic photographic detail and restrained luxury mood. Replace the skincare products entirely with exactly TWO IQON supplement products from reference images 2 and 3. Image 2 is the exact Creatine Monohydrate packaging reference: large white plastic powder jar, broad smooth white cap, silver-blue gradient label, black serif IQON, outlined Q and white CREATINE MONOHYDRATE lettering. Image 3 is the exact GLP-1 SUPPORT capsule bottle reference: white plastic bottle and smooth white screw cap, pale silver to muted slate-blue gradient, black serif IQON, outlined Q, white GLP-1 SUPPORT text, small 30 DAY SUPPLY circle. Keep their true packaging, typography and label proportions as faithfully as possible; do not turn them into frosted glass, pumps, skincare jars or silver caps. Layout: keep left 43 percent empty and charcoal-dark for HTML copy; place the GLP-1 bottle diagonally across the center-right at x62% y55%, and the larger Creatine jar diagonally at upper-right x83% y42%, both lying on the same surface, labels facing camera, natural coherent long shadows. The complete caps, labels and bottle bases must remain within the frame with generous margins; all product pixels within x48%-96%, y10%-90%. Match reference 1's photographic polish and material realism, no floating products, no plinths, no hands, no people, no extra props. NO overlay headings, slogans, UI, buttons or decorative text; only the genuine printed packaging text. Output a single continuous photograph, no collages or borders."
+    },
+    {
+      "path": "public/images/editorial/supplement-campaign-mobile-v12.webp",
+      "width": 1086,
+      "height": 1448,
+      "prompt": "Edit the first reference photograph into a matching vertical mobile campaign composition, exactly 1152x1536 (3:4). Preserve the EXACT finished photographic look: same IQON Creatine Monohydrate white jar and GLP-1 SUPPORT white capsule bottle, exact label designs and readable IQON serif branding, same cool silver-blue fine-textured surface, same upper-left light and natural long shadows, same degree of material detail, same charcoal darkness. Supporting product references 2 and 3 are for faithful package design. Recompose ONLY the camera framing and positions: the two entire products sit diagonally together in the UPPER HALF, one capsule bottle around x30% y29%, one slightly larger Creatine jar around x69% y23%; keep every cap, label and base safely inside x9%-92%, y5%-51%. Preserve natural relative product sizes and shadows; avoid overlap covering either product name. Leave the LOWER 45% as uninterrupted textured dark charcoal-to-silver-blue negative space for white webpage copy, no products or bright patches in that region. The result must be a realistic mobile companion from the same photo shoot, not a stretched or cropped landscape, not a collage. No scenery changes, no extra objects, no hands, no cosmetics, no metal caps, no floating products. Only printed product labels may contain text; absolutely no overlaid headlines, captions, text blocks or buttons. Premium continuous product photography."
+    }
+  ]
+}
