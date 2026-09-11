@@ -1,4 +1,5 @@
 import { productContent } from "./product-content";
+import approvedPrices from "./approved-prices.json";
 export type Category = "supplements" | "skincare";
 export type Purchase = "once" | "subscription";
 export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean};
@@ -12,7 +13,7 @@ export type Product = {
 export type StoreCatalog = {mode:"preview"|"live"|"unavailable"; products:Product[]; currency:string};
 
 // Studio images use supplied IQON packaging. Product information is transcribed from the supplied
-// supplier specifications in supplement-details.ts; no inventory or pricing is inferred.
+// supplier specifications in supplement-details.ts. Prices approved on 11 September 2026; stock is not inferred.
 export const SUPPLEMENT_COLLECTION_IMAGE = "/images/supplements/20_group_all_row.webp";
 export const SUPPLEMENT_HERO_IMAGE = "/images/supplements/22_group_powders_row.webp";
 const asset = (name: string) => `/images/supplements/${name}.webp`;
@@ -22,7 +23,7 @@ function supplement(
 ): Product {
   return {
     id, name, category: "supplements", type, size, descriptor: productContent[id]?.descriptor || descriptor, description: productContent[id]?.description || description,
-    number: String(index + 1).padStart(2, "0"), price: 0, pricePending: true,
+    number: String(index + 1).padStart(2, "0"), price: approvedPrices[id as keyof typeof approvedPrices], pricePending: false,
     available: false, image: asset(pack), tone: "silver", ritual: "",
     campaign: asset(detail),
     images: [pack, detail].map((file, i) => ({
@@ -65,10 +66,10 @@ const previewProducts: Product[] = [
   supplement("hair-skin-nails-gummies", "Hair, Skin & Nails Gummies", "Gummies", "60 gummies · Passion fruit",
     "A different kind of daily ritual.", "Passion-fruit-flavored Hair, Skin & Nails Gummies in a clear bottle of 60 gummies.",
     "10_pack_hair_and_skin_gummies", "14_hero_gummies_falling", 10),
-  // Skincare concepts and sample USD prices remain for the labelled store preview.
-  {id:"peptide-serum",name:"Peptide Serum",category:"skincare",type:"Serum",number:"12",price:88,size:"30 mL",descriptor:"Your daily treatment step.",description:"A serum concept at the heart of the IQON skincare ritual. Presented in frosted glass with a precise dispenser, it is designed as the treatment step between cleansing and moisturizing.",image:"/images/store/peptide-serum.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Treat",images:[{src:"/images/store/peptide-serum.webp",alt:"IQON Peptide Serum packaging"},{src:"/images/editorial/iqon-serum-mobile.webp",alt:"A close look at the IQON Peptide Serum bottle"}]},
-  {id:"barrier-cream",name:"Barrier Cream",category:"skincare",type:"Moisturizer",number:"13",price:72,size:"50 mL",descriptor:"The finishing touch.",description:"A cream concept for the final moisturizing step in a simple skincare routine. A tactile glass jar and restrained finish bring the IQON approach to an everyday essential.",image:"/images/store/barrier-cream.webp",campaign:"/images/store/campaign-skincare.webp",tone:"ivory",ritual:"Moisturize",images:[{src:"/images/store/barrier-cream.webp",alt:"IQON Barrier Cream packaging"}]},
-  {id:"gentle-cleanser",name:"Gentle Cleanser",category:"skincare",type:"Cleanser",number:"14",price:38,size:"150 mL",descriptor:"Begin with the essentials.",description:"The first step in the IQON skincare collection. This cleanser concept uses a practical pump format and pairs with the serum and cream as a three-part ritual.",image:"/images/store/gentle-cleanser.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Cleanse",images:[{src:"/images/store/gentle-cleanser.webp",alt:"IQON Gentle Cleanser packaging"}]},
+  // Approved skincare prices; the local catalog does not imply live inventory.
+  {id:"peptide-serum",name:"Peptide Serum",category:"skincare",type:"Serum",number:"12",price:approvedPrices["peptide-serum"],available:false,size:"30 mL",descriptor:"Your daily treatment step.",description:"A serum concept at the heart of the IQON skincare ritual. Presented in frosted glass with a precise dispenser, it is designed as the treatment step between cleansing and moisturizing.",image:"/images/store/peptide-serum.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Treat",images:[{src:"/images/store/peptide-serum.webp",alt:"IQON Peptide Serum packaging"},{src:"/images/editorial/iqon-serum-mobile.webp",alt:"A close look at the IQON Peptide Serum bottle"}]},
+  {id:"barrier-cream",name:"Barrier Cream",category:"skincare",type:"Moisturizer",number:"13",price:approvedPrices["barrier-cream"],available:false,size:"50 mL",descriptor:"The finishing touch.",description:"A cream concept for the final moisturizing step in a simple skincare routine. A tactile glass jar and restrained finish bring the IQON approach to an everyday essential.",image:"/images/store/barrier-cream.webp",campaign:"/images/store/campaign-skincare.webp",tone:"ivory",ritual:"Moisturize",images:[{src:"/images/store/barrier-cream.webp",alt:"IQON Barrier Cream packaging"}]},
+  {id:"gentle-cleanser",name:"Gentle Cleanser",category:"skincare",type:"Cleanser",number:"14",price:approvedPrices["gentle-cleanser"],available:false,size:"150 mL",descriptor:"Begin with the essentials.",description:"The first step in the IQON skincare collection. This cleanser concept uses a practical pump format and pairs with the serum and cream as a three-part ritual.",image:"/images/store/gentle-cleanser.webp",campaign:"/images/store/campaign-skincare.webp",tone:"silver",ritual:"Cleanse",images:[{src:"/images/store/gentle-cleanser.webp",alt:"IQON Gentle Cleanser packaging"}]},
 ];
 
 export const products: Product[] = previewProducts.map(p => ({...p, descriptor: productContent[p.id]?.descriptor || p.descriptor, description: productContent[p.id]?.description || p.description}));
@@ -81,5 +82,5 @@ export type CartItem = {id: string; quantity: number; purchase: Purchase; freque
 export const lineKey = (item: Pick<CartItem,"id"|"purchase"|"frequency"|"lineId">) => item.lineId || `${item.id}:${item.purchase}:${item.frequency}`;
 export function validateCart(input: unknown): CartItem[] {
   if (!Array.isArray(input)) return [];
-  return input.filter((i): i is CartItem => !!i && typeof i === "object" && typeof i.id === "string" && !!findProduct(i.id) && !findProduct(i.id)?.pricePending && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 20 && ["once","subscription"].includes(i.purchase) && ["once","30","60","90"].includes(i.frequency));
+  return input.filter((i): i is CartItem => !!i && typeof i === "object" && typeof i.id === "string" && !!findProduct(i.id) && !findProduct(i.id)?.pricePending && findProduct(i.id)?.available!==false && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 20 && ["once","subscription"].includes(i.purchase) && ["once","30","60","90"].includes(i.frequency));
 }

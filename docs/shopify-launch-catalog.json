@@ -2,7 +2,7 @@
   "researchDate": "2026-09-10",
   "storeDomain": "nr9zd0-t5.myshopify.com",
   "currency": "USD",
-  "status": "Draft import; proposed prices pending merchant approval. No live checkout credentials configured.",
+  "status": "Prices approved by merchant on 2026-09-11. Checkout activation pending Headless credentials, paid plan, payment setup and fulfillment inventory.",
   "products": [
     {
       "handle": "creatine-monohydrate",
@@ -31,7 +31,8 @@
           "fileId": "gid://shopify/MediaImage/45558598762791",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-creatine-monohydrate-detail.webp?v=1789080177"
         }
-      ]
+      ],
+      "approvedPrice": "29.00"
     },
     {
       "handle": "hydrolyzed-collagen-peptides",
@@ -60,7 +61,8 @@
           "fileId": "gid://shopify/MediaImage/45558605414695",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrolyzed-collagen-peptides-detail.webp?v=1789080228"
         }
-      ]
+      ],
+      "approvedPrice": "32.00"
     },
     {
       "handle": "collagen-peptides-chocolate",
@@ -69,7 +71,7 @@
       "productId": "gid://shopify/Product/10392974852391",
       "variantId": "gid://shopify/ProductVariant/52051063341351",
       "sku": "IQON-COLLAGEN-PEPTIDES-CHOCOLATE",
-      "size": "378 g · Chocolate",
+      "size": "378 g \u00b7 Chocolate",
       "proposedPrice": "36.00",
       "proposedSubscriptionPrice": "30.60",
       "subscriptionStatus": "not enabled",
@@ -89,7 +91,8 @@
           "fileId": "gid://shopify/MediaImage/45558607675687",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-collagen-peptides-chocolate-detail.webp?v=1789080248"
         }
-      ]
+      ],
+      "approvedPrice": "36.00"
     },
     {
       "handle": "colostrum-powder",
@@ -118,7 +121,8 @@
           "fileId": "gid://shopify/MediaImage/45558609903911",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colostrum-powder-detail.webp?v=1789080263"
         }
-      ]
+      ],
+      "approvedPrice": "49.00"
     },
     {
       "handle": "colon-gentle-cleanse",
@@ -147,7 +151,8 @@
           "fileId": "gid://shopify/MediaImage/45558611935527",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colon-gentle-cleanse-detail.webp?v=1789080281"
         }
-      ]
+      ],
+      "approvedPrice": "29.00"
     },
     {
       "handle": "keto-5",
@@ -176,7 +181,8 @@
           "fileId": "gid://shopify/MediaImage/45558614032679",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-keto-5-detail.webp?v=1789080300"
         }
-      ]
+      ],
+      "approvedPrice": "24.00"
     },
     {
       "handle": "glp-1-support",
@@ -205,7 +211,8 @@
           "fileId": "gid://shopify/MediaImage/45558616949031",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-glp-1-support-detail.webp?v=1789080322"
         }
-      ]
+      ],
+      "approvedPrice": "44.00"
     },
     {
       "handle": "liver-support",
@@ -234,7 +241,8 @@
           "fileId": "gid://shopify/MediaImage/45558619373863",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-liver-support-detail.webp?v=1789080339"
         }
-      ]
+      ],
+      "approvedPrice": "29.00"
     },
     {
       "handle": "nmn",
@@ -263,7 +271,8 @@
           "fileId": "gid://shopify/MediaImage/45558622093607",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-nmn-detail.webp?v=1789080357"
         }
-      ]
+      ],
+      "approvedPrice": "49.00"
     },
     {
       "handle": "resveratrol",
@@ -292,7 +301,8 @@
           "fileId": "gid://shopify/MediaImage/45558624026919",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-resveratrol-detail.webp?v=1789080372"
         }
-      ]
+      ],
+      "approvedPrice": "24.00"
     },
     {
       "handle": "hair-skin-nails-gummies",
@@ -301,7 +311,7 @@
       "productId": "gid://shopify/Product/10392977604903",
       "variantId": "gid://shopify/ProductVariant/52051066814759",
       "sku": "IQON-HAIR-SKIN-NAILS-GUMMIES",
-      "size": "60 gummies · Passion fruit",
+      "size": "60 gummies \u00b7 Passion fruit",
       "proposedPrice": "24.00",
       "proposedSubscriptionPrice": "20.40",
       "subscriptionStatus": "not enabled",
@@ -321,7 +331,8 @@
           "fileId": "gid://shopify/MediaImage/45558625698087",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hair-skin-nails-gummies-detail.webp?v=1789080389"
         }
-      ]
+      ],
+      "approvedPrice": "24.00"
     },
     {
       "handle": "peptide-serum",
@@ -350,7 +361,8 @@
           "fileId": "gid://shopify/MediaImage/45558628352295",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-peptide-serum-detail.webp?v=1789080411"
         }
-      ]
+      ],
+      "approvedPrice": "58.00"
     },
     {
       "handle": "barrier-cream",
@@ -373,7 +385,8 @@
           "fileId": "gid://shopify/MediaImage/45558630121767",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-barrier-cream.webp?v=1789080422"
         }
-      ]
+      ],
+      "approvedPrice": "48.00"
     },
     {
       "handle": "gentle-cleanser",
@@ -396,7 +409,9 @@
           "fileId": "gid://shopify/MediaImage/45558631104807",
           "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-gentle-cleanser.webp?v=1789080432"
         }
-      ]
+      ],
+      "approvedPrice": "28.00"
     }
-  ]
+  ],
+  "priceApprovalDate": "2026-09-11"
 }

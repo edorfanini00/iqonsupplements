@@ -39,7 +39,7 @@ async function check() {
     if(mapped.variants.length!==1) problems.push(`${expected.handle}: the launch manifest expects one format variant.`);
     for(const variant of mapped.variants) {
       if(variant.currency!==launch.currency) problems.push(`${expected.handle}: expected ${launch.currency}, received ${variant.currency}.`);
-      if(variant.price!==Number(expected.proposedPrice)) problems.push(`${expected.handle}: Shopify price differs from the proposal; update the manifest after approving a new price.`);
+      if(variant.price!==Number(expected.approvedPrice)) problems.push(`${expected.handle}: Shopify price differs from the approved price; review the variant and launch manifest.`);
       if(variant.title!==expected.size) problems.push(`${expected.handle}: pack format differs from the launch manifest.`);
     }
   }
