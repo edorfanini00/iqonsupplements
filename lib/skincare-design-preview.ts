@@ -3,10 +3,10 @@
 import type { SkinResult } from "./skincare-results";
 
 const skinDetails = [
-  { id: "texture", label: "Skin texture", productId: "barrier-cream", headline: "Your skin. In its best light.", detail: "Texture, tone and the small details that make your skin yours.", area: "close-up cheek skin" },
-  { id: "cheek", label: "Cheek detail", productId: "barrier-cream", headline: "A little care. A softer touch.", detail: "Make space for a simple ritual, morning and evening.", area: "skin texture beside the nose" },
-  { id: "tone", label: "Skin tone", productId: "peptide-serum", headline: "Every tone. Naturally yours.", detail: "A closer look at your skin’s warmth and natural luminosity.", area: "cheek skin with natural pigmentation" },
-  { id: "eye", label: "Fine-line detail", productId: "peptide-serum", headline: "Care for the finer details.", detail: "A moment for the delicate texture that makes skin unique.", area: "fine cheek texture" },
+  { id: "texture", label: "Skin texture", productId: "copper-peptide-restore-cream", headline: "Your skin. In its best light.", detail: "Texture, tone and the small details that make your skin yours.", area: "close-up cheek skin" },
+  { id: "cheek", label: "Cheek detail", productId: "copper-peptide-restore-cream", headline: "A little care. A softer touch.", detail: "Make space for a simple ritual, morning and evening.", area: "skin texture beside the nose" },
+  { id: "tone", label: "Skin tone", productId: "hydra-c-ferulic-serum", headline: "Every tone. Naturally yours.", detail: "A closer look at your skin’s warmth and natural luminosity.", area: "cheek skin with natural pigmentation" },
+  { id: "eye", label: "Fine-line detail", productId: "hydra-c-ferulic-serum", headline: "Care for the finer details.", detail: "A moment for the delicate texture that makes skin unique.", area: "fine cheek texture" },
 ];
 export const sampleSkinResults: SkinResult[] = skinDetails.map(item => ({
   id: `design-sample-${item.id}`, productId: item.productId, label: item.label,

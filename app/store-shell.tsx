@@ -111,7 +111,7 @@ export function CartLine({item}:{item:CartItem}) {
 export function Quantity({value,setValue,min=1,label="product",disabled=false}:{value:number;setValue:(n:number)=>void;min?:number;label?:string;disabled?:boolean}) {return <div className="quantity"><button aria-label={`Decrease ${label} quantity`} disabled={disabled||value<=min} onClick={()=>setValue(value-1)}><Minus size={15}/></button><span aria-live="polite">{value}</span><button aria-label={`Increase ${label} quantity`} disabled={disabled||value>=20} onClick={()=>setValue(value+1)}><Plus size={15}/></button></div>;}
 export function ProductCard({product:p,compact=false}:{product:Product;compact?:boolean}) {
  const {add,busy,ready}=useStore();
- return <article className={`product-card ${p.category==="supplements"?"supplied-product":""} ${compact?"compact-card":""}`}>
+ return <article className={`product-card ${p.category==="supplements"?"supplied-product":"skincare-product"} ${compact?"compact-card":""}`}>
   <Link className="product-visual" href={`/products/${p.id}`}><img src={p.image} alt={`IQON ${p.name}`} loading="lazy" width={1122} height={1402}/></Link>
   <div className="product-card-title"><Link href={`/products/${p.id}`}><h3>{p.name}</h3></Link></div>
   <p>{p.descriptor}</p>

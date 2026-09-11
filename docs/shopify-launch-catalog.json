@@ -1,8 +1,8 @@
 {
-  "researchDate": "2026-09-10",
+  "researchDate": "2026-09-11",
   "storeDomain": "nr9zd0-t5.myshopify.com",
   "currency": "USD",
-  "status": "Prices approved by merchant on 2026-09-11. Checkout activation pending Headless credentials, paid plan, payment setup and fulfillment inventory.",
+  "status": "Pricing applied. Shopify connection configured; merchant reports payments configured. Products remain drafts pending confirmed inventory and fulfillment. Checkout has not been verified end to end.",
   "products": [
     {
       "handle": "creatine-monohydrate",
@@ -335,82 +335,158 @@
       "approvedPrice": "24.00"
     },
     {
-      "handle": "peptide-serum",
-      "name": "Peptide Serum",
+      "handle": "anti-aging-cleanser-with-peptides",
+      "name": "Anti-Aging Cleanser with Peptides",
       "category": "skincare",
-      "productId": "gid://shopify/Product/10392978129191",
-      "variantId": "gid://shopify/ProductVariant/52051067765031",
-      "sku": "IQON-PEPTIDE-SERUM",
-      "size": "30 mL",
-      "proposedPrice": "58.00",
-      "proposedSubscriptionPrice": "49.30",
+      "productId": "gid://shopify/Product/10393654231335",
+      "variantId": "gid://shopify/ProductVariant/52052012237095",
+      "sku": "IQON-ANTI-AGING-CLEANSER-WITH-PEPTIDES",
+      "size": "207 mL",
+      "approvedPrice": "36.00",
+      "proposedPrice": "36.00",
+      "proposedSubscriptionPrice": null,
       "subscriptionStatus": "not enabled",
       "status": "DRAFT",
       "inventoryPolicy": "DENY",
       "inventoryQuantityAtImport": 0,
       "media": [
         {
-          "alt": "IQON Peptide Serum packaging",
-          "source": "/images/store/peptide-serum.webp",
-          "fileId": "gid://shopify/MediaImage/45558627303719",
-          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-peptide-serum.webp?v=1789080401"
-        },
-        {
-          "alt": "A close look at the IQON Peptide Serum bottle",
-          "source": "/images/editorial/iqon-serum-mobile.webp",
-          "fileId": "gid://shopify/MediaImage/45558628352295",
-          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-peptide-serum-detail.webp?v=1789080411"
+          "alt": "IQON Anti-Aging Cleanser with Peptides, 207 mL",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-anti-aging-peptide-cleanser.jpg?v=1789092104"
         }
-      ],
-      "approvedPrice": "58.00"
+      ]
     },
     {
-      "handle": "barrier-cream",
-      "name": "Barrier Cream",
+      "handle": "hydrating-tonic",
+      "name": "Hydrating Tonic",
       "category": "skincare",
-      "productId": "gid://shopify/Product/10392978456871",
-      "variantId": "gid://shopify/ProductVariant/52051068092711",
-      "sku": "IQON-BARRIER-CREAM",
-      "size": "50 mL",
+      "productId": "gid://shopify/Product/10393654821159",
+      "variantId": "gid://shopify/ProductVariant/52052013056295",
+      "sku": "IQON-HYDRATING-TONIC",
+      "size": "198 mL",
+      "approvedPrice": "32.00",
+      "proposedPrice": "32.00",
+      "proposedSubscriptionPrice": null,
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Hydrating Tonic, 198 mL",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydrating-tonic.jpg?v=1789092121"
+        }
+      ]
+    },
+    {
+      "handle": "exfoliating-pads",
+      "name": "Exfoliating Pads",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10393655345447",
+      "variantId": "gid://shopify/ProductVariant/52052013744423",
+      "sku": "IQON-EXFOLIATING-PADS",
+      "size": "50 pads",
+      "approvedPrice": "48.00",
       "proposedPrice": "48.00",
-      "proposedSubscriptionPrice": "40.80",
+      "proposedSubscriptionPrice": null,
       "subscriptionStatus": "not enabled",
       "status": "DRAFT",
       "inventoryPolicy": "DENY",
       "inventoryQuantityAtImport": 0,
       "media": [
         {
-          "alt": "IQON Barrier Cream packaging",
-          "source": "/images/store/barrier-cream.webp",
-          "fileId": "gid://shopify/MediaImage/45558630121767",
-          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-barrier-cream.webp?v=1789080422"
+          "alt": "IQON Exfoliating Pads, 50 pads",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-exfoliating-pads.jpg?v=1789092081"
         }
-      ],
-      "approvedPrice": "48.00"
+      ]
     },
     {
-      "handle": "gentle-cleanser",
-      "name": "Gentle Cleanser",
+      "handle": "hydra-c-ferulic-serum",
+      "name": "Hydra C + Ferulic Serum",
       "category": "skincare",
-      "productId": "gid://shopify/Product/10392978882855",
-      "variantId": "gid://shopify/ProductVariant/52051068616999",
-      "sku": "IQON-GENTLE-CLEANSER",
-      "size": "150 mL",
-      "proposedPrice": "28.00",
-      "proposedSubscriptionPrice": "23.80",
+      "productId": "gid://shopify/Product/10393656066343",
+      "variantId": "gid://shopify/ProductVariant/52052014727463",
+      "sku": "IQON-HYDRA-C-FERULIC-SERUM",
+      "size": "30 mL",
+      "approvedPrice": "68.00",
+      "proposedPrice": "68.00",
+      "proposedSubscriptionPrice": null,
       "subscriptionStatus": "not enabled",
       "status": "DRAFT",
       "inventoryPolicy": "DENY",
       "inventoryQuantityAtImport": 0,
       "media": [
         {
-          "alt": "IQON Gentle Cleanser packaging",
-          "source": "/images/store/gentle-cleanser.webp",
-          "fileId": "gid://shopify/MediaImage/45558631104807",
-          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-gentle-cleanser.webp?v=1789080432"
+          "alt": "IQON Hydra C + Ferulic Serum, 30 mL",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-hydra-c-ferulic-serum.jpg?v=1789092149"
         }
-      ],
-      "approvedPrice": "28.00"
+      ]
+    },
+    {
+      "handle": "retinol-rx",
+      "name": "Retinol Rx",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10393656656167",
+      "variantId": "gid://shopify/ProductVariant/52052015710503",
+      "sku": "IQON-RETINOL-RX",
+      "size": "30 mL",
+      "approvedPrice": "64.00",
+      "proposedPrice": "64.00",
+      "proposedSubscriptionPrice": null,
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Retinol Rx, 30 mL",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-retinol-rx.jpg?v=1789092131"
+        }
+      ]
+    },
+    {
+      "handle": "firming-peptide-eye-gel",
+      "name": "Firming Peptide Eye Gel",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10393657245991",
+      "variantId": "gid://shopify/ProductVariant/52052016955687",
+      "sku": "IQON-FIRMING-PEPTIDE-EYE-GEL",
+      "size": "15 mL",
+      "approvedPrice": "48.00",
+      "proposedPrice": "48.00",
+      "proposedSubscriptionPrice": null,
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Firming Peptide Eye Gel, 15 mL",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-firming-peptide-eye-gel.jpg?v=1789092141"
+        }
+      ]
+    },
+    {
+      "handle": "copper-peptide-restore-cream",
+      "name": "Copper Peptide Restore Cream",
+      "category": "skincare",
+      "productId": "gid://shopify/Product/10393657737511",
+      "variantId": "gid://shopify/ProductVariant/52052017971495",
+      "sku": "IQON-COPPER-PEPTIDE-RESTORE-CREAM",
+      "size": "50 mL",
+      "approvedPrice": "68.00",
+      "proposedPrice": "68.00",
+      "proposedSubscriptionPrice": null,
+      "subscriptionStatus": "not enabled",
+      "status": "DRAFT",
+      "inventoryPolicy": "DENY",
+      "inventoryQuantityAtImport": 0,
+      "media": [
+        {
+          "alt": "IQON Copper Peptide Restore Cream, 50 mL",
+          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-copper-peptide-restore-cream.jpg?v=1789092113"
+        }
+      ]
     }
   ],
   "priceApprovalDate": "2026-09-11"

@@ -541,129 +541,273 @@
       }
     ]
   },
-  "peptide-serum": {
-    "descriptor": "The focused step in a simpler routine.",
-    "description": "A 30 mL serum concept for the IQON skincare collection. The proposed treatment step between cleansing and moisturizing.",
+  "anti-aging-cleanser-with-peptides": {
+    "descriptor": "A fresh start. A softer feel.",
+    "description": "A peptide-enriched facial cleanser with glycerin and panthenol. Cleanses away daily buildup while helping skin feel comfortable.",
     "highlights": [
-      "Serum concept",
-      "Step 02 · Treat",
-      "30 mL dispenser"
+      "Peptides, glycerin and panthenol",
+      "207 mL format",
+      "Cleanse step"
     ],
-    "title": "Give each layer a purpose.",
-    "story": "A serum creates a dedicated moment between a fresh cleanse and the final cream. Peptide Serum is that step in the proposed IQON routine: a focused treatment concept in a 30 mL dispenser. The final formula will define its peptide ingredients, texture and application details.",
+    "title": "A fresh start. A softer feel.",
+    "story": "A peptide-enriched facial cleanser with glycerin and panthenol. Cleanses away daily buildup while helping skin feel comfortable.",
     "facts": [
       {
-        "label": "Routine step",
-        "value": "02 / Treat",
-        "detail": "The proposed step after cleansing."
+        "label": "Format",
+        "value": "207 mL",
+        "detail": "Size shown on the supplied IQON packaging."
       },
+      {
+        "label": "Routine",
+        "value": "Cleanse",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Peptides, glycerin and panthenol",
+        "detail": "Based on the matching Global Beauty supplier formulation."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do I use it?",
+        "answer": "Massage a small amount onto damp skin, then rinse thoroughly. Use morning and evening."
+      },
+      {
+        "question": "What is the formula focus?",
+        "answer": "Peptides, glycerin and panthenol. Check the packaging for the current complete ingredient list."
+      }
+    ]
+  },
+  "hydrating-tonic": {
+    "descriptor": "A little hydration. Before everything else.",
+    "description": "An aloe-based tonic with glycerin and sodium PCA. A light hydration step after cleansing, before your chosen serum.",
+    "highlights": [
+      "Aloe, glycerin and sodium PCA",
+      "198 mL format",
+      "Hydrate step"
+    ],
+    "title": "A little hydration. Before everything else.",
+    "story": "An aloe-based tonic with glycerin and sodium PCA. A light hydration step after cleansing, before your chosen serum.",
+    "facts": [
       {
         "label": "Format",
-        "value": "Serum concept",
-        "detail": "Presented in a dispenser bottle."
+        "value": "198 mL",
+        "detail": "Size shown on the supplied IQON packaging."
       },
       {
-        "label": "Concept size",
+        "label": "Routine",
+        "value": "Hydrate",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Aloe, glycerin and sodium PCA",
+        "detail": "Based on the matching Global Beauty supplier formulation."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do I use it?",
+        "answer": "Sweep over the face and neck with a cotton pad after cleansing. Use morning and evening."
+      },
+      {
+        "question": "What is the formula focus?",
+        "answer": "Aloe, glycerin and sodium PCA. Check the packaging for the current complete ingredient list."
+      }
+    ]
+  },
+  "exfoliating-pads": {
+    "descriptor": "A smoother-looking surface.",
+    "description": "Pre-moistened pads with mandelic, lactic and salicylic acids. A focused exfoliating step for uneven texture and congested-looking skin.",
+    "highlights": [
+      "Mandelic, lactic and salicylic acids",
+      "50 pads format",
+      "Refine step"
+    ],
+    "title": "A smoother-looking surface.",
+    "story": "Pre-moistened pads with mandelic, lactic and salicylic acids. A focused exfoliating step for uneven texture and congested-looking skin.",
+    "facts": [
+      {
+        "label": "Format",
+        "value": "50 pads",
+        "detail": "Size shown on the supplied IQON packaging."
+      },
+      {
+        "label": "Routine",
+        "value": "Refine",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Mandelic, lactic and salicylic acids",
+        "detail": "Based on the matching Global Beauty supplier formulation."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do I use it?",
+        "answer": "Sweep a pad over the areas you want to exfoliate, avoiding eyes. Follow the product label for frequency. Use sunscreen and limit sun exposure during use and for a week afterwards."
+      },
+      {
+        "question": "What is the formula focus?",
+        "answer": "Mandelic, lactic and salicylic acids. Check the packaging for the current complete ingredient list."
+      }
+    ]
+  },
+  "hydra-c-ferulic-serum": {
+    "descriptor": "Your daily moment of brightness.",
+    "description": "A vitamin C and ferulic acid serum with sodium hyaluronate. Designed to bring antioxidant care and hydration to a routine for dull or uneven-looking skin.",
+    "highlights": [
+      "Vitamin C, ferulic acid and sodium hyaluronate",
+      "30 mL format",
+      "Brighten step"
+    ],
+    "title": "Your daily moment of brightness.",
+    "story": "A vitamin C and ferulic acid serum with sodium hyaluronate. Designed to bring antioxidant care and hydration to a routine for dull or uneven-looking skin.",
+    "facts": [
+      {
+        "label": "Format",
         "value": "30 mL",
-        "detail": "The proposed pack size."
+        "detail": "Size shown on the supplied IQON packaging."
+      },
+      {
+        "label": "Routine",
+        "value": "Brighten",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Vitamin C, ferulic acid and sodium hyaluronate",
+        "detail": "Based on the matching Global Beauty supplier formulation."
       }
     ],
     "faqs": [
       {
-        "question": "Where would I use it in the routine?",
-        "answer": "The proposed order is Gentle Cleanser, Peptide Serum, then Barrier Cream. Final application directions will accompany the completed formula."
+        "question": "How do I use it?",
+        "answer": "Apply a small amount to the face and neck after cleansing and toning. Follow with moisturizer and daytime SPF. May be used morning and evening."
       },
       {
-        "question": "Which peptides are planned for the serum?",
-        "answer": "The peptide identities and concentrations have not been finalized in this concept. The complete ingredient list will define the formula."
-      },
-      {
-        "question": "Would I still use a moisturizer?",
-        "answer": "The proposed IQON routine includes a separate moisturizing step after the serum. The serum's role is the treatment step."
+        "question": "What is the formula focus?",
+        "answer": "Vitamin C, ferulic acid and sodium hyaluronate. Check the packaging for the current complete ingredient list."
       }
     ]
   },
-  "barrier-cream": {
-    "descriptor": "A deliberate final layer.",
-    "description": "A moisturizer concept in a 50 mL jar. The finishing step in IQON's proposed cleanse, treat and moisturize routine.",
+  "retinol-rx": {
+    "descriptor": "An evening ritual. A renewed look.",
+    "description": "An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
     "highlights": [
-      "Moisturizer concept",
-      "Step 03 · Moisturize",
-      "50 mL jar"
+      "Encapsulated retinol, niacinamide and squalane",
+      "30 mL format",
+      "Renew step"
     ],
-    "title": "Finish with intention.",
-    "story": "The final layer gives a skincare routine a clear finish. Barrier Cream is the moisturizer concept in the IQON collection, designed to follow the cleanser and serum steps. Its completed formula will define the texture, ingredient profile and skin types it is suited to.",
+    "title": "An evening ritual. A renewed look.",
+    "story": "An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
     "facts": [
       {
-        "label": "Routine step",
-        "value": "03 / Moisturize",
-        "detail": "The final step in the proposed three-product routine."
+        "label": "Format",
+        "value": "30 mL",
+        "detail": "Size shown on the supplied IQON packaging."
       },
+      {
+        "label": "Routine",
+        "value": "Renew",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Encapsulated retinol, niacinamide and squalane",
+        "detail": "Based on the matching Global Beauty supplier formulation."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do I use it?",
+        "answer": "Use in the evening, introducing gradually as tolerated and following the product label. Wear SPF 30 or higher during the day. Do not use when pregnant or breastfeeding."
+      },
+      {
+        "question": "What is the formula focus?",
+        "answer": "Encapsulated retinol, niacinamide and squalane. Check the packaging for the current complete ingredient list."
+      }
+    ]
+  },
+  "firming-peptide-eye-gel": {
+    "descriptor": "Care for the finer details.",
+    "description": "A cooling peptide eye gel with aloe and cucumber water. A light, targeted step for smoother-looking skin around the eyes.",
+    "highlights": [
+      "Peptides, aloe and cucumber water",
+      "15 mL format",
+      "Eye care step"
+    ],
+    "title": "Care for the finer details.",
+    "story": "A cooling peptide eye gel with aloe and cucumber water. A light, targeted step for smoother-looking skin around the eyes.",
+    "facts": [
       {
         "label": "Format",
-        "value": "Cream concept",
-        "detail": "Presented in a jar."
+        "value": "15 mL",
+        "detail": "Size shown on the supplied IQON packaging."
       },
       {
-        "label": "Concept size",
+        "label": "Routine",
+        "value": "Eye care",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Peptides, aloe and cucumber water",
+        "detail": "Based on the matching Global Beauty supplier formulation."
+      }
+    ],
+    "faqs": [
+      {
+        "question": "How do I use it?",
+        "answer": "Gently apply a small amount around the eye area after cleansing, avoiding direct contact with eyes. Use morning and evening."
+      },
+      {
+        "question": "What is the formula focus?",
+        "answer": "Peptides, aloe and cucumber water. Check the packaging for the current complete ingredient list."
+      }
+    ]
+  },
+  "copper-peptide-restore-cream": {
+    "descriptor": "Lasting comfort. A considered finish.",
+    "description": "A rich multi-peptide moisturizer with copper peptide, shea butter and sodium hyaluronate. Delivers moisture for dry-feeling skin and a smoother, firmer-looking finish.",
+    "highlights": [
+      "Copper peptide, shea butter and sodium hyaluronate",
+      "50 mL format",
+      "Moisturize step"
+    ],
+    "title": "Lasting comfort. A considered finish.",
+    "story": "A rich multi-peptide moisturizer with copper peptide, shea butter and sodium hyaluronate. Delivers moisture for dry-feeling skin and a smoother, firmer-looking finish.",
+    "facts": [
+      {
+        "label": "Format",
         "value": "50 mL",
-        "detail": "The proposed moisturizer size."
+        "detail": "Size shown on the supplied IQON packaging."
+      },
+      {
+        "label": "Routine",
+        "value": "Moisturize",
+        "detail": "Choose the steps that suit your skin."
+      },
+      {
+        "label": "Formula focus",
+        "value": "Copper peptide, shea butter and sodium hyaluronate",
+        "detail": "Based on the matching Global Beauty supplier formulation."
       }
     ],
     "faqs": [
       {
-        "question": "When would the cream go on?",
-        "answer": "In the proposed IQON routine, it follows cleansing and the serum step. The final label will confirm application guidance."
+        "question": "How do I use it?",
+        "answer": "Apply to face and neck after cleansing and serum. Follow with SPF in the morning. Contains retinol; consider your other active products when building a routine."
       },
       {
-        "question": "Does the cream contain ceramides?",
-        "answer": "The formula is still a concept. Ceramides or other barrier-related ingredients have not been confirmed."
+        "question": "What is the formula focus?",
+        "answer": "Copper peptide, shea butter and sodium hyaluronate. Check the packaging for the current complete ingredient list."
       },
       {
-        "question": "Is it suitable for sensitive skin?",
-        "answer": "Skin-type suitability will depend on the final formula and testing. A sensitive-skin claim is not established for this concept."
-      }
-    ]
-  },
-  "gentle-cleanser": {
-    "descriptor": "Make the first step feel simple.",
-    "description": "A cleanser concept for the beginning of the IQON skincare routine. Presented in a 150 mL pump bottle, ready to sit beside serum and cream.",
-    "highlights": [
-      "Cleanser concept",
-      "Step 01 · Cleanse",
-      "150 mL pump bottle"
-    ],
-    "title": "Begin with a clean sequence.",
-    "story": "A straightforward routine starts with a clear first step. Gentle Cleanser introduces IQON's proposed three-part sequence, followed by Peptide Serum and Barrier Cream. The pump format keeps the design practical; the completed formula will establish its texture, cleansing instructions and suitability.",
-    "facts": [
-      {
-        "label": "Routine step",
-        "value": "01 / Cleanse",
-        "detail": "The beginning of the proposed skincare sequence."
-      },
-      {
-        "label": "Format",
-        "value": "Cleanser concept",
-        "detail": "Presented in a pump bottle."
-      },
-      {
-        "label": "Concept size",
-        "value": "150 mL",
-        "detail": "The proposed cleanser size."
-      }
-    ],
-    "faqs": [
-      {
-        "question": "Would this be the first step?",
-        "answer": "Yes. Gentle Cleanser starts the proposed IQON routine, before Peptide Serum and Barrier Cream."
-      },
-      {
-        "question": "Will it remove makeup and sunscreen?",
-        "answer": "Removal performance has not been established for this concept. The finished formula and directions will explain its intended cleansing use."
-      },
-      {
-        "question": "Is it fragrance-free?",
-        "answer": "Fragrance content is not yet confirmed. The complete ingredient list will answer this once the formula is finalized."
+        "question": "Does this cream contain retinol?",
+        "answer": "Yes. The supplier ingredient list includes retinol alongside copper peptide. Consider other retinoids in your routine and follow the final product label."
       }
     ]
   }
