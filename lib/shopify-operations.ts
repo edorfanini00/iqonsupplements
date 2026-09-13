@@ -15,6 +15,7 @@ export const CATALOG_QUERY = `query IQONCatalog($after: String) {
 
 const CART_FRAGMENT = `fragment IQONCart on Cart {
   id checkoutUrl totalQuantity
+  discountCodes { code applicable }
   cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
   lines(first: 100) {
     pageInfo { hasNextPage }
@@ -40,9 +41,13 @@ const UPDATE_BODY = `mutation IQONCartUpdate($cartId: ID!, $lines: [CartLineUpda
 const REMOVE_BODY = `mutation IQONCartRemove($cartId: ID!, $lineIds: [ID!]!) {
   cartLinesRemove(cartId: $cartId, lineIds: $lineIds) { cart { ...IQONCart } userErrors { field message } warnings { message } }
 }`;
+const DISCOUNT_BODY = `mutation IQONCartDiscounts($cartId: ID!, $discountCodes: [String!]!) {
+  cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) { cart { ...IQONCart } userErrors { field message } }
+}`;
 export const CART_QUERY = CART_QUERY_BODY + CART_FRAGMENT;
 export const CART_CREATE = CREATE_BODY + CART_FRAGMENT;
 export const CART_ADD = ADD_BODY + CART_FRAGMENT;
 export const CART_UPDATE = UPDATE_BODY + CART_FRAGMENT;
 export const CART_REMOVE = REMOVE_BODY + CART_FRAGMENT;
-export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, CART_FRAGMENT].join("\n");
+export const CART_DISCOUNTS = DISCOUNT_BODY + CART_FRAGMENT;
+export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CART_FRAGMENT].join("\n");

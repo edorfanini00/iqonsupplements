@@ -2,7 +2,7 @@ import type { CartItem, Product } from "./catalog";
 
 export type ShopifyConfig = {domain:string; token:string; version:string};
 export class CommerceError extends Error {
-  constructor(message:string, public status=502) { super(message); }
+  constructor(message:string, public status=502, public cart?:CartSnapshot) { super(message); }
 }
 export function shopifyConfig(values:Record<string,unknown>): ShopifyConfig | null {
   const domain=String(values.SHOPIFY_STORE_DOMAIN || "").trim().toLowerCase();
@@ -54,18 +54,20 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
 }
 export type ShopifyCart = {
   id:string; checkoutUrl:string; totalQuantity:number;
+  discountCodes?:{code:string;applicable:boolean}[];
   cost:{subtotalAmount:{amount:string;currencyCode:string};totalAmount:{amount:string;currencyCode:string}};
   lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{totalAmount:{amount:string;currencyCode:string}};merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string}}}[]};
 };
-export type CartSnapshot = {items:CartItem[];subtotal:number;currency:string;count:number;notice?:string};
+export type CartSnapshot = {items:CartItem[];subtotal:number;currency:string;count:number;discountCodes:{code:string;applicable:boolean}[];notice?:string};
 export function publicCart(cart:ShopifyCart|null):CartSnapshot {
-  if(!cart) return {items:[],subtotal:0,currency:"USD",count:0};
+  if(!cart) return {items:[],subtotal:0,currency:"USD",count:0,discountCodes:[]};
   if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.");
   return {items:cart.lines.nodes.map(line=>({id:line.merchandise.product.handle,lineId:line.id,
     variantId:line.merchandise.id,variantTitle:line.merchandise.title,name:line.merchandise.product.title,
     image:line.merchandise.image?.url,quantity:line.quantity,purchase:"once",frequency:"once",
     amount:Number(line.cost.totalAmount.amount),currency:line.cost.totalAmount.currencyCode})),
-    subtotal:Number(cart.cost.subtotalAmount.amount),currency:cart.cost.subtotalAmount.currencyCode,count:cart.totalQuantity};
+    subtotal:Number(cart.cost.subtotalAmount.amount),currency:cart.cost.subtotalAmount.currencyCode,count:cart.totalQuantity,
+    discountCodes:cart.discountCodes||[]};
 }
 export function sameOrigin(request:Request) {
   if(request.headers.get("origin")!==new URL(request.url).origin) throw new CommerceError("Please refresh the page and try again.",403);
@@ -74,4 +76,10 @@ export function sameOrigin(request:Request) {
 export function validQuantity(value:unknown, allowZero=false):number {
   if(typeof value!=="number" || !Number.isInteger(value) || value<(allowZero?0:1) || value>20) throw new CommerceError("Choose a quantity between 1 and 20.",400);
   return value;
+}
+
+export function validDiscountCodes(value:unknown):string[] {
+  if(!Array.isArray(value)||value.length>5||value.some(code=>typeof code!=="string"||!code.trim()||code.trim().length>255||/[\u0000-\u001f\u007f]/.test(code)))
+    throw new CommerceError("Enter a valid discount code. You can apply up to five codes.",400);
+  return [...new Set(value.map(code=>(code as string).trim().toUpperCase()))];
 }

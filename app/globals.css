@@ -36,6 +36,19 @@
 /* Commerce states */
 .commerce-message {padding:1rem 1.5rem;background:#eef0ef;color:#202524;font-size:.875rem;line-height:1.5;}
 .commerce-message p {margin:0 0 .5rem;}
+.cart-discounts {display:block!important;margin:0 0 22px;font-size:13px;font-weight:400;text-align:left;}
+.cart-discounts label {display:block;margin-bottom:9px;font-size:12px;letter-spacing:.02em;}
+.discount-entry {display:flex;gap:8px;}
+.discount-entry input {min-width:0;flex:1;padding:12px;border:1px solid #cdd1d5;background:transparent;border-radius:0;color:#252a2e;font:inherit;}
+.discount-entry input:focus {outline:1px solid #525e68;outline-offset:1px;}
+.discount-entry button {padding:10px 15px;border:1px solid #9ea6ad;background:transparent;font:inherit;min-height:44px;}
+.discount-entry button:disabled {opacity:.45;cursor:not-allowed;}
+.discount-results {list-style:none;margin:10px 0 0;padding:0;}
+.discount-results li {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #d9dde0;}
+.discount-results strong {font-size:12px;font-weight:500;letter-spacing:.05em;}
+.discount-results span {display:block;margin-top:3px;font-size:12px;line-height:1.5;color:#656b70;}
+.discount-results button {display:grid;place-items:center;min-width:44px;min-height:44px;background:transparent;border:0;}
+.bag-review-link {display:flex;justify-content:center;margin-top:12px;}
 .product-variant-picker {display:grid;gap:.75rem;margin:1.5rem 0;font-size:.875rem;}
 .product-variant-picker select {width:100%;padding:1rem;border:1px solid #c8cdca;background:transparent;color:inherit;font:inherit;}
 .catalog-empty {grid-column:1/-1;padding:3rem 0;font-size:1rem;}

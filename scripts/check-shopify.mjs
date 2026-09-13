@@ -11,6 +11,14 @@ async function loadTypeScript(path) {
 const {shopifyConfig,shopifyRequest,mapProduct}=await loadTypeScript("../lib/shopify.ts");
 const {CATALOG_QUERY,CART_CREATE,CART_QUERY,CART_REMOVE}=await loadTypeScript("../lib/shopify-operations.ts");
 const launch=JSON.parse(fs.readFileSync(new URL("../docs/shopify-launch-catalog.json",import.meta.url),"utf8"));
+const skincare=JSON.parse(fs.readFileSync(new URL("../lib/skincare-range.json",import.meta.url),"utf8"));
+const approvedPrices=JSON.parse(fs.readFileSync(new URL("../lib/approved-prices.json",import.meta.url),"utf8"));
+// The original manifest includes three archived skincare concepts. Check the
+// current seven-product range and eleven supplements instead.
+const expectedProducts=[
+  ...launch.products.filter(product=>product.category==="supplements"),
+  ...skincare.map(product=>({handle:product.id,size:product.size,approvedPrice:product.price,media:[{}]})),
+].map(product=>({...product,approvedPrice:approvedPrices[product.handle]}));
 
 async function check() {
   const config=shopifyConfig(process.env);
@@ -29,7 +37,7 @@ async function check() {
   } while(after);
 
   const problems=[];
-  for(const expected of launch.products) {
+  for(const expected of expectedProducts) {
     const node=nodes.find(p=>p.handle===expected.handle);
     if(!node) {problems.push(`${expected.handle}: not visible to this Headless storefront (check draft status and publication).`);continue;}
     const mapped=mapProduct(node,0);
@@ -43,7 +51,7 @@ async function check() {
       if(variant.title!==expected.size) problems.push(`${expected.handle}: pack format differs from the launch manifest.`);
     }
   }
-  console.log(`Visible IQON products: ${nodes.length}; expected launch products: ${launch.products.length}.`);
+  console.log(`Visible IQON products: ${nodes.length}; expected launch products: ${expectedProducts.length}.`);
   if(problems.length) {
     for(const problem of problems) console.error(`CHECK: ${problem}`);
     throw new Error("Launch checks need attention. No order or payment was created.");

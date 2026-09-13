@@ -2,8 +2,8 @@ import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
-import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE } from "./shopify-operations";
-import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, type ShopifyCart, type ShopifyProduct } from "./shopify";
+import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
 // Worker target with nodejs_compat_populate_process_env enabled.
@@ -53,13 +53,14 @@ async function mutate(query:string,variables:Record<string,unknown>):Promise<Car
   if(!settings) throw new CommerceError("Orders are not open yet.",503);
   const data=await shopifyRequest<Record<string,CartPayload>>(settings,query,variables,await buyerIP());
   const result=Object.values(data)[0];
-  if(result.userErrors.length) throw new CommerceError(result.userErrors.map(e=>e.message).join(" "),422);
+  if(result.userErrors.length) throw new CommerceError(result.userErrors.map(e=>e.message).join(" "),422,result.cart?publicCart(result.cart):undefined);
   if(!result.cart) throw new CommerceError("We couldn’t update your bag. Please try again.");
   return result;
 }
 const responseHeaders={"Cache-Control":"private, no-store","Vary":"Cookie","X-Content-Type-Options":"nosniff"};
 function fail(error:unknown) {
-  return Response.json({error:error instanceof CommerceError?error.message:"We couldn’t update your bag. Please try again."},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
+  return Response.json({error:error instanceof CommerceError?error.message:"We couldn’t update your bag. Please try again.",
+    ...(error instanceof CommerceError&&error.cart?{cart:error.cart}:{})},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
 }
 export async function getCartResponse() {
   try {return Response.json(publicCart(await readCart()),{headers:responseHeaders});}catch(error){return fail(error);}
@@ -72,7 +73,7 @@ export async function mutateCartResponse(request:Request) {
     if(text.length>4096) throw new CommerceError("Invalid request.",413);
     let input:Record<string,unknown>;
     try {input=JSON.parse(text);}catch {throw new CommerceError("Invalid request.",400);}
-    if(!input||typeof input!=="object") throw new CommerceError("Invalid request.",400);
+    if(!input||typeof input!=="object"||Array.isArray(input)) throw new CommerceError("Invalid request.",400);
     let current=await readCart();
     let result:CartPayload;
     if(input.action==="add") {
@@ -88,8 +89,12 @@ export async function mutateCartResponse(request:Request) {
       result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
     } else if(input.action==="update") {
       const quantity=validQuantity(input.quantity,true);
-      if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Refresh it and try again.",409);
+      if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));
       result=quantity?await mutate(CART_UPDATE,{cartId:current.id,lines:[{id:input.lineId,quantity}]}):await mutate(CART_REMOVE,{cartId:current.id,lineIds:[input.lineId]});
+    } else if(input.action==="discount") {
+      const discountCodes=validDiscountCodes(input.discountCodes);
+      if(!current?.totalQuantity) throw new CommerceError("Add an item to your bag before applying a code.",422,publicCart(current));
+      result=await mutate(CART_DISCOUNTS,{cartId:current.id,discountCodes});
     } else throw new CommerceError("Invalid request.",400);
     current=result.cart!;
     await setCartId(current.id,request);
@@ -103,7 +108,7 @@ export async function checkoutResponse(request:Request) {
     sameOrigin(request);
     // Refresh immediately before handing the buyer to Shopify's hosted checkout.
     const cart=await readCart();
-    if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty.",422);
+    if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
     return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
