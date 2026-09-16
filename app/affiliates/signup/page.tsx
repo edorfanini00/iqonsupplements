@@ -261,8 +261,8 @@ function SignUpForm() {
           Join the Program
         </h1>
         <p className="text-[#64717a] text-lg mb-6">
-          Fill out the form below to create your affiliate account and get your
-          unique promo code.
+          Apply to join IQON Supplements and choose your preferred creator code.
+          We review each application before activating your account and code.
         </p>
 
         {error && (
@@ -581,13 +581,13 @@ function SignUpForm() {
             </div>
           </div>
 
-          {/* Terms */}
-          <div className="mb-8 p-5 rounded-xl border border-[#20282c]/10 bg-[#EAE8E3]/30">
+          {/* Program details */}
+          <div className="mb-8 p-5 rounded-xl border border-[#20282c]/10 bg-[#e9edf0]/30">
             <p className="text-sm text-[#64717a] leading-relaxed">
-              By signing up, you agree to our affiliate terms. You will earn
-              commission on all orders attributed to your promo code. Repeat
-              customers matched by name/email will also earn you recurring
-              commissions. Payouts are processed monthly.
+              Earn on qualifying product revenue after discounts, excluding
+              shipping and tax. Returning customers are matched by email.
+              Refunds adjust earnings. Approved commission rates and payout
+              records appear in your dashboard.
             </p>
           </div>
 
@@ -596,7 +596,7 @@ function SignUpForm() {
             disabled={loading}
             className="w-full bg-[#20282c] text-white rounded-full h-14 text-sm uppercase tracking-wider hover:bg-[#20282c]/90 transition-colors"
           >
-            {loading ? "Creating account…" : "Create Affiliate Account"}
+            {loading ? "Submitting application…" : "Submit application"}
           </Button>
 
           <p className="text-center text-sm text-[#64717a] mt-6">
