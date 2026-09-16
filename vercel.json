@@ -2,5 +2,27 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "npm run build:vercel",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/affiliate-sync",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/monthly-bonus",
+      "schedule": "5 3 * * *"
+    },
+    {
+      "path": "/api/cron/leaderboard",
+      "schedule": "10 3 * * *"
+    },
+    {
+      "path": "/api/cron/email-campaigns",
+      "schedule": "15 3 * * *"
+    },
+    {
+      "path": "/api/cron/app-commissions",
+      "schedule": "20 3 * * *"
+    }
+  ]
 }

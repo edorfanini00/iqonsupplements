@@ -95,6 +95,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   };
   const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count};
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
+  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
   return <StoreContext.Provider value={value}>
     <a className="skip-link" href="#main">Skip to content</a>
     {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span className="preview-review-notice">Illustrative ratings &amp; review counts</span><span>Orders are not enabled yet</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}

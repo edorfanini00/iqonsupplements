@@ -1,0 +1,496 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SUPPLEMENTS_DATABASE_URL")
+}
+
+model AffiliateProfile {
+  id                       String   @id @default(cuid())
+  portalUserId                 Int?     @unique @map("portal_user_id")
+  firstName                String   @map("first_name")
+  lastName                 String   @map("last_name")
+  email                    String   @unique
+  phone                    String   @default("")
+  whatsapp                 String?
+  promoCode                String   @unique @map("promo_code")
+  instagram                String?
+  tiktok                   String?
+  website                  String?
+  portalRole               String   @default("affiliate") @map("portal_role")
+  status                   String   @default("pending")
+  commissionRate           Float    @default(20) @map("commission_rate")
+  recurringCommissionRate  Float    @default(20) @map("recurring_commission_rate")
+  couponRate               Float    @default(15) @map("coupon_rate")
+  referrerId               String?  @map("referrer_id")
+  referrer                 AffiliateProfile?  @relation("Referrals", fields: [referrerId], references: [id])
+  referees                 AffiliateProfile[] @relation("Referrals")
+  referralCommissionRate   Float?   @map("referral_commission_rate")
+  // Monthly sales bonus: when set, hitting bonusThreshold in attributed sales
+  // within a calendar month (ET) earns a bonusRate % bonus on that volume.
+  bonusThreshold           Float?   @map("bonus_threshold")
+  bonusRate                Float?   @map("bonus_rate")
+  shopifyCustomerId            Float?     @map("shopify_customer_id")
+  reviewedAt               DateTime? @map("reviewed_at")
+  // First-login onboarding: set once the affiliate completes the welcome flow.
+  onboardedAt              DateTime? @map("onboarded_at")
+  // Personal one-time 70% coupon for the affiliate's first order.
+  welcomeCouponCode        String?  @map("welcome_coupon_code")
+  notifyOnOrder            Boolean  @default(true) @map("notify_on_order")
+  notifyOnPayout           Boolean  @default(true) @map("notify_on_payout")
+  notifyOnReferralAccepted Boolean  @default(true) @map("notify_on_referral_accepted")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  bankAccount AffiliateBankAccount?
+  orders      AffiliateOrder[]
+  payouts     AffiliatePayout[]
+  auditLogs   AffiliateAuditLog[] @relation("AuditTarget")
+  tiktokSubmissions TikTokSubmission[]
+
+  @@map("supplements_affiliate_profiles")
+}
+
+// TikTok bonus program: affiliates submit links to the TikToks they posted;
+// hitting 10/15/30 in a calendar month (ET) earns a tiered bonus paid out at
+// month close through the monthly bonus cron.
+model TikTokSubmission {
+  id          String           @id @default(cuid())
+  affiliateId String           @map("affiliate_id")
+  affiliate   AffiliateProfile @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  url         String
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  @@unique([affiliateId, url])
+  @@index([affiliateId, createdAt])
+  @@index([createdAt])
+  @@map("supplements_tiktok_submissions")
+}
+
+// Admin-editable reward ladder for the TikTok bonus: amountsJson is a JSON
+// array where index 0 is the reward for the 1st month on a streak, index 1
+// for the 2nd consecutive month, etc. Single row with id "default".
+model TikTokBonusConfig {
+  id          String   @id
+  amountsJson String   @map("amounts_json")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("supplements_tiktok_bonus_config")
+}
+
+// Settings for the SUPPLEMENTS_APP mobile app integration (e.g. affiliate commission
+// rate on app subscriptions). Single row keyed by a fixed id, JSON payload.
+model AppPortalConfig {
+  id        String   @id
+  json      String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("supplements_app_portal_config")
+}
+
+model AffiliateBankAccount {
+  id               String           @id @default(cuid())
+  affiliateId      String           @unique @map("affiliate_id")
+  affiliate        AffiliateProfile @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  encryptedPayload String           @map("encrypted_payload")
+  last4            String?
+  country          String?
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@map("supplements_affiliate_bank_accounts")
+}
+
+model AffiliateOrder {
+  id                String            @id @default(cuid())
+  affiliateId       String            @map("affiliate_id")
+  affiliate         AffiliateProfile  @relation(fields: [affiliateId], references: [id])
+  orderId           String            @map("order_id")
+  shopifyOrderId        Float?              @map("shopify_order_id")
+  shopifyCustomerId     Float?              @map("shopify_customer_id")
+  customerName      String            @map("customer_name")
+  customerEmail     String            @map("customer_email")
+  orderTotal        Float             @map("order_total")
+  commission        Float
+  commissionRateSnapshot Float? @map("commission_rate_snapshot")
+  sourceUpdatedAt DateTime? @map("source_updated_at")
+  matchType         String            @map("match_type")
+  status            String            @default("pending")
+  payoutId          String?           @map("payout_id")
+  payout            AffiliatePayout?  @relation(fields: [payoutId], references: [id])
+  sourceAffiliateId String?           @map("source_affiliate_id")
+  items             Json?
+  subtotal          Float?
+  discountTotal     Float?            @map("discount_total")
+  shippingTotal     Float?            @map("shipping_total")
+  taxTotal          Float?            @map("tax_total")
+  currency          String?
+  couponCode        String?           @map("coupon_code")
+  itemsSyncedAt     DateTime?         @map("items_synced_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  leaderboardCycleKey String? @map("leaderboard_cycle_key")
+  leaderboardRank Int? @map("leaderboard_rank")
+  leaderboardCycle LeaderboardCycle? @relation(fields: [leaderboardCycleKey], references: [cycleKey], onDelete: Restrict)
+
+  payoutItem AffiliatePayoutItem?
+
+  @@unique([leaderboardCycleKey, leaderboardRank])
+  @@unique([leaderboardCycleKey, affiliateId])
+
+  @@unique([shopifyOrderId, affiliateId, matchType], name: "shopify_order_affiliate_match")
+  @@index([affiliateId])
+  @@index([shopifyOrderId])
+  @@index([customerEmail])
+  @@map("supplements_affiliate_orders")
+}
+
+model AffiliatePayout {
+  id                String              @id @default(cuid())
+  affiliateId       String              @map("affiliate_id")
+  affiliate         AffiliateProfile    @relation(fields: [affiliateId], references: [id])
+  amount            Float
+  method            String
+  reference         String?
+  notes             String?
+  paidAt            DateTime            @map("paid_at")
+  createdByPortalUserId Int?                @map("created_by_portal_user_id")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  orders            AffiliateOrder[]
+  items             AffiliatePayoutItem[]
+
+  @@index([affiliateId])
+  @@map("supplements_affiliate_payouts")
+}
+
+model AffiliatePayoutItem {
+  id       String          @id @default(cuid())
+  payoutId String          @map("payout_id")
+  payout   AffiliatePayout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  orderId  String          @unique @map("order_id")
+  order    AffiliateOrder  @relation(fields: [orderId], references: [id])
+
+  @@map("supplements_affiliate_payout_items")
+}
+
+model AffiliateAuditLog {
+  id                String            @id @default(cuid())
+  actorPortalUserId     Int?              @map("actor_portal_user_id")
+  actorEmail        String?           @map("actor_email")
+  action            String
+  targetAffiliateId String?           @map("target_affiliate_id")
+  targetAffiliate   AffiliateProfile? @relation("AuditTarget", fields: [targetAffiliateId], references: [id])
+  beforeJson        Json?             @map("before_json")
+  afterJson         Json?             @map("after_json")
+  ip                String?
+  userAgent         String?           @map("user_agent")
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  @@index([targetAffiliateId])
+  @@index([createdAt])
+  @@map("supplements_affiliate_audit_logs")
+}
+
+model AffiliateWebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  externalId  String    @map("external_id")
+  payloadHash String?   @map("payload_hash")
+  result      String?
+  receivedAt  DateTime  @default(now()) @map("received_at")
+  processedAt DateTime? @map("processed_at")
+
+  @@unique([provider, externalId])
+  @@map("supplements_affiliate_webhook_events")
+}
+
+model AffiliatePasswordReset {
+  id        String    @id @default(cuid())
+  email     String
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([email])
+  @@map("supplements_affiliate_password_resets")
+}
+
+
+model ContactMessage {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    String    @default("new") // new | read | replied | archived
+  readAt    DateTime? @map("read_at")
+  repliedAt DateTime? @map("replied_at")
+  ip        String?
+  userAgent String?   @map("user_agent")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("supplements_contact_messages")
+}
+
+// Free-form internal notes for the admin team (e.g. notes about specific
+// orders, customers, or operational reminders). Not customer-facing.
+model AdminNote {
+  id          String   @id @default(cuid())
+  title       String?
+  body        String
+  tag         String?  // optional free-form association, e.g. an order number or topic
+  pinned      Boolean  @default(false)
+  authorEmail String   @map("author_email")
+  authorName  String?  @map("author_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([pinned, updatedAt])
+  @@index([createdAt])
+  @@map("supplements_admin_notes")
+}
+
+// ---------------------------------------------------------------------------
+// Accounting: inventory purchases, stock tracking, and business expenses.
+// One InventoryItem per Shopify product the team stocks. Purchases add
+// units (cost ÷ units = cost per unit); paid Shopify orders deduct units live
+// (computed at read time — nothing is written when orders come in).
+// ---------------------------------------------------------------------------
+
+model InventoryItem {
+  id                String   @id @default(cuid())
+  shopifyProductId      Float      @unique @map("shopify_product_id")
+  name              String
+  lowStockThreshold Int      @default(5) @map("low_stock_threshold")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  purchases InventoryPurchase[]
+
+  @@map("supplements_inventory_items")
+}
+
+model InventoryPurchase {
+  id          String        @id @default(cuid())
+  itemId      String        @map("item_id")
+  item        InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  // Set when this line was recorded as part of a multi-item supplier order.
+  orderId     String?        @map("order_id")
+  order       SupplierOrder? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  units       Int
+  totalCost   Float         @map("total_cost")
+  note        String?
+  purchasedAt DateTime      @map("purchased_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  @@index([itemId, purchasedAt])
+  @@index([purchasedAt])
+  @@index([orderId])
+  @@map("supplements_inventory_purchases")
+}
+
+// A supplier order groups several purchase lines bought together (we usually
+// restock many peptides in one go). The InventoryPurchase lines remain the
+// source of truth for inventory/COGS; this is purely a grouping + history view.
+// Admin-editable prize money for the monthly affiliate contest. One row per
+// contest cycle it was set in (e.g. "2026-07" = cycle starting Jul 13 ET);
+// later cycles inherit the most recent earlier config until changed again.
+// Write-once, complete rankings including zero-sale affiliates and prize rules.
+model LeaderboardCycle {
+  cycleKey String @id @map("cycle_key")
+  start DateTime
+  end DateTime
+  snapshot Json
+  settledAt DateTime @default(now()) @map("settled_at")
+  awards AffiliateOrder[]
+
+  @@map("supplements_leaderboard_cycles")
+}
+
+// Seeded by migration, not first successful cron: outages cannot lose cycles.
+model LeaderboardSettlementState {
+  id String @id
+  firstCycleStart DateTime @map("first_cycle_start")
+
+  @@map("supplements_leaderboard_settlement_state")
+}
+
+model LeaderboardPrizeConfig {
+  id        String   @id @default(cuid())
+  cycleKey  String   @unique @map("cycle_key")
+  first     Float
+  second    Float
+  third     Float
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("supplements_leaderboard_prize_configs")
+}
+
+model SupplierOrder {
+  id        String   @id @default(cuid())
+  supplier  String?
+  note      String?
+  orderedAt DateTime @map("ordered_at")
+  // Null while the shipment is in transit; stock only counts once arrived.
+  arrivedAt DateTime? @map("arrived_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  purchases InventoryPurchase[]
+
+  @@index([orderedAt])
+  @@map("supplements_supplier_orders")
+}
+
+// Sales made outside Shopify (cash/offline/direct). Counted as revenue in
+// the P&L and deducted from inventory alongside Shopify orders.
+// kind "giveaway" = free stock shipped out (e.g. to affiliates): deducts
+// inventory and counts COGS, but adds no revenue (totalAmount stays 0).
+model ManualSale {
+  id           String   @id @default(cuid())
+  shopifyProductId Float      @map("shopify_product_id")
+  productName  String   @map("product_name")
+  kind         String   @default("sale") // sale | giveaway
+  units        Int
+  totalAmount  Float    @map("total_amount")
+  note         String?
+  soldAt       DateTime @map("sold_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([shopifyProductId, soldAt])
+  @@index([soldAt])
+  @@map("supplements_manual_sales")
+}
+
+// Placeholder products created from the accounting UI before they exist in
+// Shopify. They get a reserved synthetic id (>= 910000) so purchases and
+// supplier orders can be recorded right away; once a product with a matching
+// name goes live in Shopify, inventory/sales/adjustments remap to the real id
+// automatically and Shopify sales start deducting stock.
+model PendingProduct {
+  id           String    @id @default(cuid())
+  syntheticId  Int       @unique @map("synthetic_id")
+  name         String
+  createdAt    DateTime  @default(now()) @map("created_at")
+  matchedShopifyId Float?      @map("matched_shopify_id")
+  matchedAt    DateTime? @map("matched_at")
+
+  @@map("supplements_pending_products")
+}
+
+// Manual stock corrections: positive delta adds units (found stock, recount),
+// negative delta removes them (lost, damaged, never recorded). Kept as an
+// auditable report so discrepancies can be investigated.
+model InventoryAdjustment {
+  id           String   @id @default(cuid())
+  shopifyProductId Float      @map("shopify_product_id")
+  productName  String   @map("product_name")
+  delta        Int
+  reason       String?
+  adjustedAt   DateTime @map("adjusted_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([shopifyProductId, adjustedAt])
+  @@index([adjustedAt])
+  @@map("supplements_inventory_adjustments")
+}
+
+// Non-inventory operating costs (shipping supplies, software, ads, etc.)
+// included in the P&L to compute net profit.
+model BusinessExpense {
+  id         String   @id @default(cuid())
+  label      String
+  category   String?
+  amount     Float
+  note       String?
+  incurredAt DateTime @map("incurred_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([incurredAt])
+  @@map("supplements_business_expenses")
+}
+
+// ---------------------------------------------------------------------------
+// Email marketing: drip campaigns composed in the admin dashboard. Recipients
+// are queued when the campaign is created; a daily cron emails the next
+// `dailyLimit` queued recipients until the queue is empty.
+// ---------------------------------------------------------------------------
+
+model EmailCampaign {
+  id         String   @id @default(cuid())
+  subject    String
+  message    String
+  dailyLimit Int      @default(25) @map("daily_limit")
+  status     String   @default("active") // active | paused | completed
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  recipients EmailCampaignRecipient[]
+
+  @@index([status])
+  @@map("supplements_email_campaigns")
+}
+
+model EmailCampaignRecipient {
+  id         String        @id @default(cuid())
+  campaignId String        @map("campaign_id")
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  email      String
+  firstName  String?       @map("first_name")
+  status     String        @default("queued") // queued | sent | failed
+  sentAt     DateTime?     @map("sent_at")
+  error      String?
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  @@unique([campaignId, email])
+  @@index([campaignId, status])
+  @@map("supplements_email_campaign_recipients")
+}
+
+// Two-way direct messaging between an affiliate and the admin team. One thread
+// per affiliate; senderRole records who wrote each message and the read flags
+// track unread state for each side independently.
+model AffiliateMessage {
+  id              String   @id @default(cuid())
+  affiliateId     String   @map("affiliate_id")
+  senderRole      String   @map("sender_role") // affiliate | admin
+  body            String
+  readByAdmin     Boolean  @default(false) @map("read_by_admin")
+  readByAffiliate Boolean  @default(false) @map("read_by_affiliate")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([affiliateId, createdAt])
+  @@index([readByAdmin])
+  @@map("supplements_affiliate_messages")
+}
+
+
+model PortalAccount {
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String
+  role String @default("affiliate")
+  disabled Boolean @default(false)
+  sessions PortalSession[]
+  createdAt DateTime @default(now())
+  @@map("supplements_portal_accounts")
+}
+model PortalSession {
+  tokenHash String @id
+  accountId Int
+  account PortalAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  @@index([accountId])
+  @@map("supplements_portal_sessions")
+}
+model PortalRateLimit {
+  key String @id
+  count Int @default(1)
+  expiresAt DateTime
+  @@index([expiresAt])
+  @@map("supplements_portal_rate_limits")
+}
