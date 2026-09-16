@@ -1,11 +1,17 @@
 .affiliate-platform{color:var(--ink,#242526);font-family:Inter,Arial,sans-serif;--portal-bg:#f2f4f5;--portal-line:#dfe4e7;isolation:isolate}
+/* The storefront's unlayered element resets otherwise override Tailwind utilities.
+   Restore the utility cascade within the portal, preserving storefront buttons. */
+.affiliate-platform :where(button,input,select,textarea){font:revert-layer;color:revert-layer}
+.affiliate-platform :where(h1,h2,h3,p){margin:revert-layer}
+.affiliate-platform :where(h1,h2,h3){font-weight:revert-layer;line-height:revert-layer}
+.affiliate-platform a[class]:not(.button){color:revert-layer;text-decoration:revert-layer}
+.affiliate-platform :where(img){display:revert-layer;width:revert-layer;object-fit:revert-layer}
 .affiliate-platform h1,.affiliate-platform h2,.affiliate-platform h3{font-family:var(--display);letter-spacing:-.035em}
 .affiliate-platform .glass-surface{background:#fff;border:1px solid var(--portal-line);box-shadow:0 2px 4px #20282c03}
 .affiliate-platform .glass-surface-strong{background:#fff;border:1px solid var(--portal-line);box-shadow:0 8px 28px #20282c08}
 .affiliate-platform .glass-hero-dark,.affiliate-platform .glass-accent{background:#242b30;color:#fff;border:1px solid #36434c}
 .affiliate-platform .dashboard-orb{display:none}
 .affiliate-platform button,.affiliate-platform input,.affiliate-platform select,.affiliate-platform textarea{font-family:inherit}
-.affiliate-platform input,.affiliate-platform select,.affiliate-platform textarea{color:inherit}
 .affiliate-platform button:focus-visible,.affiliate-platform a:focus-visible{outline:2px solid #627f91;outline-offset:4px}
 .affiliate-platform table{font-variant-numeric:tabular-nums}
 .affiliate-platform .rounded-full:is(button,input){border-radius:4px}

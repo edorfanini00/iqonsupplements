@@ -86,8 +86,8 @@ export default function AffiliateLoginPage() {
         <form onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Input
-              type="text"
-              placeholder="Username or Email"
+              type="email"
+              placeholder="Email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
               required
