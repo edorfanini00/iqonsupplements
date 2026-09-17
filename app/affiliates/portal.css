@@ -1,0 +1,31 @@
+.affiliate-platform{color:var(--ink,#242526);font-family:Inter,Arial,sans-serif;--portal-bg:#f2f4f5;--portal-line:#dfe4e7;isolation:isolate}
+/* The storefront's unlayered element resets otherwise override Tailwind utilities.
+   Restore the utility cascade within the portal, preserving storefront buttons. */
+.affiliate-platform :where(button,input,select,textarea){font:revert-layer;color:revert-layer}
+.affiliate-platform :where(h1,h2,h3,p){margin:revert-layer}
+.affiliate-platform :where(h1,h2,h3){font-weight:revert-layer;line-height:revert-layer}
+.affiliate-platform a[class]:not(.button){color:revert-layer;text-decoration:revert-layer}
+.affiliate-platform :where(img){display:revert-layer;width:revert-layer;object-fit:revert-layer}
+.affiliate-platform h1,.affiliate-platform h2,.affiliate-platform h3{font-family:var(--display);letter-spacing:-.035em}
+.affiliate-platform .glass-surface{background:#fff;border:1px solid var(--portal-line);box-shadow:0 2px 4px #20282c03}
+.affiliate-platform .glass-surface-strong{background:#fff;border:1px solid var(--portal-line);box-shadow:0 8px 28px #20282c08}
+.affiliate-platform .glass-hero-dark,.affiliate-platform .glass-accent{background:#242b30;color:#fff;border:1px solid #36434c}
+.affiliate-platform .dashboard-orb{display:none}
+.affiliate-platform button,.affiliate-platform input,.affiliate-platform select,.affiliate-platform textarea{font-family:inherit}
+.affiliate-platform button:focus-visible,.affiliate-platform a:focus-visible{outline:2px solid #627f91;outline-offset:4px}
+.affiliate-platform table{font-variant-numeric:tabular-nums}
+.affiliate-platform .rounded-full:is(button,input){border-radius:4px}
+.affiliate-platform .portal-logo{width:100px;height:auto;object-fit:contain}
+.affiliate-hero{display:grid;grid-template-columns:1fr 1fr;min-height:650px;background:#e9edf0;align-items:center}
+.affiliate-hero-copy{padding:80px clamp(24px,5vw,90px)}
+.affiliate-hero h1{font-size:clamp(44px,5vw,78px);line-height:1.04;margin:22px 0}
+.affiliate-hero h1 em{font-family:var(--serif);font-weight:400}
+.affiliate-hero-copy>p:not(.eyebrow){max-width:480px;font-size:17px;line-height:1.7;color:#5d6971}
+.affiliate-hero img{width:100%;height:100%;min-height:600px;object-fit:cover}
+.affiliate-actions{display:flex;gap:16px;flex-wrap:wrap;margin-top:32px}
+.affiliate-benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:44px;padding:80px var(--space-gutter,5vw);background:#fafbfb}
+.affiliate-benefits article{border-top:1px solid #b7c1c8;padding-top:24px}
+.affiliate-benefits h2{font-size:29px;margin:14px 0}
+.affiliate-benefits p{font-size:15px;color:#5d6971;line-height:1.7}
+@media(max-width:760px){.affiliate-hero{grid-template-columns:1fr}.affiliate-hero-copy{padding:60px 24px}.affiliate-hero img{height:320px;min-height:0}.affiliate-benefits{grid-template-columns:1fr;gap:36px;padding:48px 24px}}
+@media(prefers-reduced-motion:reduce){.affiliate-platform *{animation-duration:.01ms!important;transition-duration:.01ms!important}}

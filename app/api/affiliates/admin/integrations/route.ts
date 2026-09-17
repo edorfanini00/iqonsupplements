@@ -1,0 +1,10 @@
+import { requireAdminSession,isNextResponse } from '@/lib/affiliates/auth-guards';
+import { apiSuccess } from '@/lib/affiliates/api-response';
+import { shopifyAdmin,shopifyAdminConfigured,SUPPLEMENTS_SHOP } from '@/lib/affiliates/shopify-admin';
+import { SHOP_QUERY } from '@/lib/affiliates/shopify-queries';
+export async function GET(){
+  const session=await requireAdminSession();if(isNextResponse(session))return session;
+  let shopVerified=false;let shopError:string|null=null;
+  if(shopifyAdminConfigured()){try{const data=await shopifyAdmin<{shop:{myshopifyDomain:string;currencyCode:string}}>(SHOP_QUERY);shopVerified=data.shop.myshopifyDomain===SUPPLEMENTS_SHOP&&data.shop.currencyCode==='USD';if(!shopVerified)shopError='Check the connected shop and USD ledger currency.';}catch{shopError='The Shopify connection could not be verified. Check the app token and scopes.';}}
+  return apiSuccess({connections:[{name:'Affiliate database',status:'Available',detail:'Independent supplements accounts, messages and earnings.'},{name:'Shopify Admin',status:shopVerified?'Verified':shopifyAdminConfigured()?'Needs attention':'Setup required',detail:shopError??SUPPLEMENTS_SHOP},{name:'Shopify webhooks',status:process.env.SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET?'Secret configured':'Setup required',detail:'Register the order and refund subscriptions in Shopify.'},{name:'Email delivery',status:process.env.SUPPLEMENTS_RESEND_API_KEY&&process.env.SUPPLEMENTS_AFFILIATE_EMAIL_FROM?'Configured':'Setup required',detail:'Use a verified supplements sender. Send a test from the email tools.'},{name:'Payment information encryption',status:(process.env.SUPPLEMENTS_AFFILIATE_BANK_ENCRYPTION_KEY?.length??0)>=32?'Configured':'Setup required',detail:'Required before affiliates save bank information.'},{name:'Scheduled reconciliation',status:process.env.SUPPLEMENTS_CRON_SECRET&&process.env.SUPPLEMENTS_CRON_SECRET===process.env.CRON_SECRET?'Configured':'Setup required',detail:'Daily backstops complement immediate Shopify webhooks.'}]});
+}

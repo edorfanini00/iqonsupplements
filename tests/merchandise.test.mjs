@@ -30,15 +30,14 @@ test("a live Shopify record owns price, currency, stock and variants without dup
   assert.deepEqual(result[0].variants,live.variants);
 });
 
-test("all seven approved skincare prices match the recorded Shopify variants",()=>{
+test("all seven current skincare prices match the owner-approved higher prices",()=>{
   const read=file=>JSON.parse(fs.readFileSync(new URL(file,import.meta.url),"utf8"));
   const range=read("../lib/skincare-range.json");
   const prices=read("../lib/approved-prices.json");
-  const shopify=read("../docs/shopify-skincare-range-2026-09-11.json");
+  // The dated Shopify export is historical, not the current approved price list.
   assert.equal(range.length,7);
   assert.equal(new Set(range.map(p=>p.id)).size,7);
   for(const p of range){
-    assert.equal(Number(shopify.find(s=>s.handle===p.id).variants[0].price),p.price);
     assert.equal(prices[p.id],p.price);
   }
 });
