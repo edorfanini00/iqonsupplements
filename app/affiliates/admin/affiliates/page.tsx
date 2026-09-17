@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
+import { SharedProgram } from "@/components/affiliates/shared/SharedProgram";
 import {
   Search,
   Plus,
@@ -62,10 +63,13 @@ interface AffiliateRow {
   bankInfo: BankInfo | null;
   stats: {
     totalOrders: number;
-    totalRevenue: number;
-    totalCommission: number;
-    pendingCommission: number;
-    paidCommission: number;
+    totalRevenue: number | null;
+    totalCommission: number | null;
+    pendingCommission: number | null;
+    paidCommission: number | null;
+    currency: string | null;
+    scalarTotalsAvailable: boolean;
+    currencies: {currency: string | null; totalRevenue: number; totalCommission: number; pendingCommission: number; paidCommission: number}[];
   };
   lastPayoutAt: string | null;
 }
@@ -114,32 +118,20 @@ export default function AdminAffiliatesPage() {
   const totals = useMemo(() => {
     const active = affiliates.filter((a) => a.status === "active").length;
     const withBank = affiliates.filter((a) => a.bankInfo).length;
-    const pending = affiliates.reduce(
-      (s, a) => s + (a.stats?.pendingCommission ?? 0),
-      0
-    );
-    const paid = affiliates.reduce(
-      (s, a) => s + (a.stats?.paidCommission ?? 0),
-      0
-    );
-    return { active, withBank, pending, paid };
+    // Financial totals are rendered by SharedProgram, grouped by currency.
+    return { active, withBank };
   }, [affiliates]);
 
   return (
     <>
+      <SharedProgram admin brand="supplements" title="Affiliate shared performance" />
       <PageHeader
         eyebrow="Roster"
         title="Manage affiliates"
         description="Bank info, contact details, payout history and account controls."
         actions={
           <>
-            <a
-              href="/api/affiliates/admin/export?type=affiliates"
-              className="inline-flex items-center gap-2 glass-surface rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#20282c] hover:bg-white/80 transition-colors"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Export
-            </a>
+
             <button
               onClick={() => setShowCreate(true)}
               className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors"
@@ -165,17 +157,8 @@ export default function AdminAffiliatesPage() {
           value={String(totals.withBank)}
           hint="Ready for payout"
         />
-        <StatCard
-          icon={CreditCard}
-          label="Pending payout"
-          value={formatCurrency(totals.pending)}
-          accent
-        />
-        <StatCard
-          icon={CreditCard}
-          label="Paid lifetime"
-          value={formatCurrency(totals.paid)}
-        />
+
+
       </section>
 
       {/* Filters */}
@@ -257,18 +240,7 @@ export default function AdminAffiliatesPage() {
                         {a.promoCode}
                       </span>
                     </td>
-                    <td className="py-4 px-5 text-right font-sans text-[#64717a]">
-                      {a.stats.totalOrders}
-                    </td>
-                    <td className="py-4 px-5 text-right font-sans">
-                      {formatCurrency(a.stats.totalRevenue)}
-                    </td>
-                    <td className="py-4 px-5 text-right font-sans">
-                      {formatCurrency(a.stats.totalCommission)}
-                    </td>
-                    <td className="py-4 px-5 text-right font-sans text-[#20282c]">
-                      {formatCurrency(a.stats.pendingCommission)}
-                    </td>
+                    <td className="py-4 px-5" colSpan={4}><Link onClick={e => e.stopPropagation()} className="underline" href={`/affiliates/admin/affiliates/${a.id}`}>Open shared performance</Link></td>
                     <td className="py-4 px-5">
                       {a.bankInfo ? (
                         <Pill tone="success">On file</Pill>
@@ -483,35 +455,12 @@ function AffiliateDetailDrawer({
               className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors"
             >
               <UserSquare className="h-3.5 w-3.5" />
-              View recruits & clients
+              Shared performance, recruits & clients
               <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
-          {/* Stats */}
-          <section>
-            <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-3">
-              Performance
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <MiniStat
-                label="Orders"
-                value={String(affiliate.stats.totalOrders)}
-              />
-              <MiniStat
-                label="Revenue"
-                value={formatCurrency(affiliate.stats.totalRevenue)}
-              />
-              <MiniStat
-                label="Commission"
-                value={formatCurrency(affiliate.stats.totalCommission)}
-              />
-              <MiniStat
-                label="Pending"
-                value={formatCurrency(affiliate.stats.pendingCommission)}
-              />
-            </div>
-          </section>
+          <p className="text-sm">Use the shared performance report for category/date-filtered earnings and payouts. This drawer manages contact and account settings only.</p>
 
           {/* Contact */}
           <section>

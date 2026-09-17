@@ -19,6 +19,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import Link from "next/link";
+import { SharedProgram } from "@/components/affiliates/shared/SharedProgram";
 import { AreaChart } from "@/components/affiliates/charts/AreaChart";
 import { Donut } from "@/components/affiliates/charts/Donut";
 import { RangePicker, type Preset } from "@/components/affiliates/shared/RangePicker";
@@ -39,21 +40,6 @@ import {
   resolveRange,
 } from "@/lib/affiliates/time-series";
 import type { Granularity } from "@/lib/affiliates/types";
-
-interface Stats {
-  totalOrders: number;
-  totalRevenue: number;
-  totalCommission: number;
-  directCommission: number;
-  pendingCommission: number;
-  paidCommission: number;
-  codeOrders: number;
-  recurringOrders: number;
-  referralOrders: number;
-  referralCommission: number;
-  referralCommissionPending: number;
-  referralCommissionPaid: number;
-}
 
 interface Account {
   commissionRate: number;
@@ -87,158 +73,41 @@ interface ReferralBreakdownRow {
   paidCommission: number;
 }
 
+import { formatBuckets, formatDenominated, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
+
 interface BonusInfo {
+  currency: string | null;
+  scalarTotalsAvailable: boolean;
+  currencies: MoneyBucket[];
   threshold: number;
   rate: number;
-  monthSales: number;
+  monthSales: number | null;
   reached: boolean;
-  projectedBonus: number;
+  projectedBonus: number | null;
   monthLabel: string;
 }
 
 interface SessionUser {
-  couponRate:number;
   firstName: string;
   promoCode: string;
 }
 
 export default function AffiliateOverviewPage() {
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [preset, setPreset] = useState<Preset>("30d");
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [account, setAccount] = useState<Account | null>(null);
-  const [orders, setOrders] = useState<OrderRow[]>([]);
-  const [referralBreakdown, setReferralBreakdown] = useState<
-    ReferralBreakdownRow[]
-  >([]);
   const [bonus, setBonus] = useState<BonusInfo | null>(null);
-  // IQON Supplements app: this affiliate's customers on the app, subscribers, earnings.
-  const [appStats, setAppStats] = useState<{
-    usersOnApp: number | null;
-    subscribers: number;
-    earnings: number;
-  } | null>(null);
+  const [appStats, setAppStats] = useState<{usersOnApp: number | null; subscribers: number; earnings: number | null; currencies: MoneyBucket[]} | null>(null);
   const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
-  const hasLoadedOnce = useRef(false);
-  const calendarDay = useCalendarDay();
-
-  const load = useCallback(async (p: Preset, isInitial: boolean) => {
-    if (isInitial) setLoading(true);
-    else setRefreshing(true);
-    try {
-      const [meRes, dashRes] = await Promise.all([
-        fetch("/api/affiliates/me", { credentials: "include" }),
-        fetch(`/api/affiliates/dashboard?range=${p}`, {
-          credentials: "include",
-        }),
-      ]);
-      if (meRes.ok) {
-        const data = await meRes.json();
-        setUser(data.user);
-      }
-      if (dashRes.ok) {
-        const data = await dashRes.json();
-        setStats(data.stats);
-        setAccount(data.account ?? null);
-        setOrders(data.orders ?? []);
-        setReferralBreakdown(data.referralBreakdown ?? []);
-        setBonus(data.bonus ?? null);
-        setAppStats(data.appStats ?? null);
-      }
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
+  const [error, setError] = useState('');
   useEffect(() => {
-    const isInitial = !hasLoadedOnce.current;
-    load(preset, isInitial).then(() => {
-      hasLoadedOnce.current = true;
-    });
-  }, [preset, calendarDay, load]);
-
-  function copy() {
-    if (!user) return;
-    navigator.clipboard.writeText(user.promoCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  function share() {
-    if (!user) return;
-    const text = `Use my code ${user.promoCode} for ${user.couponRate}% off at ${window.location.origin}`;
-    if (navigator.share) {
-      navigator.share({ title: "IQON code", text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }
-
-  const chartRange = useMemo(
-    () => resolveRange(preset),
-    [preset, calendarDay]
-  );
-
-  const seriesData = useMemo(() => {
-    const series = buildTimeSeries(orders, chartRange);
-    return series.map((s) => ({
-      date: s.bucket,
-      label: s.label,
-      primary: s.commission,
-      secondary: s.revenue,
-    }));
-  }, [orders, chartRange]);
-
-  const rangeCaption = useMemo(
-    () => formatRangeCaption(chartRange, preset),
-    [chartRange, preset]
-  );
-
-  const chartGranularity: Granularity = chartRange.granularity;
-
-  const splitDonut = useMemo(
-    () => [
-      { label: "Code orders", value: stats?.codeOrders ?? 0 },
-      { label: "Recurring", value: stats?.recurringOrders ?? 0 },
-    ],
-    [stats]
-  );
-
-  const earningsDonut = useMemo(() => {
-    const slices: { label: string; value: number }[] = [];
-
-    slices.push({
-      label: "Your sales",
-      value: stats?.directCommission ?? 0,
-    });
-
-    for (const referee of referralBreakdown) {
-      slices.push({
-        label: referee.refereeName,
-        value: referee.totalCommission,
-      });
-    }
-
-    return slices.filter((slice) => slice.value > 0);
-  }, [stats, referralBreakdown]);
-
-  const hasReferralNetwork = referralBreakdown.length > 0;
-
-  return (
-    <>
-      <PageHeader
-        eyebrow={`Welcome back${user ? `, ${user.firstName}` : ""}`}
-        title="Your performance"
-        description="Track sales attributed to your code, your commissions and your payouts."
-        actions={<RangePicker value={preset} onChange={setPreset} />}
-      />
-
+    let alive = true;
+    Promise.all([fetch('/api/affiliates/me', {credentials:'include', cache:'no-store'}), fetch('/api/affiliates/dashboard?range=all', {credentials:'include', cache:'no-store'})])
+      .then(async ([me, dash]) => { if (!me.ok || !dash.ok) throw new Error('Could not load your existing partnership tools.'); const [m,d] = await Promise.all([me.json(),dash.json()]); if (alive) {setUser(m.user); setBonus(d.bonus ?? null); setAppStats(d.appStats ?? null);} })
+      .catch(e => {if (alive) setError(e.message);});
+    return () => {alive=false;};
+  }, []);
+  function copy() { if (!user) return; navigator.clipboard.writeText(user.promoCode).then(() => {setCopied(true); setTimeout(() => setCopied(false),2000);}).catch(() => setError('Clipboard unavailable. Select your code to copy it.')); }
+  function share() { if (!user) return; const text = `My IQON creator code is ${user.promoCode}. Check the participating store for verified availability and the applicable discount.`; if (navigator.share) void navigator.share({title:'IQON creator code',text}).catch(() => {}); else void navigator.clipboard.writeText(text).catch(() => setError('Clipboard unavailable.')); }
+  return <>
       {/* Promo code hero */}
       <section className="relative overflow-hidden rounded-lg glass-hero-dark text-white p-7 md:p-10 mb-8">
         <div
@@ -251,9 +120,7 @@ export default function AffiliateOverviewPage() {
         <div className="relative grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8">
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-white/55">
-              Your promo code ·{" "}
-              {account ? `${account.couponRate}%` : "—"} off ·{" "}
-              {account ? `${account.commissionRate}%` : "—"} commission
+              Your creator code
             </p>
             <p
               className="font-sans font-medium tracking-tight text-white leading-none mt-3 break-words"
@@ -263,21 +130,7 @@ export default function AffiliateOverviewPage() {
             >
               {user?.promoCode ?? "—"}
             </p>
-            <p className="text-white/55 text-sm mt-3 max-w-md">
-              Earn{" "}
-              <span className="text-white">
-                {account ? `${account.commissionRate}%` : "—"}
-              </span>{" "}
-              on a customer&apos;s first order with your code, plus{" "}
-              <span className="text-white">
-                {account ? `${account.recurringCommissionRate}%` : "—"}
-              </span>{" "}
-              on every recurring order from repeat customers
-              {account && account.referralCommissionRate > 0
-                ? " and your referral network"
-                : ""}
-              .
-            </p>
+            <p className="text-white/55 text-sm mt-3 max-w-md">Use the verified category agreements below before advertising a discount. Your existing network, app and bonus programs remain linked to this account.</p>
             <div className="mt-6 flex flex-wrap gap-2">
               <button
                 onClick={copy}
@@ -307,83 +160,26 @@ export default function AffiliateOverviewPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 self-end lg:self-stretch">
-            <DarkInline
-              label="Earnings"
-              value={stats ? formatCurrency(stats.totalCommission) : "—"}
-            />
-            <DarkInline
-              label="Pending"
-              value={stats ? formatCurrency(stats.pendingCommission) : "—"}
-            />
-            <DarkInline
-              label="Paid out"
-              value={stats ? formatCurrency(stats.paidCommission) : "—"}
-            />
-            <DarkInline
-              label="Orders"
-              value={stats ? String(stats.totalOrders) : "—"}
-            />
-          </div>
+          <div className="self-end text-sm text-white/70">One creator identity. Category agreements and verified store activation are shown in your shared program report. A code is not an activation guarantee.</div>
         </div>
       </section>
-
-      <MonthlyRankCard />
-
-      {bonus && <BonusProgressCard bonus={bonus} />}
-
-      <TikTokBonusCard />
-
-      {/* Stat row */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10">
-        <StatCard
-          icon={ShoppingBag}
-          label="Orders"
-          value={stats ? String(stats.totalOrders - stats.referralOrders) : "—"}
-          hint={
-            stats && stats.referralOrders > 0
-              ? `+ ${stats.referralOrders} referral`
-              : undefined
-          }
-        />
-        <StatCard
-          icon={DollarSign}
-          label="Revenue driven"
-          value={stats ? formatCurrency(stats.totalRevenue) : "—"}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Commission"
-          value={stats ? formatCurrency(stats.totalCommission) : "—"}
-          accent
-          hint={
-            stats && stats.referralCommission > 0
-              ? `incl. ${formatCurrency(stats.referralCommission)} from network`
-              : undefined
-          }
-        />
-        {stats && stats.referralCommission > 0 ? (
-          <StatCard
-            icon={Repeat}
-            label="From network"
-            value={formatCurrency(stats.referralCommission)}
-            hint={`${stats.referralOrders} referred orders`}
-          />
-        ) : (
-          <StatCard
-            icon={Repeat}
-            label="Recurring"
-            value={stats ? String(stats.recurringOrders) : "—"}
-            hint="Repeat customer orders"
-          />
-        )}
-      </section>
-
-      {/* IQON Supplements app — shown once any of their customers is on the app */}
+      <div id="shared-performance"><SharedProgram brand="supplements" /></div>
+      <nav aria-label="Partnership tools" className="glass-surface rounded-lg p-5 flex flex-wrap gap-4 mb-8">
+        <Link className="underline" href="/affiliates/dashboard/network">Referral network</Link>
+        <Link className="underline" href="/affiliates/dashboard/messages">Messages</Link>
+        <Link className="underline" href="/affiliates/dashboard/learn">Learning & resources</Link>
+        <Link className="underline" href="/affiliates/dashboard/clients">Linked clients</Link>
+        <Link className="underline" href="/affiliates/dashboard/orders">Order details</Link>
+        <Link className="underline" href="/affiliates/dashboard/payment">Payment settings</Link>
+      </nav>
+      {error && <p role="alert">{error}</p>}
+      <h2 className="text-2xl mb-2">Your partnership programs</h2>
+      <p className="text-sm mb-6">Existing app audience, bonus targets and contest cycles use their own stated periods and eligibility rules, not the reporting filters above. Earnings and paid balances remain in the shared ledger.</p>
+      {/* IQONIC app — shown once any of their customers is on the app */}
       {appStats &&
         ((appStats.usersOnApp ?? 0) > 0 ||
           appStats.subscribers > 0 ||
-          appStats.earnings > 0) && (
+          appStats.currencies.some(b => Number(b.earnings) > 0)) && (
           <section className="glass-surface rounded-lg p-6 md:p-7 mb-10">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -392,7 +188,7 @@ export default function AffiliateOverviewPage() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a]">
-                    IQON Supplements app
+                    IQONIC app
                   </p>
                   <p className="text-sm text-[#20282c] mt-0.5">
                     Your customers on the app — you earn a cut of their app
@@ -424,7 +220,7 @@ export default function AffiliateOverviewPage() {
                     App earnings
                   </p>
                   <p className="text-xl font-sans font-medium mt-1">
-                    {formatCurrency(appStats.earnings)}
+                    <a href="#shared-performance" className="underline text-sm">Select App in shared report</a>
                   </p>
                 </div>
               </div>
@@ -432,191 +228,11 @@ export default function AffiliateOverviewPage() {
           </section>
         )}
 
-      {/* Charts */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
-        <div className="lg:col-span-2 glass-surface rounded-lg p-6 md:p-7">
-          <SectionTitle
-            eyebrow="Trend"
-            title="Earnings over time"
-            right={
-              <span className="text-[10px] uppercase tracking-[0.16em] font-sans text-[#64717a]">
-                {refreshing ? "Updating…" : rangeCaption}
-              </span>
-            }
-          />
-          {loading && orders.length === 0 ? (
-            <ChartSkeleton />
-          ) : seriesData.length === 0 ? (
-            <EmptyState
-              icon={TrendingUp}
-              title="No data for this range"
-              description="Try a wider time frame or share your code to earn commissions."
-            />
-          ) : (
-            <AreaChart
-              key={`${preset}-${calendarDay}`}
-              data={seriesData}
-              granularity={chartGranularity}
-              primaryLabel="Commission"
-              secondaryLabel="Revenue"
-              formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
-            />
-          )}
-        </div>
-        <div className="glass-surface rounded-lg p-6 md:p-7">
-          <SectionTitle eyebrow="Mix" title="Order types" />
-          <Donut
-            slices={splitDonut}
-            centerLabel={String(
-              splitDonut.reduce((s, x) => s + x.value, 0)
-            )}
-            centerSubLabel="Total orders"
-          />
-        </div>
-        <div className="glass-surface rounded-lg p-6 md:p-7">
-          <SectionTitle
-            eyebrow="Sources"
-            title="Earnings mix"
-            right={
-              hasReferralNetwork ? (
-                <Link
-                  href="/affiliates/dashboard/network"
-                  className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] transition-colors"
-                >
-                  Network
-                  <ArrowRight className="h-3 w-3" />
-                </Link>
-              ) : undefined
-            }
-          />
-          {loading ? (
-            <ChartSkeleton />
-          ) : earningsDonut.length === 0 ? (
-            <EmptyState
-              icon={DollarSign}
-              title="No earnings yet"
-              description="Commission from your sales and referrals will show up here."
-            />
-          ) : (
-            <Donut
-              slices={earningsDonut}
-              centerLabel={formatCurrency(stats?.totalCommission ?? 0)}
-              centerSubLabel="Total earned"
-              formatValue={(n) => formatCurrency(n)}
-            />
-          )}
-          {hasReferralNetwork && earningsDonut.length > 0 && (
-            <p className="text-xs text-[#64717a] mt-4 leading-relaxed">
-              Your sales vs. kickbacks from each affiliate you referred.
-              {referralBreakdown.some((r) => r.totalCommission === 0) && (
-                <>
-                  {" "}
-                  Referred affiliates with no orders yet are omitted until they
-                  earn.
-                </>
-              )}
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* Recent orders */}
-      <section>
-        <SectionTitle
-          eyebrow="Activity"
-          title="Recent orders"
-          right={
-            <Link
-              href="/affiliates/dashboard/orders"
-              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] transition-colors"
-            >
-              View all
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          }
-        />
-        {orders.length === 0 ? (
-          <EmptyState
-            icon={ShoppingBag}
-            title="No orders yet"
-            description="Share your code to start earning on every sale."
-          />
-        ) : (
-          <div className="glass-surface rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px] text-sm">
-                <thead>
-                  <tr className="border-b border-[#242526]/8">
-                    <Th>Date</Th>
-                    <Th>Customer</Th>
-                    <Th>Type</Th>
-                    <Th align="right">Order</Th>
-                    <Th align="right">Commission</Th>
-                    <Th>Status</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.slice(0, 10).map((o) => (
-                    <tr
-                      key={o.id}
-                      onClick={() => setActiveOrderId(o.id)}
-                      className="border-b border-[#242526]/5 last:border-0 cursor-pointer hover:bg-[#242526]/[0.03] transition-colors"
-                    >
-                      <td className="py-4 px-5 font-sans text-xs text-[#64717a]">
-                        {formatShortDate(o.createdAt)}
-                      </td>
-                      <td className="py-4 px-5">
-                        <p className="font-medium leading-tight">
-                          {o.customerName}
-                        </p>
-                        <p className="text-xs text-[#64717a] mt-0.5">
-                          {o.customerEmail}
-                        </p>
-                      </td>
-                      <td className="py-4 px-5">
-                        <Pill
-                          tone={o.matchType === "code" ? "dark" : "neutral"}
-                          icon={
-                            o.matchType === "code"
-                              ? ShoppingBag
-                              : o.matchType === "bonus"
-                              ? TrendingUp
-                              : Repeat
-                          }
-                        >
-                          {o.matchType === "code"
-                            ? "Code"
-                            : o.matchType === "bonus"
-                            ? "Bonus"
-                            : "Recurring"}
-                        </Pill>
-                      </td>
-                      <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.orderTotal)}
-                      </td>
-                      <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.commission)}
-                      </td>
-                      <td className="py-4 px-5">
-                        <Pill tone={o.status === "paid" ? "success" : "warn"}>
-                          {o.status}
-                        </Pill>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <OrderDetailDrawer
-        orderId={activeOrderId}
-        onClose={() => setActiveOrderId(null)}
-      />
-    </>
-  );
+      {!appStats && <p className="glass-surface rounded-lg p-5 mb-6">IQONIC app audience is unavailable or not linked yet. App commission records remain available through the shared App category.</p>}
+      <MonthlyRankCard />
+      {bonus && <BonusProgressCard bonus={bonus} />}
+      <TikTokBonusCard />
+    </>;
 }
 
 interface RankPayload {
@@ -663,6 +279,12 @@ const RANK_MEDALS: Record<
  * the card flips to a "bonus unlocked" state with the earned amount.
  */
 function BonusProgressCard({ bonus }: { bonus: BonusInfo }) {
+  if (!bonus.scalarTotalsAvailable || bonus.monthSales === null || bonus.projectedBonus === null || bonus.currency === null) return <section className="glass-surface rounded-3xl p-6 mb-8">
+    <h3>{bonus.monthLabel} sales bonus</h3>
+    <p>{formatBuckets(bonus, 'monthSales')}</p>
+    <p>Bonus projection unavailable: a single known currency is required. No cross-currency target comparison or FX conversion has been made.</p>
+  </section>;
+  const formatCurrency = (amount: number) => formatDenominated(amount, bonus.currency);
   const pct = Math.min(100, (bonus.monthSales / bonus.threshold) * 100);
   const remaining = Math.max(0, bonus.threshold - bonus.monthSales);
 

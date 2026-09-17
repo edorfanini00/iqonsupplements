@@ -15,17 +15,19 @@ import {
   StatCard,
   Pill,
   EmptyState,
-  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 import { OrderDetailDrawer } from "@/components/affiliates/shared/OrderDetailDrawer";
+
+import { combineBuckets, formatBuckets, formatDenominated, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
 
 interface Customer {
   key: string;
   email: string;
   name: string;
-  totalSpent: number;
-  totalCommission: number;
+  currencies: MoneyBucket[];
+  totalSpent: number | null;
+  totalCommission: number | null;
   orderCount: number;
   codeOrders: number;
   recurringOrders: number;
@@ -35,6 +37,7 @@ interface Customer {
 }
 
 interface OrderRow {
+  currency?: string | null;
   id: string;
   orderId: string;
   orderTotal: number;
@@ -100,11 +103,9 @@ export default function AffiliateClientsPage() {
 
   const totals = useMemo(() => {
     const recurring = customers.filter((c) => c.isRecurring).length;
-    const totalRevenue = customers.reduce((s, c) => s + c.totalSpent, 0);
-    const totalCommission = customers.reduce((s, c) => s + c.totalCommission, 0);
-    const lifetimeAvg =
-      customers.length > 0 ? totalRevenue / customers.length : 0;
-    return { recurring, totalRevenue, totalCommission, lifetimeAvg };
+    const money = combineBuckets(customers, ['totalSpent', 'totalCommission']);
+    const average = {currencies:money.currencies.map(b => ({...b,totalSpent:Number(b.totalSpent)/customers.filter(c => c.currencies.some(x => x.currency === b.currency)).length}))};
+    return { recurring, money, average };
   }, [customers]);
 
   return (
@@ -137,12 +138,12 @@ export default function AffiliateClientsPage() {
         <StatCard
           icon={ShoppingBag}
           label="Lifetime revenue"
-          value={formatCurrency(totals.totalRevenue)}
+          value={formatBuckets(totals.money, 'totalSpent')}
         />
         <StatCard
           icon={TrendingUp}
           label="Avg LTV"
-          value={formatCurrency(totals.lifetimeAvg)}
+          value={formatBuckets(totals.average, 'totalSpent')}
         />
       </section>
 
@@ -219,10 +220,10 @@ export default function AffiliateClientsPage() {
                       {c.orderCount}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {formatCurrency(c.totalSpent)}
+                      {formatBuckets(c, 'totalSpent')}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {formatCurrency(c.totalCommission)}
+                      {formatBuckets(c, 'totalCommission')}
                     </td>
                     <td className="py-4 px-5">
                       <Pill
@@ -327,11 +328,11 @@ function CustomerDrawer({
             />
             <MiniStat
               label="Spent"
-              value={formatCurrency(customer.totalSpent)}
+              value={formatBuckets(customer, 'totalSpent')}
             />
             <MiniStat
               label="Your commission"
-              value={formatCurrency(customer.totalCommission)}
+              value={formatBuckets(customer, 'totalCommission')}
             />
             <MiniStat
               label="Customer since"
@@ -385,10 +386,10 @@ function CustomerDrawer({
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-sans">
-                        {formatCurrency(o.orderTotal)}
+                        {formatDenominated(o.orderTotal, o.currency)}
                       </p>
                       <p className="text-[11px] font-sans text-[#64717a] mt-0.5">
-                        + {formatCurrency(o.commission)}
+                        + {formatDenominated(o.commission, o.currency)}
                       </p>
                     </div>
                   </li>

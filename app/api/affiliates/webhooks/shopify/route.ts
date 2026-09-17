@@ -1,3 +1,4 @@
+import { sharedJobAuthorityGuard } from '@/lib/affiliates/job-authority';
 import { verifyShopifyWebhookSignature } from '@/lib/affiliates/shopify-webhook';
 import { SUPPLEMENTS_SHOP,resourceId } from '@/lib/affiliates/shopify-admin';
 import { getOrder } from '@/lib/portal-commerce';
@@ -5,6 +6,9 @@ import { ingestShopifyOrder } from '@/lib/affiliates/shopify-ingest';
 import { apiError,apiSuccess } from '@/lib/affiliates/api-response';
 export const runtime='nodejs';
 export async function POST(request:Request){
+  // Canonical Health alone owns ingestion, settlement and scheduled sends.
+  const authorityGuard = sharedJobAuthorityGuard();
+  if (authorityGuard) return authorityGuard;
   const raw=await request.text();
   if(Buffer.byteLength(raw)>2_000_000)return apiError('TOO_LARGE','Payload too large.',413);
   if(request.headers.get('x-shopify-shop-domain')!==SUPPLEMENTS_SHOP)return apiError('INVALID_SHOP','Unexpected shop.',401);

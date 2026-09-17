@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, use } from "react";
 import Link from "next/link";
+import { SharedProgram } from "@/components/affiliates/shared/SharedProgram";
 import { RecruitmentLink } from "@/components/affiliates/RecruitmentLink";
 import {
   ArrowLeft,
@@ -19,7 +20,6 @@ import {
   StatCard,
   Pill,
   EmptyState,
-  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 import { OrderDetailDrawer } from "@/components/affiliates/shared/OrderDetailDrawer";
@@ -28,8 +28,9 @@ interface Customer {
   key: string;
   email: string;
   name: string;
-  totalSpent: number;
-  totalCommission: number;
+  currencies: MoneyBucket[];
+  totalSpent: number | null;
+  totalCommission: number | null;
   orderCount: number;
   codeOrders: number;
   recurringOrders: number;
@@ -39,6 +40,7 @@ interface Customer {
 }
 
 interface OrderRow {
+  currency?: string | null;
   id: string;
   orderId: string;
   orderTotal: number;
@@ -48,8 +50,11 @@ interface OrderRow {
   createdAt: string;
 }
 
+import { formatBuckets, formatDenominated, type BucketedMoney, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
+
 interface Referee {
-  storeRevenue: number;
+  currencies: MoneyBucket[];
+  storeRevenue: number | null;
   orderCount: number;
   createdAt: string;
   id: string;
@@ -75,7 +80,7 @@ export default function AdminAffiliateDetailPage({
   const [info, setInfo] = useState<AffiliateInfo | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [referees, setReferees] = useState<Referee[]>([]);
-  const [networkRevenue, setNetworkRevenue] = useState(0);
+  const [networkRevenue, setNetworkRevenue] = useState<BucketedMoney | null>(null);
   const [referrerId, setReferrerId] = useState("");
   const [referrerOptions, setReferrerOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [saving, setSaving] = useState(false);
@@ -100,7 +105,7 @@ export default function AdminAffiliateDetailPage({
         setInfo(data.affiliate);
         setCustomers(data.customers ?? []);
         setReferees(data.referees ?? []);
-        setNetworkRevenue(data.network?.storeRevenue ?? 0);
+        setNetworkRevenue(data.network ?? null);
         const [profileRes, optionsRes] = await Promise.all([
           fetch(`/api/affiliates/admin/affiliates/${id}`, { credentials: "include" }),
           fetch("/api/affiliates/admin/referrer-options", { credentials: "include" }),
@@ -166,16 +171,12 @@ export default function AdminAffiliateDetailPage({
 
   const totals = useMemo(() => {
     const recurring = customers.filter((c) => c.isRecurring).length;
-    const totalSpent = customers.reduce((s, c) => s + c.totalSpent, 0);
-    const totalCommission = customers.reduce(
-      (s, c) => s + c.totalCommission,
-      0
-    );
-    return { recurring, totalSpent, totalCommission };
+    return { recurring };
   }, [customers]);
 
   return (
     <>
+      <SharedProgram admin brand="supplements" affiliateId={id} title="Affiliate shared performance" />
       <Link
         href="/affiliates/admin/affiliates"
         className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] mb-6 transition-colors"
@@ -187,7 +188,7 @@ export default function AdminAffiliateDetailPage({
       <PageHeader
         eyebrow={info ? info.promoCode : "Loading"}
         title={info ? `${info.name}'s network & clients` : "Loading…"}
-        description="Direct recruited applicants, affiliates and attributed customers."
+        description="Contact and network directory (lifetime, not filtered). All financial reporting is in the shared report above."
       />
 
       {loadError && <p role="alert" className="text-amber-700 mb-4">{loadError} <button className="underline" onClick={load}>Retry</button></p>}
@@ -223,16 +224,8 @@ export default function AdminAffiliateDetailPage({
               : undefined
           }
         />
-        <StatCard
-          icon={ShoppingBag}
-          label="Total spent"
-          value={formatCurrency(totals.totalSpent)}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Commission earned"
-          value={formatCurrency(totals.totalCommission)}
-        />
+
+
       </section>
 
       {!loading && !loadError && (
@@ -240,8 +233,8 @@ export default function AdminAffiliateDetailPage({
           <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-3">
             Direct recruits of {info?.name ?? "this affiliate"} · {referees.length}
           </p>
-          <p className="text-xl font-medium mb-2">Store revenue: {formatCurrency(networkRevenue)}</p>
-          <p className="text-xs text-[#64717a] mb-4">Lifetime recorded store sales from current direct recruits, including recurring orders. Excludes referral mirrors, bonus/app commission rows and known voided entries. Not fully refund-adjusted. App subscription revenue is not included. This is sales revenue, not the recruiter’s commission.</p>
+          <p className="text-xl font-medium mb-2">Legacy network sales (unfiltered): {formatBuckets(networkRevenue, 'storeRevenue')}</p>
+          <p className="text-xs text-[#64717a] mb-4">Lifetime recorded store sales from current direct recruits, including recurring orders. Excludes referral mirrors, bonus/app commission rows and known voided entries. Includes recorded signed refund adjustments; original Woo revenue uses its recorded net basis. App subscription revenue is not included. This is sales revenue, not the recruiter’s commission.</p>
           {referees.length === 0 && <p className="text-sm text-[#64717a]">No referred applications yet.</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {referees.map((r) => (
@@ -258,7 +251,7 @@ export default function AdminAffiliateDetailPage({
                   <p className="text-xs text-[#64717a] font-sans mt-0.5 truncate">
                     {r.promoCode} · {r.commissionRate}%
                   </p>
-                  <p className="text-sm mt-2">{formatCurrency(r.storeRevenue)} store revenue · {r.orderCount} orders</p>
+                  <p className="text-sm mt-2">Legacy lifetime: {formatBuckets(r, 'storeRevenue')} · {r.orderCount} orders</p>
                   <p className="text-xs text-[#64717a] mt-1">Applied {formatShortDate(r.createdAt)}</p>
                 </div>
                 <Pill tone={r.status === "active" ? "success" : "warn"}>
@@ -339,10 +332,10 @@ export default function AdminAffiliateDetailPage({
                       {c.orderCount}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {formatCurrency(c.totalSpent)}
+                      {formatBuckets(c, 'totalSpent')}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {formatCurrency(c.totalCommission)}
+                      {formatBuckets(c, 'totalCommission')}
                     </td>
                     <td className="py-4 px-5">
                       <Pill
@@ -448,11 +441,11 @@ function CustomerDrawer({
             />
             <MiniStat
               label="Spent"
-              value={formatCurrency(customer.totalSpent)}
+              value={formatBuckets(customer, 'totalSpent')}
             />
             <MiniStat
               label="Commission"
-              value={formatCurrency(customer.totalCommission)}
+              value={formatBuckets(customer, 'totalCommission')}
             />
             <MiniStat
               label="Customer since"
@@ -510,10 +503,10 @@ function CustomerDrawer({
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-sans">
-                        {formatCurrency(o.orderTotal)}
+                        {formatDenominated(o.orderTotal, o.currency)}
                       </p>
                       <p className="text-[11px] font-sans text-[#64717a] mt-0.5">
-                        + {formatCurrency(o.commission)}
+                        + {formatDenominated(o.commission, o.currency)}
                       </p>
                     </div>
                   </li>

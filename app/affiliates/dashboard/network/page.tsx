@@ -20,23 +20,26 @@ import {
   StatCard,
   Pill,
   EmptyState,
-  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
+import { combineBuckets, formatBuckets, formatDenominated, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
+
 interface BreakdownRow {
+  currencies: MoneyBucket[];
   refereeId: string;
   refereeName: string;
   refereePromoCode: string;
   refereeStatus: "active" | "pending" | "disabled";
   referralRate: number;
   ordersCount: number;
-  totalCommission: number;
-  pendingCommission: number;
-  paidCommission: number;
+  totalCommission: number | null;
+  pendingCommission: number | null;
+  paidCommission: number | null;
 }
 
 interface ReferralOrder {
+  currency: string | null;
   id: string;
   orderId: string;
   customerName: string;
@@ -115,11 +118,9 @@ export default function AffiliateNetworkPage() {
   }, []);
 
   const totals = useMemo(() => {
-    const earned = breakdown.reduce((s, r) => s + r.totalCommission, 0);
-    const pending = breakdown.reduce((s, r) => s + r.pendingCommission, 0);
-    const paid = breakdown.reduce((s, r) => s + r.paidCommission, 0);
+    const money = combineBuckets(breakdown, ['totalCommission', 'pendingCommission', 'paidCommission']);
     const orders = breakdown.reduce((s, r) => s + r.ordersCount, 0);
-    return { earned, pending, paid, orders };
+    return { money, orders };
   }, [breakdown]);
 
   return (
@@ -188,14 +189,14 @@ export default function AffiliateNetworkPage() {
         <StatCard
           icon={Wallet}
           label="Referral earnings"
-          value={formatCurrency(totals.earned)}
+          value={formatBuckets(totals.money, 'totalCommission')}
           accent
-          hint={`${formatCurrency(totals.pending)} pending`}
+          hint={`${formatBuckets(totals.money, 'pendingCommission')} pending`}
         />
         <StatCard
           icon={Wallet}
           label="Already paid"
-          value={formatCurrency(totals.paid)}
+          value={formatBuckets(totals.money, 'paidCommission')}
         />
       </section>
 
@@ -256,10 +257,10 @@ export default function AffiliateNetworkPage() {
                         {r.ordersCount}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(r.totalCommission)}
+                        {formatBuckets(r, 'totalCommission')}
                       </td>
                       <td className="py-4 px-5 text-right font-sans text-[#20282c]">
-                        {formatCurrency(r.pendingCommission)}
+                        {formatBuckets(r, 'pendingCommission')}
                       </td>
                     </tr>
                   ))}
@@ -320,10 +321,10 @@ export default function AffiliateNetworkPage() {
                       </td>
                       <td className="py-4 px-5 text-sm">{o.customerName}</td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.orderTotal)}
+                        {formatDenominated(o.orderTotal, o.currency)}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.commission)}
+                        {formatDenominated(o.commission, o.currency)}
                       </td>
                       <td className="py-4 px-5">
                         <Pill tone={o.status === "paid" ? "success" : "warn"}>

@@ -1,3 +1,4 @@
+import { sharedJobAuthorityGuard } from '@/lib/affiliates/job-authority';
 /**
  * Monthly bonus cron.
  *
@@ -27,6 +28,9 @@ function isAuthorized(request: Request): boolean {
 }
 
 export async function GET(request: Request) {
+  // Canonical Health alone owns ingestion, settlement and scheduled sends.
+  const authorityGuard = sharedJobAuthorityGuard();
+  if (authorityGuard) return authorityGuard;
   if (!isAuthorized(request)) {
     return jsonNoCache({ error: "Unauthorized" }, { status: 401 });
   }

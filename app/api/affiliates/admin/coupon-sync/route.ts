@@ -1,3 +1,4 @@
+import { sharedJobAuthorityGuard } from '@/lib/affiliates/job-authority';
 import { syncAffiliateCoupons } from "@/lib/affiliates/coupon-sync";
 import { writeAuditLog } from "@/lib/affiliates/audit";
 import {
@@ -10,6 +11,9 @@ import { enforceRateLimit } from "@/lib/affiliates/rate-limit";
 export const runtime = "nodejs";
 
 export async function GET() {
+  // Canonical Health alone owns ingestion, settlement and scheduled sends.
+  const authorityGuard = sharedJobAuthorityGuard();
+  if (authorityGuard) return authorityGuard;
   const session = await requireAdminSession();
   if (isNextResponse(session)) return session;
 
@@ -19,6 +23,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Canonical Health alone owns ingestion, settlement and scheduled sends.
+  const authorityGuard = sharedJobAuthorityGuard();
+  if (authorityGuard) return authorityGuard;
   const session = await requireAdminSession();
   if (isNextResponse(session)) return session;
 

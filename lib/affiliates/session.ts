@@ -1,42 +1,29 @@
 import { cookies } from 'next/headers';
-import { randomBytes } from 'node:crypto';
-import { prisma } from '@/lib/db/prisma';
-import { isDatabaseConfigured } from '@/lib/db/database';
-import { getAffiliateByPortalUserId } from '@/lib/affiliates/store';
-import { tokenHash } from './password';
+import { relayAffiliateRequest, sharedRelayConfig } from './shared-relay';
 import type { Affiliate } from './types';
-export const AFFILIATE_SESSION_COOKIE = 'iqon_supplements_portal';
-export const AFFILIATE_COOKIE_OPTIONS = { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/', maxAge: 60 * 60 * 24 * 7 };
+/** Compatibility names only. Legacy independent portal cookies never authenticate. */
+export const AFFILIATE_SESSION_COOKIE = 'iqon_affiliate_wp_jwt';
+export const AFFILIATE_COOKIE_OPTIONS = {httpOnly:true,secure:process.env.NODE_ENV === 'production',sameSite:'lax' as const,path:'/',maxAge:2592000};
 export interface AffiliateSession {
-  portalUserId: number;
-  email: string;
-  role: 'affiliate' | 'admin' | 'shop_manager';
-  portalRoles: string[];
-  profile: Affiliate | null;
+  portalUserId:number;
+  wpUserId:number;
+  email:string;
+  role:'affiliate'|'admin'|'shop_manager';
+  portalRoles:string[];
+  profile:Affiliate|null;
 }
-export async function getAffiliateSession(): Promise<AffiliateSession | null> {
-  if (!isDatabaseConfigured()) return null;
-  const token = (await cookies()).get(AFFILIATE_SESSION_COOKIE)?.value;
-  if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
-  const session = await prisma.portalSession.findUnique({where:{tokenHash:tokenHash(token)},include:{account:true}});
-  if (!session || session.expiresAt <= new Date() || session.account.disabled) return null;
-  const account = session.account;
-  if (!['admin','affiliate','shop_manager'].includes(account.role)) return null;
-  const profile = await getAffiliateByPortalUserId(account.id);
-  if (profile && profile.status !== 'active') return null;
-  if (account.role === 'affiliate' && !profile) return null;
-  return {portalUserId:account.id,email:account.email,role:account.role as AffiliateSession['role'],portalRoles:[account.role],profile};
+export async function getAffiliateSession():Promise<AffiliateSession|null> {
+  try {
+    const {portal}=sharedRelayConfig();
+    const store=await cookies();
+    const response=await relayAffiliateRequest(new Request(portal+'/api/affiliates/shared-session',{headers:{cookie:store.toString()}}));
+    if(!response.ok)return null;
+    const {session}=await response.json();
+    if(!session || !Number.isSafeInteger(session.wpUserId) || !['admin','affiliate','shop_manager'].includes(session.role) || (session.profile && session.profile.status !== 'active') || (session.role === 'affiliate' && !session.profile))return null;
+    return {...session,portalUserId:session.wpUserId,portalRoles:session.wpRoles ?? []};
+  } catch {return null;}
 }
-export async function getLightSession() {
-  const session = await getAffiliateSession();
-  return session ? {...session,profileId:session.profile?.id,status:session.profile?.status} : null;
-}
-export async function createPortalSession(accountId: number): Promise<string> {
-  const token = randomBytes(32).toString('hex');
-  await prisma.portalSession.create({data:{tokenHash:tokenHash(token),accountId,expiresAt:new Date(Date.now()+AFFILIATE_COOKIE_OPTIONS.maxAge*1000)}});
-  return token;
-}
-export async function revokeCurrentSession() {
-  const token = (await cookies()).get(AFFILIATE_SESSION_COOKIE)?.value;
-  if (token && isDatabaseConfigured()) await prisma.portalSession.deleteMany({where:{tokenHash:tokenHash(token)}});
-}
+export async function getLightSession(){const session=await getAffiliateSession();return session?{...session,profileId:session.profile?.id,status:session.profile?.status}:null;}
+// Fail closed if an old handler is ever invoked outside middleware.
+export async function createPortalSession(_accountId:number):Promise<string>{throw Error('Independent affiliate sessions are disabled');}
+export async function revokeCurrentSession():Promise<void>{throw Error('Logout must use the shared authority relay');}
