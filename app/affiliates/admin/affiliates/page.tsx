@@ -1,7 +1,4 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
@@ -25,6 +22,7 @@ import {
   StatCard,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
@@ -72,7 +70,6 @@ interface AffiliateRow {
 }
 
 export default function AdminAffiliatesPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [affiliates, setAffiliates] = useState<AffiliateRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -127,8 +124,6 @@ export default function AdminAffiliatesPage() {
     return { active, withBank, pending, paid };
   }, [affiliates]);
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
       <PageHeader
@@ -172,13 +167,13 @@ export default function AdminAffiliatesPage() {
         <StatCard
           icon={CreditCard}
           label="Pending payout"
-          value={loading ? "—" : originalTotal(affiliates.map(a=>a.stats), "pendingCommission")}
+          value={formatCurrency(totals.pending)}
           accent
         />
         <StatCard
           icon={CreditCard}
           label="Paid lifetime"
-          value={loading ? "—" : originalTotal(affiliates.map(a=>a.stats), "paidCommission")}
+          value={formatCurrency(totals.paid)}
         />
       </section>
 
@@ -265,13 +260,13 @@ export default function AdminAffiliatesPage() {
                       {a.stats.totalOrders}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(a.stats, "totalRevenue")}
+                      {formatCurrency(a.stats.totalRevenue)}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(a.stats, "totalCommission")}
+                      {formatCurrency(a.stats.totalCommission)}
                     </td>
                     <td className="py-4 px-5 text-right font-sans text-[#20282c]">
-                      {originalField(a.stats, "pendingCommission")}
+                      {formatCurrency(a.stats.pendingCommission)}
                     </td>
                     <td className="py-4 px-5">
                       {a.bankInfo ? (
@@ -504,15 +499,15 @@ function AffiliateDetailDrawer({
               />
               <MiniStat
                 label="Revenue"
-                value={originalField(affiliate.stats, "totalRevenue")}
+                value={formatCurrency(affiliate.stats.totalRevenue)}
               />
               <MiniStat
                 label="Commission"
-                value={originalField(affiliate.stats, "totalCommission")}
+                value={formatCurrency(affiliate.stats.totalCommission)}
               />
               <MiniStat
                 label="Pending"
-                value={originalField(affiliate.stats, "pendingCommission")}
+                value={formatCurrency(affiliate.stats.pendingCommission)}
               />
             </div>
           </section>

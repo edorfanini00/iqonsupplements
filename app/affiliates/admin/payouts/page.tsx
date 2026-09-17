@@ -1,8 +1,4 @@
 "use client";
-import {useOriginalPayout} from "@/components/affiliates/shared/useOriginalPayout";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -20,6 +16,7 @@ import {
   Pill,
   EmptyState,
   bonusKindLabel,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 import { RangePicker, type Preset } from "@/components/affiliates/shared/RangePicker";
@@ -39,7 +36,7 @@ function paidAtDay(paidAt: string): Date {
   return parseOrderTimestamp(paidAt.slice(0, 10));
 }
 
-interface PendingOrderRow extends OriginalMoney {
+interface PendingOrderRow {
   id: string;
   orderId: string;
   wooOrderId: number | null;
@@ -51,7 +48,7 @@ interface PendingOrderRow extends OriginalMoney {
   createdAt: string;
 }
 
-interface PendingRow extends OriginalMoney {
+interface PendingRow {
   id: string;
   name: string;
   promoCode: string;
@@ -87,7 +84,7 @@ function orderRef(o: { matchType: string; wooOrderId: number | null; orderId: st
   return o.matchType === "bonus" ? "—" : `#${o.wooOrderId ?? o.orderId}`;
 }
 
-interface PayoutOrderRow extends OriginalMoney {
+interface PayoutOrderRow {
   id: string;
   orderId: string;
   wooOrderId: number | null;
@@ -99,7 +96,7 @@ interface PayoutOrderRow extends OriginalMoney {
   createdAt: string;
 }
 
-interface PayoutRow extends OriginalMoney {
+interface PayoutRow {
   id: string;
   affiliateId: string;
   affiliateName: string;
@@ -115,7 +112,6 @@ interface PayoutRow extends OriginalMoney {
 }
 
 export default function AdminPayoutsPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [pending, setPending] = useState<PendingRow[]>([]);
   const [payouts, setPayouts] = useState<PayoutRow[]>([]);
   const [preset, setPreset] = useState<Preset>("30d");
@@ -133,7 +129,7 @@ export default function AdminPayoutsPage() {
       if (res.ok) {
         const data = await res.json();
         setPending(data.pendingByAffiliate ?? []);
-        setPayouts((data.payouts ?? []).filter((p: PayoutRow) => p.status !== "reversed"));
+        setPayouts(data.payouts ?? []);
       }
     } finally {
       setLoading(false);
@@ -160,7 +156,7 @@ export default function AdminPayoutsPage() {
       totalPending,
       totalPaid,
       paidInRange,
-      affiliatesAwaiting: pending.filter((p) => p.orders.some(o => Number(o.outstandingAmount ?? o.commission) > 0)).length,
+      affiliatesAwaiting: pending.filter((p) => p.pendingCommission > 0).length,
     };
   }, [pending, payouts, filteredPayouts]);
 
@@ -172,8 +168,6 @@ export default function AdminPayoutsPage() {
     });
     if (res.ok) load();
   }
-
-  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -199,20 +193,20 @@ export default function AdminPayoutsPage() {
         <StatCard
           icon={Wallet}
           label="Total pending"
-          value={loading ? "—" : originalTotal(pending, "pendingCommission")}
+          value={formatCurrency(totals.totalPending)}
           accent
           hint={`${totals.affiliatesAwaiting} affiliates`}
         />
         <StatCard
           icon={Wallet}
           label="Paid"
-          value={loading ? "—" : originalTotal(filteredPayouts, "amount")}
+          value={formatCurrency(totals.paidInRange)}
           hint={rangeLabel(preset)}
         />
         <StatCard
           icon={Wallet}
           label="Paid lifetime"
-          value={loading ? "—" : originalTotal(payouts, "amount")}
+          value={formatCurrency(totals.totalPaid)}
         />
         <StatCard
           icon={Wallet}
@@ -239,7 +233,7 @@ export default function AdminPayoutsPage() {
           <div className="glass-surface rounded-lg p-12 text-center text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a]">
             Loading…
           </div>
-        ) : pending.filter((p) => p.orders.some(o => Number(o.outstandingAmount ?? o.commission) > 0)).length === 0 ? (
+        ) : pending.filter((p) => p.pendingCommission > 0).length === 0 ? (
           <EmptyState
             icon={Wallet}
             title="Nothing to pay"
@@ -261,7 +255,7 @@ export default function AdminPayoutsPage() {
                 </thead>
                 <tbody>
                   {pending
-                    .filter((p) => p.orders.some(o => Number(o.outstandingAmount ?? o.commission) > 0))
+                    .filter((p) => p.pendingCommission > 0)
                     .map((p) => (
                       <PendingBalanceRow
                         key={p.id}
@@ -411,7 +405,7 @@ function PendingBalanceRow({
           {row.pendingOrders}
         </td>
         <td className="py-4 px-5 text-right font-sans font-medium">
-          {originalField(row, "pendingCommission")}
+          {formatCurrency(row.pendingCommission)}
         </td>
         <td className="py-4 px-5">
           {row.bankInfoOnFile ? (
@@ -478,10 +472,10 @@ function PendingBalanceRow({
                         </Pill>
                       </td>
                       <td className="py-2.5 px-5 text-right font-sans text-[#64717a]">
-                        {o.matchType === "bonus" ? "—" : formatCurrency(o.orderTotal, o.currency as string | null)}
+                        {o.matchType === "bonus" ? "—" : formatCurrency(o.orderTotal)}
                       </td>
                       <td className="py-2.5 px-5 text-right font-sans font-medium">
-                        {formatCurrency(o.outstandingAmount as number ?? o.commission, o.currency as string | null)}
+                        {formatCurrency(o.commission)}
                       </td>
                       <td className="py-2.5 px-3 text-right">
                         <button
@@ -505,7 +499,7 @@ function PendingBalanceRow({
                       Total to pay
                     </td>
                     <td className="py-2.5 px-5 text-right font-sans font-semibold">
-                      {originalField(row, "pendingCommission")}
+                      {formatCurrency(row.pendingCommission)}
                     </td>
                     <td />
                   </tr>
@@ -564,7 +558,7 @@ function PayoutHistoryRow({
           {payout.orderIds.length}
         </td>
         <td className="py-4 px-5 text-right font-sans font-medium">
-          {formatCurrency(payout.amount, payout.currency as string | null)}
+          {formatCurrency(payout.amount)}
         </td>
         <td className="py-4 px-5 text-right">
           <button
@@ -618,10 +612,10 @@ function PayoutHistoryRow({
                           </Pill>
                         </td>
                         <td className="py-2.5 px-5 text-right font-sans text-[#64717a]">
-                          {o.matchType === "bonus" ? "—" : formatCurrency(o.orderTotal, o.currency as string | null)}
+                          {o.matchType === "bonus" ? "—" : formatCurrency(o.orderTotal)}
                         </td>
                         <td className="py-2.5 px-5 text-right font-sans font-medium">
-                          {formatCurrency((payout.items as {orderId:string;amount:number}[] | undefined)?.find(i=>i.orderId===o.id)?.amount ?? o.commission, o.currency as string | null)}
+                          {formatCurrency(o.commission)}
                         </td>
                       </tr>
                     ))}
@@ -635,7 +629,7 @@ function PayoutHistoryRow({
                         Total paid
                       </td>
                       <td className="py-2.5 px-5 text-right font-sans font-semibold">
-                        {formatCurrency(payout.amount, payout.currency as string | null)}
+                        {formatCurrency(payout.amount)}
                       </td>
                     </tr>
                   </tfoot>
@@ -674,11 +668,46 @@ function RecordPayoutModal({
   onClose: () => void;
   onRecorded: () => void;
 }) {
-  const payment=useOriginalPayout(target.id,onRecorded);
-  const {busy:loading,error}=payment;
-  const form={method:payment.method,reference:payment.reference,notes:payment.notes,paidAt:payment.paidAt};
-  function setForm(next:typeof form) { payment.setMethod(next.method);payment.setReference(next.reference);payment.setNotes(next.notes);payment.setPaidAt(next.paidAt);payment.setConfirmed(false); }
-  async function submit(e:React.FormEvent) {e.preventDefault();await payment.submit();}
+  const [form, setForm] = useState({
+    method: "bank" as "bank" | "paypal" | "zelle" | "other",
+    reference: "",
+    notes: "",
+    paidAt: new Date().toISOString().slice(0, 10),
+    amount: target.pendingCommission,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/affiliates/admin/payouts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          affiliateId: target.id,
+          method: form.method,
+          reference: form.reference || undefined,
+          notes: form.notes || undefined,
+          // Anchor the picked day at local noon so the stored timestamp
+          // stays on the same calendar day in any timezone.
+          paidAt: parseOrderTimestamp(form.paidAt).toISOString(),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Failed");
+        return;
+      }
+      onRecorded();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const inputClass =
     "bg-transparent border-0 border-b border-[#242526]/15 rounded-none px-0 py-2.5 text-sm focus:outline-none focus:border-[#242526] transition-colors placeholder:text-[#64717a] w-full";
 
@@ -710,7 +739,7 @@ function RecordPayoutModal({
               Amount due
             </p>
             <p className="font-sans text-2xl font-medium mt-1">
-              {originalField(target, "pendingCommission")}
+              {formatCurrency(target.pendingCommission)}
             </p>
           </div>
           <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-white/55">
@@ -736,7 +765,7 @@ function RecordPayoutModal({
                   </p>
                 </div>
                 <p className="font-sans font-medium shrink-0">
-                  {Number(o.outstandingAmount ?? o.commission)>0 ? <input aria-label={`Amount for ${o.orderId}`} type="number" step="0.01" min="0.01" max={Number(o.outstandingAmount ?? o.commission)} value={payment.draft[o.id]??''} disabled={payment.busy||payment.locked||!payment.full} onChange={e=>{payment.setConfirmed(false);payment.setDraft(d=>({...d,[o.id]:e.target.value}));}} className={`${inputClass} w-24 text-right`} /> : formatCurrency(Number(o.outstandingAmount ?? o.commission), o.currency as string | null)}
+                  {formatCurrency(o.commission)}
                 </p>
               </div>
             ))}
@@ -759,13 +788,7 @@ function RecordPayoutModal({
           </p>
         )}
 
-        {!payment.full && <p role="status" className="text-xs text-[#64717a] mb-4">Loading settlement balances…</p>}
-        {payment.negatives.length>0 && <div className="mb-4 text-xs text-[#64717a]">Required adjustments (all dates and categories): {payment.negatives.map(o=><p key={o.id}>{o.orderId} · {formatCurrency(o.outstandingAmount,o.currency)}</p>)}</div>}
-        {payment.plan && <p className="text-sm font-sans mb-4">Payment amount: {formatCurrency(payment.plan.amount,payment.plan.currency)}</p>}
-        {payment.planError && !payment.locked && <p role="alert" className="text-amber-700 text-sm mb-4">{payment.planError}</p>}
-        {payment.locked && <p className="text-xs break-all mb-4">Pending payment reference: {payment.token}. Retry retains the original payment details.</p>}
         <form onSubmit={submit} className="space-y-1">
-          <fieldset disabled={payment.busy||payment.locked||!payment.full} className="space-y-1">
           <div className="grid grid-cols-2 gap-4">
             <select
               value={form.method}
@@ -800,8 +823,6 @@ function RecordPayoutModal({
             className={`${inputClass} resize-none`}
           />
 
-          </fieldset>
-          <label className="flex gap-2 items-start text-xs text-[#64717a] !mt-4"><input type="checkbox" checked={payment.confirmed} onChange={e=>payment.setConfirmed(e.target.checked)}/>I confirm this payment was made externally and includes the required adjustments.</label>
           <div className="!mt-8 flex gap-3">
             <button
               type="button"
@@ -812,15 +833,13 @@ function RecordPayoutModal({
             </button>
             <button
               type="submit"
-              disabled={loading||!payment.confirmed||payment.canCorrect||(!payment.locked&&!payment.plan)}
+              disabled={loading}
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-3 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
-              {loading ? "Recording…" : payment.locked ? "Retry same payment" : "Mark as paid"}
+              {loading ? "Recording…" : "Mark as paid"}
             </button>
           </div>
-          {payment.locked && <button type="button" className="text-xs underline !mt-4" disabled={loading} onClick={()=>void payment.resolveAttempt().catch(()=>{})}>Check recorded payment</button>}
-          {payment.canCorrect && <button type="button" className="text-xs underline !mt-4" onClick={payment.correct}>Correct rejected payment after confirmed readback</button>}
         </form>
       </div>
     </div>

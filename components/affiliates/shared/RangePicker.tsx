@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
+import { useCalendarDay } from "./useCalendarDay";
 import { isMonthToken, recentMonthTokens } from "@/lib/affiliates/time-series";
 
 const PRESETS = [
@@ -39,9 +40,10 @@ export function RangePicker({
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
+  const calendarDay = useCalendarDay();
   const months = useMemo(
     () => recentMonthTokens(monthsBack),
-    [monthsBack]
+    [monthsBack, calendarDay]
   );
 
   const monthSelected = isMonthToken(value);

@@ -1,6 +1,9 @@
 // Audited existing Health read surfaces only. No commerce mutation dispatch.
 // Products GET is excluded: its legacy handler reconciles inventory records.
 export const ORIGINAL_READ_ROUTES: readonly RegExp[] = [
+  /^\/api\/affiliates\/shop-manager\/orders$/,
+  /^\/api\/affiliates\/admin\/marketing\/(?:audience|campaigns)$/,
+  /^\/api\/affiliates\/admin\/marketing\/campaigns\/[A-Za-z0-9_-]+$/,
   /^\/api\/affiliates\/admin\/(?:orders|subscriptions|customers)$/,
   /^\/api\/affiliates\/admin\/accounting\/(?:summary|trends|inventory|purchases|sales|expenses|adjustments|orders)$/,
   /^\/api\/affiliates\/admin\/accounting\/items\/[A-Za-z0-9_-]+\/history$/,

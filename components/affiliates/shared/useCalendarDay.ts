@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 
 export function localDayKey(d = new Date()): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  // Reporting follows Eastern calendar dates, regardless of the browser's zone.
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(d);
 }
 
 /** Local calendar day (YYYY-MM-DD), updates at midnight and when the tab regains focus. */

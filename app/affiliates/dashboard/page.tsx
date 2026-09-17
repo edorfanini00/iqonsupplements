@@ -1,9 +1,5 @@
 "use client";
-import {OriginalCurrencyChart} from "@/components/affiliates/shared/OriginalCurrencyChart";
-import { OverviewCategoryRevenue } from "@/components/affiliates/shared/OverviewCategoryRevenue";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -34,6 +30,7 @@ import {
   SectionTitle,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 import { OrderDetailDrawer } from "@/components/affiliates/shared/OrderDetailDrawer";
@@ -44,7 +41,7 @@ import {
 } from "@/lib/affiliates/time-series";
 import type { Granularity } from "@/lib/affiliates/types";
 
-interface Stats extends OriginalMoney {
+interface Stats {
   totalOrders: number;
   totalRevenue: number;
   totalCommission: number;
@@ -67,7 +64,7 @@ interface Account {
   referredBy: { name: string; promoCode: string; rate: number } | null;
 }
 
-interface OrderRow extends OriginalMoney {
+interface OrderRow {
   id: string;
   orderId: string;
   customerName: string;
@@ -79,7 +76,7 @@ interface OrderRow extends OriginalMoney {
   createdAt: string;
 }
 
-interface ReferralBreakdownRow extends OriginalMoney {
+interface ReferralBreakdownRow {
   refereeId: string;
   refereeName: string;
   refereePromoCode: string;
@@ -91,7 +88,7 @@ interface ReferralBreakdownRow extends OriginalMoney {
   paidCommission: number;
 }
 
-interface BonusInfo extends OriginalMoney {
+interface BonusInfo {
   threshold: number;
   rate: number;
   monthSales: number;
@@ -106,7 +103,6 @@ interface SessionUser {
 }
 
 export default function AffiliateOverviewPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [user, setUser] = useState<SessionUser | null>(null);
   const [preset, setPreset] = useState<Preset>("30d");
   const [stats, setStats] = useState<Stats | null>(null);
@@ -129,22 +125,30 @@ export default function AffiliateOverviewPage() {
   const hasLoadedOnce = useRef(false);
   const calendarDay = useCalendarDay();
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const load = useCallback(async (p: Preset, isInitial: boolean) => {
     if (isInitial) setLoading(true);
     else setRefreshing(true);
+    const request = beginRead();
+    setReadError(null);
+    setStats(null); setAccount(null); setOrders([]); setReferralBreakdown([]); setBonus(null); setAppStats(null);
     try {
       const [meRes, dashRes] = await Promise.all([
-        fetch("/api/affiliates/me", { credentials: "include" }),
-        fetch(`/api/affiliates/dashboard?range=${p}`, {
-          credentials: "include",
+        fetch("/api/affiliates/me", { credentials: "include", cache: "no-store", signal: request.signal }),
+        fetch(`/api/affiliates/dashboard?range=${encodeURIComponent(p)}`, {
+          credentials: "include", cache: "no-store", signal: request.signal,
         }),
       ]);
+      if (!meRes.ok || !dashRes.ok) throw new Error("Could not load data. Please retry.");
       if (meRes.ok) {
         const data = await meRes.json();
+        if (!request.isCurrent()) return;
         setUser(data.user);
       }
       if (dashRes.ok) {
         const data = await dashRes.json();
+        if (!request.isCurrent()) return;
         setStats(data.stats);
         setAccount(data.account ?? null);
         setOrders(data.orders ?? []);
@@ -152,11 +156,14 @@ export default function AffiliateOverviewPage() {
         setBonus(data.bonus ?? null);
         setAppStats(data.appStats ?? null);
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [beginRead]);
 
   useEffect(() => {
     const isInitial = !hasLoadedOnce.current;
@@ -174,7 +181,7 @@ export default function AffiliateOverviewPage() {
 
   function share() {
     if (!user) return;
-    const text = `Use my code ${user.promoCode} at iqonhealth.com. Check the store for the applicable discount.`;
+    const text = `Use my code ${user.promoCode} for 15% off at iqonhealth.com`;
     if (navigator.share) {
       navigator.share({ title: "IQON code", text }).catch(() => {});
     } else {
@@ -190,7 +197,7 @@ export default function AffiliateOverviewPage() {
   );
 
   const seriesData = useMemo(() => {
-    const series = buildTimeSeries(originalChartRows(orders), chartRange);
+    const series = buildTimeSeries(orders, chartRange);
     return series.map((s) => ({
       date: s.bucket,
       label: s.label,
@@ -216,7 +223,6 @@ export default function AffiliateOverviewPage() {
 
   const earningsDonut = useMemo(() => {
     const slices: { label: string; value: number }[] = [];
-    if (stats?.scalarTotalsAvailable === false) return slices;
 
     slices.push({
       label: "Your sales",
@@ -235,10 +241,9 @@ export default function AffiliateOverviewPage() {
 
   const hasReferralNetwork = referralBreakdown.length > 0;
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => load(preset, false)}>Retry</button></p>}
       <PageHeader
         eyebrow={`Welcome back${user ? `, ${user.firstName}` : ""}`}
         title="Your performance"
@@ -317,15 +322,15 @@ export default function AffiliateOverviewPage() {
           <div className="grid grid-cols-2 gap-3 self-end lg:self-stretch">
             <DarkInline
               label="Earnings"
-              value={stats ? originalField(stats, "totalCommission") : "—"}
+              value={stats ? formatCurrency(stats.totalCommission) : "—"}
             />
             <DarkInline
               label="Pending"
-              value={stats ? originalField(stats, "pendingCommission") : "—"}
+              value={stats ? formatCurrency(stats.pendingCommission) : "—"}
             />
             <DarkInline
               label="Paid out"
-              value={stats ? originalField(stats, "paidCommission") : "—"}
+              value={stats ? formatCurrency(stats.paidCommission) : "—"}
             />
             <DarkInline
               label="Orders"
@@ -356,16 +361,16 @@ export default function AffiliateOverviewPage() {
         <StatCard
           icon={DollarSign}
           label="Revenue driven"
-          value={stats ? originalField(stats, "totalRevenue") : "—"}
+          value={stats ? formatCurrency(stats.totalRevenue) : "—"}
         />
         <StatCard
           icon={TrendingUp}
           label="Commission"
-          value={stats ? originalField(stats, "totalCommission") : "—"}
+          value={stats ? formatCurrency(stats.totalCommission) : "—"}
           accent
           hint={
             stats && stats.referralCommission > 0
-              ? `incl. ${originalField(stats, "referralCommission")} from network`
+              ? `incl. ${formatCurrency(stats.referralCommission)} from network`
               : undefined
           }
         />
@@ -373,7 +378,7 @@ export default function AffiliateOverviewPage() {
           <StatCard
             icon={Repeat}
             label="From network"
-            value={originalField(stats, "referralCommission")}
+            value={formatCurrency(stats.referralCommission)}
             hint={`${stats.referralOrders} referred orders`}
           />
         ) : (
@@ -384,7 +389,6 @@ export default function AffiliateOverviewPage() {
             hint="Repeat customer orders"
           />
         )}
-        <OverviewCategoryRevenue preset={preset} />
       </section>
 
       {/* IQONIC app — shown once any of their customers is on the app */}
@@ -432,7 +436,7 @@ export default function AffiliateOverviewPage() {
                     App earnings
                   </p>
                   <p className="text-xl font-sans font-medium mt-1">
-                    {originalField(appStats, "earnings")}
+                    {formatCurrency(appStats.earnings)}
                   </p>
                 </div>
               </div>
@@ -461,14 +465,14 @@ export default function AffiliateOverviewPage() {
               description="Try a wider time frame or share your code to earn commissions."
             />
           ) : (
-            <OriginalCurrencyChart rows={orders}>{<AreaChart
+            <AreaChart
               key={`${preset}-${calendarDay}`}
               data={seriesData}
               granularity={chartGranularity}
               primaryLabel="Commission"
               secondaryLabel="Revenue"
               formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
-            />}</OriginalCurrencyChart>
+            />
           )}
         </div>
         <div className="glass-surface rounded-lg p-6 md:p-7">
@@ -508,9 +512,9 @@ export default function AffiliateOverviewPage() {
           ) : (
             <Donut
               slices={earningsDonut}
-              centerLabel={originalField(stats, "totalCommission")}
+              centerLabel={formatCurrency(stats?.totalCommission ?? 0)}
               centerSubLabel="Total earned"
-              formatValue={(n) => formatCurrency(n, stats?.currency as string | null)}
+              formatValue={(n) => formatCurrency(n)}
             />
           )}
           {hasReferralNetwork && earningsDonut.length > 0 && (
@@ -600,10 +604,10 @@ export default function AffiliateOverviewPage() {
                         </Pill>
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.orderTotal, o.currency as string | null)}
+                        {formatCurrency(o.orderTotal)}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.commission, o.currency as string | null)}
+                        {formatCurrency(o.commission)}
                       </td>
                       <td className="py-4 px-5">
                         <Pill tone={o.status === "paid" ? "success" : "warn"}>

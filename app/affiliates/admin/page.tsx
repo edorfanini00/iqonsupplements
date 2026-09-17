@@ -1,9 +1,4 @@
 "use client";
-import {OriginalCurrencyChart} from "@/components/affiliates/shared/OriginalCurrencyChart";
-import { OverviewCategoryRevenue } from "@/components/affiliates/shared/OverviewCategoryRevenue";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -36,10 +31,11 @@ import {
   SectionTitle,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
-interface AdminStats extends OriginalMoney {
+interface AdminStats {
   totalAffiliates: number;
   activeAffiliates: number;
   totalOrders: number;
@@ -59,7 +55,7 @@ interface StoreStats {
   truncated: boolean;
 }
 
-interface RankingRow extends OriginalMoney {
+interface RankingRow {
   id: string;
   name: string;
   promoCode: string;
@@ -70,7 +66,7 @@ interface RankingRow extends OriginalMoney {
   orderCount: number;
 }
 
-interface OrderRow extends OriginalMoney {
+interface OrderRow {
   id: string;
   affiliateId: string;
   orderId: string;
@@ -83,7 +79,7 @@ interface OrderRow extends OriginalMoney {
   createdAt: string;
 }
 
-interface ChartOrder extends OriginalMoney {
+interface ChartOrder {
   createdAt: string;
   orderTotal: number;
   commission: number;
@@ -96,7 +92,6 @@ interface StoreChartOrder {
 }
 
 export default function AdminOverviewPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [preset, setPreset] = useState<Preset>("30d");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -210,15 +205,36 @@ export default function AdminOverviewPage() {
     }
   }
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const activeRequest = useRef<AbortController | null>(null);
   const load = useCallback(async (p: Preset, isInitial: boolean) => {
+    activeRequest.current?.abort();
+    const controller = new AbortController();
+    activeRequest.current = controller;
+    setLoadError(null);
+    // A new label must never be paired with the previous range's totals.
+    setStats(null);
+    setStoreStats(null);
+    setRanking([]);
+    setRecentOrders([]);
+    setChartOrders([]);
+    setStoreChartOrders([]);
+    setAppRevenue(null);
+    setAppRevenueSeries([]);
     if (isInitial) setLoading(true);
     else setRefreshing(true);
     try {
-      const res = await fetch(`/api/affiliates/admin/dashboard?range=${p}`, {
+      const res = await fetch(`/api/affiliates/admin/dashboard?range=${encodeURIComponent(p)}`, {
         credentials: "include",
+        cache: "no-store",
+        signal: controller.signal,
       });
-      if (res.ok) {
+      if (!res.ok) throw new Error(res.status === 401 || res.status === 403
+        ? "Your session could not be verified. Please sign in again."
+        : "Unable to load this period. Please try again.");
+      {
         const data = await res.json();
+        if (controller.signal.aborted) return;
         setStats(data.stats);
         setStoreStats(data.storeStats ?? null);
         setRanking(data.ranking ?? []);
@@ -228,9 +244,15 @@ export default function AdminOverviewPage() {
         setAppRevenue(typeof data.appRevenue === "number" ? data.appRevenue : null);
         setAppRevenueSeries(data.appRevenueSeries ?? []);
       }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setLoadError(error instanceof Error ? error.message : "Unable to load this period. Please try again.");
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, []);
 
@@ -239,6 +261,7 @@ export default function AdminOverviewPage() {
     load(preset, isInitial).then(() => {
       hasLoadedOnce.current = true;
     });
+    return () => activeRequest.current?.abort();
   }, [preset, calendarDay, load]);
 
   const chartRange = useMemo(
@@ -247,7 +270,7 @@ export default function AdminOverviewPage() {
   );
 
   const seriesData = useMemo(() => {
-    const series = buildTimeSeries(originalChartRows(chartOrders), chartRange);
+    const series = buildTimeSeries(chartOrders, chartRange);
     // Bucket store-wide totals with the same series builder so the total
     // revenue line lines up with the affiliate buckets.
     const storeSeries = buildTimeSeries(
@@ -314,8 +337,6 @@ export default function AdminOverviewPage() {
     ];
   }, [recentOrders]);
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
       <PageHeader
@@ -363,6 +384,13 @@ export default function AdminOverviewPage() {
         }
       />
 
+      {loadError && (
+        <div role="alert" className="mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c]">
+          {loadError}{" "}
+          <button type="button" onClick={() => load(preset, false)} className="underline">Retry</button>
+        </div>
+      )}
+
       {emailMessage && (
         <div className="mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c] flex items-start gap-2">
           <Mail className="h-3.5 w-3.5 text-[#64717a] mt-0.5 shrink-0" />
@@ -398,7 +426,9 @@ export default function AdminOverviewPage() {
             {(() => {
               const storeRevenue = storeStats
                 ? storeStats.totalRevenue
-                : null;
+                : stats
+                  ? stats.totalRevenue
+                  : null;
               const heroValue =
                 storeRevenue == null
                   ? null
@@ -520,17 +550,17 @@ export default function AdminOverviewPage() {
           <div className="grid grid-cols-2 gap-4 self-end lg:self-stretch">
             <DarkInline
               label="Paid Out"
-              value={stats ? originalField(stats, "totalPaid") : "—"}
+              value={stats ? formatCurrency(stats.totalPaid) : "—"}
               hint="Settled to bank/PayPal/Zelle"
             />
             <DarkInline
               label="Pending"
-              value={stats ? originalField(stats, "totalPending") : "—"}
+              value={stats ? formatCurrency(stats.totalPending) : "—"}
               hint="To be paid · all time"
             />
             <DarkInline
               label="Commissions"
-              value={stats ? originalField(stats, "totalCommissions") : "—"}
+              value={stats ? formatCurrency(stats.totalCommissions) : "—"}
               hint="Generated this period"
             />
             <DarkInline
@@ -538,7 +568,9 @@ export default function AdminOverviewPage() {
               value={
                 storeStats && storeStats.totalOrders
                   ? formatCurrency(storeStats.totalRevenue / storeStats.totalOrders)
-                  : "—"
+                  : stats && stats.totalOrders
+                    ? formatCurrency(stats.totalRevenue / stats.totalOrders)
+                    : "—"
               }
               hint="Per paid order"
             />
@@ -569,7 +601,7 @@ export default function AdminOverviewPage() {
         <StatCard
           icon={DollarSign}
           label="Affiliate revenue"
-          value={stats ? originalField(stats, "affiliateRevenue") : "—"}
+          value={stats ? formatCurrency(stats.affiliateRevenue) : "—"}
           hint={
             storeStats && storeStats.totalRevenue > 0 && stats
               ? `${Math.round(
@@ -578,7 +610,6 @@ export default function AdminOverviewPage() {
               : undefined
           }
         />
-        <OverviewCategoryRevenue admin preset={preset} />
       </section>
 
       {/* Charts */}
@@ -596,7 +627,7 @@ export default function AdminOverviewPage() {
           {loading && chartOrders.length === 0 ? (
             <ChartSkeleton />
           ) : (
-            <OriginalCurrencyChart rows={chartOrders}>{<AreaChart
+            <AreaChart
               key={`${preset}-${calendarDay}`}
               data={seriesData}
               granularity={chartGranularity}
@@ -611,8 +642,8 @@ export default function AdminOverviewPage() {
                       ? "App revenue"
                       : "Combined revenue"
               }
-              formatValue={(n) => formatCurrency(n, originalCurrency(chartOrders))}
-            />}</OriginalCurrencyChart>
+              formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
+            />
           )}
         </div>
         <div className="glass-surface rounded-lg p-6 md:p-7">
@@ -651,12 +682,12 @@ export default function AdminOverviewPage() {
             <BarChart
               data={topRanking.map((r) => ({
                 label: r.name,
-                value: originalCurrency(ranking) ? r.totalSales : 0,
+                value: r.totalSales,
                 hint: `${r.orderCount} ${
                   r.orderCount === 1 ? "order" : "orders"
-                } · ${originalField(r, "totalCommission")} commission`,
+                } · ${formatCurrency(r.totalCommission)} commission`,
               }))}
-              formatValue={(n) => formatCurrency(n, originalCurrency(ranking))}
+              formatValue={formatCurrency}
             />
           )}
         </div>
@@ -681,7 +712,7 @@ export default function AdminOverviewPage() {
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-sans">{formatCurrency(o.orderTotal, o.currency as string | null)}</p>
+                  <p className="text-sm font-sans">{formatCurrency(o.orderTotal)}</p>
                   <Pill
                     tone={o.matchType === "code" ? "dark" : "neutral"}
                     icon={o.matchType === "code" ? ShoppingBag : Repeat}
@@ -742,3 +773,4 @@ function ChartSkeleton() {
     </div>
   );
 }
+

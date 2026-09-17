@@ -1,4 +1,5 @@
 "use client";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 /**
  * Admin — TikTok bonus monitoring. Every active affiliate with their video
@@ -73,20 +74,29 @@ export default function AdminTikTokPage() {
   const [ladderSaving, setLadderSaving] = useState(false);
   const [ladderError, setLadderError] = useState<string | null>(null);
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const load = useCallback(async (p: Period) => {
     setLoading(true);
+    const request = beginRead();
+    setReadError(null); setData(null);
     try {
-      const res = await fetch(`/api/affiliates/admin/tiktok?period=${p}`, {
-        credentials: "include",
+      const res = await fetch(`/api/affiliates/admin/tiktok?period=${encodeURIComponent(p)}`, {
+        credentials: "include", cache: "no-store", signal: request.signal,
       });
+      if (!res.ok) throw new Error("Could not load data. Please retry.");
       if (res.ok) {
         const json = await res.json();
+        if (!request.isCurrent()) return;
         if (json?.ok) setData(json as Payload);
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setLoading(false);
     }
-  }, []);
+  }, [beginRead]);
 
   useEffect(() => {
     void load(period);
@@ -150,6 +160,7 @@ export default function AdminTikTokPage() {
 
   return (
     <div>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => load(period)}>Retry</button></p>}
       <PageHeader
         eyebrow="TikTok bonus"
         title="TikTok submissions"

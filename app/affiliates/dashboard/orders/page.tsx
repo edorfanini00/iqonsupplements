@@ -1,4 +1,6 @@
 "use client";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
+import { resolveRange, parseOrderTimestamp } from "@/lib/affiliates/time-series";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Search, ShoppingBag, Repeat, Gift } from "lucide-react";
@@ -33,20 +35,30 @@ export default function AffiliateOrdersPage() {
   const [filter, setFilter] = useState<"all" | "code" | "recurring" | "pending" | "paid">("all");
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const load = useCallback(async (p: Preset) => {
     setLoading(true);
+    const request = beginRead();
+    setReadError(null);
+    setOrders([]);
     try {
-      const res = await fetch(`/api/affiliates/dashboard?range=${p}`, {
-        credentials: "include",
+      const res = await fetch(`/api/affiliates/dashboard?range=${encodeURIComponent(p)}`, {
+        credentials: "include", cache: "no-store", signal: request.signal,
       });
+      if (!res.ok) throw new Error("Could not load data. Please retry.");
       if (res.ok) {
         const data = await res.json();
+        if (!request.isCurrent()) return;
         setOrders(data.orders ?? []);
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setLoading(false);
     }
-  }, []);
+  }, [beginRead]);
 
   useEffect(() => {
     load(preset);
@@ -54,7 +66,10 @@ export default function AffiliateOrdersPage() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+    const range = resolveRange(preset);
     return orders.filter((o) => {
+      const at = parseOrderTimestamp(o.createdAt).getTime();
+      if (at < range.start.getTime() || at > range.end.getTime()) return false;
       if (filter === "code" || filter === "recurring") {
         if (o.matchType !== filter) return false;
       }
@@ -68,10 +83,11 @@ export default function AffiliateOrdersPage() {
         o.orderId.toLowerCase().includes(q)
       );
     });
-  }, [orders, search, filter]);
+  }, [orders, search, filter, preset]);
 
   return (
     <>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => load(preset)}>Retry</button></p>}
       <PageHeader
         eyebrow="Orders"
         title="Attributed orders"

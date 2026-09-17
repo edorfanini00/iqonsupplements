@@ -1,7 +1,4 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -23,10 +20,11 @@ import {
   StatCard,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
-interface BreakdownRow extends OriginalMoney {
+interface BreakdownRow {
   refereeId: string;
   refereeName: string;
   refereePromoCode: string;
@@ -38,7 +36,7 @@ interface BreakdownRow extends OriginalMoney {
   paidCommission: number;
 }
 
-interface ReferralOrder extends OriginalMoney {
+interface ReferralOrder {
   id: string;
   orderId: string;
   customerName: string;
@@ -60,7 +58,6 @@ interface ReferredBy {
 const INTRO_SEEN_KEY = "iqon_supplements_affiliate_network_intro_v1";
 
 export default function AffiliateNetworkPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [breakdown, setBreakdown] = useState<BreakdownRow[]>([]);
   const [recent, setRecent] = useState<ReferralOrder[]>([]);
   const [referredBy, setReferredBy] = useState<ReferredBy | null>(null);
@@ -124,8 +121,6 @@ export default function AffiliateNetworkPage() {
     const orders = breakdown.reduce((s, r) => s + r.ordersCount, 0);
     return { earned, pending, paid, orders };
   }, [breakdown]);
-
-  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -193,14 +188,14 @@ export default function AffiliateNetworkPage() {
         <StatCard
           icon={Wallet}
           label="Referral earnings"
-          value={(loading ? "—" : originalTotal(breakdown, "totalCommission"))}
+          value={formatCurrency(totals.earned)}
           accent
-          hint={`${(loading ? "—" : originalTotal(breakdown, "pendingCommission"))} pending`}
+          hint={`${formatCurrency(totals.pending)} pending`}
         />
         <StatCard
           icon={Wallet}
           label="Already paid"
-          value={(loading ? "—" : originalTotal(breakdown, "paidCommission"))}
+          value={formatCurrency(totals.paid)}
         />
       </section>
 
@@ -261,10 +256,10 @@ export default function AffiliateNetworkPage() {
                         {r.ordersCount}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {originalField(r, "totalCommission")}
+                        {formatCurrency(r.totalCommission)}
                       </td>
                       <td className="py-4 px-5 text-right font-sans text-[#20282c]">
-                        {originalField(r, "pendingCommission")}
+                        {formatCurrency(r.pendingCommission)}
                       </td>
                     </tr>
                   ))}
@@ -325,10 +320,10 @@ export default function AffiliateNetworkPage() {
                       </td>
                       <td className="py-4 px-5 text-sm">{o.customerName}</td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.orderTotal, o.currency as string | null)}
+                        {formatCurrency(o.orderTotal)}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatCurrency(o.commission, o.currency as string | null)}
+                        {formatCurrency(o.commission)}
                       </td>
                       <td className="py-4 px-5">
                         <Pill tone={o.status === "paid" ? "success" : "warn"}>

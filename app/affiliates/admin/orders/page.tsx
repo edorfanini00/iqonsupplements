@@ -1,4 +1,5 @@
 "use client";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -125,22 +126,32 @@ function AdminOrdersPageInner() {
   const [attrChoice, setAttrChoice] = useState<Record<number, string>>({});
   const [attrSaving, setAttrSaving] = useState<Set<number>>(new Set());
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const load = useCallback(async (p: Preset) => {
     setLoading(true);
+    const request = beginRead();
+    setReadError(null);
+    setOrders([]); setTruncated(false);
     try {
-      const res = await fetch(`/api/affiliates/admin/orders?range=${p}`, {
-        credentials: "include",
+      const res = await fetch(`/api/affiliates/admin/orders?range=${encodeURIComponent(p)}`, {
+        credentials: "include", cache: "no-store", signal: request.signal,
       });
+      if (!res.ok) throw new Error("Could not load data. Please retry.");
       if (res.ok) {
         const data = await res.json();
+        if (!request.isCurrent()) return;
         setOrders(data.orders ?? []);
         setAffiliateOptions(data.affiliates ?? []);
         setTruncated(Boolean(data.truncated));
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setLoading(false);
     }
-  }, []);
+  }, [beginRead]);
 
   useEffect(() => {
     load(preset);
@@ -232,6 +243,11 @@ function AdminOrdersPageInner() {
 
   const markRefund = useCallback(
     async (orderId: number, action: "refund" | "return") => {
+      const confirmText =
+        action === "return"
+          ? `Mark order #${orderId} as refunded AND returned?\n\nIt will be removed from revenue, any pending commission is voided, and the units go back into inventory.`
+          : `Mark order #${orderId} as refunded (customer keeps the products)?\n\nIt will be removed from revenue and any pending commission is voided. Stock stays deducted — use "returned" if the products came back.`;
+      if (!window.confirm(confirmText)) return;
       setSaving(orderId, true);
       try {
         const res = await fetch(`/api/affiliates/admin/orders/${orderId}/refund`, {
@@ -245,7 +261,11 @@ function AdminOrdersPageInner() {
           toast.error(data.error ?? "Could not update this order.");
           return;
         }
-        if (data.redirectUrl) { window.location.assign(data.redirectUrl); return; }
+        toast.success(
+          action === "return"
+            ? `Order #${orderId} marked returned — stock is back in inventory.`
+            : `Order #${orderId} marked refunded.`
+        );
         await load(preset);
       } finally {
         setSaving(orderId, false);
@@ -284,10 +304,11 @@ function AdminOrdersPageInner() {
 
   return (
     <>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => load(preset)}>Retry</button></p>}
       <PageHeader
         eyebrow="Orders"
         title="All orders"
-        description="Every order with products, totals, and the affiliate (if any) attributed to it. Defaults to paid orders (processing + completed); use the status filter for pending payment, on hold, or refunded. Open an order to process refunds and returns securely in Shopify."
+        description="Every order with products, totals, and the affiliate (if any) attributed to it. Defaults to paid orders (processing + completed); use the status filter for pending payment, on hold, or refunded. Open an order to flag it refunded or returned."
         actions={<RangePicker value={preset} onChange={setPreset} />}
       />
 
@@ -717,7 +738,7 @@ function RefundControl({
             ) : (
               <Undo2 className="h-3.5 w-3.5" />
             )}
-            Refund in Shopify
+            Mark refunded
           </button>
         )}
         <button
@@ -731,13 +752,13 @@ function RefundControl({
           ) : (
             <PackageCheck className="h-3.5 w-3.5" />
           )}
-          {isRefunded ? "Return in Shopify" : "Return in Shopify"}
+          {isRefunded ? "Mark returned — restock" : "Refunded + returned"}
         </button>
       </div>
       <p className="mt-2 text-xs text-[#64717a] leading-relaxed">
         {isRefunded
-          ? "Manage returned inventory in Shopify."
-          : "Refunded removes the order from revenue (stock stays deducted). Return in Shopify also puts the units back into inventory."}
+          ? "This order is already out of revenue. Mark it returned when the products come back to put the units into inventory."
+          : "Refunded removes the order from revenue (stock stays deducted). Refunded + returned also puts the units back into inventory."}
       </p>
     </div>
   );
