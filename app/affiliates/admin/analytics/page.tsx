@@ -1,4 +1,8 @@
 "use client";
+import {OriginalCurrencyChart} from "@/components/affiliates/shared/OriginalCurrencyChart";
+import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
+
+import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { TrendingUp, ShoppingBag, Users, Repeat } from "lucide-react";
@@ -19,17 +23,13 @@ import {
   SectionTitle,
 } from "@/components/affiliates/shared/ui";
 
-import { formatDenominated, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
-
-interface ChartOrder {
-  currency: string | null;
+interface ChartOrder extends OriginalMoney {
   createdAt: string;
   orderTotal: number;
   commission: number;
 }
 
-interface RankingRow {
-  currencies: MoneyBucket[];
+interface RankingRow extends OriginalMoney {
   id: string;
   name: string;
   promoCode: string;
@@ -40,9 +40,7 @@ interface RankingRow {
   orderCount: number;
 }
 
-interface OrderRow {
-  reportedRevenue?: number;
-  currency?: string | null;
+interface OrderRow extends OriginalMoney {
   id: string;
   orderTotal: number;
   commission: number;
@@ -51,8 +49,7 @@ interface OrderRow {
   createdAt: string;
 }
 
-interface AdminStats {
-  currencies: MoneyBucket[];
+interface AdminStats extends OriginalMoney {
   totalOrders: number;
   totalRevenue: number;
   totalCommissions: number;
@@ -62,24 +59,14 @@ interface AdminStats {
 }
 
 export default function AdminAnalyticsPage() {
+  const {request: fetch, requestError} = useOriginalRequest();
   const [preset, setPreset] = useState<Preset>("90d");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [rawStats, setStats] = useState<AdminStats | null>(null);
-  const [rawRanking, setRanking] = useState<RankingRow[]>([]);
-  const [rawChartOrders, setChartOrders] = useState<ChartOrder[]>([]);
-  const [rawRecentOrders, setRecentOrders] = useState<OrderRow[]>([]);
-  const [selectedCurrency, setSelectedCurrency] = useState('');
-  const currencyOptions = [...new Set([...(rawStats?.currencies ?? []).map(b => b.currency ?? 'UNKNOWN'),...rawChartOrders.map(o => o.currency ?? 'UNKNOWN')])];
-  const currency = currencyOptions.includes(selectedCurrency) ? selectedCurrency : currencyOptions[0] ?? 'UNKNOWN';
-  const formatCurrency = (amount: number) => formatDenominated(amount, currency === 'UNKNOWN' ? null : currency);
-  const stats = rawStats;
-  const ranking = rawRanking.flatMap(r => {
-    const bucket = r.currencies.find(b => (b.currency ?? 'UNKNOWN') === currency);
-    return bucket ? [{...r,totalSales:Number(bucket.totalSales),totalCommission:Number(bucket.totalCommission)}] : [];
-  }).sort((a,b) => b.totalSales-a.totalSales);
-  const chartOrders = useMemo(() => rawChartOrders.filter(o => (o.currency ?? 'UNKNOWN') === currency),[rawChartOrders,currency]);
-  const recentOrders = useMemo(() => rawRecentOrders.filter(o => (o.currency ?? 'UNKNOWN') === currency),[rawRecentOrders,currency]);
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [ranking, setRanking] = useState<RankingRow[]>([]);
+  const [chartOrders, setChartOrders] = useState<ChartOrder[]>([]);
+  const [recentOrders, setRecentOrders] = useState<OrderRow[]>([]);
   const hasLoadedOnce = useRef(false);
   const calendarDay = useCalendarDay();
 
@@ -116,7 +103,7 @@ export default function AdminAnalyticsPage() {
   );
 
   const series = useMemo(
-    () => buildTimeSeries(chartOrders, chartRange),
+    () => buildTimeSeries(originalChartRows(chartOrders), chartRange),
     [chartOrders, chartRange]
   );
 
@@ -129,12 +116,12 @@ export default function AdminAnalyticsPage() {
 
   const ordersData = useMemo(
     () =>
-      series.map((s) => ({
+      buildTimeSeries(chartOrders, chartRange).map((s) => ({
         date: s.bucket,
         label: s.label,
         primary: s.orders,
       })),
-    [series]
+    [chartOrders, chartRange]
   );
 
   const revenueData = useMemo(
@@ -167,6 +154,7 @@ export default function AdminAnalyticsPage() {
   }, [recentOrders]);
 
   const statusSplit = useMemo(() => {
+    if (recentOrders.length && !originalCurrency(recentOrders)) return [];
     const paid = recentOrders.filter((o) => o.status === "paid");
     const pending = recentOrders.filter((o) => o.status === "pending");
     return [
@@ -184,9 +172,10 @@ export default function AdminAnalyticsPage() {
   }, [recentOrders]);
 
   const aov = useMemo(() => {
+    if (!originalCurrency(recentOrders)) return null;
     if (recentOrders.length === 0) return 0;
     return (
-      recentOrders.reduce((s, o) => s + (o.reportedRevenue ?? o.orderTotal), 0) / recentOrders.length
+      recentOrders.reduce((s, o) => s + o.orderTotal, 0) / recentOrders.length
     );
   }, [recentOrders]);
 
@@ -200,6 +189,8 @@ export default function AdminAnalyticsPage() {
     if (series.length === 0) return null;
     return series.reduce((a, b) => (a.revenue >= b.revenue ? a : b));
   }, [series]);
+
+  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -217,17 +208,11 @@ export default function AdminAnalyticsPage() {
         }
       />
 
-      <label className="block mb-5">Reporting currency
-        <select aria-label="Reporting currency" value={currency} onChange={e => setSelectedCurrency(e.target.value)} className="ml-3 border rounded p-2">
-          {currencyOptions.map(c => <option key={c} value={c}>{c === 'UNKNOWN' ? 'Unknown currency' : c}</option>)}
-        </select>
-        <span className="ml-3 text-sm">Charts and monetary comparisons include only this currency; no FX conversion.</span>
-      </label>
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
         <StatCard
           icon={ShoppingBag}
           label="Avg order value"
-          value={formatCurrency(aov)}
+          value={formatCurrency(aov, originalCurrency(recentOrders))}
           hint={`${recentOrders.length} orders`}
         />
         <StatCard
@@ -257,13 +242,13 @@ export default function AdminAnalyticsPage() {
           {loading && chartOrders.length === 0 ? (
             <Skeleton />
           ) : (
-            <AreaChart
+            <OriginalCurrencyChart rows={chartOrders}>{<AreaChart
               key={`revenue-${preset}-${calendarDay}`}
               data={revenueData}
               granularity={chartGranularity}
               primaryLabel="Revenue"
-              formatValue={formatCurrency}
-            />
+              formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
+            />}</OriginalCurrencyChart>
           )}
         </div>
         <div className="glass-surface rounded-lg p-6 md:p-7">
@@ -271,13 +256,13 @@ export default function AdminAnalyticsPage() {
           {loading && chartOrders.length === 0 ? (
             <Skeleton />
           ) : (
-            <AreaChart
+            <OriginalCurrencyChart rows={chartOrders}>{<AreaChart
               key={`commission-${preset}-${calendarDay}`}
               data={commissionData}
               granularity={chartGranularity}
               primaryLabel="Commission"
-              formatValue={formatCurrency}
-            />
+              formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
+            />}</OriginalCurrencyChart>
           )}
         </div>
       </section>
@@ -310,30 +295,30 @@ export default function AdminAnalyticsPage() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <div className="glass-surface rounded-lg p-6 md:p-7">
           <SectionTitle eyebrow="Liability" title="Commission status" />
-          <Donut
+          <OriginalCurrencyChart rows={recentOrders}>{<Donut
             slices={statusSplit}
             centerLabel={formatCurrency(
               statusSplit.reduce((s, x) => s + x.value, 0)
             )}
             centerSubLabel="Total commission"
-            formatValue={formatCurrency}
-          />
+            formatValue={(n) => formatCurrency(n, originalCurrency(chartOrders))}
+          />}</OriginalCurrencyChart>
         </div>
         <div className="glass-surface rounded-lg p-6 md:p-7">
           <SectionTitle eyebrow="Performance" title="Top affiliates" />
           {ranking.length === 0 ? (
             <Skeleton />
           ) : (
-            <BarChart
+            <OriginalCurrencyChart rows={ranking}>{<BarChart
               data={ranking.slice(0, 8).map((r) => ({
                 label: r.name,
-                value: r.totalSales,
+                value: originalCurrency(ranking) ? r.totalSales : 0,
                 hint: `${r.orderCount} orders · ${formatCurrency(
                   r.totalCommission
                 )} earned`,
               }))}
-              formatValue={formatCurrency}
-            />
+              formatValue={(n) => formatCurrency(n, originalCurrency(chartOrders))}
+            />}</OriginalCurrencyChart>
           )}
         </div>
       </section>

@@ -1,9 +1,9 @@
 "use client";
+import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
+
+import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback } from "react";
-import { ProgramRates } from '@/components/affiliates/shared/SharedProgram';
-import { approvalAgreements, type ProgramRate } from '@/components/affiliates/shared/program-view';
-import { requestProgram } from '@/components/affiliates/shared/program-api';
 import {
   Inbox,
   Check,
@@ -28,7 +28,6 @@ interface SuggestedReferrer {
 }
 
 interface RequestRow {
-  originPortal?: string | null;
   referralCommissionRate?: number | null;
   id: string;
   firstName: string;
@@ -52,6 +51,7 @@ interface ReferrerOption {
 }
 
 export default function AdminRequestsPage() {
+  const {request: fetch, requestError} = useOriginalRequest();
   const [requests, setRequests] = useState<RequestRow[]>([]);
   const [referrers, setReferrers] = useState<ReferrerOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +76,8 @@ export default function AdminRequestsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -111,7 +113,7 @@ export default function AdminRequestsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a]">
-                    {formatShortDate(r.createdAt)} · Origin: {r.originPortal === "supplements" ? "IQON Supplements" : r.originPortal === "health" ? "IQON Health" : "Legacy / not recorded"}
+                    {formatShortDate(r.createdAt)}
                   </p>
                   <h3 className="text-xl font-medium tracking-tight mt-1">
                     {r.firstName} {r.lastName}
@@ -244,11 +246,13 @@ function ReviewModal({
   onDone: () => void;
 }) {
   const [promoCode, setPromoCode] = useState(request.promoCode);
-  const [agreements, setAgreements] = useState<ProgramRate[]>([]);
-  let agreementsReady = false; try { approvalAgreements(agreements); agreementsReady = true; } catch {}
+  const [commissionRate, setCommissionRate] = useState(15);
+  const [recurringCommissionRate, setRecurringCommissionRate] = useState(10);
+  const [couponRate, setCouponRate] = useState(15);
   const [referrerId, setReferrerId] = useState(
     request.suggestedReferrer?.id ?? ""
   );
+  const [referralCommissionRate, setReferralCommissionRate] = useState(request.referralCommissionRate ?? 5);
   // Optional monthly sales bonus, off unless a target is entered.
   const [bonusThreshold, setBonusThreshold] = useState("");
   const [bonusRate, setBonusRate] = useState("5");
@@ -264,20 +268,17 @@ function ReviewModal({
     setLoading(true);
     setError(null);
     try {
-      // Save agreements separately first. Re-read them before approval; never inject defaults.
-      const saved = await requestProgram(`/api/affiliates/admin/rates?affiliateId=${encodeURIComponent(request.id)}`);
-      const peptide = approvalAgreements(saved.rates ?? []);
       const res = await fetch(`/api/affiliates/admin/requests/${request.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           promoCode: promoCode.trim(),
-          commissionRate: peptide.directRate,
-          recurringCommissionRate: peptide.recurringRate,
-          couponRate: peptide.customerDiscount,
+          commissionRate,
+          recurringCommissionRate,
+          couponRate,
           referrerId: referrerId || null,
-          referralCommissionRate: peptide.referralRate,
+          referralCommissionRate: referrerId ? referralCommissionRate : 0,
           bonusThreshold: Number(bonusThreshold) > 0 ? Number(bonusThreshold) : undefined,
           bonusRate:
             Number(bonusThreshold) > 0 && Number(bonusRate) > 0
@@ -290,11 +291,8 @@ function ReviewModal({
         setError(data?.error?.message || data.error || "Failed to approve");
         return;
       }
-      const verified = await requestProgram(`/api/affiliates/admin/affiliates/${encodeURIComponent(request.id)}`);
-      if (verified.affiliate?.status !== 'active') throw new Error('Approval submitted but active profile readback is not confirmed. Refresh the shared queue before retrying.');
       onDone();
-    } catch (failure) { setError(failure instanceof Error ? failure.message : 'Approval failed; saved category agreements are retained.'); }
-    finally {
+    } finally {
       setLoading(false);
     }
   }
@@ -324,7 +322,7 @@ function ReviewModal({
         className="absolute inset-0 bg-[#20282c]/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative glass-surface-strong rounded-lg p-7 md:p-9 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative glass-surface-strong rounded-lg p-7 md:p-9 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-[#242526]/5"
@@ -346,12 +344,6 @@ function ReviewModal({
             {error}
           </p>
         )}
-
-        <div className="mt-6 space-y-3">
-          <p className="text-sm">Configure and save each category agreement before approval. Values already saved are retained; blank is not zero. Saving agreements does not approve the application or activate a store code. If approval fails, the saved agreements remain on this pending application.</p>
-          <ProgramRates admin affiliateId={request.id} onRatesChange={setAgreements} />
-          <p className="text-sm" role="status">{agreementsReady ? 'All four category agreements are saved. Approval will re-read them.' : 'Approval requires explicit saved Peptides, Supplements, Skincare and App agreements.'}</p>
-        </div>
 
         <form onSubmit={approve} className="mt-6 space-y-1">
           <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-2">
@@ -384,6 +376,71 @@ function ReviewModal({
               )}
             </p>
           </div>
+
+          <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-2">
+            Rates
+          </p>
+          <div className="grid grid-cols-2 gap-4 mb-1">
+            <label className="block">
+              <span className="text-xs text-[#64717a]">Coupon discount</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={couponRate}
+                  onChange={(e) =>
+                    setCouponRate(Math.max(0, Number(e.target.value) || 0))
+                  }
+                  className={inputClass}
+                />
+                <span className="text-sm text-[#64717a] font-sans">%</span>
+              </div>
+            </label>
+            <label className="block">
+              <span className="text-xs text-[#64717a]">First-order commission</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={commissionRate}
+                  onChange={(e) =>
+                    setCommissionRate(Math.max(0, Number(e.target.value) || 0))
+                  }
+                  className={inputClass}
+                />
+                <span className="text-sm text-[#64717a] font-sans">%</span>
+              </div>
+            </label>
+            <label className="block">
+              <span className="text-xs text-[#64717a]">Recurring commission</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={recurringCommissionRate}
+                  onChange={(e) =>
+                    setRecurringCommissionRate(
+                      Math.max(0, Number(e.target.value) || 0)
+                    )
+                  }
+                  className={inputClass}
+                />
+                <span className="text-sm text-[#64717a] font-sans">%</span>
+              </div>
+            </label>
+          </div>
+          <p className="text-xs text-[#64717a] mb-6 leading-relaxed">
+            Customers get {couponRate}% off with code{" "}
+            <span className="font-sans text-[#20282c]">{promoCode || request.promoCode}</span>.
+            {request.firstName} earns {commissionRate}% on a customer&apos;s first
+            order and {recurringCommissionRate}% on their recurring orders.
+          </p>
 
           <div className="rounded-lg bg-[#242526]/4 border border-[#242526]/8 p-4 !mt-4 mb-4">
             <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-2">
@@ -460,7 +517,38 @@ function ReviewModal({
               ))}
             </select>
 
-            {referrerId && <p className="text-sm mt-3">Referral earnings benefit {referrer?.name ?? 'the selected referrer'} at each saved category rate and revenue/commission base. No self-referral or referral cycles are allowed.</p>}
+            {referrerId && (
+              <>
+                <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mt-5 mb-2">
+                  Referrer's cut
+                </p>
+                <div className="flex items-center gap-2 mb-1">
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    max="50"
+                    value={referralCommissionRate}
+                    onChange={(e) =>
+                      setReferralCommissionRate(
+                        Math.max(0, Number(e.target.value) || 0)
+                      )
+                    }
+                    className={inputClass}
+                  />
+                  <span className="text-sm text-[#64717a] font-sans">%</span>
+                </div>
+                <p className="text-xs text-[#64717a] mt-2 leading-relaxed">
+                  We'll automatically credit{" "}
+                  <span className="font-sans text-[#20282c]">
+                    {referrer?.name}
+                  </span>{" "}
+                  with {referralCommissionRate}% of every order{" "}
+                  {request.firstName} brings in — on top of the{" "}
+                  {commissionRate}% paid to {request.firstName}.
+                </p>
+              </>
+            )}
           </div>
 
           <div className="!mt-8 flex gap-3">
@@ -475,7 +563,7 @@ function ReviewModal({
             </button>
             <button
               type="submit"
-              disabled={loading || !agreementsReady}
+              disabled={loading}
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-3 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors disabled:opacity-50"
             >
               <Check className="h-3.5 w-3.5" />

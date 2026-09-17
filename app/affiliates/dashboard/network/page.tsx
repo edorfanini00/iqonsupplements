@@ -1,4 +1,7 @@
 "use client";
+import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
+
+import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -23,23 +26,19 @@ import {
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
-import { combineBuckets, formatBuckets, formatDenominated, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
-
-interface BreakdownRow {
-  currencies: MoneyBucket[];
+interface BreakdownRow extends OriginalMoney {
   refereeId: string;
   refereeName: string;
   refereePromoCode: string;
   refereeStatus: "active" | "pending" | "disabled";
   referralRate: number;
   ordersCount: number;
-  totalCommission: number | null;
-  pendingCommission: number | null;
-  paidCommission: number | null;
+  totalCommission: number;
+  pendingCommission: number;
+  paidCommission: number;
 }
 
-interface ReferralOrder {
-  currency: string | null;
+interface ReferralOrder extends OriginalMoney {
   id: string;
   orderId: string;
   customerName: string;
@@ -61,6 +60,7 @@ interface ReferredBy {
 const INTRO_SEEN_KEY = "iqon_supplements_affiliate_network_intro_v1";
 
 export default function AffiliateNetworkPage() {
+  const {request: fetch, requestError} = useOriginalRequest();
   const [breakdown, setBreakdown] = useState<BreakdownRow[]>([]);
   const [recent, setRecent] = useState<ReferralOrder[]>([]);
   const [referredBy, setReferredBy] = useState<ReferredBy | null>(null);
@@ -118,10 +118,14 @@ export default function AffiliateNetworkPage() {
   }, []);
 
   const totals = useMemo(() => {
-    const money = combineBuckets(breakdown, ['totalCommission', 'pendingCommission', 'paidCommission']);
+    const earned = breakdown.reduce((s, r) => s + r.totalCommission, 0);
+    const pending = breakdown.reduce((s, r) => s + r.pendingCommission, 0);
+    const paid = breakdown.reduce((s, r) => s + r.paidCommission, 0);
     const orders = breakdown.reduce((s, r) => s + r.ordersCount, 0);
-    return { money, orders };
+    return { earned, pending, paid, orders };
   }, [breakdown]);
+
+  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -189,14 +193,14 @@ export default function AffiliateNetworkPage() {
         <StatCard
           icon={Wallet}
           label="Referral earnings"
-          value={formatBuckets(totals.money, 'totalCommission')}
+          value={(loading ? "—" : originalTotal(breakdown, "totalCommission"))}
           accent
-          hint={`${formatBuckets(totals.money, 'pendingCommission')} pending`}
+          hint={`${(loading ? "—" : originalTotal(breakdown, "pendingCommission"))} pending`}
         />
         <StatCard
           icon={Wallet}
           label="Already paid"
-          value={formatBuckets(totals.money, 'paidCommission')}
+          value={(loading ? "—" : originalTotal(breakdown, "paidCommission"))}
         />
       </section>
 
@@ -257,10 +261,10 @@ export default function AffiliateNetworkPage() {
                         {r.ordersCount}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatBuckets(r, 'totalCommission')}
+                        {originalField(r, "totalCommission")}
                       </td>
                       <td className="py-4 px-5 text-right font-sans text-[#20282c]">
-                        {formatBuckets(r, 'pendingCommission')}
+                        {originalField(r, "pendingCommission")}
                       </td>
                     </tr>
                   ))}
@@ -321,10 +325,10 @@ export default function AffiliateNetworkPage() {
                       </td>
                       <td className="py-4 px-5 text-sm">{o.customerName}</td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatDenominated(o.orderTotal, o.currency)}
+                        {formatCurrency(o.orderTotal, o.currency as string | null)}
                       </td>
                       <td className="py-4 px-5 text-right font-sans">
-                        {formatDenominated(o.commission, o.currency)}
+                        {formatCurrency(o.commission, o.currency as string | null)}
                       </td>
                       <td className="py-4 px-5">
                         <Pill tone={o.status === "paid" ? "success" : "warn"}>

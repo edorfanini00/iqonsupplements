@@ -1,4 +1,4 @@
-import { SHARED_ROUTES } from './shared-route-allowlist';
+import { SHARED_ROUTES, ORIGINAL_READ_ROUTES } from './shared-route-allowlist';
 
 type Env = Record<string, string | undefined>;
 type Transport = (input: string | URL, init?: RequestInit) => Promise<Response>;
@@ -40,12 +40,14 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   try {config=sharedRelayConfig(env);} catch {return fail(503);}
   const incoming = new URL(request.url);
   const method = request.method.toUpperCase();
-  // These legacy operations target Woo/Square, not the shared affiliate ledger.
-  // Never send Shopify identifiers into them until source-aware dispatch exists.
-  if (/^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
+  // Restore narrowly audited original reads, retaining canonical role/identity checks.
+  // Detail refresh is a write to a Woo snapshot despite using GET; never relay it.
+  const originalRead = method === 'GET' && ORIGINAL_READ_ROUTES.some(pattern => pattern.test(incoming.pathname))
+    && !(incoming.pathname.startsWith('/api/affiliates/orders/') && incoming.searchParams.get('refresh') === '1');
+  if (!originalRead && /^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
     return Response.json({ok:false,error:'Source-aware commerce operation is unavailable in this portal'}, {status:501,headers:{'cache-control':'no-store'}});
   }
-  if (!SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
+  if (!originalRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
   const mutation=!['GET','HEAD'].includes(method);
   if (incoming.origin !== config.portal || (mutation && request.headers.get('origin') !== config.portal)) return fail(403);
   if (mutation && request.body && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
