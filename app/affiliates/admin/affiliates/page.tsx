@@ -1,9 +1,10 @@
 "use client";
-import { toast } from "sonner";
+import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
+
+import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { SharedProgram } from "@/components/affiliates/shared/SharedProgram";
 import {
   Search,
   Plus,
@@ -24,7 +25,6 @@ import {
   StatCard,
   Pill,
   EmptyState,
-  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
@@ -63,18 +63,16 @@ interface AffiliateRow {
   bankInfo: BankInfo | null;
   stats: {
     totalOrders: number;
-    totalRevenue: number | null;
-    totalCommission: number | null;
-    pendingCommission: number | null;
-    paidCommission: number | null;
-    currency: string | null;
-    scalarTotalsAvailable: boolean;
-    currencies: {currency: string | null; totalRevenue: number; totalCommission: number; pendingCommission: number; paidCommission: number}[];
+    totalRevenue: number;
+    totalCommission: number;
+    pendingCommission: number;
+    paidCommission: number;
   };
   lastPayoutAt: string | null;
 }
 
 export default function AdminAffiliatesPage() {
+  const {request: fetch, requestError} = useOriginalRequest();
   const [affiliates, setAffiliates] = useState<AffiliateRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -118,20 +116,34 @@ export default function AdminAffiliatesPage() {
   const totals = useMemo(() => {
     const active = affiliates.filter((a) => a.status === "active").length;
     const withBank = affiliates.filter((a) => a.bankInfo).length;
-    // Financial totals are rendered by SharedProgram, grouped by currency.
-    return { active, withBank };
+    const pending = affiliates.reduce(
+      (s, a) => s + (a.stats?.pendingCommission ?? 0),
+      0
+    );
+    const paid = affiliates.reduce(
+      (s, a) => s + (a.stats?.paidCommission ?? 0),
+      0
+    );
+    return { active, withBank, pending, paid };
   }, [affiliates]);
+
+  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
-      <SharedProgram admin brand="supplements" title="Affiliate shared performance" />
       <PageHeader
         eyebrow="Roster"
         title="Manage affiliates"
         description="Bank info, contact details, payout history and account controls."
         actions={
           <>
-
+            <a
+              href="/api/affiliates/admin/export?type=affiliates"
+              className="inline-flex items-center gap-2 glass-surface rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#20282c] hover:bg-white/80 transition-colors"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </a>
             <button
               onClick={() => setShowCreate(true)}
               className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors"
@@ -157,8 +169,17 @@ export default function AdminAffiliatesPage() {
           value={String(totals.withBank)}
           hint="Ready for payout"
         />
-
-
+        <StatCard
+          icon={CreditCard}
+          label="Pending payout"
+          value={loading ? "—" : originalTotal(affiliates.map(a=>a.stats), "pendingCommission")}
+          accent
+        />
+        <StatCard
+          icon={CreditCard}
+          label="Paid lifetime"
+          value={loading ? "—" : originalTotal(affiliates.map(a=>a.stats), "paidCommission")}
+        />
       </section>
 
       {/* Filters */}
@@ -240,7 +261,18 @@ export default function AdminAffiliatesPage() {
                         {a.promoCode}
                       </span>
                     </td>
-                    <td className="py-4 px-5" colSpan={4}><Link onClick={e => e.stopPropagation()} className="underline" href={`/affiliates/admin/affiliates/${a.id}`}>Open shared performance</Link></td>
+                    <td className="py-4 px-5 text-right font-sans text-[#64717a]">
+                      {a.stats.totalOrders}
+                    </td>
+                    <td className="py-4 px-5 text-right font-sans">
+                      {originalField(a.stats, "totalRevenue")}
+                    </td>
+                    <td className="py-4 px-5 text-right font-sans">
+                      {originalField(a.stats, "totalCommission")}
+                    </td>
+                    <td className="py-4 px-5 text-right font-sans text-[#20282c]">
+                      {originalField(a.stats, "pendingCommission")}
+                    </td>
                     <td className="py-4 px-5">
                       {a.bankInfo ? (
                         <Pill tone="success">On file</Pill>
@@ -362,7 +394,7 @@ function AffiliateDetailDrawer({
     if (
       codeChanged &&
       !window.confirm(
-        `Change this affiliate's code from ${affiliate.promoCode} to ${newCode}?\n\nThe old coupon stops working immediately and a new Shopify coupon is created. Future sales attribute through ${newCode} only.`
+        `Change this affiliate's code from ${affiliate.promoCode} to ${newCode}?\n\nThe old coupon stops working immediately and a new WooCommerce coupon is created. Future sales attribute through ${newCode} only.`
       )
     ) {
       return;
@@ -455,12 +487,35 @@ function AffiliateDetailDrawer({
               className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors"
             >
               <UserSquare className="h-3.5 w-3.5" />
-              Shared performance, recruits & clients
+              View recruits & clients
               <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
-          <p className="text-sm">Use the shared performance report for category/date-filtered earnings and payouts. This drawer manages contact and account settings only.</p>
+          {/* Stats */}
+          <section>
+            <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-3">
+              Performance
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <MiniStat
+                label="Orders"
+                value={String(affiliate.stats.totalOrders)}
+              />
+              <MiniStat
+                label="Revenue"
+                value={originalField(affiliate.stats, "totalRevenue")}
+              />
+              <MiniStat
+                label="Commission"
+                value={originalField(affiliate.stats, "totalCommission")}
+              />
+              <MiniStat
+                label="Pending"
+                value={originalField(affiliate.stats, "pendingCommission")}
+              />
+            </div>
+          </section>
 
           {/* Contact */}
           <section>
@@ -625,7 +680,7 @@ function AffiliateDetailDrawer({
             </div>
             {promoCode.trim().toUpperCase() !== affiliate.promoCode.toUpperCase() && (
               <p className="text-xs text-amber-700 mt-2 leading-relaxed">
-                Saving renames the code: a new Shopify coupon is created with
+                Saving renames the code: a new WooCommerce coupon is created with
                 the same discount, the old {affiliate.promoCode} coupon is
                 deactivated, and all future sales attribute through the new code.
                 Past orders and commissions are untouched.
@@ -787,7 +842,7 @@ function AffiliateDetailDrawer({
           )}
           {couponWarning && (
             <p className="text-amber-700 text-sm p-3 bg-amber-50/80 border border-amber-200 rounded-xl">
-              Saved, but check Shopify: {couponWarning}
+              Saved, but check WooCommerce: {couponWarning}
             </p>
           )}
 
@@ -869,10 +924,11 @@ function CreateAffiliateModal({
     lastName: "",
     email: "",
     phone: "",
+    password: "",
     nickname: "",
     role: "affiliate" as "affiliate" | "admin",
-    commissionRate: 20,
-    recurringCommissionRate: 20,
+    commissionRate: 15,
+    recurringCommissionRate: 10,
     couponRate: 15,
     referrerId: "",
     referralCommissionRate: 5,
@@ -904,6 +960,16 @@ function CreateAffiliateModal({
     return clean ? `${clean}15` : "";
   }, [form.nickname]);
 
+  function generatePassword() {
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    let pwd = "";
+    for (let i = 0; i < 12; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setForm((f) => ({ ...f, password: pwd }));
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -918,6 +984,7 @@ function CreateAffiliateModal({
           lastName: form.lastName,
           email: form.email,
           phone: form.phone,
+          password: form.password,
           nickname: form.nickname,
           role: form.role,
           commissionRate: form.commissionRate,
@@ -939,8 +1006,6 @@ function CreateAffiliateModal({
         setError(data.error || "Failed to create");
         return;
       }
-      if(data.warning) toast.warning(data.warning);
-      if(data.email && !data.email.ok) toast.warning("Account saved. Email could not be delivered; configure email and use password reset.");
       onCreated();
     } finally {
       setLoading(false);
@@ -1018,7 +1083,25 @@ function CreateAffiliateModal({
             }
             className={inputClass}
           />
-          <p className="text-sm text-slate-500">The account owner sets their own password using a secure email link.</p>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Password*"
+              value={form.password}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, password: e.target.value }))
+              }
+              required
+              className={`${inputClass} pr-20`}
+            />
+            <button
+              type="button"
+              onClick={generatePassword}
+              className="absolute right-0 bottom-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] transition-colors"
+            >
+              Generate
+            </button>
+          </div>
           <input
             placeholder="Nickname (for promo code)*"
             value={form.nickname}
@@ -1207,7 +1290,7 @@ function CreateAffiliateModal({
               </p>
               <p className="text-[11px] text-[#64717a] mt-1 leading-relaxed">
                 We'll email {form.email || "them"} their promo code, commission
-                login instructions and a secure password setup link.
+                rate, login URL and temporary password.
               </p>
             </div>
           </label>

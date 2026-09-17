@@ -1,4 +1,7 @@
 "use client";
+import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
+
+import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -20,7 +23,6 @@ import {
   StatCard,
   SectionTitle,
   EmptyState,
-  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
@@ -70,7 +72,7 @@ interface Match {
   commissionsRecorded: number;
 }
 
-interface RecordedCommission {
+interface RecordedCommission extends OriginalMoney {
   id: string;
   orderId: string;
   affiliateName: string;
@@ -84,8 +86,7 @@ interface RecordedCommission {
 interface AppData {
   status: IntegrationStatus;
   errors: string[];
-  commissionRate: number | null;
-  ingestion?: { status: string; reason: string };
+  commissionRate: number;
   users: {
     total: number;
     last30d: number;
@@ -107,11 +108,16 @@ const ACTIVE_STATUSES = new Set(["active", "trialing", "in_grace_period"]);
 type SubFilter = "all" | "paying" | "stopped";
 
 export default function AdminAppPage() {
+  const {request: fetch, requestError} = useOriginalRequest();
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
   const [subFilter, setSubFilter] = useState<SubFilter>("all");
   const [rateInput, setRateInput] = useState("");
   const [savingRate, setSavingRate] = useState(false);
+  // Which match row has the record-commission form open, and its amount input.
+  const [recordFor, setRecordFor] = useState<string | null>(null);
+  const [amountInput, setAmountInput] = useState("12.99");
+  const [recording, setRecording] = useState(false);
   const [signupsShown, setSignupsShown] = useState(15);
 
   const load = useCallback(async () => {
@@ -151,15 +157,51 @@ export default function AdminAppPage() {
         toast.error(payload.error ?? "Could not save the rate.");
         return;
       }
-      const readback = await fetch('/api/affiliates/admin/app', {credentials:'include', cache:'no-store'});
-      const verified = await readback.json();
-      if (!readback.ok || verified.commissionRate !== value) { toast.error('Rate save not confirmed on readback. Refresh before retrying.'); return; }
-      setData(verified);
-      toast.success(`App commission rate verified at ${value}%. Historical earnings are unchanged.`);
+      toast.success(`App commission rate set to ${value}%.`);
+      setData((prev) => (prev ? { ...prev, commissionRate: value } : prev));
     } finally {
       setSavingRate(false);
     }
   }, [rateInput]);
+
+  const recordCommission = useCallback(
+    async (match: Match) => {
+      if (!match.affiliate) return;
+      const amount = Number(amountInput);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        toast.error("Enter the subscription amount first.");
+        return;
+      }
+      setRecording(true);
+      try {
+        const res = await fetch("/api/affiliates/admin/app", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            action: "record_commission",
+            affiliateId: match.affiliate.id,
+            customerEmail: match.appUser.email || match.store.email,
+            customerName: match.appUser.name || match.store.name,
+            amount,
+          }),
+        });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          toast.error(payload.error ?? "Could not record the commission.");
+          return;
+        }
+        toast.success(
+          `${formatCurrency(payload.commission)} credited to ${match.affiliate.name}.`
+        );
+        setRecordFor(null);
+        await load();
+      } finally {
+        setRecording(false);
+      }
+    },
+    [amountInput, load]
+  );
 
   const subs = data?.subscriptions?.subscriptions ?? [];
   const paying = useMemo(
@@ -174,29 +216,32 @@ export default function AdminAppPage() {
     subFilter === "paying" ? paying : subFilter === "stopped" ? stopped : subs;
 
   const metrics = data?.metrics ?? null;
+  const rate = data?.commissionRate ?? null;
+  const previewAmount = Number(amountInput);
+  const previewCommission =
+    rate !== null && Number.isFinite(previewAmount) && previewAmount > 0
+      ? Math.round(previewAmount * rate) / 100
+      : null;
+
+  if (requestError) return <OriginalRequestError message={requestError} />;
+
   return (
     <>
       <PageHeader
-        eyebrow="Supplements app"
+        eyebrow="IQONIC"
         title="App"
-        description="Existing IQONIC app analytics: signups, business subscription revenue, active and stopped subscribers. Analytics matches alone do not authorize commission earnings."
+        description="Analytics from the IQONIC mobile app: signups, subscription revenue, who's paying and who stopped, plus app users matched to store customers so affiliates get credited."
       />
-
-      <aside role="status" className="mb-6 border border-amber-500/40 rounded-xl p-5 text-sm">
-        <strong>{data?.ingestion?.status === 'complete' ? 'Verified app transaction ingestion is available.' : 'App earning ingestion is paused for verified transaction cutover.'}</strong>
-        <p>Historical earnings are preserved; live analytics are read-only. No manual top-ups or snapshot-based accrual. {data?.ingestion?.reason ?? 'VERIFIED_TRANSACTION_CUTOVER_REQUIRED'}</p>
-        <p>App commission rate: {data?.commissionRate == null ? 'Unavailable — no default applied' : `${data.commissionRate}%`}. Editing configuration does not rewrite earnings.</p>
-      </aside>
 
       {data && data.status.missing.length > 0 && (
         <div className="mb-6 glass-surface rounded-lg px-5 py-4 text-sm text-[#20282c]">
           <p className="font-medium">Finish connecting the app</p>
           <p className="text-[#64717a] mt-1 leading-relaxed">
             Add {data.status.missing.length === 1 ? "this environment variable" : "these environment variables"} in
-            the canonical IQON Health deployment to activate the missing sections (do not create a second app project):{" "}
+            Vercel to activate the missing sections:{" "}
             <span className="font-sans text-xs">{data.status.missing.join(", ")}</span>
             {!data.status.supabaseConfigured &&
-              " — the Supabase service role key comes from the Supplements app Supabase project settings"}
+              " — the Supabase service role key comes from the IQONIC Supabase project settings"}
             {!data.status.revenuecatConfigured &&
               " — the RevenueCat secret key and project id come from the RevenueCat dashboard"}
             .
@@ -468,18 +513,25 @@ export default function AdminAppPage() {
               title="Store customers in the app"
               right={
                 <span className="text-xs text-[#64717a]">
-                  Email analytics candidates — not proof of attribution
+                  Matched by email, then by name
                 </span>
               }
             />
             <p className="text-sm text-[#64717a] mt-2 mb-5 leading-relaxed">
-              These are analytical candidates only. No name-based identity linking or automatic payment from a subscription snapshot is permitted. Manual top-ups remain disabled. New earning ingestion requires the reviewed transaction/history cutover described above. Historical app commissions remain available below and in the shared program ledger.
+              App accounts that match a store customer. When a matched customer
+              came through an affiliate, each app subscription payment is
+              credited to that affiliate at the current rate ({rate}%) — added
+              to their payout once the charge has settled for a few days and
+              the subscription is still active, so refunds never pay out. Only
+              paying subscribers earn commission; downloading the app alone
+              earns nothing. The button on each row is for manual top-ups or
+              corrections only.
             </p>
             {data && data.matches.length === 0 ? (
               <EmptyState
                 icon={Link2}
                 title="No matches yet"
-                description="As store customers sign up in the app (verified email analytics), they show up here."
+                description="As store customers sign up in the app (same email or name), they show up here."
               />
             ) : (
               <div className="overflow-x-auto">
@@ -497,6 +549,7 @@ export default function AdminAppPage() {
                   <tbody>
                     {(data?.matches ?? []).map((m) => {
                       const key = m.appUser.email || m.store.email;
+                      const open = recordFor === key;
                       return (
                         <FragmentRow key={key}>
                           <tr className="border-b border-[#242526]/5">
@@ -543,9 +596,86 @@ export default function AdminAppPage() {
                               {formatCurrency(m.store.totalSpent)}
                             </td>
                             <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                              <span className="text-xs">Manual recording disabled — verified transaction cutover required</span>
+                              {m.affiliate ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setRecordFor(open ? null : key);
+                                    setAmountInput("12.99");
+                                  }}
+                                  className="inline-flex items-center gap-1.5 rounded-full bg-[#242526] px-3.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-sans text-white hover:opacity-90 transition-opacity"
+                                >
+                                  <Gift className="h-3 w-3" />
+                                  {m.commissionsRecorded > 0
+                                    ? `Commission (${m.commissionsRecorded})`
+                                    : "Commission"}
+                                </button>
+                              ) : (
+                                <span className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a]">
+                                  No affiliate
+                                </span>
+                              )}
                             </td>
                           </tr>
+                          {open && m.affiliate && (
+                            <tr className="border-b border-[#242526]/5 bg-[#242526]/[0.02]">
+                              <td colSpan={6} className="px-4 py-4">
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <span className="text-xs text-[#64717a]">
+                                    App subscription amount:
+                                  </span>
+                                  {["12.99", "49.99", "149.99"].map((preset) => (
+                                    <button
+                                      key={preset}
+                                      type="button"
+                                      onClick={() => setAmountInput(preset)}
+                                      className={`px-3 py-1.5 rounded-full text-xs font-sans border transition-colors ${
+                                        amountInput === preset
+                                          ? "bg-[#242526] text-white border-[#242526]"
+                                          : "border-[#242526]/15 text-[#20282c] hover:bg-[#242526]/5"
+                                      }`}
+                                    >
+                                      ${preset}
+                                    </button>
+                                  ))}
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={amountInput}
+                                    onChange={(e) => setAmountInput(e.target.value)}
+                                    className="w-24 glass-surface rounded-full px-3 py-1.5 text-xs font-sans focus:outline-none focus:ring-2 focus:ring-[#242526]/15"
+                                  />
+                                  <span className="text-xs text-[#64717a]">
+                                    → {m.affiliate.name} earns{" "}
+                                    <strong className="text-[#20282c]">
+                                      {previewCommission != null
+                                        ? formatCurrency(previewCommission)
+                                        : "—"}
+                                    </strong>{" "}
+                                    ({rate}%)
+                                  </span>
+                                  <button
+                                    type="button"
+                                    disabled={recording}
+                                    onClick={() => recordCommission(m)}
+                                    className="inline-flex items-center gap-1.5 rounded-full bg-[#242526] px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans text-white hover:opacity-90 transition-opacity disabled:opacity-40"
+                                  >
+                                    {recording ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      <Gift className="h-3 w-3" />
+                                    )}
+                                    Record
+                                  </button>
+                                </div>
+                                <p className="text-[11px] text-[#64717a] mt-2">
+                                  One commission per app customer per month. It shows up
+                                  under Payouts as &ldquo;App commission&rdquo;.
+                                </p>
+                              </td>
+                            </tr>
+                          )}
                         </FragmentRow>
                       );
                     })}
@@ -582,7 +712,7 @@ export default function AdminAppPage() {
                 <button
                   type="button"
                   onClick={saveRate}
-                  disabled={savingRate || !rateInput.trim() || String(data?.commissionRate) === rateInput}
+                  disabled={savingRate || String(rate) === rateInput}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#242526] px-4 py-2.5 text-[10px] uppercase tracking-[0.18em] font-sans text-white hover:opacity-90 transition-opacity disabled:opacity-40"
                 >
                   {savingRate ? (
@@ -620,7 +750,7 @@ export default function AdminAppPage() {
                         </p>
                       </div>
                       <span className="font-sans whitespace-nowrap">
-                        {formatCurrency(c.commission)}
+                        {originalField(c, "commission")}
                       </span>
                     </li>
                   ))}

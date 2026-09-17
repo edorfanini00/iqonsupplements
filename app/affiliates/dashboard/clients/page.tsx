@@ -1,4 +1,7 @@
 "use client";
+import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
+
+import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -19,15 +22,12 @@ import {
 } from "@/components/affiliates/shared/ui";
 import { OrderDetailDrawer } from "@/components/affiliates/shared/OrderDetailDrawer";
 
-import { combineBuckets, formatBuckets, formatDenominated, type MoneyBucket } from "@/components/affiliates/shared/currency-view";
-
-interface Customer {
+interface Customer extends OriginalMoney {
   key: string;
   email: string;
   name: string;
-  currencies: MoneyBucket[];
-  totalSpent: number | null;
-  totalCommission: number | null;
+  totalSpent: number;
+  totalCommission: number;
   orderCount: number;
   codeOrders: number;
   recurringOrders: number;
@@ -36,8 +36,7 @@ interface Customer {
   isRecurring: boolean;
 }
 
-interface OrderRow {
-  currency?: string | null;
+interface OrderRow extends OriginalMoney {
   id: string;
   orderId: string;
   orderTotal: number;
@@ -48,6 +47,7 @@ interface OrderRow {
 }
 
 export default function AffiliateClientsPage() {
+  const {request: fetch, requestError} = useOriginalRequest();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -103,10 +103,14 @@ export default function AffiliateClientsPage() {
 
   const totals = useMemo(() => {
     const recurring = customers.filter((c) => c.isRecurring).length;
-    const money = combineBuckets(customers, ['totalSpent', 'totalCommission']);
-    const average = {currencies:money.currencies.map(b => ({...b,totalSpent:Number(b.totalSpent)/customers.filter(c => c.currencies.some(x => x.currency === b.currency)).length}))};
-    return { recurring, money, average };
+    const totalRevenue = customers.reduce((s, c) => s + c.totalSpent, 0);
+    const totalCommission = customers.reduce((s, c) => s + c.totalCommission, 0);
+    const lifetimeAvg =
+      customers.length > 0 ? totalRevenue / customers.length : 0;
+    return { recurring, totalRevenue, totalCommission, lifetimeAvg };
   }, [customers]);
+
+  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -138,12 +142,12 @@ export default function AffiliateClientsPage() {
         <StatCard
           icon={ShoppingBag}
           label="Lifetime revenue"
-          value={formatBuckets(totals.money, 'totalSpent')}
+          value={loading ? "—" : originalTotal(customers, "totalSpent")}
         />
         <StatCard
           icon={TrendingUp}
           label="Avg LTV"
-          value={formatBuckets(totals.average, 'totalSpent')}
+          value={loading ? "—" : originalTotal(customers, "totalSpent", customers.length)}
         />
       </section>
 
@@ -220,10 +224,10 @@ export default function AffiliateClientsPage() {
                       {c.orderCount}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {formatBuckets(c, 'totalSpent')}
+                      {originalField(c, "totalSpent")}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {formatBuckets(c, 'totalCommission')}
+                      {originalField(c, "totalCommission")}
                     </td>
                     <td className="py-4 px-5">
                       <Pill
@@ -328,11 +332,11 @@ function CustomerDrawer({
             />
             <MiniStat
               label="Spent"
-              value={formatBuckets(customer, 'totalSpent')}
+              value={originalField(customer, "totalSpent")}
             />
             <MiniStat
               label="Your commission"
-              value={formatBuckets(customer, 'totalCommission')}
+              value={originalField(customer, "totalCommission")}
             />
             <MiniStat
               label="Customer since"
@@ -386,10 +390,10 @@ function CustomerDrawer({
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-sans">
-                        {formatDenominated(o.orderTotal, o.currency)}
+                        {formatCurrency(o.orderTotal, o.currency as string | null)}
                       </p>
                       <p className="text-[11px] font-sans text-[#64717a] mt-0.5">
-                        + {formatDenominated(o.commission, o.currency)}
+                        + {formatCurrency(o.commission, o.currency as string | null)}
                       </p>
                     </div>
                   </li>
