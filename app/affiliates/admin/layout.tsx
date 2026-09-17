@@ -1,4 +1,5 @@
 "use client";
+import { CommandRecovery } from "@/components/affiliates/shared/CommandRecovery";
 
 import { SidebarShell } from "@/components/affiliates/shared/SidebarShell";
 import { useAffiliatePortalAuth } from "@/components/affiliates/shared/useAffiliatePortalAuth";
@@ -18,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarShell user={user} variant="admin">
+      <CommandRecovery />
       {children}
     </SidebarShell>
   );

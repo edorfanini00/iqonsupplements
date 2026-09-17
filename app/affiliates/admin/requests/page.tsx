@@ -1,4 +1,6 @@
 "use client";
+// BODY COMMAND ADAPTER
+import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -300,6 +302,8 @@ function ReviewModal({
         credentials: "include",
       });
       if (res.ok) onDone();
+      // BODY COMMAND REJECTION STATE
+      else { const data = await res.json(); setError(data.error || "Command not confirmed complete. Check Command recovery."); }
     } finally {
       setLoading(false);
     }

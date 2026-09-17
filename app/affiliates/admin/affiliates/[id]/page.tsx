@@ -1,4 +1,8 @@
 "use client";
+// BODY CATEGORY CONTROLS
+import { CanonicalAffiliateControls } from "@/components/affiliates/shared/CanonicalAffiliateControls";
+// BODY COMMAND ADAPTER
+import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
 import { useEffect, useState, useCallback, useMemo, use } from "react";
 import Link from "next/link";
@@ -183,6 +187,9 @@ export default function AdminAffiliateDetailPage({
         <ArrowLeft className="h-3.5 w-3.5" />
         All affiliates
       </Link>
+
+      {/* BODY CATEGORY CONTROLS */}
+      <CanonicalAffiliateControls affiliateId={id} />
 
       <PageHeader
         eyebrow={info ? info.promoCode : "Loading"}

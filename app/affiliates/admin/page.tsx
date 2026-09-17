@@ -1,4 +1,6 @@
 "use client";
+// BODY CATEGORY ADDITION
+import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -611,6 +613,9 @@ export default function AdminOverviewPage() {
           }
         />
       </section>
+
+      {/* BODY CATEGORY ADDITION */}
+      <CategoryRevenue preset={preset} audience="admin" />
 
       {/* Charts */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-10">

@@ -1,4 +1,6 @@
 "use client";
+// BODY CATEGORY ADDITION
+import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
@@ -443,6 +445,9 @@ export default function AffiliateOverviewPage() {
             </div>
           </section>
         )}
+
+      {/* BODY CATEGORY ADDITION */}
+      <CategoryRevenue preset={preset} audience="affiliate" />
 
       {/* Charts */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">

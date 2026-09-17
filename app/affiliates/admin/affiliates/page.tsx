@@ -1,4 +1,6 @@
 "use client";
+// BODY COMMAND ADAPTER
+import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";

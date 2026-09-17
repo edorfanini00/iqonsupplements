@@ -40,19 +40,23 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   try {config=sharedRelayConfig(env);} catch {return fail(503);}
   const incoming = new URL(request.url);
   const method = request.method.toUpperCase();
+  const command = /^\/api\/affiliates\/commands\/(signup|affiliate-approval|commission-settings|payout-record|creator-code-sync)(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
+  const commandWrite = !!command && !command[2] && method === 'POST' && incoming.search === '';
+  const commandRead = (!!command?.[2] || /^\/api\/affiliates\/commands\/state\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)) && method === 'GET' && incoming.search === '';
   // Restore narrowly audited original reads, retaining canonical role/identity checks.
   // Detail refresh is a write to a Woo snapshot despite using GET; never relay it.
   const accountingPicker = method === 'GET' && incoming.pathname === '/api/affiliates/admin/accounting/products' && incoming.search === '';
-  const originalRead = accountingPicker || (method === 'GET' && ORIGINAL_READ_ROUTES.some(pattern => pattern.test(incoming.pathname))
+  const categoryRead = method === 'GET' && incoming.pathname === '/api/affiliates/category-revenue';
+  const originalRead = categoryRead || accountingPicker || (method === 'GET' && ORIGINAL_READ_ROUTES.some(pattern => pattern.test(incoming.pathname))
     && !(incoming.pathname.startsWith('/api/affiliates/orders/') && incoming.search !== ''));
   if (!originalRead && /^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
     return Response.json({ok:false,error:'Source-aware commerce operation is unavailable in this portal'}, {status:501,headers:{'cache-control':'no-store'}});
   }
-  if (!originalRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
+  if (!originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
   const mutation=!['GET','HEAD'].includes(method);
   // Auth is the only qualified write contract. No generic financial dispatch;
   // other features remain explicit release gaps until canonical receipts exist.
-  if (mutation && !['/api/affiliates/login','/api/affiliates/logout'].includes(incoming.pathname)) {
+  if (mutation && !commandWrite && !['/api/affiliates/login','/api/affiliates/logout'].includes(incoming.pathname)) {
     return Response.json({ok:false,error:'This action is unavailable until its dedicated canonical command is qualified'}, {status:501,headers:{'cache-control':'no-store'}});
   }
   const readMarker = method === 'GET' && (incoming.pathname === '/api/affiliates/messages' || /^\/api\/affiliates\/admin\/affiliate-messages\/[A-Za-z0-9_-]+$/.test(incoming.pathname));
@@ -79,10 +83,10 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   try { body=mutation ? await boundedBody(request) : undefined; } catch {return fail(413);}
   try {
     // Compatibility path is local-only; canonical session lives in the additive integration namespace.
-    const path = incoming.pathname === '/api/affiliates/shared-session'
-      ? '/api/integrations/body/session' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname;
+    const path = commandWrite || commandRead ? incoming.pathname.replace('/api/affiliates/commands/', '/api/integrations/body/commands/') : incoming.pathname === '/api/affiliates/shared-session'
+      ? '/api/integrations/body/session' : categoryRead ? '/api/integrations/body/category-revenue' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname;
     const target = new URL(path + incoming.search,config.health);
-    const upstream=await (options.fetch ?? fetch)(target,{method,headers,body:body as BodyInit | undefined,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(originalRead ? 90000 : 15000)});
+    const upstream=await (options.fetch ?? fetch)(target,{method,headers,body:body as BodyInit | undefined,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(originalRead ? 90000 : commandWrite || commandRead ? 60000 : 15000)});
     if(upstream.status>=300 && upstream.status<400) return fail(502);
     const out = new Headers({'cache-control':'no-store','content-type':upstream.headers.get('content-type') ?? 'application/json','x-content-type-options':'nosniff'});
     // Never reflect Domain, arbitrary cookies, CORS, Location or upstream headers.
