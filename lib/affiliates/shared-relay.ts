@@ -40,7 +40,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   try {config=sharedRelayConfig(env);} catch {return fail(503);}
   const incoming = new URL(request.url);
   const method = request.method.toUpperCase();
-  const command = /^\/api\/affiliates\/commands\/(signup|affiliate-approval|commission-settings|payout-record|creator-code-sync)(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
+  const command = /^\/api\/affiliates\/commands\/(signup|affiliate-approval|commission-settings|payout-record|creator-code-sync|admin-create)(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
   const commandWrite = !!command && !command[2] && method === 'POST' && incoming.search === '';
   const commandRead = (!!command?.[2] || /^\/api\/affiliates\/commands\/state\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)) && method === 'GET' && incoming.search === '';
   // Restore narrowly audited original reads, retaining canonical role/identity checks.

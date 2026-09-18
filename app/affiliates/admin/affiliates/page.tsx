@@ -921,7 +921,6 @@ function CreateAffiliateModal({
     lastName: "",
     email: "",
     phone: "",
-    password: "",
     nickname: "",
     role: "affiliate" as "affiliate" | "admin",
     commissionRate: 15,
@@ -957,16 +956,6 @@ function CreateAffiliateModal({
     return clean ? `${clean}15` : "";
   }, [form.nickname]);
 
-  function generatePassword() {
-    const chars =
-      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-    let pwd = "";
-    for (let i = 0; i < 12; i++) {
-      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setForm((f) => ({ ...f, password: pwd }));
-  }
-
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -981,7 +970,6 @@ function CreateAffiliateModal({
           lastName: form.lastName,
           email: form.email,
           phone: form.phone,
-          password: form.password,
           nickname: form.nickname,
           role: form.role,
           commissionRate: form.commissionRate,
@@ -1080,25 +1068,10 @@ function CreateAffiliateModal({
             }
             className={inputClass}
           />
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Password*"
-              value={form.password}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, password: e.target.value }))
-              }
-              required
-              className={`${inputClass} pr-20`}
-            />
-            <button
-              type="button"
-              onClick={generatePassword}
-              className="absolute right-0 bottom-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] transition-colors"
-            >
-              Generate
-            </button>
-          </div>
+          <p className="text-xs text-[#64717a] py-3">
+            Identity setup is handled by the canonical provider. Creating a profile
+            does not confirm login access, email delivery or creator-code activation.
+          </p>
           <input
             placeholder="Nickname (for promo code)*"
             value={form.nickname}

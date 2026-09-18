@@ -8,6 +8,7 @@ const source=process.env.HEALTH_COMMAND_VALIDATION_SOURCE;
 test('actual canonical validator accepts original Body command envelopes', {skip:!source},async()=>{
  const {validateCommand,commandHash}=await import(pathToFileURL(source!).href);
  const cases:[string,string,Record<string,unknown>][]=[
+ ['/api/affiliates/admin/create','POST',{firstName:'Synthetic',lastName:'Created',email:'created@example.test',nickname:'CREATED',role:'affiliate',commissionRate:0,sendEmail:false}],
  ['/api/affiliates/signup','POST',{firstName:'Synthetic',lastName:'Applicant',email:'synthetic@example.test',phone:'5550100',password:'synthetic-only-password',nickname:'EXAMPLE',noReferrer:true}],
  ['/api/affiliates/admin/requests/fixture','POST',{promoCode:'EXAMPLE15',commissionRate:0,recurringCommissionRate:0,couponRate:0,referrerId:null,referralCommissionRate:0}],
  ['/api/affiliates/admin/requests/fixture','DELETE',{}],
@@ -18,7 +19,7 @@ test('actual canonical validator accepts original Body command envelopes', {skip
  ];
  for(const [path,method,payload] of cases){
   const mapped=mapLegacyCommand(path,method,payload)!;assert.ok(mapped,path);
-  const envelope={version:1,commandId:'87bfc143-8302-4073-b184-a000ee947ff1',...(['signup','payout-record'].includes(mapped.kind)?{}:{expectedVersion:0}),payload:mapped.payload};
+  const envelope={version:1,commandId:'87bfc143-8302-4073-b184-a000ee947ff1',...(['signup','payout-record','admin-create'].includes(mapped.kind)?{}:{expectedVersion:0}),payload:mapped.payload};
   const validated=validateCommand(mapped.kind,envelope);assert.equal(validated.kind,mapped.kind);
   assert.equal(commandHash(validated,'wp:1'),commandHash(validateCommand(mapped.kind,JSON.parse(JSON.stringify(envelope))),'wp:1'));
  }

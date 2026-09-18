@@ -2,6 +2,12 @@
 import {browserCommandClient,type CommandKind,type CommandResponse} from './canonical-command-client';
 import {parseBodySession} from './body-session-dto';
 export function mapLegacyCommand(path:string,method:string,payload:Record<string,unknown>):{kind:CommandKind;payload:Record<string,unknown>}|null {
+ if(path==='/api/affiliates/admin/create'&&method==='POST'){
+  // Canonical admin provisioning owns identity setup; the legacy password is
+  // not accepted by its DTO and must never enter the durable attempt journal.
+  const {password:_legacyPassword,...canonicalPayload}=payload;
+  return {kind:'admin-create',payload:canonicalPayload};
+ }
  if(path==='/api/affiliates/signup'&&method==='POST')return {kind:'signup',payload};
  const approval=/^\/api\/affiliates\/admin\/requests\/([A-Za-z0-9_-]+)$/.exec(path);
  if(approval&&['POST','DELETE'].includes(method))return {kind:'affiliate-approval',payload:{...payload,affiliateId:approval[1],decision:method==='POST'?'approve':'deny'}};
@@ -33,9 +39,9 @@ export async function canonicalActionFetch(input:string,init?:RequestInit):Promi
   if(mapped.kind==='signup')return client.submit(`signup:${String(mapped.payload.email??'').trim().toLowerCase()}`,mapped.kind,mapped.payload);
   const {actor,session}=await currentCommandActor();
   if(session.role!=='admin')return fail('This command requires a current canonical administrator.',403);
-  const existing=client.list(actor).find(a=>!a.archived&&a.kind===mapped.kind&&a.envelope.payload.affiliateId===mapped.payload.affiliateId);
+  const existing=client.list(actor).find(a=>!a.archived&&a.kind===mapped.kind&&(a.envelope.payload.affiliateId??a.envelope.payload.email)===(mapped.payload.affiliateId??mapped.payload.email));
   let version=existing?.envelope.expectedVersion;
-  if(mapped.kind!=='payout-record'&&!existing){
+  if(!['payout-record','admin-create'].includes(mapped.kind)&&!existing){
    // Dedicated canonical state read; never assume zero or infer a version from
    // profile dates when the dependency is unavailable.
    const res=await globalThis.fetch(`/api/affiliates/commands/state/${encodeURIComponent(String(mapped.payload.affiliateId))}`,{credentials:'include',cache:'no-store'});

@@ -1,0 +1,21 @@
+{
+  "reason": "Canonical admin-create rejects password; remove unsupported password collection, generation and submission, and disclose provider identity boundary. Preserve all other original page source.",
+  "hunks": [
+    {
+      "original": "    email: \"\",\n    phone: \"\",\n    password: \"\",\n    nickname: \"\",\n    role: \"affiliate\" as \"affiliate\" | \"admin\",\n",
+      "canonical": "    email: \"\",\n    phone: \"\",\n    nickname: \"\",\n    role: \"affiliate\" as \"affiliate\" | \"admin\",\n"
+    },
+    {
+      "original": "  }, [form.nickname]);\n\n  function generatePassword() {\n    const chars =\n      \"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789\";\n    let pwd = \"\";\n    for (let i = 0; i < 12; i++) {\n      pwd += chars.charAt(Math.floor(Math.random() * chars.length));\n    }\n    setForm((f) => ({ ...f, password: pwd }));\n  }\n\n  async function submit(e: React.FormEvent) {\n    e.preventDefault();\n",
+      "canonical": "  }, [form.nickname]);\n\n  async function submit(e: React.FormEvent) {\n    e.preventDefault();\n"
+    },
+    {
+      "original": "          email: form.email,\n          phone: form.phone,\n          password: form.password,\n          nickname: form.nickname,\n          role: form.role,\n",
+      "canonical": "          email: form.email,\n          phone: form.phone,\n          nickname: form.nickname,\n          role: form.role,\n"
+    },
+    {
+      "original": "            className={inputClass}\n          />\n          <div className=\"relative\">\n            <input\n              type=\"text\"\n              placeholder=\"Password*\"\n              value={form.password}\n              onChange={(e) =>\n                setForm((f) => ({ ...f, password: e.target.value }))\n              }\n              required\n              className={`${inputClass} pr-20`}\n            />\n            <button\n              type=\"button\"\n              onClick={generatePassword}\n              className=\"absolute right-0 bottom-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] transition-colors\"\n            >\n              Generate\n            </button>\n          </div>\n          <input\n            placeholder=\"Nickname (for promo code)*\"\n",
+      "canonical": "            className={inputClass}\n          />\n          <p className=\"text-xs text-[#64717a] py-3\">\n            Identity setup is handled by the canonical provider. Creating a profile\n            does not confirm login access, email delivery or creator-code activation.\n          </p>\n          <input\n            placeholder=\"Nickname (for promo code)*\"\n"
+    }
+  ]
+}

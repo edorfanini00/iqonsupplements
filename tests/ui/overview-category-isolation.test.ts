@@ -38,6 +38,24 @@ it("only commits the latest month when requests finish out of order and Shopify 
   expect(screen.getByText("$5.00")).toBeTruthy();
 });
 
+it("keeps successful category data independent when original Overview fails and changes both period requests", async () => {
+  const categoryCalls:string[]=[];
+  vi.stubGlobal('fetch',async(url:string)=>{
+    if(!url.includes('category-revenue'))return Response.json({}, {status:503});
+    categoryCalls.push(url);const q=new URL(url,'https://local.test').searchParams;
+    const amount=q.get('start')!.startsWith('2026-08')?'111.00':'222.00';
+    const metric={state:'available',reason:null,currencies:[{currency:'USD',amount}],orderCount:1};
+    return Response.json({version:1,provider:'shopify',period:{start:q.get('start'),end:q.get('end'),timezone:'America/New_York'},categories:Object.fromEntries(['supplements','skincare','unclassified'].map(k=>[k,{storeRevenue:metric,attributedRevenue:{state:'unavailable',reason:'CANONICAL_ATTRIBUTION_UNAVAILABLE',currencies:null,orderCount:null}}]))});
+  });
+  render(React.createElement(Overview));
+  month('September 2026');await screen.findAllByText('USD 222.00');
+  month('August 2026');await screen.findAllByText('USD 111.00');
+  expect(screen.queryByText('USD 222.00')).toBeNull();
+  const q=new URL(categoryCalls.at(-1)!,'https://local.test').searchParams;
+  expect(q.get('start')).toBe('2026-08-01T04:00:00.000Z');expect(q.get('end')).toBe('2026-09-01T04:00:00.000Z');
+  expect(screen.queryByText('$905.00')).toBeNull();
+});
+
 it("does not relabel successful September totals as August after a rejected request", async () => {
   const fetcher = vi.fn().mockResolvedValueOnce(response("30d",100)).mockResolvedValueOnce(response("m:2026-09",900)).mockResolvedValueOnce(new Response('{}',{status:401}));
   vi.stubGlobal("fetch", (url:string,...args:unknown[])=>url.includes("category-revenue")?Promise.resolve(new Response("{}",{status:503})):fetcher(url,...args));

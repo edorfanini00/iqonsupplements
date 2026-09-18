@@ -1,6 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createCommandClient} from '../../lib/affiliates/canonical-command-client';
+import {createCommandClient,commandComplete} from '../../lib/affiliates/canonical-command-client';
+test('admin-create completion follows its own canonical tasks, never coupon-only success',()=>{
+ const base={command:{state:'committed'},affiliate:{id:'new-admin'}};
+ assert.equal(commandComplete('admin-create',{...base,outbox:[]}),true);
+ assert.equal(commandComplete('admin-create',{...base,outbox:[{store:'identity',operation:'admin-identity',state:'blocked'},{store:'woo',operation:'public-code',state:'confirmed'},{store:'shopify',operation:'public-code',state:'confirmed'}]}),false);
+});
 const uuid='87bfc143-8302-4073-b184-a000ee947ff1';
 function store(){const data=new Map<string,string>();return {data,getItem:(k:string)=>data.get(k)??null,setItem:(k:string,v:string)=>{data.set(k,v)},removeItem:(k:string)=>{data.delete(k)}};}
 test('durably retains exact key/payload on lost response; pending is not success; completed readback matches receipt',async()=>{
@@ -36,10 +41,32 @@ test('new version is explicit after canonical commit readback and archives unres
 });
 test('correction requires definite validation rejection AND exact authorized canonical no-record readback',async()=>{
  const storage=store();let proof=false;
- const client=createCommandClient({storage,uuid:()=>uuid,fetch:async(_url,init)=>init?.method==='POST'?Response.json({error:{code:'VALIDATION_ERROR',message:'Invalid amount'}},{status:400}):Response.json(proof?{error:{code:'VALIDATION_ERROR',message:'Command not found'}}:{error:'Not Found'},{status:404})});
+ const client=createCommandClient({storage,uuid:()=>uuid,fetch:async(_url,init)=>init?.method==='POST'?Response.json({error:'Invalid amount',errorDetail:{code:'VALIDATION_ERROR',message:'Invalid amount'}},{status:400}):Response.json(proof?{error:'Command not found',errorDetail:{code:'VALIDATION_ERROR',message:'Command not found'}}:{error:'Not Found'},{status:404})});
  await client.submit('wp:1','payout-record',{affiliateId:'a',amount:-1});
  const a=client.list('wp:1')[0];assert.equal(await client.allowCorrection('wp:1',a),false);assert.equal(client.list('wp:1')[0].archived,undefined);
  proof=true;assert.equal(await client.allowCorrection('wp:1',a),true);assert.equal(client.list('wp:1')[0].archived,true);
+});
+for(const code of ['VERSION_CONFLICT','PROVIDER_BUSY','REJECTED_CONFLICT'])test(`${code} permits corrected user submission without replaying an impossible attempt`,async()=>{
+ const storage=store();let calls=0;const sent:any[]=[];
+ const client=createCommandClient({storage,uuid:()=>calls++===0?uuid:'87bfc143-8302-4073-b184-a000ee947ff2',fetch:async(_url,init)=>{sent.push(JSON.parse(String(init?.body)));return Response.json({error:'Definitive non-commit',errorDetail:{code,message:'Definitive non-commit'}},{status:409})}});
+ await client.submit('wp:1','commission-settings',{affiliateId:'a',commissionRate:10},1);
+ await client.submit('wp:1','commission-settings',{affiliateId:'a',commissionRate:20},2);
+ assert.equal(sent.length,2);assert.notEqual(sent[0].commandId,sent[1].commandId);assert.equal(sent[1].expectedVersion,2);
+ assert.equal(client.list('wp:1').filter(a=>!a.archived).length,0);
+});
+test('anonymous signup DTO rejection permits correction without inaccessible authenticated status and never stores password',async()=>{
+ const storage=store();let seq=0;const sent:any[]=[];
+ const client=createCommandClient({storage,uuid:()=>seq++===0?uuid:'87bfc143-8302-4073-b184-a000ee947ff2',fetch:async(_url,init)=>{sent.push(JSON.parse(String(init?.body)));return Response.json({error:'Invalid phone',errorDetail:{code:'VALIDATION_ERROR',message:'Invalid phone'}},{status:400})}});
+ await client.submit('signup:a','signup',{email:'a@example.test',phone:'',password:'secret'});
+ await client.submit('signup:a','signup',{email:'a@example.test',phone:'5551234567',password:'secret'});
+ assert.equal(sent.length,2);assert.notEqual(sent[0].commandId,sent[1].commandId);assert.ok(![...storage.data.values()].join('').includes('secret'));
+});
+test('payload CONFLICT never releases an uncertain financial key',async()=>{
+ const storage=store();let calls=0;
+ const client=createCommandClient({storage,uuid:()=>uuid,fetch:async()=>{calls++;return Response.json({error:{code:'CONFLICT',message:'Command payload conflict'}},{status:409})}});
+ await client.submit('wp:1','payout-record',{affiliateId:'a',amount:10});
+ await client.submit('wp:1','payout-record',{affiliateId:'a',amount:20});
+ assert.equal(calls,1);assert.equal(client.list('wp:1')[0].archived,undefined);
 });
 test('storage unavailable blocks before network and mismatched command receipt is not success',async()=>{
  let calls=0;const storage={getItem:()=>null,setItem:()=>{throw Error('disabled')},removeItem:()=>{}};

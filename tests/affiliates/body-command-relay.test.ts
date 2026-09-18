@@ -4,7 +4,7 @@ import {relayAffiliateRequest} from '../../lib/affiliates/shared-relay';
 const env={NODE_ENV:'production',SHARED_AFFILIATE_HEALTH_ORIGIN:'https://health.test',SHARED_AFFILIATE_PORTAL_ORIGIN:'https://body.test',SHARED_AFFILIATE_RELAY_SECRET:'synthetic-test-credential-at-least-32'};
 const id='87bfc143-8302-4073-b184-a000ee947ff1';
 test('only fixed canonical commands relay exact envelope and authenticated receipt reads',async()=>{
- for(const kind of ['signup','affiliate-approval','commission-settings','payout-record','creator-code-sync']){
+ for(const kind of ['signup','affiliate-approval','commission-settings','payout-record','creator-code-sync','admin-create']){
   const body=JSON.stringify({version:1,commandId:id,payload:{affiliateId:'a'}});let target='',sent='';
   const res=await relayAffiliateRequest(new Request(`https://body.test/api/affiliates/commands/${kind}`,{method:'POST',headers:{origin:'https://body.test','content-type':'application/json'},body}),{env,fetch:async(url,init)=>{target=String(url);sent=new TextDecoder().decode(init!.body as Uint8Array);return Response.json({ok:true,command:{id,kind,state:'pending'}},{status:202});}});
   assert.equal(res.status,202);assert.equal(target,`https://health.test/api/integrations/body/commands/${kind}`);assert.equal(sent,body);
