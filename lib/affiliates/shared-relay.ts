@@ -47,12 +47,15 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   // Detail refresh is a write to a Woo snapshot despite using GET; never relay it.
   const accountingPicker = method === 'GET' && incoming.pathname === '/api/affiliates/admin/accounting/products' && incoming.search === '';
   const categoryRead = method === 'GET' && incoming.pathname === '/api/affiliates/category-revenue';
+  // Settlement is all-time and unfiltered. Do not widen this into a prefix proxy.
+  const outstandingRead = method === 'GET' && incoming.pathname === '/api/affiliates/payouts/outstanding'
+    && incoming.searchParams.size === 1 && !!incoming.searchParams.get('affiliateId')?.trim();
   const originalRead = categoryRead || accountingPicker || (method === 'GET' && ORIGINAL_READ_ROUTES.some(pattern => pattern.test(incoming.pathname))
     && !(incoming.pathname.startsWith('/api/affiliates/orders/') && incoming.search !== ''));
   if (!originalRead && /^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
     return Response.json({ok:false,error:'Source-aware commerce operation is unavailable in this portal'}, {status:501,headers:{'cache-control':'no-store'}});
   }
-  if (!originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
+  if (!outstandingRead && !originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
   const mutation=!['GET','HEAD'].includes(method);
   // Auth is the only qualified write contract. No generic financial dispatch;
   // other features remain explicit release gaps until canonical receipts exist.
@@ -84,7 +87,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   try {
     // Compatibility path is local-only; canonical session lives in the additive integration namespace.
     const path = commandWrite || commandRead ? incoming.pathname.replace('/api/affiliates/commands/', '/api/integrations/body/commands/') : incoming.pathname === '/api/affiliates/shared-session'
-      ? '/api/integrations/body/session' : categoryRead ? '/api/integrations/body/category-revenue' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname;
+      ? '/api/integrations/body/session' : outstandingRead ? '/api/integrations/body/payouts/outstanding' : categoryRead ? '/api/integrations/body/category-revenue' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname;
     const target = new URL(path + incoming.search,config.health);
     const upstream=await (options.fetch ?? fetch)(target,{method,headers,body:body as BodyInit | undefined,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(originalRead ? 90000 : commandWrite || commandRead ? 60000 : 15000)});
     if(upstream.status>=300 && upstream.status<400) return fail(502);

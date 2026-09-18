@@ -1,6 +1,7 @@
 "use client";
 // BODY COMMAND ADAPTER
 import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
+import { usePayoutOutstanding, payoutMoney } from "@/lib/affiliates/use-payout-outstanding";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -675,46 +676,32 @@ function RecordPayoutModal({
     reference: "",
     notes: "",
     paidAt: new Date().toISOString().slice(0, 10),
-    amount: target.pendingCommission,
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const settlement = usePayoutOutstanding(target.id);
+  const { busy: loading, error, display } = settlement;
+  const savedFields = settlement.saved?.envelope.payload;
+  const displayedForm = savedFields ? {
+    method: String(savedFields.method ?? ""),
+    reference: String(savedFields.reference ?? ""),
+    notes: String(savedFields.notes ?? ""),
+    paidAt: String(savedFields.paidAt ?? "").slice(0, 10),
+  } : form;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/affiliates/admin/payouts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          affiliateId: target.id,
-          method: form.method,
-          reference: form.reference || undefined,
-          notes: form.notes || undefined,
-          // Anchor the picked day at local noon so the stored timestamp
-          // stays on the same calendar day in any timezone.
-          paidAt: parseOrderTimestamp(form.paidAt).toISOString(),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.error || "Failed");
-        return;
-      }
-      onRecorded();
-    } finally {
-      setLoading(false);
-    }
+    if (await settlement.submit({
+      method: form.method,
+      reference: form.reference || undefined,
+      notes: form.notes || undefined,
+      paidAt: parseOrderTimestamp(form.paidAt).toISOString(),
+    })) onRecorded();
   }
 
   const inputClass =
     "bg-transparent border-0 border-b border-[#242526]/15 rounded-none px-0 py-2.5 text-sm focus:outline-none focus:border-[#242526] transition-colors placeholder:text-[#64717a] w-full";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div role="dialog" aria-modal="true" aria-label="Record payout" className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-[#20282c]/50 backdrop-blur-sm"
         onClick={onClose}
@@ -741,33 +728,37 @@ function RecordPayoutModal({
               Amount due
             </p>
             <p className="font-sans text-2xl font-medium mt-1">
-              {formatCurrency(target.pendingCommission)}
+              {display ? payoutMoney(display.amount, display.currency) : loading ? "Loading outstanding…" : "Unavailable"}
             </p>
           </div>
           <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-white/55">
-            {target.pendingOrders} orders
+            {display?.allocations.length ?? 0} allocations
           </p>
         </div>
 
-        {target.orders.length > 0 && (
+        <p className="text-xs text-[#64717a] mb-3">Record a payment already made. All-time canonical outstanding, including partial payments and required negative adjustments; no funds are transferred.</p>
+        {!settlement.saved && settlement.buckets.length > 0 && <select aria-label="Payout currency" className={inputClass} value={settlement.currency ?? ""} disabled={loading} onChange={e=>settlement.setCurrency(e.target.value || null)}>
+          {settlement.buckets.map(b=><option key={b.currency ?? "unknown"} value={b.currency ?? ""}>{payoutMoney(b.amount,b.currency)}{b.payable ? "" : " · not payable"}</option>)}
+        </select>}
+        {settlement.saved && <p className="text-xs mb-3">Saved attempt: the original amount, allocations, details and key are retained for exact retry.</p>}
+        {settlement.saved?.rejected && <button type="button" disabled={loading} onClick={()=>void settlement.correct()} className="text-sm underline mb-3">Verify no record and review correction</button>}
+        {display && display.allocations.length > 0 && (
           <div className="mb-6 max-h-44 overflow-y-auto rounded-lg border border-[#242526]/8 divide-y divide-[#242526]/5">
-            {target.orders.map((o) => (
+            {display.allocations.map((a) => (
               <div
-                key={o.id}
+                key={a.orderId}
                 className="flex items-center justify-between gap-3 px-4 py-2.5 text-xs"
               >
                 <div className="min-w-0">
                   <p className="font-medium truncate">
-                    {o.matchType === "bonus"
-                      ? o.customerName
-                      : `#${o.wooOrderId ?? o.orderId} · ${o.customerName}`}
+                    {target.orders.find(o=>o.id===a.orderId)?.customerName ?? a.orderId}
                   </p>
                   <p className="text-[#64717a] font-sans mt-0.5">
-                    {formatShortDate(o.createdAt)} · {matchTypeLabel(o)}
+                    {a.orderId}{a.amount < 0 ? " · required negative offset" : " · outstanding allocation"}
                   </p>
                 </div>
                 <p className="font-sans font-medium shrink-0">
-                  {formatCurrency(o.commission)}
+                  {payoutMoney(a.amount,display.currency)}
                 </p>
               </div>
             ))}
@@ -791,9 +782,10 @@ function RecordPayoutModal({
         )}
 
         <form onSubmit={submit} className="space-y-1">
+          <fieldset disabled={loading || !!settlement.saved} className="space-y-1">
           <div className="grid grid-cols-2 gap-4">
             <select
-              value={form.method}
+              value={displayedForm.method}
               onChange={(e) =>
                 setForm({ ...form, method: e.target.value as typeof form.method })
               }
@@ -806,25 +798,26 @@ function RecordPayoutModal({
             </select>
             <input
               type="date"
-              value={form.paidAt}
+              value={displayedForm.paidAt}
               onChange={(e) => setForm({ ...form, paidAt: e.target.value })}
               className={inputClass}
             />
           </div>
           <input
             placeholder="Reference (e.g. wire confirmation #)"
-            value={form.reference}
+            value={displayedForm.reference}
             onChange={(e) => setForm({ ...form, reference: e.target.value })}
             className={inputClass}
           />
           <textarea
             placeholder="Internal notes (optional)"
-            value={form.notes}
+            value={displayedForm.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
             rows={2}
             className={`${inputClass} resize-none`}
           />
 
+          </fieldset>
           <div className="!mt-8 flex gap-3">
             <button
               type="button"
@@ -835,7 +828,7 @@ function RecordPayoutModal({
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={!settlement.canSubmit}
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-3 text-[10px] uppercase tracking-[0.18em] font-sans bg-[#242526] text-white hover:bg-[#20282c] transition-colors disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />

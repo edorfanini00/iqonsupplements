@@ -8,6 +8,13 @@ for(const [path,expected] of Object.entries(fixture.files)) {
   const file=new URL('../../'+path,import.meta.url);
   assert.ok(existsSync(file),`Missing restored source ${path}`);
   let source=readFileSync(file,'utf8');
+  if(path==='app/affiliates/admin/payouts/page.tsx'){
+   const adaptation=JSON.parse(readFileSync(new URL('./fixtures/payout-outstanding-reviewed-adaptation.json',import.meta.url),'utf8'));
+   for(const hunk of adaptation.hunks){
+    assert.equal(source.split(hunk.canonical).length,2,'Reviewed settlement-only adaptation must match exactly once');
+    source=source.replace(hunk.canonical,hunk.original);
+   }
+  }
   if(path==='app/affiliates/admin/affiliates/page.tsx'){
    const adaptation=JSON.parse(readFileSync(new URL('./fixtures/admin-create-reviewed-adaptation.json',import.meta.url),'utf8'));
    for(const hunk of adaptation.hunks){
