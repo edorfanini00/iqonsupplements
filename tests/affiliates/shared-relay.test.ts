@@ -22,7 +22,7 @@ test('bodyless logout uses authority and non-JSON body is rejected',async()=> {
 test('Shopify-shaped IDs cannot trigger Health provider operations',async()=> {
  for(const path of ['/api/affiliates/admin/orders/987654/refund','/api/affiliates/admin/subscriptions/987654','/api/affiliates/admin/accounting/orders','/api/affiliates/admin/customers/email']) {
   let called=false;const result=await relayAffiliateRequest(req(path),{env,fetch:async()=>{called=true;return Response.json({ok:true});}});
-  assert.equal(result.status,501);assert.equal(called,false);
+  assert.equal(result.status,path==='/api/affiliates/admin/accounting/orders'?400:501);assert.equal(called,false);
  }
 });
 test('unconfigured authority never falls through',async()=> { assert.equal((await relayAffiliateRequest(req(),{env:{}})).status,503); });

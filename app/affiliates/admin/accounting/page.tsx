@@ -1,4 +1,6 @@
 "use client";
+
+import {accountingMutationFetch} from "@/lib/affiliates/accounting-mutation-fetch";
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -604,7 +606,7 @@ export default function AdminAccountingPage() {
     setNpError(null);
     setNpSuccess(null);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/products", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -824,7 +826,7 @@ export default function AdminAccountingPage() {
         : costInput;
     setPSaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/purchases", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/purchases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -855,7 +857,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this purchase entry? Inventory counts will update.")) return;
       setPurchases((prev) => prev.filter((p) => p.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/purchases/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/purchases/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -918,7 +920,7 @@ export default function AdminAccountingPage() {
     }
     setOSaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/orders", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -960,7 +962,7 @@ export default function AdminAccountingPage() {
   const markOrderArrived = useCallback(
     async (id: string) => {
       setOrderActionError(null);
-      const res = await fetch(`/api/affiliates/admin/accounting/orders/${id}`, {
+      const res = await accountingMutationFetch(`/api/affiliates/admin/accounting/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -998,7 +1000,7 @@ export default function AdminAccountingPage() {
       )
         return;
       setOrderActionError(null);
-      const res = await fetch(`/api/affiliates/admin/accounting/orders/${id}`, {
+      const res = await accountingMutationFetch(`/api/affiliates/admin/accounting/orders/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => null);
@@ -1032,7 +1034,7 @@ export default function AdminAccountingPage() {
     const delta = aDirection === "deduct" ? -units : units;
     setASaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/adjustments", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/adjustments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1060,7 +1062,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this adjustment? Stock counts will update.")) return;
       setAdjustments((prev) => prev.filter((a) => a.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/adjustments/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/adjustments/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -1090,7 +1092,7 @@ export default function AdminAccountingPage() {
     }
     setSSaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/sales", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/sales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1122,7 +1124,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this entry? Revenue and inventory will update.")) return;
       setSales((prev) => prev.filter((s) => s.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/sales/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/sales/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -1146,7 +1148,7 @@ export default function AdminAccountingPage() {
     }
     setESaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/expenses", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1177,7 +1179,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this expense?")) return;
       setExpenses((prev) => prev.filter((e) => e.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/expenses/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/expenses/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -1199,7 +1201,7 @@ export default function AdminAccountingPage() {
             : row
         )
       );
-      await fetch(`/api/affiliates/admin/accounting/items/${itemId}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/items/${itemId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

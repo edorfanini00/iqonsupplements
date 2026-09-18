@@ -7,6 +7,6 @@ test('accounting picker only maps GET with no query to additive read-only endpoi
  assert.equal(response.status,200);assert.equal(target,'https://health.test/api/integrations/body/accounting-products');
  for(const [method,query] of [['POST',''],['GET','?reconcile=1']]){
  let calls=0;const blocked=await relayAffiliateRequest(new Request('https://body.test/api/affiliates/admin/accounting/products'+query,{method,headers:{origin:'https://body.test'}}),{env,fetch:async()=>{calls++;return Response.json({});}});
- assert.equal(calls,0);assert.equal(blocked.status,501);
+ assert.equal(calls,0);assert.equal(blocked.status,method==='POST'?400:501);
  }
 });
