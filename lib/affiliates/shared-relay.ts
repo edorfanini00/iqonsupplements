@@ -27,10 +27,10 @@ export function affiliateCookieHeader(raw: string): string {
     return matches.length === 1 && /^[A-Za-z0-9_.%=-]+$/.test(matches[0].slice(name.length+1)) ? matches : [];
   }).join('; ');
 }
-async function boundedBody(request: Request): Promise<Uint8Array | undefined> {
+async function boundedBody(request: Request, maxBytes=MAX_BODY): Promise<Uint8Array | undefined> {
   if (!request.body) return undefined;
   const reader=request.body.getReader(); const chunks:Uint8Array[]=[]; let size=0;
-  for (;;) { const {done,value}=await reader.read(); if(done)break; size+=value.length; if(size>MAX_BODY){await reader.cancel();throw Error('body too large');} chunks.push(value); }
+  for (;;) { const {done,value}=await reader.read(); if(done)break; size+=value.length; if(size>maxBytes){await reader.cancel();throw Error('body too large');} chunks.push(value); }
   const bytes=new Uint8Array(size); let offset=0; for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;} return bytes;
 }
 /** Server-only fixed-origin BFF. Does not import any independent DB/auth code. */
@@ -44,7 +44,19 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const payoutId = /^\/api\/affiliates\/admin\/payouts\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
   const noteId = /^\/api\/affiliates\/admin\/notes\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
   const messageId = /^\/api\/affiliates\/admin\/messages\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
+  const replyId = /^\/api\/affiliates\/admin\/messages\/([A-Za-z0-9_-]{1,100})\/reply$/.exec(incoming.pathname)?.[1];
+  const threadId = /^\/api\/affiliates\/admin\/affiliate-messages\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
   const nativeTarget = incoming.search !== '' ? null
+    : incoming.pathname === '/api/affiliates/change-password' && method === 'POST' ? '/api/integrations/body/native/change-password'
+    : incoming.pathname === '/api/affiliates/forgot-password' && method === 'POST' ? '/api/integrations/body/native/forgot-password'
+    : incoming.pathname === '/api/affiliates/reset-password' && method === 'POST' ? '/api/integrations/body/native/reset-password'
+    : incoming.pathname === '/api/affiliates/contact' && method === 'POST' ? '/api/integrations/body/native/contact'
+    : incoming.pathname === '/api/affiliates/invite' && method === 'POST' ? '/api/integrations/body/native/invite'
+    : incoming.pathname === '/api/affiliates/creator-code' && method === 'POST' ? '/api/integrations/body/native/creator-code'
+    : incoming.pathname === '/api/affiliates/messages' && method === 'POST' ? '/api/integrations/body/native/messages'
+    : replyId && method === 'POST' ? '/api/integrations/body/native/contact-reply/'+replyId
+    : incoming.pathname === '/api/affiliates/admin/affiliate-messages/broadcast' && method === 'POST' ? '/api/integrations/body/native/broadcast'
+    : threadId && threadId !== 'broadcast' && method === 'POST' ? '/api/integrations/body/native/affiliate-messages/'+threadId
     : incoming.pathname === '/api/affiliates/bank' && method === 'PUT' ? '/api/integrations/body/native/bank'
     : incoming.pathname === '/api/affiliates/onboarding' && method === 'POST' ? '/api/integrations/body/native/onboarding'
     : incoming.pathname === '/api/affiliates/admin/notes' && method === 'POST' ? '/api/integrations/body/native/notes'
@@ -92,10 +104,15 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
   if(mutation) headers.set('content-type','application/json');
+  if(nativeTarget && request.headers.has('idempotency-key')) {
+    const key=request.headers.get('idempotency-key')!;
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))return fail(400);
+    headers.set('idempotency-key',key);
+  }
   // Origin is server generated after browser-origin validation, never blindly copied.
   headers.set('origin',config.portal);
   let body:Uint8Array | undefined;
-  try { body=mutation ? await boundedBody(request) : undefined; } catch {return fail(413);}
+  try { body=mutation ? await boundedBody(request,replyId && nativeTarget ? 4300000 : MAX_BODY) : undefined; } catch {return fail(413);}
   if (nativeTarget) {
     if (body?.byteLength && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
     if (!body?.byteLength) body=undefined;
@@ -109,7 +126,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     const path = nativeTarget ?? (commandWrite || commandRead ? incoming.pathname.replace('/api/affiliates/commands/', '/api/integrations/body/commands/') : incoming.pathname === '/api/affiliates/shared-session'
       ? '/api/integrations/body/session' : outstandingRead ? '/api/integrations/body/payouts/outstanding' : categoryRead ? '/api/integrations/body/category-revenue' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname);
     const target = new URL(path + incoming.search,config.health);
-    const upstream=await (options.fetch ?? fetch)(target,{method,headers,body:body as BodyInit | undefined,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(originalRead ? 90000 : commandWrite || commandRead ? 60000 : 15000)});
+    const upstream=await (options.fetch ?? fetch)(target,{method,headers,body:body as BodyInit | undefined,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(originalRead ? 90000 : commandWrite || commandRead || nativeTarget === '/api/integrations/body/native/broadcast' ? 60000 : 15000)});
     if(upstream.status>=300 && upstream.status<400) return fail(502);
     const out = new Headers({'cache-control':'no-store','content-type':upstream.headers.get('content-type') ?? 'application/json','x-content-type-options':'nosniff'});
     // Never reflect Domain, arbitrary cookies, CORS, Location or upstream headers.

@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -433,7 +434,7 @@ function MessageDrawer({
     setSending(true);
     setError(null);
     try {
-      const res = await fetch(
+      const res = await nativeMutationFetch(
         `/api/affiliates/admin/messages/${message.id}/reply`,
         {
           method: "POST",

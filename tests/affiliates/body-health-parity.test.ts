@@ -8,6 +8,11 @@ for(const [path,expected] of Object.entries(fixture.files)) {
   const file=new URL('../../'+path,import.meta.url);
   assert.ok(existsSync(file),`Missing restored source ${path}`);
   let source=readFileSync(file,'utf8');
+  const native=JSON.parse(readFileSync(new URL('./fixtures/native-account-reviewed-adaptation.json',import.meta.url),'utf8'))[path];
+  if(native)for(const hunk of native.hunks){
+    assert.equal(source.split(hunk.canonical).length,2,'Exact reviewed account action adaptation');
+    source=source.replace(hunk.canonical,hunk.original);
+  }
   if(path==='app/affiliates/admin/page.tsx'){
    const adaptation=JSON.parse(readFileSync(new URL('./fixtures/bulk-reviewed-adaptation.json',import.meta.url),'utf8'));
    for(const hunk of adaptation.hunks){

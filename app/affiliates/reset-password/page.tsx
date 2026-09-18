@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
@@ -34,7 +35,7 @@ function ResetPasswordForm() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/affiliates/reset-password", {
+      const res = await nativeMutationFetch("/api/affiliates/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),

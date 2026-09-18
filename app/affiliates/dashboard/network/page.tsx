@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -420,7 +421,7 @@ function InviteModal({
     setSubmitting(true);
     setResult(null);
     try {
-      const res = await fetch("/api/affiliates/invite", {
+      const res = await nativeMutationFetch("/api/affiliates/invite", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -4,7 +4,7 @@ import {relayAffiliateRequest} from '../../lib/affiliates/shared-relay';
 const env={NODE_ENV:'production',SHARED_AFFILIATE_HEALTH_ORIGIN:'https://health.test',SHARED_AFFILIATE_PORTAL_ORIGIN:'https://body.test',SHARED_AFFILIATE_RELAY_SECRET:'synthetic-relay-test-secret-32-characters'};
 test('unqualified writes never reach canonical finance or provider state',async()=>{
  // Onboarding/notes now use explicit local-state adapters; neighboring provider and finance actions stay denied.
- for(const [path,method] of [['admin/payouts','POST'],['admin/affiliates/a','PATCH'],['admin/app','POST'],['creator-code','POST'],['admin/rates','PUT'],['admin/notes/note1','DELETE']]){
+ for(const [path,method] of [['admin/payouts','POST'],['admin/affiliates/a','PATCH'],['admin/app','POST'],['creator-code?unexpected=1','POST'],['admin/rates','PUT'],['admin/notes/note1','DELETE']]){
   let calls=0;const result=await relayAffiliateRequest(new Request('https://body.test/api/affiliates/'+path,{method,headers:{origin:'https://body.test','content-type':'application/json'},body:'{}'}),{env,fetch:async()=>{calls++;return Response.json({ok:true});}});
   assert.equal(calls,0,path);assert.equal(result.status,501,path);
  }

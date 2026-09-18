@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useState } from "react";
 import { Lock, Save, Eye, EyeOff, ShieldCheck } from "lucide-react";
@@ -32,7 +33,7 @@ export default function AffiliateSettingsPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/affiliates/change-password", {
+      const res = await nativeMutationFetch("/api/affiliates/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

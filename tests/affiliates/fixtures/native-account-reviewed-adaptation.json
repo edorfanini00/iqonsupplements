@@ -1,0 +1,110 @@
+{
+  "app/affiliates/admin/affiliate-messages/page.tsx": {
+    "originalSha256": "569372a6d8cae7f65606653b2a6b68910e9f50561ce6f2c21ed971135f3e2310",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\"/api/affiliates/admin/affiliate-messages/broadcast\", {\n",
+        "canonical": "      const res = await nativeMutationFetch(\"/api/affiliates/admin/affiliate-messages/broadcast\", {\n"
+      },
+      {
+        "original": "      const res = await fetch(\n",
+        "canonical": "      const res = await nativeMutationFetch(\n"
+      }
+    ]
+  },
+  "app/affiliates/admin/messages/page.tsx": {
+    "originalSha256": "cd77a1e555a0cd2506e32b06f498c43ba9ba68cdc305613bf4678a80dbfc5f8f",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\n",
+        "canonical": "      const res = await nativeMutationFetch(\n"
+      }
+    ]
+  },
+  "app/affiliates/contact/page.tsx": {
+    "originalSha256": "0bdeab03f3bb66f9a342b7519e6ec7e1f023b775e54ec598c5bacf2ef069a7d6",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "export default function ContactAffiliateTeam(){const [status,setStatus]=useState('');const [busy,setBusy]=useState(false);return <main id=\"main\" className=\"max-w-xl mx-auto px-6 py-20\"><p className=\"eyebrow mb-4\">IQON PARTNERS</p><h1 className=\"text-4xl mb-5\">Let\u2019s stay connected.</h1><p className=\"text-slate-500 mb-8\">Questions about your application or affiliate program? Leave a message for the supplements team.</p><form className=\"space-y-5\" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;setBusy(true);setStatus('');try{const body=Object.fromEntries(new FormData(form));const r=await fetch('/api/affiliates/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error);setStatus('Message received. Our team will reply by email.');form.reset();}catch(err){setStatus(err instanceof Error?err.message:'Your message could not be sent.');}finally{setBusy(false);}}}><label className=\"block text-sm\">Name<input name=\"name\" required maxLength={120} className=\"block border rounded p-3 mt-2 w-full\" autoComplete=\"name\"/></label><label className=\"block text-sm\">Email<input name=\"email\" type=\"email\" required maxLength={254} className=\"block border rounded p-3 mt-2 w-full\" autoComplete=\"email\"/></label><label className=\"block text-sm\">Subject<input name=\"subject\" maxLength={160} className=\"block border rounded p-3 mt-2 w-full\"/></label><label className=\"block text-sm\">Message<textarea name=\"message\" required minLength={10} maxLength={5000} rows={5} className=\"block border rounded p-3 mt-2 w-full\"/></label><input name=\"companyWebsite\" className=\"hidden\" tabIndex={-1} autoComplete=\"off\" aria-hidden=\"true\"/><button className=\"button button-dark\" disabled={busy}>{busy?'Sending\u2026':'Send message'}</button>{status&&<p role=\"status\" className=\"text-sm text-slate-600\">{status}</p>}</form></main>;}\n",
+        "canonical": "export default function ContactAffiliateTeam(){const [status,setStatus]=useState('');const [busy,setBusy]=useState(false);return <main id=\"main\" className=\"max-w-xl mx-auto px-6 py-20\"><p className=\"eyebrow mb-4\">IQON PARTNERS</p><h1 className=\"text-4xl mb-5\">Let\u2019s stay connected.</h1><p className=\"text-slate-500 mb-8\">Questions about your application or affiliate program? Leave a message for the supplements team.</p><form className=\"space-y-5\" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;setBusy(true);setStatus('');try{const body=Object.fromEntries(new FormData(form));const r=await nativeMutationFetch('/api/affiliates/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw new Error(d.error);setStatus('Message received. Our team will reply by email.');form.reset();}catch(err){setStatus(err instanceof Error?err.message:'Your message could not be sent.');}finally{setBusy(false);}}}><label className=\"block text-sm\">Name<input name=\"name\" required maxLength={120} className=\"block border rounded p-3 mt-2 w-full\" autoComplete=\"name\"/></label><label className=\"block text-sm\">Email<input name=\"email\" type=\"email\" required maxLength={254} className=\"block border rounded p-3 mt-2 w-full\" autoComplete=\"email\"/></label><label className=\"block text-sm\">Subject<input name=\"subject\" maxLength={160} className=\"block border rounded p-3 mt-2 w-full\"/></label><label className=\"block text-sm\">Message<textarea name=\"message\" required minLength={10} maxLength={5000} rows={5} className=\"block border rounded p-3 mt-2 w-full\"/></label><input name=\"companyWebsite\" className=\"hidden\" tabIndex={-1} autoComplete=\"off\" aria-hidden=\"true\"/><button className=\"button button-dark\" disabled={busy}>{busy?'Sending\u2026':'Send message'}</button>{status&&<p role=\"status\" className=\"text-sm text-slate-600\">{status}</p>}</form></main>;}\n"
+      }
+    ]
+  },
+  "app/affiliates/dashboard/messages/page.tsx": {
+    "originalSha256": "24cd415683fa8ec160794b1092b0a28709f4d38e6fcfec27dbeb4d45d0c34e77",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\"/api/affiliates/messages\", {\n",
+        "canonical": "      const res = await nativeMutationFetch(\"/api/affiliates/messages\", {\n"
+      }
+    ]
+  },
+  "app/affiliates/dashboard/network/page.tsx": {
+    "originalSha256": "9fb2e27845ca8b5b291e3bc011e076c958ea2a76d9938a4260020e29e612dccb",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\"/api/affiliates/invite\", {\n",
+        "canonical": "      const res = await nativeMutationFetch(\"/api/affiliates/invite\", {\n"
+      }
+    ]
+  },
+  "app/affiliates/dashboard/settings/page.tsx": {
+    "originalSha256": "5b9b98468bf628b93e9bc98c40b4853c40f05f1e7e8328c54aa7817fabff3cd3",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\"/api/affiliates/change-password\", {\n",
+        "canonical": "      const res = await nativeMutationFetch(\"/api/affiliates/change-password\", {\n"
+      }
+    ]
+  },
+  "app/affiliates/forgot-password/page.tsx": {
+    "originalSha256": "d00d6fc632a8afcd45f8f933aca0c1e74b278c8e8153c8cb334d7e1d4ef30179",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\"/api/affiliates/forgot-password\", {\n",
+        "canonical": "      const res = await nativeMutationFetch(\"/api/affiliates/forgot-password\", {\n"
+      }
+    ]
+  },
+  "app/affiliates/reset-password/page.tsx": {
+    "originalSha256": "91a7d83dc79cbd18cab8db2728d5475e858ebca315dee387d0caf496bc4c3954",
+    "hunks": [
+      {
+        "original": "",
+        "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
+      },
+      {
+        "original": "      const res = await fetch(\"/api/affiliates/reset-password\", {\n",
+        "canonical": "      const res = await nativeMutationFetch(\"/api/affiliates/reset-password\", {\n"
+      }
+    ]
+  }
+}
