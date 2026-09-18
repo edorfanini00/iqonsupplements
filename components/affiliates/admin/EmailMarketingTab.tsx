@@ -1,4 +1,5 @@
 "use client";
+import {providerMutationFetch} from "@/lib/affiliates/provider-mutation-fetch";
 
 /**
  * Email marketing tab (admin Contact inbox).
@@ -191,7 +192,7 @@ export default function EmailMarketingTab() {
       const recipients = prospects
         .filter((p) => selected.has(p.email))
         .map((p) => ({ email: p.email, firstName: p.firstName }));
-      const res = await fetch("/api/affiliates/admin/marketing/campaigns", {
+      const res = await providerMutationFetch("/api/affiliates/admin/marketing/campaigns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -226,7 +227,7 @@ export default function EmailMarketingTab() {
       setBusyCampaign(id);
       setError(null);
       try {
-        const res = await fetch(
+        const res = await providerMutationFetch(
           `/api/affiliates/admin/marketing/campaigns/${id}/run`,
           { method: "POST", credentials: "include" }
         );
@@ -244,6 +245,8 @@ export default function EmailMarketingTab() {
             : "Nothing left to send."
         );
         await loadCampaigns();
+      } catch {
+        setError("Acknowledgement unavailable. Keep the operation unchanged and retry to check its receipt.");
       } finally {
         setBusyCampaign(null);
       }
@@ -255,13 +258,15 @@ export default function EmailMarketingTab() {
     async (id: string, status: "active" | "paused") => {
       setBusyCampaign(id);
       try {
-        await fetch(`/api/affiliates/admin/marketing/campaigns/${id}`, {
+        await providerMutationFetch(`/api/affiliates/admin/marketing/campaigns/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ status }),
         });
         await loadCampaigns();
+      } catch {
+        setError("Acknowledgement unavailable. Keep the operation unchanged and retry to check its receipt.");
       } finally {
         setBusyCampaign(null);
       }
@@ -280,11 +285,13 @@ export default function EmailMarketingTab() {
       }
       setBusyCampaign(id);
       try {
-        await fetch(`/api/affiliates/admin/marketing/campaigns/${id}`, {
+        await providerMutationFetch(`/api/affiliates/admin/marketing/campaigns/${id}`, {
           method: "DELETE",
           credentials: "include",
         });
         await loadCampaigns();
+      } catch {
+        setError("Acknowledgement unavailable. Keep the operation unchanged and retry to check its receipt.");
       } finally {
         setBusyCampaign(null);
       }

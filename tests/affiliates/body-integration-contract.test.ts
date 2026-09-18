@@ -8,13 +8,13 @@ test('SSR compatibility request targets only additive Body session namespace',as
  assert.equal(target,env.SHARED_AFFILIATE_HEALTH_ORIGIN+'/api/integrations/body/session');
  assert.equal(result.status,401);
 });
-test('audited marketing reads preserve complete Customers tab without permitting sends',async()=>{
+test('audited marketing reads preserve complete Customers tab without permitting unkeyed sends',async()=>{
  for(const path of ['/api/affiliates/admin/marketing/audience','/api/affiliates/admin/marketing/campaigns','/api/affiliates/admin/marketing/campaigns/campaign_1']){
   let called=false;
   const read=await relayAffiliateRequest(new Request(env.SHARED_AFFILIATE_PORTAL_ORIGIN+path),{env,fetch:async()=>{called=true;return Response.json({ok:true});}});
   assert.equal(read.status,200);assert.equal(called,true);
   const write=await relayAffiliateRequest(new Request(env.SHARED_AFFILIATE_PORTAL_ORIGIN+path,{method:'POST',headers:{origin:env.SHARED_AFFILIATE_PORTAL_ORIGIN}}),{env,fetch:async()=>{throw Error('must not send');}});
-  assert.equal(write.status,501);
+  assert.equal(write.status,path==='/api/affiliates/admin/marketing/campaigns'?400:501);
  }
 });
 test('shop-manager read uses canonical full source rather than nonexistent local data',async()=>{

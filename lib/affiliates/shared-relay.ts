@@ -1,3 +1,4 @@
+import {nativeProviderTarget} from './native-provider-target';
 import { SHARED_ROUTES, ORIGINAL_READ_ROUTES } from './shared-route-allowlist';
 
 type Env = Record<string, string | undefined>;
@@ -51,7 +52,9 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     || method === 'DELETE' && /^\/api\/affiliates\/admin\/accounting\/(adjustments|expenses|purchases|sales|orders)\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)
     || method === 'PATCH' && /^\/api\/affiliates\/admin\/accounting\/(items|orders)\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)
   );
+  const providerTarget=incoming.search===''?nativeProviderTarget(incoming.pathname,method):null;
   const nativeTarget = incoming.search !== '' ? null
+    : providerTarget ? providerTarget
     : accounting ? incoming.pathname.replace('/api/affiliates/admin/accounting/','/api/integrations/body/native/accounting/')
     : incoming.pathname === '/api/affiliates/change-password' && method === 'POST' ? '/api/integrations/body/native/change-password'
     : incoming.pathname === '/api/affiliates/forgot-password' && method === 'POST' ? '/api/integrations/body/native/forgot-password'
@@ -82,7 +85,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     && incoming.searchParams.size === 1 && !!incoming.searchParams.get('affiliateId')?.trim();
   const originalRead = categoryRead || accountingPicker || (method === 'GET' && ORIGINAL_READ_ROUTES.some(pattern => pattern.test(incoming.pathname))
     && !(incoming.pathname.startsWith('/api/affiliates/orders/') && incoming.search !== ''));
-  if (!accounting && !originalRead && /^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
+  if (!providerTarget && !accounting && !originalRead && /^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
     return Response.json({ok:false,error:'Source-aware commerce operation is unavailable in this portal'}, {status:501,headers:{'cache-control':'no-store'}});
   }
   if (!nativeTarget && !outstandingRead && !originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
@@ -110,7 +113,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
   if(mutation) headers.set('content-type','application/json');
-  if(accounting && !request.headers.has('idempotency-key')) return fail(400);
+  if((accounting || providerTarget) && !request.headers.has('idempotency-key')) return fail(400);
   if(nativeTarget && request.headers.has('idempotency-key')) {
     const key=request.headers.get('idempotency-key')!;
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))return fail(400);

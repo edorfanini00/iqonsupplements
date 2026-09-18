@@ -1,4 +1,5 @@
 "use client";
+import {providerMutationFetch} from "@/lib/affiliates/provider-mutation-fetch";
 import {BulkCouponControl} from "@/components/affiliates/shared/BulkCouponControl";
 // BODY CATEGORY ADDITION
 import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
@@ -129,7 +130,7 @@ export default function AdminOverviewPage() {
     setTestingEmail(true);
     setEmailMessage(null);
     try {
-      const res = await fetch("/api/affiliates/admin/test-email", {
+      const res = await providerMutationFetch("/api/affiliates/admin/test-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
