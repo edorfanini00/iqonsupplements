@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 // BODY COMMAND ADAPTER
 import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
@@ -439,7 +440,7 @@ function AffiliateDetailDrawer({
     if (!window.confirm("Delete this affiliate? This cannot be undone.")) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/affiliates/admin/affiliates/${affiliate.id}`, {
+      const res = await nonproviderMutationFetch(`/api/affiliates/admin/affiliates/${affiliate.id}`, {
         method: "DELETE",
         credentials: "include",
       });

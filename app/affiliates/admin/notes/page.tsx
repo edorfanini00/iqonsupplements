@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -128,7 +129,7 @@ export default function AdminNotesPage() {
     if (!window.confirm("Delete this note permanently?")) return;
     setNotes((prev) => prev.filter((n) => n.id !== id));
     if (editingId === id) setEditingId(null);
-    await fetch(`/api/affiliates/admin/notes/${id}`, {
+    await nonproviderMutationFetch(`/api/affiliates/admin/notes/${id}`, {
       method: "DELETE",
       credentials: "include",
     }).catch(() => {});

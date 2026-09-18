@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Trophy, RefreshCw, Pencil, Check, X, Loader2 } from "lucide-react";
@@ -106,7 +107,7 @@ export default function AdminRankingsPage() {
     setPrizeSaving(true);
     setPrizeError(null);
     try {
-      const res = await fetch("/api/affiliates/admin/rankings", {
+      const res = await nonproviderMutationFetch("/api/affiliates/admin/rankings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

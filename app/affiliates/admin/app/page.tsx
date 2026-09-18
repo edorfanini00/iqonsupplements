@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -154,7 +155,7 @@ export default function AdminAppPage() {
     }
     setSavingRate(true);
     try {
-      const res = await fetch("/api/affiliates/admin/app", {
+      const res = await nonproviderMutationFetch("/api/affiliates/admin/app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -182,7 +183,7 @@ export default function AdminAppPage() {
       }
       setRecording(true);
       try {
-        const res = await fetch("/api/affiliates/admin/app", {
+        const res = await nonproviderMutationFetch("/api/affiliates/admin/app", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

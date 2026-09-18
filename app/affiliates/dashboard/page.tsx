@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 // BODY CATEGORY ADDITION
 import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
@@ -825,7 +826,7 @@ function TikTokBonusCard() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/affiliates/tiktok", {
+      const res = await nonproviderMutationFetch("/api/affiliates/tiktok", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

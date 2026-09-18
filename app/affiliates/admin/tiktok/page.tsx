@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 /**
@@ -109,7 +110,7 @@ export default function AdminTikTokPage() {
       }
       setDeleting(id);
       try {
-        const res = await fetch(`/api/affiliates/admin/tiktok/${id}`, {
+        const res = await nonproviderMutationFetch(`/api/affiliates/admin/tiktok/${id}`, {
           method: "DELETE",
           credentials: "include",
         });
@@ -136,7 +137,7 @@ export default function AdminTikTokPage() {
     setLadderSaving(true);
     setLadderError(null);
     try {
-      const res = await fetch("/api/affiliates/admin/tiktok", {
+      const res = await nonproviderMutationFetch("/api/affiliates/admin/tiktok", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

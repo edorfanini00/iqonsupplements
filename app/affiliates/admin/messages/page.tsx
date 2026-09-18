@@ -1,4 +1,5 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
@@ -137,7 +138,7 @@ export default function AdminMessagesPage() {
     if (!window.confirm("Delete this message permanently?")) return;
     setMessages((prev) => prev.filter((m) => m.id !== id));
     setActive((cur) => (cur && cur.id === id ? null : cur));
-    await fetch(`/api/affiliates/admin/messages/${id}`, {
+    await nonproviderMutationFetch(`/api/affiliates/admin/messages/${id}`, {
       method: "DELETE",
       credentials: "include",
     }).catch(() => {});

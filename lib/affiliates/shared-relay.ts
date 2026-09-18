@@ -1,4 +1,5 @@
 import {nativeProviderTarget} from './native-provider-target';
+import { nonproviderTarget } from './nonprovider-target';
 import { SHARED_ROUTES, ORIGINAL_READ_ROUTES } from './shared-route-allowlist';
 
 type Env = Record<string, string | undefined>;
@@ -53,8 +54,10 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     || method === 'PATCH' && /^\/api\/affiliates\/admin\/accounting\/(items|orders)\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)
   );
   const providerTarget=incoming.search===''?nativeProviderTarget(incoming.pathname,method):null;
+  const nonprovider = incoming.search === '' ? nonproviderTarget(incoming.pathname,method) : null;
   const nativeTarget = incoming.search !== '' ? null
     : providerTarget ? providerTarget
+    : nonprovider ? nonprovider
     : accounting ? incoming.pathname.replace('/api/affiliates/admin/accounting/','/api/integrations/body/native/accounting/')
     : incoming.pathname === '/api/affiliates/change-password' && method === 'POST' ? '/api/integrations/body/native/change-password'
     : incoming.pathname === '/api/affiliates/forgot-password' && method === 'POST' ? '/api/integrations/body/native/forgot-password'
@@ -113,7 +116,11 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
   if(mutation) headers.set('content-type','application/json');
+<<<<<<< HEAD
   if((accounting || providerTarget) && !request.headers.has('idempotency-key')) return fail(400);
+=======
+  if((accounting || nonprovider) && !request.headers.has('idempotency-key')) return fail(400);
+>>>>>>> 881a7a0 (Relay nine exact nonprovider methods with durable form receipts)
   if(nativeTarget && request.headers.has('idempotency-key')) {
     const key=request.headers.get('idempotency-key')!;
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))return fail(400);
