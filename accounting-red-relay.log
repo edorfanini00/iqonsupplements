@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: exact thirteen accounting methods route to fixed native authority and carry receipt key
+not ok 1 - exact thirteen accounting methods route to fixed native authority and carry receipt key
+  ---
+  duration_ms: 23.150292
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:1:782'
+  failureType: 'testCodeFailure'
+  error: |-
+    POST adjustments
+    
+    501 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 501
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:14:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: accounting neighboring methods, source queries and forged origin remain fail closed
+ok 2 - accounting neighboring methods, source queries and forged origin remain fail closed
+  ---
+  duration_ms: 1.779375
+  type: 'test'
+  ...
+# Subtest: all thirteen original accounting form mutations retain a durable operation UUID
+not ok 3 - all thirteen original accounting form mutations retain a durable operation UUID
+  ---
+  duration_ms: 1.327709
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:1:2413'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 13
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 13
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:25:9)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 1
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 437.997334

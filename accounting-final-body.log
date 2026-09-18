@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: accounting picker only maps GET with no query to additive read-only endpoint
+ok 1 - accounting picker only maps GET with no query to additive read-only endpoint
+  ---
+  duration_ms: 21.411792
+  type: 'test'
+  ...
+# Subtest: exact native account/contact/thread actions preserve the operation key and never retry transport
+ok 2 - exact native account/contact/thread actions preserve the operation key and never retry transport
+  ---
+  duration_ms: 24.951584
+  type: 'test'
+  ...
+# Subtest: client retains only a UUID across response loss/reload; never passwords or automatic retries
+ok 3 - client retains only a UUID across response loss/reload; never passwords or automatic retries
+  ---
+  duration_ms: 1.759084
+  type: 'test'
+  ...
+# Subtest: unreadable or negative success responses keep the operation key for safe recovery
+ok 4 - unreadable or negative success responses keep the operation key for safe recovery
+  ---
+  duration_ms: 1.185541
+  type: 'test'
+  ...
+# Subtest: generic forgot-password acknowledgement retains its key; never assumes mail delivery
+ok 5 - generic forgot-password acknowledgement retains its key; never assumes mail delivery
+  ---
+  duration_ms: 0.310959
+  type: 'test'
+  ...
+# Subtest: exact thirteen accounting methods route to fixed native authority and carry receipt key
+ok 6 - exact thirteen accounting methods route to fixed native authority and carry receipt key
+  ---
+  duration_ms: 17.959708
+  type: 'test'
+  ...
+# Subtest: accounting neighboring methods, source queries and forged origin remain fail closed
+ok 7 - accounting neighboring methods, source queries and forged origin remain fail closed
+  ---
+  duration_ms: 1.999042
+  type: 'test'
+  ...
+# Subtest: all thirteen original accounting form mutations retain a durable operation UUID
+ok 8 - all thirteen original accounting form mutations retain a durable operation UUID
+  ---
+  duration_ms: 1.656917
+  type: 'test'
+  ...
+# Subtest: accounting form response loss retains UUID and does not report unreadable success
+ok 9 - accounting form response loss retains UUID and does not report unreadable success
+  ---
+  duration_ms: 2.767917
+  type: 'test'
+  ...
+# Subtest: accounting without a UUID never dispatches a financial operation
+ok 10 - accounting without a UUID never dispatches a financial operation
+  ---
+  duration_ms: 0.156125
+  type: 'test'
+  ...
+# Subtest: bank PUT uses its dedicated fixed canonical adapter without an independent DB
+ok 11 - bank PUT uses its dedicated fixed canonical adapter without an independent DB
+  ---
+  duration_ms: 16.279666
+  type: 'test'
+  ...
+# Subtest: onboarding and notes route only their exact mounted methods
+ok 12 - onboarding and notes route only their exact mounted methods
+  ---
+  duration_ms: 2.156125
+  type: 'test'
+  ...
+# Subtest: payout reversal relays the original bodyless DELETE including a Next empty stream
+ok 13 - payout reversal relays the original bodyless DELETE including a Next empty stream
+  ---
+  duration_ms: 0.948542
+  type: 'test'
+  ...
+# Subtest: native bank rejects forged Origin, queries and neighboring method escalation without dispatch
+ok 14 - native bank rejects forged Origin, queries and neighboring method escalation without dispatch
+  ---
+  duration_ms: 2.595625
+  type: 'test'
+  ...
+# Subtest: legacy financial write paths stay unavailable even with an idempotency header
+ok 15 - legacy financial write paths stay unavailable even with an idempotency header
+  ---
+  duration_ms: 21.1625
+  type: 'test'
+  ...
+# Subtest: bodyless logout uses authority and non-JSON body is rejected
+ok 16 - bodyless logout uses authority and non-JSON body is rejected
+  ---
+  duration_ms: 0.968375
+  type: 'test'
+  ...
+# Subtest: Shopify-shaped IDs cannot trigger Health provider operations
+ok 17 - Shopify-shaped IDs cannot trigger Health provider operations
+  ---
+  duration_ms: 2.0655
+  type: 'test'
+  ...
+# Subtest: unconfigured authority never falls through
+ok 18 - unconfigured authority never falls through
+  ---
+  duration_ms: 0.152458
+  type: 'test'
+  ...
+# Subtest: only named auth cookies and trusted portal credential go to fixed authority
+ok 19 - only named auth cookies and trusted portal credential go to fixed authority
+  ---
+  duration_ms: 1.028375
+  type: 'test'
+  ...
+# Subtest: CSRF null absent foreign origins and non-JSON mutations rejected
+ok 20 - CSRF null absent foreign origins and non-JSON mutations rejected
+  ---
+  duration_ms: 0.556708
+  type: 'test'
+  ...
+# Subtest: unknown targets ingestion jobs and method escalation denied
+ok 21 - unknown targets ingestion jobs and method escalation denied
+  ---
+  duration_ms: 0.684916
+  type: 'test'
+  ...
+# Subtest: unsafe authority and transport failures fail closed
+ok 22 - unsafe authority and transport failures fail closed
+  ---
+  duration_ms: 0.55325
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 212.808208

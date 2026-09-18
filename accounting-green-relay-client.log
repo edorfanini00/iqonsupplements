@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: exact thirteen accounting methods route to fixed native authority and carry receipt key
+ok 1 - exact thirteen accounting methods route to fixed native authority and carry receipt key
+  ---
+  duration_ms: 32.037959
+  type: 'test'
+  ...
+# Subtest: accounting neighboring methods, source queries and forged origin remain fail closed
+ok 2 - accounting neighboring methods, source queries and forged origin remain fail closed
+  ---
+  duration_ms: 0.573958
+  type: 'test'
+  ...
+# Subtest: all thirteen original accounting form mutations retain a durable operation UUID
+ok 3 - all thirteen original accounting form mutations retain a durable operation UUID
+  ---
+  duration_ms: 0.447
+  type: 'test'
+  ...
+# Subtest: accounting form response loss retains UUID and does not report unreadable success
+ok 4 - accounting form response loss retains UUID and does not report unreadable success
+  ---
+  duration_ms: 114.224708
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 298.788833

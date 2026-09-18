@@ -1,0 +1,56 @@
+TAP version 13
+# Subtest: exact thirteen accounting methods route to fixed native authority and carry receipt key
+ok 1 - exact thirteen accounting methods route to fixed native authority and carry receipt key
+  ---
+  duration_ms: 35.437667
+  type: 'test'
+  ...
+# Subtest: accounting neighboring methods, source queries and forged origin remain fail closed
+ok 2 - accounting neighboring methods, source queries and forged origin remain fail closed
+  ---
+  duration_ms: 0.359042
+  type: 'test'
+  ...
+# Subtest: all thirteen original accounting form mutations retain a durable operation UUID
+ok 3 - all thirteen original accounting form mutations retain a durable operation UUID
+  ---
+  duration_ms: 1.590833
+  type: 'test'
+  ...
+# Subtest: accounting form response loss retains UUID and does not report unreadable success
+ok 4 - accounting form response loss retains UUID and does not report unreadable success
+  ---
+  duration_ms: 2.57775
+  type: 'test'
+  ...
+# Subtest: accounting without a UUID never dispatches a financial operation
+not ok 5 - accounting without a UUID never dispatches a financial operation
+  ---
+  duration_ms: 1.169917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:1:3844'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    200 !== 400
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 400
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:39:9)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 4
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 578.939
