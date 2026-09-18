@@ -40,6 +40,17 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   try {config=sharedRelayConfig(env);} catch {return fail(503);}
   const incoming = new URL(request.url);
   const method = request.method.toUpperCase();
+  // Individually mounted adapters; no prefix or arbitrary dispatch.
+  const payoutId = /^\/api\/affiliates\/admin\/payouts\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
+  const noteId = /^\/api\/affiliates\/admin\/notes\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
+  const messageId = /^\/api\/affiliates\/admin\/messages\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1];
+  const nativeTarget = incoming.search !== '' ? null
+    : incoming.pathname === '/api/affiliates/bank' && method === 'PUT' ? '/api/integrations/body/native/bank'
+    : incoming.pathname === '/api/affiliates/onboarding' && method === 'POST' ? '/api/integrations/body/native/onboarding'
+    : incoming.pathname === '/api/affiliates/admin/notes' && method === 'POST' ? '/api/integrations/body/native/notes'
+    : noteId && method === 'PATCH' ? '/api/integrations/body/native/notes/'+noteId
+    : messageId && method === 'PATCH' ? '/api/integrations/body/native/message-status/'+messageId
+    : payoutId && method === 'DELETE' ? '/api/integrations/body/native/payout-reversal/'+payoutId : null;
   const command = /^\/api\/affiliates\/commands\/(signup|affiliate-approval|commission-settings|payout-record|creator-code-sync|admin-create)(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
   const bulk = /^\/api\/affiliates\/commands\/creator-code-bulk(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
   const commandWrite = ((!!command && !command[2]) || !!bulk) && method === 'POST' && incoming.search === '';
@@ -56,11 +67,11 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   if (!originalRead && /^\/api\/affiliates\/(?:admin\/(?:orders|subscriptions|accounting|customers|marketing)|orders|shop-manager)(?:\/|$)/.test(incoming.pathname)) {
     return Response.json({ok:false,error:'Source-aware commerce operation is unavailable in this portal'}, {status:501,headers:{'cache-control':'no-store'}});
   }
-  if (!outstandingRead && !originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
+  if (!nativeTarget && !outstandingRead && !originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
   const mutation=!['GET','HEAD'].includes(method);
-  // Auth is the only qualified write contract. No generic financial dispatch;
-  // other features remain explicit release gaps until canonical receipts exist.
-  if (mutation && !commandWrite && !['/api/affiliates/login','/api/affiliates/logout'].includes(incoming.pathname)) {
+  // Auth, named canonical commands and individually qualified local-state
+  // adapters only. No generic financial or provider dispatch.
+  if (mutation && !nativeTarget && !commandWrite && !['/api/affiliates/login','/api/affiliates/logout'].includes(incoming.pathname)) {
     return Response.json({ok:false,error:'This action is unavailable until its dedicated canonical command is qualified'}, {status:501,headers:{'cache-control':'no-store'}});
   }
   const readMarker = method === 'GET' && (incoming.pathname === '/api/affiliates/messages' || /^\/api\/affiliates\/admin\/affiliate-messages\/[A-Za-z0-9_-]+$/.test(incoming.pathname));
@@ -77,7 +88,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   }
   if (incoming.origin !== config.portal && incoming.origin !== previewOrigin) return fail(403);
   if (mutation && request.headers.get('origin') !== incoming.origin) return fail(403);
-  if (mutation && !bulk?.[1] && request.body && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
+  if (mutation && !nativeTarget && !bulk?.[1] && request.body && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
   if(mutation) headers.set('content-type','application/json');
@@ -85,14 +96,18 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   headers.set('origin',config.portal);
   let body:Uint8Array | undefined;
   try { body=mutation ? await boundedBody(request) : undefined; } catch {return fail(413);}
+  if (nativeTarget) {
+    if (body?.byteLength && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
+    if (!body?.byteLength) body=undefined;
+  }
   if (bulk?.[1] && mutation) {
     if (body?.byteLength) return fail(400);
     body=undefined; // Next represents bodyless POST as an empty stream.
   }
   try {
     // Compatibility path is local-only; canonical session lives in the additive integration namespace.
-    const path = commandWrite || commandRead ? incoming.pathname.replace('/api/affiliates/commands/', '/api/integrations/body/commands/') : incoming.pathname === '/api/affiliates/shared-session'
-      ? '/api/integrations/body/session' : outstandingRead ? '/api/integrations/body/payouts/outstanding' : categoryRead ? '/api/integrations/body/category-revenue' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname;
+    const path = nativeTarget ?? (commandWrite || commandRead ? incoming.pathname.replace('/api/affiliates/commands/', '/api/integrations/body/commands/') : incoming.pathname === '/api/affiliates/shared-session'
+      ? '/api/integrations/body/session' : outstandingRead ? '/api/integrations/body/payouts/outstanding' : categoryRead ? '/api/integrations/body/category-revenue' : accountingPicker ? '/api/integrations/body/accounting-products' : incoming.pathname);
     const target = new URL(path + incoming.search,config.health);
     const upstream=await (options.fetch ?? fetch)(target,{method,headers,body:body as BodyInit | undefined,cache:'no-store',redirect:'error',signal:AbortSignal.timeout(originalRead ? 90000 : commandWrite || commandRead ? 60000 : 15000)});
     if(upstream.status>=300 && upstream.status<400) return fail(502);

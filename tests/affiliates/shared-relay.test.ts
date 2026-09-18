@@ -4,7 +4,7 @@ import { relayAffiliateRequest } from '../../lib/affiliates/shared-relay';
 const env = { SHARED_AFFILIATE_HEALTH_ORIGIN:'https://health.example.test', SHARED_AFFILIATE_PORTAL_ORIGIN:'https://supplements.example.test', SHARED_AFFILIATE_RELAY_SECRET:'a'.repeat(40), NODE_ENV:'production' };
 const req = (path='/api/affiliates/login', origin: string | null=env.SHARED_AFFILIATE_PORTAL_ORIGIN) => new Request(env.SHARED_AFFILIATE_PORTAL_ORIGIN+path,{method:'POST',headers:{...(origin?{origin}:{}),'content-type':'application/json',cookie:'cart=private; iqon_affiliate_wp_jwt=token; iqon_affiliate_portal_snapshot=snapshot',authorization:'Bearer forged','x-iqon-portal':'forged'},body:'{"email":"user@example.test","password":"fixture"}'});
 test('legacy financial write paths stay unavailable even with an idempotency header',async()=> {
- for(const [path,method] of [['admin/payouts','POST'],['admin/payouts/payout_1','DELETE'],['admin/app','POST']]) {
+ for(const [path,method] of [['admin/payouts','POST'],['admin/commissions/commission_1','DELETE'],['admin/app','POST']]) {
   for(const key of ['valid-key','','k'.repeat(201)]) {
    const request=new Request(env.SHARED_AFFILIATE_PORTAL_ORIGIN+'/api/affiliates/'+path,{method,headers:{origin:env.SHARED_AFFILIATE_PORTAL_ORIGIN,'content-type':'application/json','idempotency-key':key},body:'{}'});
    let called=false;
