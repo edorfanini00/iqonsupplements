@@ -41,8 +41,10 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const incoming = new URL(request.url);
   const method = request.method.toUpperCase();
   const command = /^\/api\/affiliates\/commands\/(signup|affiliate-approval|commission-settings|payout-record|creator-code-sync|admin-create)(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
-  const commandWrite = !!command && !command[2] && method === 'POST' && incoming.search === '';
-  const commandRead = (!!command?.[2] || /^\/api\/affiliates\/commands\/state\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)) && method === 'GET' && incoming.search === '';
+  const bulk = /^\/api\/affiliates\/commands\/creator-code-bulk(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
+  if (bulk?.[1] && method === 'POST' && request.body) return fail(400);
+  const commandWrite = ((!!command && !command[2]) || !!bulk) && method === 'POST' && incoming.search === '';
+  const commandRead = (!!bulk?.[1] || !!command?.[2] || /^\/api\/affiliates\/commands\/state\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)) && method === 'GET' && incoming.search === '';
   // Restore narrowly audited original reads, retaining canonical role/identity checks.
   // Detail refresh is a write to a Woo snapshot despite using GET; never relay it.
   const accountingPicker = method === 'GET' && incoming.pathname === '/api/affiliates/admin/accounting/products' && incoming.search === '';

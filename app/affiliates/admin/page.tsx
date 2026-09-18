@@ -1,4 +1,5 @@
 "use client";
+import {BulkCouponControl} from "@/components/affiliates/shared/BulkCouponControl";
 // BODY CATEGORY ADDITION
 import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
 
@@ -117,8 +118,6 @@ export default function AdminOverviewPage() {
   const calendarDay = useCalendarDay();
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
-  const [couponSyncing, setCouponSyncing] = useState(false);
-  const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [testingEmail, setTestingEmail] = useState(false);
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
 
@@ -157,30 +156,6 @@ export default function AdminOverviewPage() {
       setEmailMessage("Test email request failed.");
     } finally {
       setTestingEmail(false);
-    }
-  }
-
-  async function handleCouponSync() {
-    setCouponSyncing(true);
-    setCouponMessage(null);
-    try {
-      const res = await fetch("/api/affiliates/admin/coupon-sync", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setCouponMessage(data.error || "Coupon sync failed");
-      } else {
-        const created = (data.results ?? []).filter(
-          (r: { status: string }) => r.status === "created" || r.status === "updated"
-        ).length;
-        const ok = (data.results ?? []).filter((r: { status: string }) => r.status === "ok").length;
-        setCouponMessage(`Coupons verified: ${ok} ok, ${created} created/updated.`);
-      }
-      setTimeout(() => setCouponMessage(null), 6000);
-    } finally {
-      setCouponSyncing(false);
     }
   }
 
@@ -348,15 +323,7 @@ export default function AdminOverviewPage() {
         actions={
           <>
             <RangePicker value={preset} onChange={setPreset} />
-            <button
-              onClick={handleCouponSync}
-              disabled={couponSyncing}
-              className="inline-flex items-center gap-2 glass-surface rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#20282c] hover:bg-white/80 transition-colors disabled:opacity-60"
-              title="Verify affiliate promo codes exist as WooCommerce coupons"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${couponSyncing ? "animate-spin" : ""}`} />
-              {couponSyncing ? "Verifying…" : "Sync Coupons"}
-            </button>
+            <BulkCouponControl />
             <button
               onClick={handleSync}
               disabled={syncing}
@@ -397,13 +364,6 @@ export default function AdminOverviewPage() {
         <div className="mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c] flex items-start gap-2">
           <Mail className="h-3.5 w-3.5 text-[#64717a] mt-0.5 shrink-0" />
           <span>{emailMessage}</span>
-        </div>
-      )}
-
-      {couponMessage && (
-        <div className="mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c] flex items-center gap-2">
-          <RefreshCw className="h-3.5 w-3.5 text-[#64717a]" />
-          {couponMessage}
         </div>
       )}
 

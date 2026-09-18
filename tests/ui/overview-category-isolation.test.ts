@@ -23,7 +23,7 @@ it("only commits the latest month when requests finish out of order and Shopify 
   const fetcher = vi.fn().mockResolvedValueOnce(response("30d",100))
     .mockImplementationOnce(() => new Promise<Response>(resolve => { finishSeptember = resolve; }))
     .mockResolvedValueOnce(response("m:2026-08",800));
-  vi.stubGlobal("fetch", (url:string,...args:unknown[])=>url.includes("category-revenue")?Promise.resolve(new Response("{}",{status:503})):fetcher(url,...args));
+  vi.stubGlobal("fetch", (url:string,...args:unknown[])=>url.includes("shared-session")?Promise.resolve(Response.json({}, {status:401})):url.includes("category-revenue")?Promise.resolve(new Response("{}",{status:503})):fetcher(url,...args));
   render(React.createElement(Overview));
   await screen.findByText("$105.00");
   month("September 2026"); month("August 2026");
@@ -58,7 +58,7 @@ it("keeps successful category data independent when original Overview fails and 
 
 it("does not relabel successful September totals as August after a rejected request", async () => {
   const fetcher = vi.fn().mockResolvedValueOnce(response("30d",100)).mockResolvedValueOnce(response("m:2026-09",900)).mockResolvedValueOnce(new Response('{}',{status:401}));
-  vi.stubGlobal("fetch", (url:string,...args:unknown[])=>url.includes("category-revenue")?Promise.resolve(new Response("{}",{status:503})):fetcher(url,...args));
+  vi.stubGlobal("fetch", (url:string,...args:unknown[])=>url.includes("shared-session")?Promise.resolve(Response.json({}, {status:401})):url.includes("category-revenue")?Promise.resolve(new Response("{}",{status:503})):fetcher(url,...args));
   render(React.createElement(Overview));
   await screen.findByText("$105.00");
   month("September 2026"); await screen.findByText("$905.00");
