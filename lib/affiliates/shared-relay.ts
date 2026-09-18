@@ -42,7 +42,6 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const method = request.method.toUpperCase();
   const command = /^\/api\/affiliates\/commands\/(signup|affiliate-approval|commission-settings|payout-record|creator-code-sync|admin-create)(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
   const bulk = /^\/api\/affiliates\/commands\/creator-code-bulk(?:\/([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}))?$/.exec(incoming.pathname);
-  if (bulk?.[1] && method === 'POST' && request.body) return fail(400);
   const commandWrite = ((!!command && !command[2]) || !!bulk) && method === 'POST' && incoming.search === '';
   const commandRead = (!!bulk?.[1] || !!command?.[2] || /^\/api\/affiliates\/commands\/state\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)) && method === 'GET' && incoming.search === '';
   // Restore narrowly audited original reads, retaining canonical role/identity checks.
@@ -78,7 +77,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   }
   if (incoming.origin !== config.portal && incoming.origin !== previewOrigin) return fail(403);
   if (mutation && request.headers.get('origin') !== incoming.origin) return fail(403);
-  if (mutation && request.body && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
+  if (mutation && !bulk?.[1] && request.body && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
   if(mutation) headers.set('content-type','application/json');
@@ -86,6 +85,10 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   headers.set('origin',config.portal);
   let body:Uint8Array | undefined;
   try { body=mutation ? await boundedBody(request) : undefined; } catch {return fail(413);}
+  if (bulk?.[1] && mutation) {
+    if (body?.byteLength) return fail(400);
+    body=undefined; // Next represents bodyless POST as an empty stream.
+  }
   try {
     // Compatibility path is local-only; canonical session lives in the additive integration namespace.
     const path = commandWrite || commandRead ? incoming.pathname.replace('/api/affiliates/commands/', '/api/integrations/body/commands/') : incoming.pathname === '/api/affiliates/shared-session'

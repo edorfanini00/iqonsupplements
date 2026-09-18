@@ -16,3 +16,7 @@ test('bulk rejects query, resume body, invalid id, foreign origin and scheduler'
   assert.ok(res.status>=400);assert.equal(called,false);
  }
 });
+test('Next bodyless POST represented as an empty stream is a valid resume',async()=>{
+ let sent:unknown='unset';const request=new Request(`https://body.test/api/affiliates/commands/creator-code-bulk/${id}`,{method:'POST',headers:{origin:'https://body.test'},body:new ReadableStream({start(c){c.close();}}),duplex:'half'} as RequestInit);
+ const res=await relayAffiliateRequest(request,{env,fetch:async(_url,init)=>{sent=init?.body;return Response.json({},{status:202});}});assert.equal(res.status,202);assert.equal(sent,undefined);
+});
