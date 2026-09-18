@@ -116,11 +116,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
   if(mutation) headers.set('content-type','application/json');
-<<<<<<< HEAD
-  if((accounting || providerTarget) && !request.headers.has('idempotency-key')) return fail(400);
-=======
-  if((accounting || nonprovider) && !request.headers.has('idempotency-key')) return fail(400);
->>>>>>> 881a7a0 (Relay nine exact nonprovider methods with durable form receipts)
+  if((accounting || providerTarget || nonprovider) && !request.headers.has('idempotency-key')) return fail(400);
   if(nativeTarget && request.headers.has('idempotency-key')) {
     const key=request.headers.get('idempotency-key')!;
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key))return fail(400);

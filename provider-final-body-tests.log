@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: fixed DELETE admin/messages/x relay
+ok 1 - fixed DELETE admin/messages/x relay
+  ---
+  duration_ms: 12.473709
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/notes/x relay
+ok 2 - fixed DELETE admin/notes/x relay
+  ---
+  duration_ms: 0.775917
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/affiliates/x relay
+ok 3 - fixed DELETE admin/affiliates/x relay
+  ---
+  duration_ms: 0.67
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/commissions/x relay
+ok 4 - fixed DELETE admin/commissions/x relay
+  ---
+  duration_ms: 0.275375
+  type: 'test'
+  ...
+# Subtest: fixed POST admin/app relay
+ok 5 - fixed POST admin/app relay
+  ---
+  duration_ms: 0.605166
+  type: 'test'
+  ...
+# Subtest: fixed POST tiktok relay
+ok 6 - fixed POST tiktok relay
+  ---
+  duration_ms: 0.847958
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/tiktok relay
+ok 7 - fixed PATCH admin/tiktok relay
+  ---
+  duration_ms: 0.446333
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/rankings relay
+ok 8 - fixed PATCH admin/rankings relay
+  ---
+  duration_ms: 0.217375
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/tiktok/x relay
+ok 9 - fixed DELETE admin/tiktok/x relay
+  ---
+  duration_ms: 0.52
+  type: 'test'
+  ...
+# Subtest: unchanged form helper retains UUID and throws on lost committed acknowledgement
+ok 10 - unchanged form helper retains UUID and throws on lost committed acknowledgement
+  ---
+  duration_ms: 4.761834
+  type: 'test'
+  ...
+# Subtest: truncated or negative successful acknowledgements retain the UUID and cannot clear forms
+ok 11 - truncated or negative successful acknowledgements retain the UUID and cannot clear forms
+  ---
+  duration_ms: 24.757042
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST 
+ok 12 - maps only marketing POST 
+  ---
+  duration_ms: 14.510125
+  type: 'test'
+  ...
+# Subtest: maps only marketing PATCH /campaign_1
+ok 13 - maps only marketing PATCH /campaign_1
+  ---
+  duration_ms: 0.720167
+  type: 'test'
+  ...
+# Subtest: maps only marketing DELETE /campaign_1
+ok 14 - maps only marketing DELETE /campaign_1
+  ---
+  duration_ms: 0.652
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST /campaign_1/run
+ok 15 - maps only marketing POST /campaign_1/run
+  ---
+  duration_ms: 0.37625
+  type: 'test'
+  ...
+# Subtest: maps exact mail action test-email
+ok 16 - maps exact mail action test-email
+  ---
+  duration_ms: 0.649708
+  type: 'test'
+  ...
+# Subtest: maps exact mail action customers/email
+ok 17 - maps exact mail action customers/email
+  ---
+  duration_ms: 0.269458
+  type: 'test'
+  ...
+# Subtest: rejects arbitrary marketing writes and missing keys
+ok 18 - rejects arbitrary marketing writes and missing keys
+  ---
+  duration_ms: 0.715791
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 253.940166
