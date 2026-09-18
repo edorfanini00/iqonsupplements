@@ -1,1 +1,1 @@
-export default {css:{postcss:{plugins:[]}},esbuild:{jsx:'automatic'},test:{environment:'node',include:['tests/ui/**/*.test.ts']},resolve:{alias:{'@':process.cwd(),...(process.env.UI_TEST_VITEST?{vitest:process.env.UI_TEST_VITEST}:{})}}};
+export default {css:{postcss:{plugins:[]}},esbuild:{jsx:'automatic'},test:{environment:'node',include:['tests/ui/**/*.test.ts']},resolve:{dedupe:['react','react-dom'],alias:{'@':process.cwd(),...(process.env.UI_TEST_VITEST?{vitest:process.env.UI_TEST_VITEST}:{})}}};

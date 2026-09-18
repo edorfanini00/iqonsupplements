@@ -28,7 +28,7 @@ export async function currentCommandActor(){
 }
 /** Existing page fetch interface, narrowly mapped writes only. No global fetch
  * patching: all other original reads/actions still traverse the reviewed BFF. */
-export async function canonicalActionFetch(input:string,init?:RequestInit):Promise<Response|CommandResponse>{
+export async function canonicalActionFetch(input:string,init?:RequestInit,reviewedVersion?:number):Promise<Response|CommandResponse>{
  const method=init?.method?.toUpperCase()??'GET';
  let payload:Record<string,unknown>={};
  try{if(typeof init?.body==='string')payload=JSON.parse(init.body);}catch{return fail('Invalid command payload. Nothing submitted.');}
@@ -40,8 +40,9 @@ export async function canonicalActionFetch(input:string,init?:RequestInit):Promi
   const {actor,session}=await currentCommandActor();
   if(session.role!=='admin')return fail('This command requires a current canonical administrator.',403);
   const existing=client.list(actor).find(a=>!a.archived&&a.kind===mapped.kind&&(a.envelope.payload.affiliateId??a.envelope.payload.email)===(mapped.payload.affiliateId??mapped.payload.email));
-  let version=existing?.envelope.expectedVersion;
-  if(!['payout-record','admin-create'].includes(mapped.kind)&&!existing){
+  if(reviewedVersion!==undefined&&(!Number.isSafeInteger(reviewedVersion)||reviewedVersion<0))return fail('Invalid reviewed version. Reload canonical settings.');
+  let version=existing?.envelope.expectedVersion??reviewedVersion;
+  if(!['payout-record','admin-create'].includes(mapped.kind)&&!existing&&version===undefined){
    // Dedicated canonical state read; never assume zero or infer a version from
    // profile dates when the dependency is unavailable.
    const res=await globalThis.fetch(`/api/affiliates/commands/state/${encodeURIComponent(String(mapped.payload.affiliateId))}`,{credentials:'include',cache:'no-store'});

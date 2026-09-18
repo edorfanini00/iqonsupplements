@@ -50,6 +50,7 @@ interface NavItem {
 const LEARN_VISITED_KEY = "iqon_supplements_affiliate_learn_visited";
 
 const adminNav: NavItem[] = [
+  { href: "/affiliates/admin/settings", label: "Settings", icon: Settings },
   { href:"/affiliates/admin/integrations",label:"Connections",icon:Settings },
   { href: "/affiliates/admin", label: "Overview", icon: LayoutDashboard },
   {

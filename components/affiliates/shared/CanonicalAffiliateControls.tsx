@@ -16,7 +16,7 @@ export function buildCategoryTerms(input:TermsInput){
 }
 /** Additional controls inside the existing affiliate detail, not a replacement
  * dashboard. Original Health rates/forms remain unchanged above this panel. */
-export function CanonicalAffiliateControls({affiliateId}:{affiliateId:string}){
+export function CanonicalAffiliateControls({affiliateId,ratesOnly=false}:{affiliateId:string;ratesOnly?:boolean}){
  const [terms,setTerms]=useState<TermsInput>({purchaseOneTime:false,purchaseSubscription:false,eligibility:'',combineOrder:'',combineProduct:'',combineShipping:'',cycleLimit:'',referralBase:'',category:'supplements',direct:'',recurring:'',referral:'',discount:'',effective:'',products:''});
  const [context,setContext]=useState<{id:string;data?:{version:number;terms:Array<{store:string;category:string;version:number;terms:Record<string,unknown>}>;outbox:Array<{store:string;operation:string;state:string;reason?:string}>};error?:string}>({id:''});
  const [refresh,setRefresh]=useState(0);
@@ -27,24 +27,26 @@ export function CanonicalAffiliateControls({affiliateId}:{affiliateId:string}){
  async function submit(kind:'rates'|'code'){
   setBusy(true);setMessage('');
   try{
+   if(!current?.data)throw Error('Load canonical settings before submitting.');
    const payload=kind==='rates'?{affiliateId,rates:[buildCategoryTerms(terms)]}:{affiliateId,...(code.trim()?{promoCode:code.trim()}:{})};
-   const res=await canonicalActionFetch(`/api/affiliates/admin/${kind==='rates'?'rates':'code-sync'}`,{method:kind==='rates'?'PUT':'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},credentials:'include'});
+   const res=await canonicalActionFetch(`/api/affiliates/admin/${kind==='rates'?'rates':'code-sync'}`,{method:kind==='rates'?'PUT':'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'},credentials:'include'},current.data.version);
    const data=await res.json();setRefresh(n=>n+1);setMessage(res.ok?'Canonical command completed. Read back provider verification before advertising a code.':typeof data.error==='string'?data.error:'Not confirmed complete. Check Command recovery.');
   }catch(error){setMessage(error instanceof Error?error.message:'Command unavailable. No completion confirmed.');}finally{setBusy(false);}
  }
  return <section aria-label="Canonical category settings" className="glass-surface rounded-lg p-6 md:p-7 mb-8">
-  <details><summary className="text-xl font-medium cursor-pointer">Category commission terms &amp; code verification</summary>
+  <details open={ratesOnly||undefined}><summary className="text-xl font-medium cursor-pointer">{ratesOnly?'Category commission terms & customer discount policy':'Category commission terms & code verification'}</summary>
    <p className="text-sm text-[#64717a] mt-3">Explicit prospective terms only. No default rates, retroactive repricing, or automatic commission activation. Saving an agreement does not prove Woo or Shopify code availability.</p>
    <div className="mt-4 text-sm">
     {current?.data?<><p>Current canonical version: {current.data.version}</p>
-     {current.data.terms.map((row,index)=><div key={index} className="border-t border-[#242526]/10 pt-2 mt-2 text-xs text-[#64717a]"><p>{row.category} · {row.store} · version {row.version}</p><p>Direct {String(row.terms.directRate)}% · recurring {String(row.terms.recurringRate)}% · referral {String(row.terms.referralRate)}% · customer discount {String(row.terms.customerDiscount)}%</p><p>Referral base: {String(row.terms.referralBase)} · effective {String(row.terms.effectiveAt)}</p></div>)}
+     {current.data.terms.map((row,index)=><div key={index} className="border-t border-[#242526]/10 pt-2 mt-2 text-xs text-[#64717a]"><p>{row.category} · {row.store} · version {row.version}</p><p>Direct {String(row.terms.directRate)}% · recurring {String(row.terms.recurringRate)}% · referral {String(row.terms.referralRate)}% · customer discount {String(row.terms.customerDiscount)}%</p><p>Referral base: {String(row.terms.referralBase)} · effective {String(row.terms.effectiveAt)}</p><details><summary>Saved checkout policy and product scope</summary><pre className="whitespace-pre-wrap break-all">{JSON.stringify(row.terms,null,2)}</pre></details></div>)}
+     {['supplements','skincare'].filter(category=>!current.data!.terms.some(row=>row.category===category)).map(category=><p key={category} className="text-xs text-[#64717a]">{category}: Unconfigured — inactive; no Health rates copied.</p>)}
      {!current.data.terms.length&&<p className="text-xs text-[#64717a]">No canonical category terms recorded.</p>}
      {current.data.outbox.map((row,index)=><p key={index} className="text-xs text-[#64717a]">{row.store} · {row.operation} · {row.state}{row.reason?` — ${row.reason}`:''}</p>)}
     </>:<p>{current?.error??'Loading canonical settings…'}</p>}
     <button type="button" className="underline text-xs mt-2" onClick={()=>setRefresh(n=>n+1)}>Refresh canonical settings</button>
    </div>
    <form onSubmit={e=>{e.preventDefault();void submit('rates');}} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-    <label className="text-sm">Category<select className={inputClass} value={terms.category} onChange={e=>setTerms({...terms,category:e.target.value as TermsInput['category']})}><option value="supplements">Supplements · Shopify</option><option value="skincare">Skincare · Shopify</option><option value="peptides">Peptides · Woo</option></select></label>
+    <label className="text-sm">Category<select className={inputClass} value={terms.category} onChange={e=>setTerms({purchaseOneTime:false,purchaseSubscription:false,eligibility:'',combineOrder:'',combineProduct:'',combineShipping:'',cycleLimit:'',referralBase:'',category:e.target.value as TermsInput['category'],direct:'',recurring:'',referral:'',discount:'',effective:'',products:''})}><option value="supplements">Supplements · Shopify</option><option value="skincare">Skincare · Shopify</option><option value="peptides">Peptides · Woo</option></select></label>
     {([['direct','Direct commission'],['recurring','Recurring commission'],['referral','Referral commission'],['discount','Customer discount']] as const).map(([key,label])=><label key={key} className="text-sm">{label} (%)<input type="number" required min="0" max="100" step="0.01" value={terms[key]} className={inputClass} onChange={e=>setTerms({...terms,[key]:e.target.value})}/></label>)}
     <label className="text-sm">Referral base<select required className={inputClass} value={terms.referralBase} onChange={e=>setTerms({...terms,referralBase:e.target.value as TermsInput['referralBase']})}><option value="">Choose agreed base</option><option value="revenue">Revenue</option><option value="commission">Commission</option></select></label>
     <label className="text-sm">Effective at (your local time)<input type="datetime-local" required className={inputClass} value={terms.effective} onChange={e=>setTerms({...terms,effective:e.target.value})}/></label>
@@ -59,10 +61,10 @@ export function CanonicalAffiliateControls({affiliateId}:{affiliateId:string}){
     <p className="text-xs text-[#64717a] md:col-span-2">The referral base must match the agreement. Category settings are separate from original Health profile settings. Provider activation may remain blocked pending canonical qualification.</p>
     <button disabled={busy} className="rounded-full px-4 py-2 bg-[#242526] text-white text-xs disabled:opacity-50">{busy?'Submitting…':'Save explicit category terms'}</button>
    </form>
-   <form className="mt-6 border-t border-[#242526]/10 pt-5" onSubmit={e=>{e.preventDefault();void submit('code');}}>
+   {!ratesOnly&&<form className="mt-6 border-t border-[#242526]/10 pt-5" onSubmit={e=>{e.preventDefault();void submit('code');}}>
     <label className="text-sm">Creator code (leave blank to verify current canonical code)<input className={inputClass} value={code} onChange={e=>setCode(e.target.value)}/></label>
     <button disabled={busy} className="rounded-full px-4 py-2 bg-[#242526] text-white text-xs mt-4 disabled:opacity-50">Verify creator code</button>
-   </form>
+   </form>}
   </details>
   {message&&<p role="status" className="text-sm mt-4">{message}</p>}
  </section>;
