@@ -14,6 +14,10 @@ export function commandComplete(kind:CommandKind,data:Json):boolean {
  if(kind==='payout-record')return !!data.payout?.id;
  const tasks=Array.isArray(data.outbox)?data.outbox:[];
  if(kind==='admin-create')return !!data.affiliate?.id&&Array.isArray(data.outbox)&&tasks.every(t=>t.state==='confirmed');
+ // A committed profile/code is not the complete native action while required
+ // identity or notification tasks remain unresolved. Payout above is explicitly
+ // a ledger-record acknowledgement, not a bank transfer/email delivery claim.
+ if(tasks.some(t=>t.state!=='confirmed'))return false;
  if(kind==='signup')return tasks.some(t=>t.store==='identity'&&t.operation==='signup'&&t.state==='confirmed');
  return ['woo','shopify'].every(store=>tasks.some(t=>t.store===store&&t.operation==='public-code'&&t.state==='confirmed'));
 }

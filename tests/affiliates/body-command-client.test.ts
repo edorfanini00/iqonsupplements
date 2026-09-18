@@ -6,6 +6,14 @@ test('admin-create completion follows its own canonical tasks, never coupon-only
  assert.equal(commandComplete('admin-create',{...base,outbox:[]}),true);
  assert.equal(commandComplete('admin-create',{...base,outbox:[{store:'identity',operation:'admin-identity',state:'blocked'},{store:'woo',operation:'public-code',state:'confirmed'},{store:'shopify',operation:'public-code',state:'confirmed'}]}),false);
 });
+test('approval cannot finish native form while canonical identity or notification work is unresolved',()=>{
+ const codes=['woo','shopify'].map(store=>({store,operation:'public-code',state:'confirmed'}));
+ for(const operation of ['admin-identity','approval-email','rejection-email']){
+  const blocked={store:operation==='admin-identity'?'identity':'notification',operation,state:'blocked'};
+  assert.equal(commandComplete('affiliate-approval',{command:{state:'committed'},outbox:[...codes,blocked]}),false,operation);
+ }
+ assert.equal(commandComplete('affiliate-approval',{command:{state:'committed'},outbox:[...codes,{store:'notification',operation:'approval-email',state:'confirmed'}]}),true);
+});
 const uuid='87bfc143-8302-4073-b184-a000ee947ff1';
 function store(){const data=new Map<string,string>();return {data,getItem:(k:string)=>data.get(k)??null,setItem:(k:string,v:string)=>{data.set(k,v)},removeItem:(k:string)=>{data.delete(k)}};}
 test('durably retains exact key/payload on lost response; pending is not success; completed readback matches receipt',async()=>{
