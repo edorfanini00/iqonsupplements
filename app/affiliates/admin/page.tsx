@@ -164,7 +164,7 @@ export default function AdminOverviewPage() {
     setSyncing(true);
     setSyncMessage(null);
     try {
-      const res = await fetch("/api/affiliates/admin/woocommerce-sync", {
+      const res = await providerMutationFetch("/api/affiliates/admin/woocommerce-sync", {
         method: "POST",
         credentials: "include",
       });

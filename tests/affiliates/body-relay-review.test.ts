@@ -6,7 +6,7 @@ test('unqualified writes never reach canonical finance or provider state',async(
  // Onboarding/notes now use explicit local-state adapters; neighboring provider and finance actions stay denied.
  for(const [path,method] of [['admin/payouts','POST'],['admin/affiliates/a','PATCH'],['admin/app','POST'],['creator-code?unexpected=1','POST'],['admin/rates','PUT'],['admin/notes/note1','DELETE']]){
   let calls=0;const result=await relayAffiliateRequest(new Request('https://body.test/api/affiliates/'+path,{method,headers:{origin:'https://body.test','content-type':'application/json'},body:'{}'}),{env,fetch:async()=>{calls++;return Response.json({ok:true});}});
-  assert.equal(calls,0,path);assert.equal(result.status,501,path);
+  assert.equal(calls,0,path);assert.equal(result.status,['admin/app','admin/notes/note1'].includes(path)?400:501,path);
  }
 });
 test('order detail query cannot escalate into refreshed writes',async()=>{

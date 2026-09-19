@@ -1,4 +1,5 @@
 "use client";
+import {providerMutationFetch} from '@/lib/affiliates/provider-mutation-fetch';
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -90,7 +91,7 @@ export function OrderDetailDrawer({
       else setLoading(true);
       setError(null);
       try {
-        const res = await fetch(
+        const res = await (refresh ? providerMutationFetch : fetch)(
           `/api/affiliates/orders/${id}${refresh ? "?refresh=1" : ""}`,
           { credentials: "include" }
         );

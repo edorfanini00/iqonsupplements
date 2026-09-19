@@ -1,4 +1,5 @@
 "use client";
+import {providerMutationFetch} from '@/lib/affiliates/provider-mutation-fetch';
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -1295,7 +1296,7 @@ function SubscriptionDrawer({
       setError(null);
       setNotice(null);
       try {
-        const res = await fetch(`/api/affiliates/admin/subscriptions/${sub.id}`, {
+        const res = await providerMutationFetch(`/api/affiliates/admin/subscriptions/${sub.id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

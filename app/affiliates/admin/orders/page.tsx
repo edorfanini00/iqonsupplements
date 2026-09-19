@@ -1,4 +1,5 @@
 "use client";
+import {providerMutationFetch} from '@/lib/affiliates/provider-mutation-fetch';
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
@@ -181,7 +182,7 @@ function AdminOrdersPageInner() {
       }
       setSaving(orderId, true);
       try {
-        const res = await fetch(
+        const res = await providerMutationFetch(
           `/api/affiliates/admin/orders/${orderId}/attribute`,
           {
             method: "POST",
@@ -223,7 +224,7 @@ function AdminOrdersPageInner() {
         return;
       setSaving(orderId, true);
       try {
-        const res = await fetch(
+        const res = await providerMutationFetch(
           `/api/affiliates/admin/orders/${orderId}/attribute`,
           { method: "DELETE", credentials: "include" }
         );
@@ -250,7 +251,7 @@ function AdminOrdersPageInner() {
       if (!window.confirm(confirmText)) return;
       setSaving(orderId, true);
       try {
-        const res = await fetch(`/api/affiliates/admin/orders/${orderId}/refund`, {
+        const res = await providerMutationFetch(`/api/affiliates/admin/orders/${orderId}/refund`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

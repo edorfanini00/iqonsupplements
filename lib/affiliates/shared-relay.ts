@@ -53,9 +53,10 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     || method === 'DELETE' && /^\/api\/affiliates\/admin\/accounting\/(adjustments|expenses|purchases|sales|orders)\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)
     || method === 'PATCH' && /^\/api\/affiliates\/admin\/accounting\/(items|orders)\/[A-Za-z0-9_-]{1,100}$/.test(incoming.pathname)
   );
-  const providerTarget=incoming.search===''?nativeProviderTarget(incoming.pathname,method):null;
+  const refreshId=method==='GET'&&incoming.search==='?refresh=1'?/^\/api\/affiliates\/orders\/([A-Za-z0-9_-]{1,100})$/.exec(incoming.pathname)?.[1]:undefined;
+  const providerTarget=refreshId?'/api/integrations/body/native/order-refresh/'+refreshId:incoming.search===''?nativeProviderTarget(incoming.pathname,method):null;
   const nonprovider = incoming.search === '' ? nonproviderTarget(incoming.pathname,method) : null;
-  const nativeTarget = incoming.search !== '' ? null
+  const nativeTarget = refreshId ? providerTarget : incoming.search !== '' ? null
     : providerTarget ? providerTarget
     : nonprovider ? nonprovider
     : accounting ? incoming.pathname.replace('/api/affiliates/admin/accounting/','/api/integrations/body/native/accounting/')
@@ -92,7 +93,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     return Response.json({ok:false,error:'Source-aware commerce operation is unavailable in this portal'}, {status:501,headers:{'cache-control':'no-store'}});
   }
   if (!nativeTarget && !outstandingRead && !originalRead && !commandWrite && !commandRead && !SHARED_ROUTES.some(([pattern,methods])=>pattern.test(incoming.pathname)&&methods.includes(method))) return fail(404);
-  const mutation=!['GET','HEAD'].includes(method);
+  const mutation=Boolean(refreshId)||!['GET','HEAD'].includes(method);
   // Auth, named canonical commands and individually qualified local-state
   // adapters only. No generic financial or provider dispatch.
   if (mutation && !nativeTarget && !commandWrite && !['/api/affiliates/login','/api/affiliates/logout'].includes(incoming.pathname)) {
