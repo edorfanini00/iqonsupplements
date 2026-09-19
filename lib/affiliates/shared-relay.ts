@@ -112,7 +112,16 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     } catch { /* Invalid server configuration grants no additional origin. */ }
   }
   if (incoming.origin !== config.portal && incoming.origin !== previewOrigin) return fail(403);
-  if (mutation && request.headers.get('origin') !== incoming.origin) return fail(403);
+  // Same-origin browser GET fetches omit Origin. Only the exact refresh route
+  // may use Fetch Metadata instead; navigation, prefetch and cross-site reads
+  // remain forbidden, and the native UUID check below still applies.
+  const browserRefresh = Boolean(refreshId) && request.headers.get('origin') === null
+    && request.headers.get('sec-fetch-site') === 'same-origin'
+    && request.headers.get('sec-fetch-mode') === 'cors'
+    && request.headers.get('sec-fetch-dest') === 'empty'
+    && request.headers.get('purpose') !== 'prefetch'
+    && !request.headers.get('sec-purpose')?.includes('prefetch');
+  if (mutation && request.headers.get('origin') !== incoming.origin && !browserRefresh) return fail(403);
   if (mutation && !nativeTarget && !bulk?.[1] && request.body && !/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type') ?? '')) return fail(415);
   const headers=new Headers({'accept':'application/json','x-iqon-portal':config.portal,'x-iqon-relay-secret':config.secret});
   const cookie=affiliateCookieHeader(request.headers.get('cookie') ?? ''); if(cookie)headers.set('cookie',cookie);
