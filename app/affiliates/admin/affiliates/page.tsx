@@ -740,8 +740,13 @@ function AffiliateDetailDrawer({
                   className={bankInputClass}
                 />
               </label>
+            </div>
+            <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mt-6 mb-2">
+              Body rates (Shopify)
+            </p>
+            <div className="grid grid-cols-2 gap-x-5 gap-y-2">
               <label className="block">
-                <span className="text-xs text-[#64717a]">Supplements commission %</span>
+                <span className="text-xs text-[#64717a]">Supplements %</span>
                 <input
                   type="number"
                   step="0.5"
@@ -754,7 +759,7 @@ function AffiliateDetailDrawer({
                 />
               </label>
               <label className="block">
-                <span className="text-xs text-[#64717a]">Skincare commission %</span>
+                <span className="text-xs text-[#64717a]">Skincare %</span>
                 <input
                   type="number"
                   step="0.5"
@@ -772,8 +777,11 @@ function AffiliateDetailDrawer({
               commission applies to a customer&apos;s first (coupon-attributed)
               order; recurring commission applies to their repeat orders. Rate
               changes only affect future orders — past commissions are locked in.
-              Run coupon sync after changing the discount. Supplements and skincare
-              rates apply to Shopify orders in those categories — leave blank (—) to keep inactive.
+              Run coupon sync after changing the discount.
+            </p>
+            <p className="text-xs text-[#64717a] mt-2 leading-relaxed">
+              Body rates apply to Shopify orders in the supplements and skincare
+              categories — leave blank (—) to keep inactive.
             </p>
 
             <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mt-6 mb-2">

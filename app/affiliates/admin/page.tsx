@@ -1,8 +1,6 @@
 "use client";
 import {providerMutationFetch} from "@/lib/affiliates/provider-mutation-fetch";
 import {BulkCouponControl} from "@/components/affiliates/shared/BulkCouponControl";
-// BODY CATEGORY ADDITION
-import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -111,8 +109,10 @@ export default function AdminOverviewPage() {
   const [appRevenueSeries, setAppRevenueSeries] = useState<
     { date: string; value: number }[]
   >([]);
+  // Shopify category revenue (supplements + skincare USD sum) — null when unavailable.
+  const [shopifyRevenue, setShopifyRevenue] = useState<number | null>(null);
   // Which revenue the hero number and total-revenue chart line show.
-  const [revenueView, setRevenueView] = useState<"combined" | "store" | "app">(
+  const [revenueView, setRevenueView] = useState<"combined" | "store" | "app" | "shopify">(
     "combined"
   );
   const hasLoadedOnce = useRef(false);
@@ -199,6 +199,7 @@ export default function AdminOverviewPage() {
     setStoreChartOrders([]);
     setAppRevenue(null);
     setAppRevenueSeries([]);
+    setShopifyRevenue(null);
     if (isInitial) setLoading(true);
     else setRefreshing(true);
     try {
@@ -221,6 +222,40 @@ export default function AdminOverviewPage() {
         setStoreChartOrders(data.storeChartOrders ?? []);
         setAppRevenue(typeof data.appRevenue === "number" ? data.appRevenue : null);
         setAppRevenueSeries(data.appRevenueSeries ?? []);
+      }
+      // Fetch Shopify category revenue (supplements + skincare) independently.
+      try {
+        const range = resolveRange(p);
+        const catParams = new URLSearchParams({
+          start: range.start.toISOString(),
+          end: new Date(range.end.getTime() + 1).toISOString(),
+        });
+        const catRes = await fetch(`/api/affiliates/category-revenue?${catParams}`, {
+          credentials: "include",
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          if (!controller.signal.aborted && catData?.version === 1 && catData?.categories) {
+            let sum = 0;
+            let hasAny = false;
+            for (const catKey of ["supplements", "skincare"] as const) {
+              const storeMetric = catData.categories[catKey]?.storeRevenue;
+              if (storeMetric?.state === "available" && Array.isArray(storeMetric.currencies)) {
+                for (const entry of storeMetric.currencies) {
+                  if (entry.currency === "USD") {
+                    sum += parseFloat(entry.amount) || 0;
+                    hasAny = true;
+                  }
+                }
+              }
+            }
+            if (!controller.signal.aborted) setShopifyRevenue(hasAny ? sum : null);
+          }
+        }
+      } catch {
+        // Shopify categories unavailable — leave shopifyRevenue as null.
       }
     } catch (error) {
       if (!controller.signal.aborted) {
@@ -277,16 +312,21 @@ export default function AdminOverviewPage() {
     const hasStoreData = storeChartOrders.length > 0;
     const hasAppData = appRevenueSeries.length > 0;
     const showTertiary =
-      revenueView === "app" ? hasAppData : hasStoreData || hasAppData;
+      revenueView === "app" ? hasAppData :
+      revenueView === "shopify" ? (shopifyRevenue != null) :
+      hasStoreData || hasAppData;
     return series.map((s) => {
       const store = storeByBucket.get(s.bucket) ?? 0;
       const app = appByBucket.get(s.bucket) ?? 0;
+      // For shopify view, show a flat line (no per-day series available).
       const total =
         revenueView === "store"
           ? store
           : revenueView === "app"
             ? app
-            : store + app;
+            : revenueView === "shopify"
+              ? 0
+              : store + app;
       return {
         date: s.bucket,
         label: s.label,
@@ -295,7 +335,7 @@ export default function AdminOverviewPage() {
         ...(showTertiary ? { tertiary: total } : {}),
       };
     });
-  }, [chartOrders, storeChartOrders, appRevenueSeries, revenueView, chartRange]);
+  }, [chartOrders, storeChartOrders, appRevenueSeries, revenueView, shopifyRevenue, chartRange]);
 
   const rangeCaption = useMemo(
     () => formatRangeCaption(chartRange, preset),
@@ -395,21 +435,25 @@ export default function AdminOverviewPage() {
               const heroValue =
                 storeRevenue == null
                   ? null
-                  : appRevenue == null
-                    ? storeRevenue
-                    : revenueView === "store"
+                  : revenueView === "shopify"
+                    ? shopifyRevenue
+                    : appRevenue == null
                       ? storeRevenue
-                      : revenueView === "app"
-                        ? appRevenue
-                        : storeRevenue + appRevenue;
+                      : revenueView === "store"
+                        ? storeRevenue
+                        : revenueView === "app"
+                          ? appRevenue
+                          : storeRevenue + appRevenue;
               const heroLabel =
-                appRevenue == null
-                  ? "Total revenue"
-                  : revenueView === "store"
-                    ? "Store revenue"
-                    : revenueView === "app"
-                      ? "App revenue"
-                      : "Combined revenue";
+                revenueView === "shopify"
+                  ? "Supp & Skincare revenue"
+                  : appRevenue == null
+                    ? "Total revenue"
+                    : revenueView === "store"
+                      ? "Store revenue"
+                      : revenueView === "app"
+                        ? "App revenue"
+                        : "Combined revenue";
               return (
                 <>
                   <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-white/50">
@@ -426,7 +470,7 @@ export default function AdminOverviewPage() {
                     {heroValue != null ? formatCurrency(heroValue) : "—"}
                     <ArrowRight className="h-[0.5em] w-[0.5em] opacity-0 -translate-x-1 group-hover/revenue:opacity-70 group-hover/revenue:translate-x-0 transition-all" />
                   </Link>
-                  {appRevenue != null && (
+                  {(appRevenue != null || shopifyRevenue != null) && (
                     <div className="mt-4 flex flex-wrap items-center gap-3">
                       <div className="inline-flex items-center rounded-full bg-white/5 border border-white/15 p-1 gap-1">
                         {(
@@ -448,8 +492,20 @@ export default function AdminOverviewPage() {
                             {label}
                           </button>
                         ))}
+                        {shopifyRevenue != null && (
+                          <button
+                            onClick={() => setRevenueView("shopify")}
+                            className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] font-sans transition-colors ${
+                              revenueView === "shopify"
+                                ? "bg-white text-[#20282c]"
+                                : "text-white/60 hover:text-white"
+                            }`}
+                          >
+                            Supp &amp; Skincare
+                          </button>
+                        )}
                       </div>
-                      {revenueView === "combined" && storeRevenue != null && (
+                      {revenueView === "combined" && storeRevenue != null && appRevenue != null && (
                         <p className="text-[11px] font-sans text-white/60 flex flex-wrap gap-x-4 gap-y-1">
                           <span>
                             Peptides{" "}
@@ -575,9 +631,6 @@ export default function AdminOverviewPage() {
         />
       </section>
 
-      {/* BODY CATEGORY ADDITION */}
-      <CategoryRevenue preset={preset} audience="admin" />
-
       {/* Charts */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-10">
         <div className="lg:col-span-2 glass-surface rounded-lg p-6 md:p-7">
@@ -600,13 +653,15 @@ export default function AdminOverviewPage() {
               primaryLabel="Affiliate revenue"
               secondaryLabel="Commission"
               tertiaryLabel={
-                appRevenue == null
+                appRevenue == null && shopifyRevenue == null
                   ? "Total revenue"
                   : revenueView === "store"
                     ? "Peptides revenue"
                     : revenueView === "app"
                       ? "App revenue"
-                      : "Combined revenue"
+                      : revenueView === "shopify"
+                        ? "Supp & Skincare revenue"
+                        : "Combined revenue"
               }
               formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
             />

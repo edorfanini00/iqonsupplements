@@ -446,11 +446,11 @@ function ReviewModal({
 
           <div className="rounded-lg bg-[#242526]/4 border border-[#242526]/8 p-4 !mt-4 mb-4">
             <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-2">
-              Shopify category rates (optional)
+              Body rates (Shopify)
             </p>
             <div className="grid grid-cols-2 gap-4">
               <label className="block">
-                <span className="text-xs text-[#64717a]">Supplements commission %</span>
+                <span className="text-xs text-[#64717a]">Supplements %</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -466,7 +466,7 @@ function ReviewModal({
                 </div>
               </label>
               <label className="block">
-                <span className="text-xs text-[#64717a]">Skincare commission %</span>
+                <span className="text-xs text-[#64717a]">Skincare %</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
