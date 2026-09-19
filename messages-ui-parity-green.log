@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: native account action preserves original UI bytes: app/affiliates/admin/affiliate-messages/page.tsx
+ok 1 - native account action preserves original UI bytes: app/affiliates/admin/affiliate-messages/page.tsx
+  ---
+  duration_ms: 0.998542
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/admin/messages/page.tsx
+ok 2 - native account action preserves original UI bytes: app/affiliates/admin/messages/page.tsx
+  ---
+  duration_ms: 0.191083
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/contact/page.tsx
+ok 3 - native account action preserves original UI bytes: app/affiliates/contact/page.tsx
+  ---
+  duration_ms: 0.352875
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/dashboard/messages/page.tsx
+ok 4 - native account action preserves original UI bytes: app/affiliates/dashboard/messages/page.tsx
+  ---
+  duration_ms: 0.264
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/dashboard/network/page.tsx
+ok 5 - native account action preserves original UI bytes: app/affiliates/dashboard/network/page.tsx
+  ---
+  duration_ms: 0.433083
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/dashboard/settings/page.tsx
+ok 6 - native account action preserves original UI bytes: app/affiliates/dashboard/settings/page.tsx
+  ---
+  duration_ms: 0.277333
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/forgot-password/page.tsx
+ok 7 - native account action preserves original UI bytes: app/affiliates/forgot-password/page.tsx
+  ---
+  duration_ms: 0.186292
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/reset-password/page.tsx
+ok 8 - native account action preserves original UI bytes: app/affiliates/reset-password/page.tsx
+  ---
+  duration_ms: 0.281333
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 86.968709

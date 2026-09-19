@@ -19,6 +19,7 @@
   "app/affiliates/admin/messages/page.tsx": {
     "originalSha256": "cd77a1e555a0cd2506e32b06f498c43ba9ba68cdc305613bf4678a80dbfc5f8f",
     "hunks": [
+      {"original": "    setMessages((prev) => prev.filter((m) => m.id !== id));\n    setActive((cur) => (cur && cur.id === id ? null : cur));\n    await nonproviderMutationFetch(`/api/affiliates/admin/messages/${id}`, {\n      method: \"DELETE\",\n      credentials: \"include\",\n    }).catch(() => {});", "canonical": "    try {\n      const response = await nonproviderMutationFetch(`/api/affiliates/admin/messages/${id}`, {\n        method: \"DELETE\",\n        credentials: \"include\",\n      });\n      if (!response.ok) return;\n      setMessages((prev) => prev.filter((m) => m.id !== id));\n      setActive((cur) => (cur && cur.id === id ? null : cur));\n    } catch {\n      // Keep the original control and operation UUID for an unchanged retry.\n    }"},
       {
         "original": "",
         "canonical": "import {nonproviderMutationFetch} from \"@/lib/affiliates/nonprovider-mutation-fetch\";\n"
