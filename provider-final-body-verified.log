@@ -1,0 +1,226 @@
+TAP version 13
+# Subtest: unqualified writes never reach canonical finance or provider state
+ok 1 - unqualified writes never reach canonical finance or provider state
+  ---
+  duration_ms: 13.117083
+  type: 'test'
+  ...
+# Subtest: order detail query cannot escalate into refreshed writes
+ok 2 - order detail query cannot escalate into refreshed writes
+  ---
+  duration_ms: 0.83675
+  type: 'test'
+  ...
+# Subtest: communication read markers need exact browser origin and no prefetch
+ok 3 - communication read markers need exact browser origin and no prefetch
+  ---
+  duration_ms: 0.558667
+  type: 'test'
+  ...
+# Subtest: upstream cookie lifetimes are never extended
+ok 4 - upstream cookie lifetimes are never extended
+  ---
+  duration_ms: 1.137
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/messages/x relay
+ok 5 - fixed DELETE admin/messages/x relay
+  ---
+  duration_ms: 16.246625
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/notes/x relay
+ok 6 - fixed DELETE admin/notes/x relay
+  ---
+  duration_ms: 0.844167
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/affiliates/x relay
+ok 7 - fixed DELETE admin/affiliates/x relay
+  ---
+  duration_ms: 0.669458
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/commissions/x relay
+ok 8 - fixed DELETE admin/commissions/x relay
+  ---
+  duration_ms: 0.282375
+  type: 'test'
+  ...
+# Subtest: fixed POST admin/app relay
+ok 9 - fixed POST admin/app relay
+  ---
+  duration_ms: 0.643917
+  type: 'test'
+  ...
+# Subtest: fixed POST tiktok relay
+ok 10 - fixed POST tiktok relay
+  ---
+  duration_ms: 1.534667
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/tiktok relay
+ok 11 - fixed PATCH admin/tiktok relay
+  ---
+  duration_ms: 0.51325
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/rankings relay
+ok 12 - fixed PATCH admin/rankings relay
+  ---
+  duration_ms: 0.23425
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/tiktok/x relay
+ok 13 - fixed DELETE admin/tiktok/x relay
+  ---
+  duration_ms: 0.594583
+  type: 'test'
+  ...
+# Subtest: unchanged form helper retains UUID and throws on lost committed acknowledgement
+ok 14 - unchanged form helper retains UUID and throws on lost committed acknowledgement
+  ---
+  duration_ms: 5.626416
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST 
+ok 15 - maps only marketing POST 
+  ---
+  duration_ms: 12.174708
+  type: 'test'
+  ...
+# Subtest: maps only marketing PATCH /campaign_1
+ok 16 - maps only marketing PATCH /campaign_1
+  ---
+  duration_ms: 0.695125
+  type: 'test'
+  ...
+# Subtest: maps only marketing DELETE /campaign_1
+ok 17 - maps only marketing DELETE /campaign_1
+  ---
+  duration_ms: 0.648625
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST /campaign_1/run
+ok 18 - maps only marketing POST /campaign_1/run
+  ---
+  duration_ms: 0.378458
+  type: 'test'
+  ...
+# Subtest: maps exact mail action test-email
+ok 19 - maps exact mail action test-email
+  ---
+  duration_ms: 0.699458
+  type: 'test'
+  ...
+# Subtest: maps exact mail action customers/email
+ok 20 - maps exact mail action customers/email
+  ---
+  duration_ms: 0.305
+  type: 'test'
+  ...
+# Subtest: rejects arbitrary marketing writes and missing keys
+ok 21 - rejects arbitrary marketing writes and missing keys
+  ---
+  duration_ms: 0.2865
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+ok 22 - exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+  ---
+  duration_ms: 14.447959
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+ok 23 - exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+  ---
+  duration_ms: 0.948166
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+ok 24 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.866542
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+ok 25 - exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.75925
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+ok 26 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+  ---
+  duration_ms: 0.403917
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+ok 27 - exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+  ---
+  duration_ms: 0.326917
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+ok 28 - exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+  ---
+  duration_ms: 1.192459
+  type: 'test'
+  ...
+# Subtest: legacy financial write paths stay unavailable even with an idempotency header
+ok 29 - legacy financial write paths stay unavailable even with an idempotency header
+  ---
+  duration_ms: 13.386
+  type: 'test'
+  ...
+# Subtest: bodyless logout uses authority and non-JSON body is rejected
+ok 30 - bodyless logout uses authority and non-JSON body is rejected
+  ---
+  duration_ms: 0.763917
+  type: 'test'
+  ...
+# Subtest: Shopify-shaped IDs cannot trigger Health provider operations
+ok 31 - Shopify-shaped IDs cannot trigger Health provider operations
+  ---
+  duration_ms: 0.722334
+  type: 'test'
+  ...
+# Subtest: unconfigured authority never falls through
+ok 32 - unconfigured authority never falls through
+  ---
+  duration_ms: 0.1085
+  type: 'test'
+  ...
+# Subtest: only named auth cookies and trusted portal credential go to fixed authority
+ok 33 - only named auth cookies and trusted portal credential go to fixed authority
+  ---
+  duration_ms: 0.954291
+  type: 'test'
+  ...
+# Subtest: CSRF null absent foreign origins and non-JSON mutations rejected
+ok 34 - CSRF null absent foreign origins and non-JSON mutations rejected
+  ---
+  duration_ms: 0.308167
+  type: 'test'
+  ...
+# Subtest: unknown targets ingestion jobs and method escalation denied
+ok 35 - unknown targets ingestion jobs and method escalation denied
+  ---
+  duration_ms: 0.557958
+  type: 'test'
+  ...
+# Subtest: unsafe authority and transport failures fail closed
+ok 36 - unsafe authority and transport failures fail closed
+  ---
+  duration_ms: 0.483209
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 226.421542
