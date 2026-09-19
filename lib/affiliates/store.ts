@@ -125,6 +125,9 @@ function mapProfile(row: {
     referralCommissionRate: row.referralCommissionRate ?? undefined,
     bonusThreshold: row.bonusThreshold ?? undefined,
     bonusRate: row.bonusRate ?? undefined,
+    // New fields — column may not exist in production until migration runs.
+    supplementsCommissionRate: (row as unknown as { supplementsCommissionRate?: number | null }).supplementsCommissionRate ?? undefined,
+    skincareCommissionRate: (row as unknown as { skincareCommissionRate?: number | null }).skincareCommissionRate ?? undefined,
     shopifyCustomerId: row.shopifyCustomerId ?? undefined,
     reviewedAt: row.reviewedAt?.toISOString(),
     onboardedAt: row.onboardedAt?.toISOString(),
@@ -503,7 +506,10 @@ async function updateAffiliateWithClient(
     await client.portalAccount.update({where:{id:existing.portalUserId},data:{email:updates.email?.toLowerCase().trim(),disabled:updates.status===undefined?undefined:updates.status==="disabled",role:updates.role}});
     if(updates.status==="disabled"||updates.email||updates.role)await client.portalSession.deleteMany({where:{accountId:existing.portalUserId}});
   }
-  const { bankInfo, role, reviewedAt, onboardedAt, createdAt: _c, id: _id, ...rest } = updates;
+  const { bankInfo, role, reviewedAt, onboardedAt, createdAt: _c, id: _id, supplementsCommissionRate: _suppRate, skincareCommissionRate: _skinRate, ...rest } = updates;
+  const hasCatRates = _suppRate !== undefined || _skinRate !== undefined;
+  const suppRate = typeof _suppRate === 'number' ? _suppRate : null;
+  const skinRate = typeof _skinRate === 'number' ? _skinRate : null;
 
   const row = await client.affiliateProfile.update({
     where: { id },
@@ -520,6 +526,19 @@ async function updateAffiliateWithClient(
 
   if (bankInfo) {
     return updateAffiliateBankInfo(id, bankInfo, client);
+  }
+
+  // Write new category rates via raw SQL — column may not exist until migration runs.
+  if (hasCatRates) {
+    try {
+      if (_suppRate !== undefined && _skinRate !== undefined) {
+        await prisma.$executeRaw`UPDATE supplements_affiliate_profiles SET supplements_commission_rate=${suppRate}, skincare_commission_rate=${skinRate} WHERE id=${id}`;
+      } else if (_suppRate !== undefined) {
+        await prisma.$executeRaw`UPDATE supplements_affiliate_profiles SET supplements_commission_rate=${suppRate} WHERE id=${id}`;
+      } else {
+        await prisma.$executeRaw`UPDATE supplements_affiliate_profiles SET skincare_commission_rate=${skinRate} WHERE id=${id}`;
+      }
+    } catch { /* column not yet created — will apply after migration */ }
   }
 
   return mapProfile(row);
@@ -1289,4 +1308,30 @@ export async function markAffiliatePasswordResetUsed(id: string): Promise<void> 
   await prisma.affiliatePasswordReset
     .update({ where: { id }, data: { usedAt: new Date() } })
     .catch(() => {});
+}
+
+/**
+ * Read category-specific commission rates from the DB for one affiliate.
+ * Uses raw SQL because the columns may not exist until the migration runs —
+ * returns nulls gracefully pre-migration.
+ */
+export async function getAffiliateCategoryRates(
+  affiliateId: string
+): Promise<{ supplementsCommissionRate: number | null; skincareCommissionRate: number | null }> {
+  try {
+    const rows = await prisma.$queryRaw<{ supplements_commission_rate: number | null; skincare_commission_rate: number | null }[]>`
+      SELECT supplements_commission_rate, skincare_commission_rate
+      FROM supplements_affiliate_profiles
+      WHERE id = ${affiliateId}
+      LIMIT 1
+    `;
+    if (!rows.length) return { supplementsCommissionRate: null, skincareCommissionRate: null };
+    return {
+      supplementsCommissionRate: rows[0].supplements_commission_rate ?? null,
+      skincareCommissionRate: rows[0].skincare_commission_rate ?? null,
+    };
+  } catch {
+    // Column doesn't exist yet — pre-migration fallback.
+    return { supplementsCommissionRate: null, skincareCommissionRate: null };
+  }
 }

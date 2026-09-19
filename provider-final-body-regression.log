@@ -1,0 +1,290 @@
+TAP version 13
+# Subtest: unqualified writes never reach canonical finance or provider state
+not ok 1 - unqualified writes never reach canonical finance or provider state
+  ---
+  duration_ms: 12.179917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/body-relay-review.test.ts:1:463'
+  failureType: 'testCodeFailure'
+  error: |-
+    admin/app
+    
+    400 !== 501
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 501
+  actual: 400
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/body-relay-review.test.ts:9:37)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: order detail query cannot escalate into refreshed writes
+ok 2 - order detail query cannot escalate into refreshed writes
+  ---
+  duration_ms: 0.955
+  type: 'test'
+  ...
+# Subtest: communication read markers need exact browser origin and no prefetch
+ok 3 - communication read markers need exact browser origin and no prefetch
+  ---
+  duration_ms: 1.222167
+  type: 'test'
+  ...
+# Subtest: upstream cookie lifetimes are never extended
+ok 4 - upstream cookie lifetimes are never extended
+  ---
+  duration_ms: 0.847708
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/messages/x relay
+ok 5 - fixed DELETE admin/messages/x relay
+  ---
+  duration_ms: 22.692667
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/notes/x relay
+ok 6 - fixed DELETE admin/notes/x relay
+  ---
+  duration_ms: 0.942625
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/affiliates/x relay
+ok 7 - fixed DELETE admin/affiliates/x relay
+  ---
+  duration_ms: 1.159125
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/commissions/x relay
+ok 8 - fixed DELETE admin/commissions/x relay
+  ---
+  duration_ms: 0.676083
+  type: 'test'
+  ...
+# Subtest: fixed POST admin/app relay
+ok 9 - fixed POST admin/app relay
+  ---
+  duration_ms: 1.181292
+  type: 'test'
+  ...
+# Subtest: fixed POST tiktok relay
+ok 10 - fixed POST tiktok relay
+  ---
+  duration_ms: 1.136875
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/tiktok relay
+ok 11 - fixed PATCH admin/tiktok relay
+  ---
+  duration_ms: 0.512834
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/rankings relay
+ok 12 - fixed PATCH admin/rankings relay
+  ---
+  duration_ms: 0.23725
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/tiktok/x relay
+ok 13 - fixed DELETE admin/tiktok/x relay
+  ---
+  duration_ms: 0.700959
+  type: 'test'
+  ...
+# Subtest: unchanged form helper retains UUID and throws on lost committed acknowledgement
+ok 14 - unchanged form helper retains UUID and throws on lost committed acknowledgement
+  ---
+  duration_ms: 4.898167
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST 
+ok 15 - maps only marketing POST 
+  ---
+  duration_ms: 19.841375
+  type: 'test'
+  ...
+# Subtest: maps only marketing PATCH /campaign_1
+ok 16 - maps only marketing PATCH /campaign_1
+  ---
+  duration_ms: 1.176959
+  type: 'test'
+  ...
+# Subtest: maps only marketing DELETE /campaign_1
+ok 17 - maps only marketing DELETE /campaign_1
+  ---
+  duration_ms: 0.699042
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST /campaign_1/run
+ok 18 - maps only marketing POST /campaign_1/run
+  ---
+  duration_ms: 0.502458
+  type: 'test'
+  ...
+# Subtest: maps exact mail action test-email
+ok 19 - maps exact mail action test-email
+  ---
+  duration_ms: 1.047
+  type: 'test'
+  ...
+# Subtest: maps exact mail action customers/email
+ok 20 - maps exact mail action customers/email
+  ---
+  duration_ms: 0.706208
+  type: 'test'
+  ...
+# Subtest: rejects arbitrary marketing writes and missing keys
+ok 21 - rejects arbitrary marketing writes and missing keys
+  ---
+  duration_ms: 0.630708
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+ok 22 - exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+  ---
+  duration_ms: 17.635917
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+ok 23 - exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+  ---
+  duration_ms: 1.011291
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+ok 24 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 1.021042
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+ok 25 - exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.514959
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+ok 26 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+  ---
+  duration_ms: 0.822791
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+ok 27 - exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+  ---
+  duration_ms: 0.799
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+ok 28 - exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+  ---
+  duration_ms: 0.747292
+  type: 'test'
+  ...
+# Subtest: legacy financial write paths stay unavailable even with an idempotency header
+not ok 29 - legacy financial write paths stay unavailable even with an idempotency header
+  ---
+  duration_ms: 12.568875
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/shared-relay.test.ts:1:895'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    400 !== 501
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 501
+  actual: 400
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/shared-relay.test.ts:12:11)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: bodyless logout uses authority and non-JSON body is rejected
+ok 30 - bodyless logout uses authority and non-JSON body is rejected
+  ---
+  duration_ms: 1.115
+  type: 'test'
+  ...
+# Subtest: Shopify-shaped IDs cannot trigger Health provider operations
+not ok 31 - Shopify-shaped IDs cannot trigger Health provider operations
+  ---
+  duration_ms: 0.339333
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/shared-relay.test.ts:1:2208'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    400 !== 501
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 501
+  actual: 400
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/shared-relay.test.ts:25:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unconfigured authority never falls through
+ok 32 - unconfigured authority never falls through
+  ---
+  duration_ms: 0.232708
+  type: 'test'
+  ...
+# Subtest: only named auth cookies and trusted portal credential go to fixed authority
+ok 33 - only named auth cookies and trusted portal credential go to fixed authority
+  ---
+  duration_ms: 0.977042
+  type: 'test'
+  ...
+# Subtest: CSRF null absent foreign origins and non-JSON mutations rejected
+ok 34 - CSRF null absent foreign origins and non-JSON mutations rejected
+  ---
+  duration_ms: 0.996208
+  type: 'test'
+  ...
+# Subtest: unknown targets ingestion jobs and method escalation denied
+not ok 35 - unknown targets ingestion jobs and method escalation denied
+  ---
+  duration_ms: 0.906917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/shared-relay.test.ts:1:4248'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    400 !== 404
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 404
+  actual: 400
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/tests/affiliates/shared-relay.test.ts:41:309)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unsafe authority and transport failures fail closed
+ok 36 - unsafe authority and transport failures fail closed
+  ---
+  duration_ms: 0.547125
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 32
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 243.754125

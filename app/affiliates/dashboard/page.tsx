@@ -64,6 +64,8 @@ interface Account {
   recurringCommissionRate: number;
   couponRate: number;
   referralCommissionRate: number;
+  supplementsCommissionRate: number | null;
+  skincareCommissionRate: number | null;
   referredBy: { name: string; promoCode: string; rate: number } | null;
 }
 
@@ -269,6 +271,8 @@ export default function AffiliateOverviewPage() {
               Your promo code ·{" "}
               {account ? `${account.couponRate}%` : "—"} off ·{" "}
               {account ? `${account.commissionRate}%` : "—"} commission
+              {account?.supplementsCommissionRate != null ? ` · ${account.supplementsCommissionRate}% supplements` : ""}
+              {account?.skincareCommissionRate != null ? ` · ${account.skincareCommissionRate}% skincare` : ""}
             </p>
             <p
               className="font-sans font-medium tracking-tight text-white leading-none mt-3 break-words"

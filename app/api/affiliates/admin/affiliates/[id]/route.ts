@@ -7,6 +7,7 @@ import {
   updateAffiliate,
 
   deleteAffiliate,
+  getAffiliateCategoryRates,
 } from "@/lib/affiliates/store";
 import { isReservedPromoNickname } from "@/lib/affiliates/commission";
 import { retireShopifyCoupon, syncAffiliateCoupons } from "@/lib/affiliates/coupon-sync";
@@ -32,6 +33,8 @@ export async function GET(
     return apiError("NOT_FOUND", "Not found", 404);
   }
 
+  const categoryRates = await getAffiliateCategoryRates(id);
+
   return apiSuccess({
     affiliate: {
       id: affiliate.id,
@@ -51,6 +54,8 @@ export async function GET(
       referralCommissionRate: affiliate.referralCommissionRate ?? null,
       bonusThreshold: affiliate.bonusThreshold ?? null,
       bonusRate: affiliate.bonusRate ?? null,
+      supplementsCommissionRate: categoryRates.supplementsCommissionRate,
+      skincareCommissionRate: categoryRates.skincareCommissionRate,
       bankInfo: affiliate.bankInfo ?? null,
       createdAt: affiliate.createdAt,
     },
@@ -103,6 +108,8 @@ async function patchAffiliate(
     "commissionRate",
     "recurringCommissionRate",
     "couponRate",
+    "supplementsCommissionRate",
+    "skincareCommissionRate",
     "bankInfo",
   ]) {
     if (key in body) allowed[key] = body[key];

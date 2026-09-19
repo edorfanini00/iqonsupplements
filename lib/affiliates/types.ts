@@ -44,6 +44,10 @@ export interface Affiliate {
   bonusThreshold?: number;
   /** Bonus percent applied to the month's sales volume once the target is hit. */
   bonusRate?: number;
+  /** Commission percent for Shopify supplements category orders. Null = not set / inactive. */
+  supplementsCommissionRate?: number;
+  /** Commission percent for Shopify skincare category orders. Null = not set / inactive. */
+  skincareCommissionRate?: number;
   shopifyCustomerId?: number;
   reviewedAt?: string;
   /** Set once the affiliate completes the first-login welcome flow. */

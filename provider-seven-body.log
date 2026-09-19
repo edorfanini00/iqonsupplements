@@ -1,0 +1,154 @@
+TAP version 13
+# Subtest: fixed DELETE admin/messages/x relay
+ok 1 - fixed DELETE admin/messages/x relay
+  ---
+  duration_ms: 11.470917
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/notes/x relay
+ok 2 - fixed DELETE admin/notes/x relay
+  ---
+  duration_ms: 0.742917
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/affiliates/x relay
+ok 3 - fixed DELETE admin/affiliates/x relay
+  ---
+  duration_ms: 0.619542
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/commissions/x relay
+ok 4 - fixed DELETE admin/commissions/x relay
+  ---
+  duration_ms: 0.268708
+  type: 'test'
+  ...
+# Subtest: fixed POST admin/app relay
+ok 5 - fixed POST admin/app relay
+  ---
+  duration_ms: 0.616667
+  type: 'test'
+  ...
+# Subtest: fixed POST tiktok relay
+ok 6 - fixed POST tiktok relay
+  ---
+  duration_ms: 1.159583
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/tiktok relay
+ok 7 - fixed PATCH admin/tiktok relay
+  ---
+  duration_ms: 0.388042
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/rankings relay
+ok 8 - fixed PATCH admin/rankings relay
+  ---
+  duration_ms: 0.213708
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/tiktok/x relay
+ok 9 - fixed DELETE admin/tiktok/x relay
+  ---
+  duration_ms: 0.499042
+  type: 'test'
+  ...
+# Subtest: unchanged form helper retains UUID and throws on lost committed acknowledgement
+ok 10 - unchanged form helper retains UUID and throws on lost committed acknowledgement
+  ---
+  duration_ms: 3.771709
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST 
+ok 11 - maps only marketing POST 
+  ---
+  duration_ms: 11.287083
+  type: 'test'
+  ...
+# Subtest: maps only marketing PATCH /campaign_1
+ok 12 - maps only marketing PATCH /campaign_1
+  ---
+  duration_ms: 0.662167
+  type: 'test'
+  ...
+# Subtest: maps only marketing DELETE /campaign_1
+ok 13 - maps only marketing DELETE /campaign_1
+  ---
+  duration_ms: 0.614667
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST /campaign_1/run
+ok 14 - maps only marketing POST /campaign_1/run
+  ---
+  duration_ms: 0.37725
+  type: 'test'
+  ...
+# Subtest: maps exact mail action test-email
+ok 15 - maps exact mail action test-email
+  ---
+  duration_ms: 0.632667
+  type: 'test'
+  ...
+# Subtest: maps exact mail action customers/email
+ok 16 - maps exact mail action customers/email
+  ---
+  duration_ms: 0.842875
+  type: 'test'
+  ...
+# Subtest: rejects arbitrary marketing writes and missing keys
+ok 17 - rejects arbitrary marketing writes and missing keys
+  ---
+  duration_ms: 0.284417
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+ok 18 - exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+  ---
+  duration_ms: 13.282125
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+ok 19 - exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+  ---
+  duration_ms: 0.747708
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+ok 20 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.756333
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+ok 21 - exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.491417
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+ok 22 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+  ---
+  duration_ms: 1.169542
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+ok 23 - exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+  ---
+  duration_ms: 0.528375
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+ok 24 - exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+  ---
+  duration_ms: 0.549917
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 24
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 221.152625

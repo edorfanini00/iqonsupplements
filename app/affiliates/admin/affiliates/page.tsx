@@ -56,6 +56,8 @@ interface AffiliateRow {
   commissionRate: number;
   recurringCommissionRate: number;
   couponRate: number;
+  supplementsCommissionRate: number | null;
+  skincareCommissionRate: number | null;
   referrerId: string | null;
   referralCommissionRate: number | null;
   bonusThreshold: number | null;
@@ -351,6 +353,12 @@ function AffiliateDetailDrawer({
     affiliate.recurringCommissionRate
   );
   const [couponRate, setCouponRate] = useState(affiliate.couponRate);
+  const [supplementsCommissionRate, setSupplementsCommissionRate] = useState<string>(
+    affiliate.supplementsCommissionRate != null ? String(affiliate.supplementsCommissionRate) : ""
+  );
+  const [skincareCommissionRate, setSkincareCommissionRate] = useState<string>(
+    affiliate.skincareCommissionRate != null ? String(affiliate.skincareCommissionRate) : ""
+  );
   const [promoCode, setPromoCode] = useState(affiliate.promoCode);
   const [couponWarning, setCouponWarning] = useState<string | null>(null);
   const [referrerId, setReferrerId] = useState(affiliate.referrerId ?? "");
@@ -412,6 +420,8 @@ function AffiliateDetailDrawer({
           commissionRate,
           recurringCommissionRate,
           couponRate,
+          supplementsCommissionRate: supplementsCommissionRate !== "" ? Number(supplementsCommissionRate) : null,
+          skincareCommissionRate: skincareCommissionRate !== "" ? Number(skincareCommissionRate) : null,
           promoCode: newCode,
           referrerId: referrerId || null,
           referralCommissionRate: referralRate,
@@ -730,13 +740,40 @@ function AffiliateDetailDrawer({
                   className={bankInputClass}
                 />
               </label>
+              <label className="block">
+                <span className="text-xs text-[#64717a]">Supplements commission %</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={supplementsCommissionRate}
+                  onChange={(e) => setSupplementsCommissionRate(e.target.value)}
+                  placeholder={affiliate.supplementsCommissionRate != null ? String(affiliate.supplementsCommissionRate) : "Not set (—)"}
+                  className={bankInputClass}
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs text-[#64717a]">Skincare commission %</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={skincareCommissionRate}
+                  onChange={(e) => setSkincareCommissionRate(e.target.value)}
+                  placeholder={affiliate.skincareCommissionRate != null ? String(affiliate.skincareCommissionRate) : "Not set (—)"}
+                  className={bankInputClass}
+                />
+              </label>
             </div>
             <p className="text-xs text-[#64717a] mt-2 leading-relaxed">
               Coupon discount is what customers save at checkout. First-order
               commission applies to a customer&apos;s first (coupon-attributed)
               order; recurring commission applies to their repeat orders. Rate
               changes only affect future orders — past commissions are locked in.
-              Run coupon sync after changing the discount.
+              Run coupon sync after changing the discount. Supplements and skincare
+              rates apply to Shopify orders in those categories — leave blank (—) to keep inactive.
             </p>
 
             <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mt-6 mb-2">

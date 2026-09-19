@@ -245,6 +245,8 @@ function ReviewModal({
   const [commissionRate, setCommissionRate] = useState(15);
   const [recurringCommissionRate, setRecurringCommissionRate] = useState(10);
   const [couponRate, setCouponRate] = useState(15);
+  const [supplementsCommissionRate, setSupplementsCommissionRate] = useState<string>("");
+  const [skincareCommissionRate, setSkincareCommissionRate] = useState<string>("");
   const [referrerId, setReferrerId] = useState(
     request.suggestedReferrer?.id ?? ""
   );
@@ -273,6 +275,8 @@ function ReviewModal({
           commissionRate,
           recurringCommissionRate,
           couponRate,
+          supplementsCommissionRate: supplementsCommissionRate !== "" ? Number(supplementsCommissionRate) : undefined,
+          skincareCommissionRate: skincareCommissionRate !== "" ? Number(skincareCommissionRate) : undefined,
           referrerId: referrerId || null,
           referralCommissionRate: referrerId ? referralCommissionRate : 0,
           bonusThreshold: Number(bonusThreshold) > 0 ? Number(bonusThreshold) : undefined,
@@ -439,6 +443,49 @@ function ReviewModal({
             {request.firstName} earns {commissionRate}% on a customer&apos;s first
             order and {recurringCommissionRate}% on their recurring orders.
           </p>
+
+          <div className="rounded-lg bg-[#242526]/4 border border-[#242526]/8 p-4 !mt-4 mb-4">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-2">
+              Shopify category rates (optional)
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <label className="block">
+                <span className="text-xs text-[#64717a]">Supplements commission %</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    max="100"
+                    value={supplementsCommissionRate}
+                    onChange={(e) => setSupplementsCommissionRate(e.target.value)}
+                    placeholder="Not set"
+                    className={inputClass}
+                  />
+                  <span className="text-sm text-[#64717a] font-sans">%</span>
+                </div>
+              </label>
+              <label className="block">
+                <span className="text-xs text-[#64717a]">Skincare commission %</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    max="100"
+                    value={skincareCommissionRate}
+                    onChange={(e) => setSkincareCommissionRate(e.target.value)}
+                    placeholder="Not set"
+                    className={inputClass}
+                  />
+                  <span className="text-sm text-[#64717a] font-sans">%</span>
+                </div>
+              </label>
+            </div>
+            <p className="text-xs text-[#64717a] mt-2 leading-relaxed">
+              Leave blank to keep Shopify supplements / skincare orders inactive for this affiliate. When set, orders from those Shopify categories earn at the specified rate instead of the peptides rate.
+            </p>
+          </div>
 
           <div className="rounded-lg bg-[#242526]/4 border border-[#242526]/8 p-4 !mt-4 mb-4">
             <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-2">

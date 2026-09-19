@@ -1,0 +1,2 @@
+ALTER TABLE supplements_affiliate_profiles ADD COLUMN supplements_commission_rate DOUBLE PRECISION;
+ALTER TABLE supplements_affiliate_profiles ADD COLUMN skincare_commission_rate DOUBLE PRECISION;
