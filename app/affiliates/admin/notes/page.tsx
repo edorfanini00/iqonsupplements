@@ -127,12 +127,17 @@ export default function AdminNotesPage() {
 
   const removeNote = useCallback(async (id: string) => {
     if (!window.confirm("Delete this note permanently?")) return;
-    setNotes((prev) => prev.filter((n) => n.id !== id));
-    if (editingId === id) setEditingId(null);
-    await nonproviderMutationFetch(`/api/affiliates/admin/notes/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    }).catch(() => {});
+    try {
+      const response = await nonproviderMutationFetch(`/api/affiliates/admin/notes/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) return;
+      setNotes((prev) => prev.filter((n) => n.id !== id));
+      if (editingId === id) setEditingId(null);
+    } catch {
+      // Keep the original control and operation UUID for an uncertain retry.
+    }
   }, [editingId]);
 
   function startEdit(note: AdminNote) {

@@ -21,6 +21,14 @@
     "hunks": [
       {
         "original": "",
+        "canonical": "import {nonproviderMutationFetch} from \"@/lib/affiliates/nonprovider-mutation-fetch\";\n"
+      },
+      {
+        "original": "    await fetch(`/api/affiliates/admin/messages/${id}`, {",
+        "canonical": "    await nonproviderMutationFetch(`/api/affiliates/admin/messages/${id}`, {"
+      },
+      {
+        "original": "",
         "canonical": "import { nativeMutationFetch } from \"@/lib/affiliates/native-mutation-fetch\";\n"
       },
       {
