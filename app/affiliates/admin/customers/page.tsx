@@ -1,4 +1,5 @@
 "use client";
+import {providerMutationFetch} from "@/lib/affiliates/provider-mutation-fetch";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -138,7 +139,7 @@ export default function AdminCustomersPage() {
       const recipients = customers
         .filter((c) => selected.has(c.email))
         .map((c) => ({ email: c.email, firstName: c.firstName }));
-      const res = await fetch("/api/affiliates/admin/customers/email", {
+      const res = await providerMutationFetch("/api/affiliates/admin/customers/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

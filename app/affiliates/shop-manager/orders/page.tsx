@@ -1,4 +1,5 @@
 "use client";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { Suspense, useCallback, useEffect, useMemo, useState, Fragment } from "react";
 import { useSearchParams } from "next/navigation";
@@ -85,21 +86,30 @@ function ShopManagerOrdersPageInner() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("to-fulfill");
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const load = useCallback(async (p: Preset) => {
     setLoading(true);
+    const request = beginRead();
+    setReadError(null); setOrders([]); setTruncated(false);
     try {
-      const res = await fetch(`/api/affiliates/shop-manager/orders?range=${p}`, {
-        credentials: "include",
+      const res = await fetch(`/api/affiliates/shop-manager/orders?range=${encodeURIComponent(p)}`, {
+        credentials: "include", cache: "no-store", signal: request.signal,
       });
+      if (!res.ok) throw new Error("Could not load data. Please retry.");
       if (res.ok) {
         const data = await res.json();
+        if (!request.isCurrent()) return;
         setOrders(data.orders ?? []);
         setTruncated(Boolean(data.truncated));
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setLoading(false);
     }
-  }, []);
+  }, [beginRead]);
 
   useEffect(() => {
     load(preset);
@@ -136,6 +146,7 @@ function ShopManagerOrdersPageInner() {
 
   return (
     <>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => load(preset)}>Retry</button></p>}
       <PageHeader
         title="Orders to ship"
         description="Paid orders waiting to be packed and shipped. Expand an order to see the full shipping address and line items."

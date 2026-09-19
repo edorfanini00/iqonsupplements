@@ -1,7 +1,4 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -18,11 +15,12 @@ import {
   StatCard,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 import { OrderDetailDrawer } from "@/components/affiliates/shared/OrderDetailDrawer";
 
-interface Customer extends OriginalMoney {
+interface Customer {
   key: string;
   email: string;
   name: string;
@@ -36,7 +34,7 @@ interface Customer extends OriginalMoney {
   isRecurring: boolean;
 }
 
-interface OrderRow extends OriginalMoney {
+interface OrderRow {
   id: string;
   orderId: string;
   orderTotal: number;
@@ -47,7 +45,6 @@ interface OrderRow extends OriginalMoney {
 }
 
 export default function AffiliateClientsPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -110,8 +107,6 @@ export default function AffiliateClientsPage() {
     return { recurring, totalRevenue, totalCommission, lifetimeAvg };
   }, [customers]);
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
       <PageHeader
@@ -142,12 +137,12 @@ export default function AffiliateClientsPage() {
         <StatCard
           icon={ShoppingBag}
           label="Lifetime revenue"
-          value={loading ? "—" : originalTotal(customers, "totalSpent")}
+          value={formatCurrency(totals.totalRevenue)}
         />
         <StatCard
           icon={TrendingUp}
           label="Avg LTV"
-          value={loading ? "—" : originalTotal(customers, "totalSpent", customers.length)}
+          value={formatCurrency(totals.lifetimeAvg)}
         />
       </section>
 
@@ -224,10 +219,10 @@ export default function AffiliateClientsPage() {
                       {c.orderCount}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(c, "totalSpent")}
+                      {formatCurrency(c.totalSpent)}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(c, "totalCommission")}
+                      {formatCurrency(c.totalCommission)}
                     </td>
                     <td className="py-4 px-5">
                       <Pill
@@ -332,11 +327,11 @@ function CustomerDrawer({
             />
             <MiniStat
               label="Spent"
-              value={originalField(customer, "totalSpent")}
+              value={formatCurrency(customer.totalSpent)}
             />
             <MiniStat
               label="Your commission"
-              value={originalField(customer, "totalCommission")}
+              value={formatCurrency(customer.totalCommission)}
             />
             <MiniStat
               label="Customer since"
@@ -390,10 +385,10 @@ function CustomerDrawer({
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-sans">
-                        {formatCurrency(o.orderTotal, o.currency as string | null)}
+                        {formatCurrency(o.orderTotal)}
                       </p>
                       <p className="text-[11px] font-sans text-[#64717a] mt-0.5">
-                        + {formatCurrency(o.commission, o.currency as string | null)}
+                        + {formatCurrency(o.commission)}
                       </p>
                     </div>
                   </li>

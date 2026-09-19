@@ -1,0 +1,260 @@
+TAP version 13
+# Subtest: actual Messages handler: lost preserves retry until confirmed
+not ok 1 - actual Messages handler: lost preserves retry until confirmed
+  ---
+  duration_ms: 11.556875
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:28:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    row/retry control stays visible while acknowledgement is pending
+    + actual - expected
+    
+      [
+        {
+    -     id: 'owned'
+    -   },
+    -   {
+          id: 'other'
+        }
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      id: 'owned'
+    1:
+      id: 'other'
+  actual:
+    0:
+      id: 'other'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:48:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: actual Messages handler: truncated preserves retry until confirmed
+not ok 2 - actual Messages handler: truncated preserves retry until confirmed
+  ---
+  duration_ms: 2.152916
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:28:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    row/retry control stays visible while acknowledgement is pending
+    + actual - expected
+    
+      [
+        {
+    -     id: 'owned'
+    -   },
+    -   {
+          id: 'other'
+        }
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      id: 'owned'
+    1:
+      id: 'other'
+  actual:
+    0:
+      id: 'other'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:48:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: actual Messages handler: negative-dto preserves retry until confirmed
+not ok 3 - actual Messages handler: negative-dto preserves retry until confirmed
+  ---
+  duration_ms: 1.504416
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:28:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    row/retry control stays visible while acknowledgement is pending
+    + actual - expected
+    
+      [
+        {
+    -     id: 'owned'
+    -   },
+    -   {
+          id: 'other'
+        }
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      id: 'owned'
+    1:
+      id: 'other'
+  actual:
+    0:
+      id: 'other'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:48:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual Messages handler: negative-http preserves retry until confirmed
+not ok 4 - actual Messages handler: negative-http preserves retry until confirmed
+  ---
+  duration_ms: 1.895416
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:28:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    row/retry control stays visible while acknowledgement is pending
+    + actual - expected
+    
+      [
+        {
+    -     id: 'owned'
+    -   },
+    -   {
+          id: 'other'
+        }
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      id: 'owned'
+    1:
+      id: 'other'
+  actual:
+    0:
+      id: 'other'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:48:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual Messages handler: unconfirmed-dto preserves retry until confirmed
+not ok 5 - actual Messages handler: unconfirmed-dto preserves retry until confirmed
+  ---
+  duration_ms: 1.25525
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:28:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    row/retry control stays visible while acknowledgement is pending
+    + actual - expected
+    
+      [
+        {
+    -     id: 'owned'
+    -   },
+    -   {
+          id: 'other'
+        }
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      id: 'owned'
+    1:
+      id: 'other'
+  actual:
+    0:
+      id: 'other'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:48:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual Messages handler: confirmed preserves retry until confirmed
+not ok 6 - actual Messages handler: confirmed preserves retry until confirmed
+  ---
+  duration_ms: 5.582625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:28:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    row/retry control stays visible while acknowledgement is pending
+    + actual - expected
+    
+      [
+        {
+    -     id: 'owned'
+    -   },
+    -   {
+          id: 'other'
+        }
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      id: 'owned'
+    1:
+      id: 'other'
+  actual:
+    0:
+      id: 'other'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-provider-body/scripts/affiliates/messages-delete-retry.test.cjs:48:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual Messages handler: cancel preserves retry until confirmed
+ok 7 - actual Messages handler: cancel preserves retry until confirmed
+  ---
+  duration_ms: 1.299625
+  type: 'test'
+  ...
+# Subtest: Messages JSX equals pinned pre-fix source
+ok 8 - Messages JSX equals pinned pre-fix source
+  ---
+  duration_ms: 28.900792
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 2
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 243.359458

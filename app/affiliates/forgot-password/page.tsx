@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ export default function AffiliateForgotPasswordPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/affiliates/forgot-password", {
+      const res = await nativeMutationFetch("/api/affiliates/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

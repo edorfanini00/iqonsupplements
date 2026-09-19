@@ -1,5 +1,8 @@
 "use client";
 
+import {accountingMutationFetch} from "@/lib/affiliates/accounting-mutation-fetch";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Calculator,
@@ -48,7 +51,7 @@ interface PickerProduct {
 
 interface InventoryRow {
   id: string;
-  shopifyProductId: number;
+  wooProductId: number;
   name: string;
   lowStockThreshold: number;
   unitsPurchased: number;
@@ -63,7 +66,7 @@ interface InventoryRow {
 
 interface Adjustment {
   id: string;
-  shopifyProductId: number;
+  wooProductId: number;
   productName: string;
   /** Positive = units added, negative = units missing/removed. */
   delta: number;
@@ -74,7 +77,7 @@ interface Adjustment {
 
 interface Purchase {
   id: string;
-  shopifyProductId: number;
+  wooProductId: number;
   productName: string;
   units: number;
   totalCost: number;
@@ -86,7 +89,7 @@ interface Purchase {
 
 interface SupplierOrderLine {
   id: string;
-  shopifyProductId: number;
+  wooProductId: number;
   productName: string;
   units: number;
   totalCost: number;
@@ -140,7 +143,7 @@ interface Expense {
 
 interface ManualSale {
   id: string;
-  shopifyProductId: number;
+  wooProductId: number;
   productName: string;
   /** "sale" = revenue + stock deduction; "giveaway" = free shipment, stock only. */
   kind: "sale" | "giveaway";
@@ -152,7 +155,7 @@ interface ManualSale {
 }
 
 interface ProductPnl {
-  shopifyProductId: number;
+  wooProductId: number;
   name: string;
   unitsSold: number;
   revenue: number;
@@ -193,7 +196,7 @@ interface TrendPoint {
 }
 
 interface ProductTrend {
-  shopifyProductId: number;
+  wooProductId: number;
   name: string;
   totalUnits: number;
   totalRevenue: number;
@@ -224,7 +227,7 @@ interface StockHistoryEvent {
 
 interface StockHistory {
   itemId: string;
-  shopifyProductId: number;
+  wooProductId: number;
   name: string;
   days: StockHistoryDay[];
   events: StockHistoryEvent[];
@@ -405,7 +408,7 @@ export default function AdminAccountingPage() {
 
   // Shared data
   const [products, setProducts] = useState<PickerProduct[]>([]);
-  // "Add new product" placeholder form + note when placeholders auto-link to Shopify.
+  // "Add new product" placeholder form + note when placeholders auto-link to Woo.
   const [npName, setNpName] = useState("");
   const [npSaving, setNpSaving] = useState(false);
   const [npError, setNpError] = useState<string | null>(null);
@@ -582,7 +585,7 @@ export default function AdminAccountingPage() {
     if (res?.ok) {
       const data = await res.json();
       setProducts(data.products ?? []);
-      // Placeholders that just got linked to live Shopify products — surface it so
+      // Placeholders that just got linked to live Woo products — surface it so
       // the admin knows stock carried over automatically.
       const linked = (data.reconciled ?? []) as { name: string }[];
       if (linked.length > 0) {
@@ -603,7 +606,7 @@ export default function AdminAccountingPage() {
     setNpError(null);
     setNpSuccess(null);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/products", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -626,22 +629,31 @@ export default function AdminAccountingPage() {
     }
   }, [npName, loadProducts]);
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const loadSummary = useCallback(async (p: Period) => {
     setSummaryLoading(true);
+    const request = beginRead();
+    setReadError(null); setSummary(null);
     try {
       const { from, to } = periodRange(p);
       const res = await fetch(
         `/api/affiliates/admin/accounting/summary?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
-        { credentials: "include" }
+        { credentials: "include", cache: "no-store", signal: request.signal }
       );
+      if (!res.ok) throw new Error("Could not load data. Please retry.");
       if (res.ok) {
         const data = await res.json();
+        if (!request.isCurrent()) return;
         setSummary(data.summary ?? null);
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setSummaryLoading(false);
     }
-  }, []);
+  }, [beginRead]);
 
   const loadTrends = useCallback(async () => {
     setTrendsLoading(true);
@@ -814,12 +826,12 @@ export default function AdminAccountingPage() {
         : costInput;
     setPSaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/purchases", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/purchases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          shopifyProductId: product.id,
+          wooProductId: product.id,
           productName: product.name,
           units,
           totalCost,
@@ -845,7 +857,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this purchase entry? Inventory counts will update.")) return;
       setPurchases((prev) => prev.filter((p) => p.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/purchases/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/purchases/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -874,7 +886,7 @@ export default function AdminAccountingPage() {
       return;
     }
     const lines: {
-      shopifyProductId: number;
+      wooProductId: number;
       productName: string;
       units: number;
       totalCost: number;
@@ -900,7 +912,7 @@ export default function AdminAccountingPage() {
           ? Math.round(costInput * units * 100) / 100
           : costInput;
       lines.push({
-        shopifyProductId: product.id,
+        wooProductId: product.id,
         productName: product.name,
         units,
         totalCost,
@@ -908,7 +920,7 @@ export default function AdminAccountingPage() {
     }
     setOSaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/orders", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -950,7 +962,7 @@ export default function AdminAccountingPage() {
   const markOrderArrived = useCallback(
     async (id: string) => {
       setOrderActionError(null);
-      const res = await fetch(`/api/affiliates/admin/accounting/orders/${id}`, {
+      const res = await accountingMutationFetch(`/api/affiliates/admin/accounting/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -988,7 +1000,7 @@ export default function AdminAccountingPage() {
       )
         return;
       setOrderActionError(null);
-      const res = await fetch(`/api/affiliates/admin/accounting/orders/${id}`, {
+      const res = await accountingMutationFetch(`/api/affiliates/admin/accounting/orders/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => null);
@@ -1022,12 +1034,12 @@ export default function AdminAccountingPage() {
     const delta = aDirection === "deduct" ? -units : units;
     setASaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/adjustments", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/adjustments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          shopifyProductId: product.id,
+          wooProductId: product.id,
           productName: product.name,
           delta,
           reason: aReason.trim() || undefined,
@@ -1050,7 +1062,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this adjustment? Stock counts will update.")) return;
       setAdjustments((prev) => prev.filter((a) => a.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/adjustments/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/adjustments/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -1080,12 +1092,12 @@ export default function AdminAccountingPage() {
     }
     setSSaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/sales", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/sales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          shopifyProductId: product.id,
+          wooProductId: product.id,
           productName: product.name,
           kind: sKind,
           units,
@@ -1112,7 +1124,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this entry? Revenue and inventory will update.")) return;
       setSales((prev) => prev.filter((s) => s.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/sales/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/sales/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -1136,7 +1148,7 @@ export default function AdminAccountingPage() {
     }
     setESaving(true);
     try {
-      const res = await fetch("/api/affiliates/admin/accounting/expenses", {
+      const res = await accountingMutationFetch("/api/affiliates/admin/accounting/expenses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1167,7 +1179,7 @@ export default function AdminAccountingPage() {
     async (id: string) => {
       if (!window.confirm("Delete this expense?")) return;
       setExpenses((prev) => prev.filter((e) => e.id !== id));
-      await fetch(`/api/affiliates/admin/accounting/expenses/${id}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/expenses/${id}`, {
         method: "DELETE",
         credentials: "include",
       }).catch(() => {});
@@ -1189,7 +1201,7 @@ export default function AdminAccountingPage() {
             : row
         )
       );
-      await fetch(`/api/affiliates/admin/accounting/items/${itemId}`, {
+      await accountingMutationFetch(`/api/affiliates/admin/accounting/items/${itemId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1253,7 +1265,7 @@ export default function AdminAccountingPage() {
       }));
     }
     const product = trends.byProduct.find(
-      (p) => String(p.shopifyProductId) === demandProductId
+      (p) => String(p.wooProductId) === demandProductId
     );
     return (product?.points ?? []).map((pt) => ({
       date: pt.date,
@@ -1324,6 +1336,7 @@ export default function AdminAccountingPage() {
 
   return (
     <>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => loadSummary(period)}>Retry</button></p>}
       <PageHeader
         eyebrow="Finance"
         title="Accounting"
@@ -1413,9 +1426,9 @@ export default function AdminAccountingPage() {
                 />
                 <StatCard
                   icon={TrendingUp}
-                  label="Estimated shipping profit"
-                  value={formatCurrency(summary.shippingProfit)}
-                  hint={`${formatCurrency(summary.shippingCollected)} shipping − ${formatCurrency(summary.shippingCost)} estimated cost · tax excluded`}
+                  label="Shipping + tax profit"
+                  value={formatCurrency(summary.shippingProfit + summary.taxCollected)}
+                  hint={`${formatCurrency(summary.shippingCollected)} shipping − ${formatCurrency(summary.shippingCost)} cost + ${formatCurrency(summary.taxCollected)} tax`}
                 />
                 <StatCard
                   icon={Users}
@@ -1438,7 +1451,7 @@ export default function AdminAccountingPage() {
               </div>
 
               <p className="text-xs text-[#64717a] font-sans mb-8">
-                Net profit = product revenue − cost of goods + estimated shipping profit
+                Net profit = product revenue − cost of goods + shipping profit + taxes
                 collected − affiliate fees − expenses. Shipping profit counts US orders
                 only ($15 collected − $6 cost each); international shipping is charged at
                 the carrier rate and passes through with no profit. Total charged in this
@@ -1479,7 +1492,7 @@ export default function AdminAccountingPage() {
                       </thead>
                       <tbody className="divide-y divide-[#242526]/6">
                         {summary.products.map((row) => (
-                          <tr key={row.shopifyProductId}>
+                          <tr key={row.wooProductId}>
                             <td className="px-5 py-3.5 text-[#20282c] font-medium">
                               {row.name}
                               {!row.tracked && (
@@ -1568,7 +1581,7 @@ export default function AdminAccountingPage() {
                       {trends.byProduct
                         .filter((p) => p.totalUnits > 0)
                         .map((p) => (
-                          <option key={p.shopifyProductId} value={p.shopifyProductId}>
+                          <option key={p.wooProductId} value={p.wooProductId}>
                             {p.name}
                           </option>
                         ))}
@@ -1747,7 +1760,7 @@ export default function AdminAccountingPage() {
           )}
 
           <p className="text-xs text-[#64717a] font-sans mt-4">
-            Sold units count paid Shopify orders placed since each product&apos;s first
+            Sold units count paid WooCommerce orders placed since each product&apos;s first
             purchase entry, so stock you record depletes automatically as orders come in.
             Click any product to see its day-by-day stock trend and the orders behind it.
             {inventoryTruncated &&
@@ -1922,7 +1935,7 @@ export default function AdminAccountingPage() {
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 mb-5 text-sm text-emerald-900">
               <strong>Linked to the store:</strong> {reconciledNote} — the
               stock and purchase history you recorded before launch now counts
-              against the live Shopify product, and every sale deducts
+              against the live WooCommerce product, and every sale deducts
               automatically.
             </div>
           )}
@@ -1953,14 +1966,14 @@ export default function AdminAccountingPage() {
             ))}
           </div>
 
-          {/* Placeholder products: orderable before they exist in Shopify */}
+          {/* Placeholder products: orderable before they exist in Woo */}
           <div className="glass-surface rounded-lg p-5 sm:p-6 mb-6">
             <SectionTitle eyebrow="New product" title="Ordering something not in the store yet?" />
             <p className="text-xs text-[#64717a] -mt-3 mb-4 max-w-2xl leading-relaxed">
               Add it here and it shows up in every product picker (marked
               &ldquo;coming soon&rdquo;) so you can include it in purchases and
               supplier orders right away. When you later publish it in
-              Shopify under the same name, everything links up on its own:
+              WooCommerce under the same name, everything links up on its own:
               recorded stock carries over and store sales start deducting
               automatically.
             </p>
@@ -2004,7 +2017,7 @@ export default function AdminAccountingPage() {
             <div className="glass-surface rounded-lg p-5 sm:p-6 mb-6">
               <SectionTitle eyebrow="New order" title="Record a supplier order" />
               <p className="text-xs text-[#64717a] -mt-3 mb-5 max-w-2xl leading-relaxed">
-                Bought several products together? Add one line per product. New
+                Bought several peptides together? Add one line per product. New
                 orders start as <strong>in transit</strong> — the units are added
                 to stock only when you hit &ldquo;Arrived&rdquo; under
                 &ldquo;Past orders.&rdquo; Nothing is recorded until you press{" "}
@@ -2490,7 +2503,7 @@ export default function AdminAccountingPage() {
             <SectionTitle eyebrow="New entry" title="Record an offline sale or free shipment" />
             <p className="text-xs text-[#64717a] -mt-3 mb-5 max-w-2xl leading-relaxed">
               Offline sales (cash, direct, in person) count as revenue and deduct stock,
-              just like a Shopify order. Free shipments (e.g. product sent to an
+              just like a WooCommerce order. Free shipments (e.g. product sent to an
               affiliate) only deduct stock — no revenue, but the unit cost still counts
               in cost of goods.
             </p>

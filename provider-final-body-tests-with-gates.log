@@ -1,0 +1,160 @@
+TAP version 13
+# Subtest: fixed DELETE admin/messages/x relay
+ok 1 - fixed DELETE admin/messages/x relay
+  ---
+  duration_ms: 18.509417
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/notes/x relay
+ok 2 - fixed DELETE admin/notes/x relay
+  ---
+  duration_ms: 0.786458
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/affiliates/x relay
+ok 3 - fixed DELETE admin/affiliates/x relay
+  ---
+  duration_ms: 0.629167
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/commissions/x relay
+ok 4 - fixed DELETE admin/commissions/x relay
+  ---
+  duration_ms: 0.27975
+  type: 'test'
+  ...
+# Subtest: fixed POST admin/app relay
+ok 5 - fixed POST admin/app relay
+  ---
+  duration_ms: 0.627291
+  type: 'test'
+  ...
+# Subtest: fixed POST tiktok relay
+ok 6 - fixed POST tiktok relay
+  ---
+  duration_ms: 0.662167
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/tiktok relay
+ok 7 - fixed PATCH admin/tiktok relay
+  ---
+  duration_ms: 0.3955
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/rankings relay
+ok 8 - fixed PATCH admin/rankings relay
+  ---
+  duration_ms: 0.209083
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/tiktok/x relay
+ok 9 - fixed DELETE admin/tiktok/x relay
+  ---
+  duration_ms: 0.548791
+  type: 'test'
+  ...
+# Subtest: unchanged form helper retains UUID and throws on lost committed acknowledgement
+ok 10 - unchanged form helper retains UUID and throws on lost committed acknowledgement
+  ---
+  duration_ms: 4.630917
+  type: 'test'
+  ...
+# Subtest: truncated or negative successful acknowledgements retain the UUID and cannot clear forms
+ok 11 - truncated or negative successful acknowledgements retain the UUID and cannot clear forms
+  ---
+  duration_ms: 20.259042
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST 
+ok 12 - maps only marketing POST 
+  ---
+  duration_ms: 18.944917
+  type: 'test'
+  ...
+# Subtest: maps only marketing PATCH /campaign_1
+ok 13 - maps only marketing PATCH /campaign_1
+  ---
+  duration_ms: 0.672541
+  type: 'test'
+  ...
+# Subtest: maps only marketing DELETE /campaign_1
+ok 14 - maps only marketing DELETE /campaign_1
+  ---
+  duration_ms: 0.646333
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST /campaign_1/run
+ok 15 - maps only marketing POST /campaign_1/run
+  ---
+  duration_ms: 0.370416
+  type: 'test'
+  ...
+# Subtest: maps exact mail action test-email
+ok 16 - maps exact mail action test-email
+  ---
+  duration_ms: 0.663667
+  type: 'test'
+  ...
+# Subtest: maps exact mail action customers/email
+ok 17 - maps exact mail action customers/email
+  ---
+  duration_ms: 0.283958
+  type: 'test'
+  ...
+# Subtest: rejects arbitrary marketing writes and missing keys
+ok 18 - rejects arbitrary marketing writes and missing keys
+  ---
+  duration_ms: 0.258709
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: POST /api/affiliates/admin/woocommerce-sync
+ok 19 - unqualified exact-seven gate: POST /api/affiliates/admin/woocommerce-sync
+  ---
+  duration_ms: 10.790083
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: POST /api/affiliates/admin/portal-commerce-sync
+ok 20 - unqualified exact-seven gate: POST /api/affiliates/admin/portal-commerce-sync
+  ---
+  duration_ms: 0.86575
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: POST /api/affiliates/admin/orders/123/attribute
+ok 21 - unqualified exact-seven gate: POST /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.331292
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: DELETE /api/affiliates/admin/orders/123/attribute
+ok 22 - unqualified exact-seven gate: DELETE /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 0.247083
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: POST /api/affiliates/admin/orders/123/refund
+ok 23 - unqualified exact-seven gate: POST /api/affiliates/admin/orders/123/refund
+  ---
+  duration_ms: 0.533292
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: POST /api/affiliates/admin/subscriptions/sub_123
+ok 24 - unqualified exact-seven gate: POST /api/affiliates/admin/subscriptions/sub_123
+  ---
+  duration_ms: 0.135625
+  type: 'test'
+  ...
+# Subtest: unqualified exact-seven gate: GET /api/affiliates/orders/order_123?refresh=1
+ok 25 - unqualified exact-seven gate: GET /api/affiliates/orders/order_123?refresh=1
+  ---
+  duration_ms: 0.242292
+  type: 'test'
+  ...
+1..25
+# tests 25
+# suites 0
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 264.2985

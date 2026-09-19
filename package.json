@@ -20,7 +20,9 @@
     "postinstall": "prisma generate",
     "affiliates:migrate": "node scripts/disabled-affiliate-migration.mjs",
     "affiliates:bootstrap": "node --import tsx scripts/bootstrap-affiliates.ts",
-    "test:affiliates": "node --import tsx --test tests/affiliates/*.test.ts"
+    "test:affiliates": "node --import tsx --test tests/affiliates/*.test.ts",
+    "test:affiliate-ui": "vitest run --config tests/ui/vitest.config.mjs",
+    "typecheck:next": "tsc -p tsconfig.next.json --noEmit --incremental false"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -53,6 +55,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
     "@tailwindcss/postcss": "4.2.1",
+    "@testing-library/react": "16.3.3",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
@@ -61,6 +64,7 @@
     "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
+    "jsdom": "30.1.0",
     "prisma": "^6.19.0",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
@@ -69,6 +73,7 @@
     "typescript": "5.9.3",
     "vinext": "0.0.50",
     "vite": "8.0.13",
+    "vitest": "3.2.4",
     "wrangler": "4.92.0"
   },
   "type": "module"

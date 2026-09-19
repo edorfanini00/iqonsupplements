@@ -1,4 +1,6 @@
 "use client";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
@@ -134,12 +136,17 @@ export default function AdminMessagesPage() {
 
   const removeMessage = useCallback(async (id: string) => {
     if (!window.confirm("Delete this message permanently?")) return;
-    setMessages((prev) => prev.filter((m) => m.id !== id));
-    setActive((cur) => (cur && cur.id === id ? null : cur));
-    await fetch(`/api/affiliates/admin/messages/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    }).catch(() => {});
+    try {
+      const response = await nonproviderMutationFetch(`/api/affiliates/admin/messages/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) return;
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+      setActive((cur) => (cur && cur.id === id ? null : cur));
+    } catch {
+      // Keep the original control and operation UUID for an unchanged retry.
+    }
   }, []);
 
   function openMessage(m: ContactMessage) {
@@ -433,7 +440,7 @@ function MessageDrawer({
     setSending(true);
     setError(null);
     try {
-      const res = await fetch(
+      const res = await nativeMutationFetch(
         `/api/affiliates/admin/messages/${message.id}/reply`,
         {
           method: "POST",

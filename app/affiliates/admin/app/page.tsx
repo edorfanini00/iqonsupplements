@@ -1,7 +1,6 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
+import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -23,6 +22,7 @@ import {
   StatCard,
   SectionTitle,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
@@ -72,7 +72,7 @@ interface Match {
   commissionsRecorded: number;
 }
 
-interface RecordedCommission extends OriginalMoney {
+interface RecordedCommission {
   id: string;
   orderId: string;
   affiliateName: string;
@@ -108,7 +108,6 @@ const ACTIVE_STATUSES = new Set(["active", "trialing", "in_grace_period"]);
 type SubFilter = "all" | "paying" | "stopped";
 
 export default function AdminAppPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
   const [subFilter, setSubFilter] = useState<SubFilter>("all");
@@ -120,19 +119,29 @@ export default function AdminAppPage() {
   const [recording, setRecording] = useState(false);
   const [signupsShown, setSignupsShown] = useState(15);
 
+  const beginRead = useLatestRead();
+  const [readError, setReadError] = useState<string | null>(null);
   const load = useCallback(async () => {
     setLoading(true);
+    const request = beginRead();
+    setReadError(null);
+    setData(null);
     try {
-      const res = await fetch("/api/affiliates/admin/app", { credentials: "include" });
+      const res = await fetch("/api/affiliates/admin/app", { credentials: "include", cache: "no-store", signal: request.signal });
+      if (!res.ok) throw new Error("Could not load data. Please retry.");
       if (res.ok) {
         const payload = await res.json();
+        if (!request.isCurrent()) return;
         setData(payload);
-        setRateInput(payload.commissionRate == null ? '' : String(payload.commissionRate));
+        setRateInput(String(payload.commissionRate ?? 10));
       }
+    } catch {
+      if (request.isCurrent()) setReadError("Could not load data. Please retry.");
     } finally {
+      if (!request.isCurrent()) return;
       setLoading(false);
     }
-  }, []);
+  }, [beginRead]);
 
   useEffect(() => {
     load();
@@ -140,13 +149,13 @@ export default function AdminAppPage() {
 
   const saveRate = useCallback(async () => {
     const value = Number(rateInput);
-    if (!rateInput.trim() || !Number.isFinite(value) || value < 0 || value > 100) {
+    if (!Number.isFinite(value) || value < 0 || value > 100) {
       toast.error("Rate must be between 0 and 100.");
       return;
     }
     setSavingRate(true);
     try {
-      const res = await fetch("/api/affiliates/admin/app", {
+      const res = await nonproviderMutationFetch("/api/affiliates/admin/app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -174,7 +183,7 @@ export default function AdminAppPage() {
       }
       setRecording(true);
       try {
-        const res = await fetch("/api/affiliates/admin/app", {
+        const res = await nonproviderMutationFetch("/api/affiliates/admin/app", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -216,17 +225,16 @@ export default function AdminAppPage() {
     subFilter === "paying" ? paying : subFilter === "stopped" ? stopped : subs;
 
   const metrics = data?.metrics ?? null;
-  const rate = data?.commissionRate ?? null;
+  const rate = data?.commissionRate ?? 10;
   const previewAmount = Number(amountInput);
   const previewCommission =
-    rate !== null && Number.isFinite(previewAmount) && previewAmount > 0
+    Number.isFinite(previewAmount) && previewAmount > 0
       ? Math.round(previewAmount * rate) / 100
       : null;
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
+      {readError && <p role="alert">{readError} <button type="button" onClick={() => load()}>Retry</button></p>}
       <PageHeader
         eyebrow="IQONIC"
         title="App"
@@ -750,7 +758,7 @@ export default function AdminAppPage() {
                         </p>
                       </div>
                       <span className="font-sans whitespace-nowrap">
-                        {originalField(c, "commission")}
+                        {formatCurrency(c.commission)}
                       </span>
                     </li>
                   ))}

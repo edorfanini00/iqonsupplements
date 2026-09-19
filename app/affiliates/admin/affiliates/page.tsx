@@ -1,7 +1,7 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
+import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
+// BODY COMMAND ADAPTER
+import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
@@ -25,6 +25,7 @@ import {
   StatCard,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
@@ -72,7 +73,6 @@ interface AffiliateRow {
 }
 
 export default function AdminAffiliatesPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [affiliates, setAffiliates] = useState<AffiliateRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -127,8 +127,6 @@ export default function AdminAffiliatesPage() {
     return { active, withBank, pending, paid };
   }, [affiliates]);
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
       <PageHeader
@@ -172,13 +170,13 @@ export default function AdminAffiliatesPage() {
         <StatCard
           icon={CreditCard}
           label="Pending payout"
-          value={loading ? "—" : originalTotal(affiliates.map(a=>a.stats), "pendingCommission")}
+          value={formatCurrency(totals.pending)}
           accent
         />
         <StatCard
           icon={CreditCard}
           label="Paid lifetime"
-          value={loading ? "—" : originalTotal(affiliates.map(a=>a.stats), "paidCommission")}
+          value={formatCurrency(totals.paid)}
         />
       </section>
 
@@ -265,13 +263,13 @@ export default function AdminAffiliatesPage() {
                       {a.stats.totalOrders}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(a.stats, "totalRevenue")}
+                      {formatCurrency(a.stats.totalRevenue)}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(a.stats, "totalCommission")}
+                      {formatCurrency(a.stats.totalCommission)}
                     </td>
                     <td className="py-4 px-5 text-right font-sans text-[#20282c]">
-                      {originalField(a.stats, "pendingCommission")}
+                      {formatCurrency(a.stats.pendingCommission)}
                     </td>
                     <td className="py-4 px-5">
                       {a.bankInfo ? (
@@ -442,7 +440,7 @@ function AffiliateDetailDrawer({
     if (!window.confirm("Delete this affiliate? This cannot be undone.")) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/affiliates/admin/affiliates/${affiliate.id}`, {
+      const res = await nonproviderMutationFetch(`/api/affiliates/admin/affiliates/${affiliate.id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -504,15 +502,15 @@ function AffiliateDetailDrawer({
               />
               <MiniStat
                 label="Revenue"
-                value={originalField(affiliate.stats, "totalRevenue")}
+                value={formatCurrency(affiliate.stats.totalRevenue)}
               />
               <MiniStat
                 label="Commission"
-                value={originalField(affiliate.stats, "totalCommission")}
+                value={formatCurrency(affiliate.stats.totalCommission)}
               />
               <MiniStat
                 label="Pending"
-                value={originalField(affiliate.stats, "pendingCommission")}
+                value={formatCurrency(affiliate.stats.pendingCommission)}
               />
             </div>
           </section>
@@ -924,7 +922,6 @@ function CreateAffiliateModal({
     lastName: "",
     email: "",
     phone: "",
-    password: "",
     nickname: "",
     role: "affiliate" as "affiliate" | "admin",
     commissionRate: 15,
@@ -960,16 +957,6 @@ function CreateAffiliateModal({
     return clean ? `${clean}15` : "";
   }, [form.nickname]);
 
-  function generatePassword() {
-    const chars =
-      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-    let pwd = "";
-    for (let i = 0; i < 12; i++) {
-      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setForm((f) => ({ ...f, password: pwd }));
-  }
-
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -984,7 +971,6 @@ function CreateAffiliateModal({
           lastName: form.lastName,
           email: form.email,
           phone: form.phone,
-          password: form.password,
           nickname: form.nickname,
           role: form.role,
           commissionRate: form.commissionRate,
@@ -1083,25 +1069,10 @@ function CreateAffiliateModal({
             }
             className={inputClass}
           />
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Password*"
-              value={form.password}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, password: e.target.value }))
-              }
-              required
-              className={`${inputClass} pr-20`}
-            />
-            <button
-              type="button"
-              onClick={generatePassword}
-              className="absolute right-0 bottom-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] hover:text-[#20282c] transition-colors"
-            >
-              Generate
-            </button>
-          </div>
+          <p className="text-xs text-[#64717a] py-3">
+            Identity setup is handled by the canonical provider. Creating a profile
+            does not confirm login access, email delivery or creator-code activation.
+          </p>
           <input
             placeholder="Nickname (for promo code)*"
             value={form.nickname}

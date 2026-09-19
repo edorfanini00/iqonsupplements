@@ -1,7 +1,6 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
+// BODY COMMAND ADAPTER
+import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -51,7 +50,6 @@ interface ReferrerOption {
 }
 
 export default function AdminRequestsPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [requests, setRequests] = useState<RequestRow[]>([]);
   const [referrers, setReferrers] = useState<ReferrerOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,8 +74,6 @@ export default function AdminRequestsPage() {
   useEffect(() => {
     load();
   }, [load]);
-
-  if (requestError) return <OriginalRequestError message={requestError} />;
 
   return (
     <>
@@ -306,6 +302,8 @@ function ReviewModal({
         credentials: "include",
       });
       if (res.ok) onDone();
+      // BODY COMMAND REJECTION STATE
+      else { const data = await res.json(); setError(data.error || "Command not confirmed complete. Check Command recovery."); }
     } finally {
       setLoading(false);
     }

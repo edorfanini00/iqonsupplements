@@ -1,7 +1,8 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
+// BODY CATEGORY CONTROLS
+import { CanonicalAffiliateControls } from "@/components/affiliates/shared/CanonicalAffiliateControls";
+// BODY COMMAND ADAPTER
+import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 
 import { useEffect, useState, useCallback, useMemo, use } from "react";
 import Link from "next/link";
@@ -22,11 +23,12 @@ import {
   StatCard,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 import { OrderDetailDrawer } from "@/components/affiliates/shared/OrderDetailDrawer";
 
-interface Customer extends OriginalMoney {
+interface Customer {
   key: string;
   email: string;
   name: string;
@@ -40,7 +42,7 @@ interface Customer extends OriginalMoney {
   isRecurring: boolean;
 }
 
-interface OrderRow extends OriginalMoney {
+interface OrderRow {
   id: string;
   orderId: string;
   orderTotal: number;
@@ -50,7 +52,7 @@ interface OrderRow extends OriginalMoney {
   createdAt: string;
 }
 
-interface Referee extends OriginalMoney {
+interface Referee {
   storeRevenue: number;
   orderCount: number;
   createdAt: string;
@@ -74,11 +76,10 @@ export default function AdminAffiliateDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const {request: fetch, requestError} = useOriginalRequest();
   const [info, setInfo] = useState<AffiliateInfo | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [referees, setReferees] = useState<Referee[]>([]);
-  const [networkRevenue, setNetworkRevenue] = useState<OriginalMoney | null>(null);
+  const [networkRevenue, setNetworkRevenue] = useState(0);
   const [referrerId, setReferrerId] = useState("");
   const [referrerOptions, setReferrerOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [saving, setSaving] = useState(false);
@@ -103,7 +104,7 @@ export default function AdminAffiliateDetailPage({
         setInfo(data.affiliate);
         setCustomers(data.customers ?? []);
         setReferees(data.referees ?? []);
-        setNetworkRevenue(data.network ?? null);
+        setNetworkRevenue(data.network?.storeRevenue ?? 0);
         const [profileRes, optionsRes] = await Promise.all([
           fetch(`/api/affiliates/admin/affiliates/${id}`, { credentials: "include" }),
           fetch("/api/affiliates/admin/referrer-options", { credentials: "include" }),
@@ -177,8 +178,6 @@ export default function AdminAffiliateDetailPage({
     return { recurring, totalSpent, totalCommission };
   }, [customers]);
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
       <Link
@@ -188,6 +187,9 @@ export default function AdminAffiliateDetailPage({
         <ArrowLeft className="h-3.5 w-3.5" />
         All affiliates
       </Link>
+
+      {/* BODY CATEGORY CONTROLS */}
+      <CanonicalAffiliateControls affiliateId={id} />
 
       <PageHeader
         eyebrow={info ? info.promoCode : "Loading"}
@@ -231,12 +233,12 @@ export default function AdminAffiliateDetailPage({
         <StatCard
           icon={ShoppingBag}
           label="Total spent"
-          value={loading ? "—" : originalTotal(customers, "totalSpent")}
+          value={formatCurrency(totals.totalSpent)}
         />
         <StatCard
           icon={TrendingUp}
           label="Commission earned"
-          value={loading ? "—" : originalTotal(customers, "totalCommission")}
+          value={formatCurrency(totals.totalCommission)}
         />
       </section>
 
@@ -245,7 +247,7 @@ export default function AdminAffiliateDetailPage({
           <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-3">
             Direct recruits of {info?.name ?? "this affiliate"} · {referees.length}
           </p>
-          <p className="text-xl font-medium mb-2">Store revenue: {originalField(networkRevenue, "storeRevenue")}</p>
+          <p className="text-xl font-medium mb-2">Store revenue: {formatCurrency(networkRevenue)}</p>
           <p className="text-xs text-[#64717a] mb-4">Lifetime recorded store sales from current direct recruits, including recurring orders. Excludes referral mirrors, bonus/app commission rows and known voided entries. Not fully refund-adjusted. App subscription revenue is not included. This is sales revenue, not the recruiter’s commission.</p>
           {referees.length === 0 && <p className="text-sm text-[#64717a]">No referred applications yet.</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -263,7 +265,7 @@ export default function AdminAffiliateDetailPage({
                   <p className="text-xs text-[#64717a] font-sans mt-0.5 truncate">
                     {r.promoCode} · {r.commissionRate}%
                   </p>
-                  <p className="text-sm mt-2">{originalField(r, "storeRevenue")} store revenue · {r.orderCount} orders</p>
+                  <p className="text-sm mt-2">{formatCurrency(r.storeRevenue)} store revenue · {r.orderCount} orders</p>
                   <p className="text-xs text-[#64717a] mt-1">Applied {formatShortDate(r.createdAt)}</p>
                 </div>
                 <Pill tone={r.status === "active" ? "success" : "warn"}>
@@ -344,10 +346,10 @@ export default function AdminAffiliateDetailPage({
                       {c.orderCount}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(c, "totalSpent")}
+                      {formatCurrency(c.totalSpent)}
                     </td>
                     <td className="py-4 px-5 text-right font-sans">
-                      {originalField(c, "totalCommission")}
+                      {formatCurrency(c.totalCommission)}
                     </td>
                     <td className="py-4 px-5">
                       <Pill
@@ -453,11 +455,11 @@ function CustomerDrawer({
             />
             <MiniStat
               label="Spent"
-              value={originalField(customer, "totalSpent")}
+              value={formatCurrency(customer.totalSpent)}
             />
             <MiniStat
               label="Commission"
-              value={originalField(customer, "totalCommission")}
+              value={formatCurrency(customer.totalCommission)}
             />
             <MiniStat
               label="Customer since"
@@ -515,10 +517,10 @@ function CustomerDrawer({
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-sans">
-                        {formatCurrency(o.orderTotal, o.currency as string | null)}
+                        {formatCurrency(o.orderTotal)}
                       </p>
                       <p className="text-[11px] font-sans text-[#64717a] mt-0.5">
-                        + {formatCurrency(o.commission, o.currency as string | null)}
+                        + {formatCurrency(o.commission)}
                       </p>
                     </div>
                   </li>

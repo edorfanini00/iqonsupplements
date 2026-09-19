@@ -1,26 +1,17 @@
 import { cookies } from 'next/headers';
 import { relayAffiliateRequest, sharedRelayConfig } from './shared-relay';
-import type { Affiliate } from './types';
+import {parseBodySession, type BodySession} from './body-session-dto';
 /** Compatibility names only. Legacy independent portal cookies never authenticate. */
 export const AFFILIATE_SESSION_COOKIE = 'iqon_affiliate_wp_jwt';
 export const AFFILIATE_COOKIE_OPTIONS = {httpOnly:true,secure:process.env.NODE_ENV === 'production',sameSite:'lax' as const,path:'/',maxAge:2592000};
-export interface AffiliateSession {
-  portalUserId:number;
-  wpUserId:number;
-  email:string;
-  role:'affiliate'|'admin'|'shop_manager';
-  portalRoles:string[];
-  profile:Affiliate|null;
-}
+export type AffiliateSession = BodySession;
 export async function getAffiliateSession():Promise<AffiliateSession|null> {
   try {
     const {portal}=sharedRelayConfig();
     const store=await cookies();
     const response=await relayAffiliateRequest(new Request(portal+'/api/affiliates/shared-session',{headers:{cookie:store.toString()}}));
     if(!response.ok)return null;
-    const {session}=await response.json();
-    if(!session || !Number.isSafeInteger(session.wpUserId) || !['admin','affiliate','shop_manager'].includes(session.role) || (session.profile && session.profile.status !== 'active') || (session.role === 'affiliate' && !session.profile))return null;
-    return {...session,portalUserId:session.wpUserId,portalRoles:session.wpRoles ?? []};
+    return parseBodySession(await response.json());
   } catch {return null;}
 }
 export async function getLightSession(){const session=await getAffiliateSession();return session?{...session,profileId:session.profile?.id,status:session.profile?.status}:null;}

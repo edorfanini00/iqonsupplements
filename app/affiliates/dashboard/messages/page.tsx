@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Send, MessageSquare, Loader2 } from "lucide-react";
@@ -89,7 +90,7 @@ export default function AffiliateMessagesPage() {
     setDraft("");
 
     try {
-      const res = await fetch("/api/affiliates/messages", {
+      const res = await nativeMutationFetch("/api/affiliates/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

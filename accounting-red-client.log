@@ -1,0 +1,69 @@
+TAP version 13
+# Subtest: exact thirteen accounting methods route to fixed native authority and carry receipt key
+ok 1 - exact thirteen accounting methods route to fixed native authority and carry receipt key
+  ---
+  duration_ms: 25.770166
+  type: 'test'
+  ...
+# Subtest: accounting neighboring methods, source queries and forged origin remain fail closed
+ok 2 - accounting neighboring methods, source queries and forged origin remain fail closed
+  ---
+  duration_ms: 0.358333
+  type: 'test'
+  ...
+# Subtest: all thirteen original accounting form mutations retain a durable operation UUID
+not ok 3 - all thirteen original accounting form mutations retain a durable operation UUID
+  ---
+  duration_ms: 1.697417
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:1:2413'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 13
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 13
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:25:9)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: accounting form response loss retains UUID and does not report unreadable success
+not ok 4 - accounting form response loss retains UUID and does not report unreadable success
+  ---
+  duration_ms: 0.728334
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts:1:2728'
+  failureType: 'testCodeFailure'
+  error: "Cannot find module '/Users/edorfanini/Projects/iqon-accounting-body/lib/affiliates/accounting-mutation-fetch' imported from /Users/edorfanini/Projects/iqon-accounting-body/tests/affiliates/native-accounting.test.ts"
+  code: 'ERR_MODULE_NOT_FOUND'
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:783:38)
+    nextStep (node:internal/modules/customization_hooks:189:26)
+    resolveBaseSync (file:///Users/edorfanini/Projects/iqon-shared-supplements/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:10932)
+    resolveDirectorySync (file:///Users/edorfanini/Projects/iqon-shared-supplements/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:12238)
+    resolveTsPathsSync (file:///Users/edorfanini/Projects/iqon-shared-supplements/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:13445)
+    resolve (file:///Users/edorfanini/Projects/iqon-shared-supplements/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:15991)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 288.513166

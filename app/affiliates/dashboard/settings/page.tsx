@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useState } from "react";
 import { Lock, Save, Eye, EyeOff, ShieldCheck } from "lucide-react";
@@ -22,7 +23,7 @@ export default function AffiliateSettingsPage() {
     setSuccess(false);
 
     if (next.length < 8) {
-      setError("Your new password must be at least 12 characters.");
+      setError("Your new password must be at least 8 characters.");
       return;
     }
     if (next !== confirm) {
@@ -32,7 +33,7 @@ export default function AffiliateSettingsPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/affiliates/change-password", {
+      const res = await nativeMutationFetch("/api/affiliates/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -89,7 +90,7 @@ export default function AffiliateSettingsPage() {
                 value={next}
                 onChange={(e) => setNext(e.target.value)}
                 autoComplete="new-password"
-                minLength={12}
+                minLength={8}
                 required
                 className={`${inputClass} pr-8`}
               />
@@ -108,7 +109,7 @@ export default function AffiliateSettingsPage() {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               autoComplete="new-password"
-              minLength={12}
+              minLength={8}
               required
               className={inputClass}
             />
@@ -144,7 +145,7 @@ export default function AffiliateSettingsPage() {
             </div>
             <p className="font-medium leading-tight">Keep it secure</p>
             <p className="text-sm text-[#64717a] mt-2 leading-relaxed">
-              Use at least 12 characters. Your new password updates everywhere you
+              Use at least 8 characters. Your new password updates everywhere you
               sign in with this account.
             </p>
           </div>

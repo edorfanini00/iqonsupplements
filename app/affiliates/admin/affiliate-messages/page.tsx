@@ -1,4 +1,5 @@
 "use client";
+import { nativeMutationFetch } from "@/lib/affiliates/native-mutation-fetch";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -334,7 +335,7 @@ function BroadcastComposer({
     setSending(true);
     setError(null);
     try {
-      const res = await fetch("/api/affiliates/admin/affiliate-messages/broadcast", {
+      const res = await nativeMutationFetch("/api/affiliates/admin/affiliate-messages/broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -624,7 +625,7 @@ function Conversation({
     setDraft("");
 
     try {
-      const res = await fetch(
+      const res = await nativeMutationFetch(
         `/api/affiliates/admin/affiliate-messages/${affiliateId}`,
         {
           method: "POST",

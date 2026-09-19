@@ -1,0 +1,26 @@
+{
+  "base": "2ccf7114eefe295fcaae1982f5bdf8535c79fd16",
+  "scope": "Only native bulk control import/mount and removal of its legacy callback/state/message",
+  "hunks": [
+    {
+      "original": "\"use client\";\n// BODY CATEGORY ADDITION\nimport { CategoryRevenue } from \"@/components/affiliates/shared/CategoryRevenue\";\n\n",
+      "canonical": "\"use client\";\nimport {BulkCouponControl} from \"@/components/affiliates/shared/BulkCouponControl\";\n// BODY CATEGORY ADDITION\nimport { CategoryRevenue } from \"@/components/affiliates/shared/CategoryRevenue\";\n\n"
+    },
+    {
+      "original": "  const calendarDay = useCalendarDay();\n  const [syncing, setSyncing] = useState(false);\n  const [syncMessage, setSyncMessage] = useState<string | null>(null);\n  const [couponSyncing, setCouponSyncing] = useState(false);\n  const [couponMessage, setCouponMessage] = useState<string | null>(null);\n  const [testingEmail, setTestingEmail] = useState(false);\n  const [emailMessage, setEmailMessage] = useState<string | null>(null);\n\n",
+      "canonical": "  const calendarDay = useCalendarDay();\n  const [syncing, setSyncing] = useState(false);\n  const [syncMessage, setSyncMessage] = useState<string | null>(null);\n  const [testingEmail, setTestingEmail] = useState(false);\n  const [emailMessage, setEmailMessage] = useState<string | null>(null);\n\n"
+    },
+    {
+      "original": "      setEmailMessage(\"Test email request failed.\");\n    } finally {\n      setTestingEmail(false);\n    }\n  }\n\n  async function handleCouponSync() {\n    setCouponSyncing(true);\n    setCouponMessage(null);\n    try {\n      const res = await fetch(\"/api/affiliates/admin/coupon-sync\", {\n        method: \"POST\",\n        credentials: \"include\",\n      });\n      const data = await res.json().catch(() => ({}));\n      if (!res.ok) {\n        setCouponMessage(data.error || \"Coupon sync failed\");\n      } else {\n        const created = (data.results ?? []).filter(\n          (r: { status: string }) => r.status === \"created\" || r.status === \"updated\"\n        ).length;\n        const ok = (data.results ?? []).filter((r: { status: string }) => r.status === \"ok\").length;\n        setCouponMessage(`Coupons verified: ${ok} ok, ${created} created/updated.`);\n      }\n      setTimeout(() => setCouponMessage(null), 6000);\n    } finally {\n      setCouponSyncing(false);\n    }\n  }\n\n",
+      "canonical": "      setEmailMessage(\"Test email request failed.\");\n    } finally {\n      setTestingEmail(false);\n    }\n  }\n\n"
+    },
+    {
+      "original": "        actions={\n          <>\n            <RangePicker value={preset} onChange={setPreset} />\n            <button\n              onClick={handleCouponSync}\n              disabled={couponSyncing}\n              className=\"inline-flex items-center gap-2 glass-surface rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.18em] font-sans text-[#20282c] hover:bg-white/80 transition-colors disabled:opacity-60\"\n              title=\"Verify affiliate promo codes exist as WooCommerce coupons\"\n            >\n              <RefreshCw className={`h-3.5 w-3.5 ${couponSyncing ? \"animate-spin\" : \"\"}`} />\n              {couponSyncing ? \"Verifying\u2026\" : \"Sync Coupons\"}\n            </button>\n            <button\n              onClick={handleSync}\n              disabled={syncing}\n",
+      "canonical": "        actions={\n          <>\n            <RangePicker value={preset} onChange={setPreset} />\n            <BulkCouponControl />\n            <button\n              onClick={handleSync}\n              disabled={syncing}\n"
+    },
+    {
+      "original": "        <div className=\"mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c] flex items-start gap-2\">\n          <Mail className=\"h-3.5 w-3.5 text-[#64717a] mt-0.5 shrink-0\" />\n          <span>{emailMessage}</span>\n        </div>\n      )}\n\n      {couponMessage && (\n        <div className=\"mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c] flex items-center gap-2\">\n          <RefreshCw className=\"h-3.5 w-3.5 text-[#64717a]\" />\n          {couponMessage}\n        </div>\n      )}\n\n",
+      "canonical": "        <div className=\"mb-6 glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c] flex items-start gap-2\">\n          <Mail className=\"h-3.5 w-3.5 text-[#64717a] mt-0.5 shrink-0\" />\n          <span>{emailMessage}</span>\n        </div>\n      )}\n\n"
+    }
+  ]
+}

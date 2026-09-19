@@ -1,7 +1,4 @@
 "use client";
-import { useOriginalRequest, OriginalRequestError } from "@/components/affiliates/shared/useOriginalRequest";
-
-import { originalMoney as formatCurrency, originalField, originalTotal, originalCurrency, originalChartRows, type OriginalMoney } from "@/components/affiliates/shared/original-view";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Wallet } from "lucide-react";
@@ -10,10 +7,11 @@ import {
   StatCard,
   Pill,
   EmptyState,
+  formatCurrency,
   formatShortDate,
 } from "@/components/affiliates/shared/ui";
 
-interface Payout extends OriginalMoney {
+interface Payout {
   id: string;
   amount: number;
   method: "bank" | "paypal" | "zelle" | "other";
@@ -23,7 +21,7 @@ interface Payout extends OriginalMoney {
   paidAt: string;
 }
 
-interface Stats extends OriginalMoney {
+interface Stats {
   paidCommission: number;
   pendingCommission: number;
   totalCommission: number;
@@ -32,7 +30,6 @@ interface Stats extends OriginalMoney {
 }
 
 export default function AffiliatePayoutsPage() {
-  const {request: fetch, requestError} = useOriginalRequest();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,8 +59,6 @@ export default function AffiliatePayoutsPage() {
     [payouts]
   );
 
-  if (requestError) return <OriginalRequestError message={requestError} />;
-
   return (
     <>
       <PageHeader
@@ -75,13 +70,13 @@ export default function AffiliatePayoutsPage() {
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
         <StatCard
           label="Pending"
-          value={stats ? originalField(stats, "pendingCommission") : "—"}
+          value={stats ? formatCurrency(stats.pendingCommission) : "—"}
           accent
           hint="Awaiting next payout"
         />
         <StatCard
           label="Paid lifetime"
-          value={stats ? originalField(stats, "paidCommission") : "—"}
+          value={stats ? formatCurrency(stats.paidCommission) : "—"}
         />
         <StatCard
           label="Payouts"
@@ -135,7 +130,7 @@ export default function AffiliatePayoutsPage() {
                       {p.orderIds.length}
                     </td>
                     <td className="py-4 px-5 text-right font-sans font-medium">
-                      {formatCurrency(p.amount, p.currency as string | null)}
+                      {formatCurrency(p.amount)}
                     </td>
                   </tr>
                 ))}
