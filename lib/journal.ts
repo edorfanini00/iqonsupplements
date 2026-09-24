@@ -108,7 +108,7 @@ export const journalArticles:JournalArticle[]=[
     "dek": "Give cleansing, treatment, moisture and sun protection a clear place in your day.",
     "category": "SKINCARE NOTES",
     "readTime": "3 MIN READ",
-    "image": "/images/editorial/skincare-ritual-v24.webp",
+    "image": "/images/editorial/skincare-ritual-v25.webp",
     "imageAlt": "A woman applying cream to her cheek while holding IQON Copper Peptide Restore Cream",
     "sections": [
       {
