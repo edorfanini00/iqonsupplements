@@ -7,3 +7,7 @@ The coastal, skincare and Pilates campaign photographs are AI-generated editoria
 No generated person is presented as a customer testimonial or a product result. `lib/reviews.ts` is intentionally empty until genuine, permissioned IQON supplement/skincare reviews are available.
 
 WebP files use encoding-only compression; packaging text, background and shadows were not composited or redrawn after generation. Original-label wording on rendered packaging is inherited reference artwork, not independent product substantiation.
+
+## September 24 imagery refresh
+
+The `*-v24.webp` editorial assets were generated with the built-in image tool for younger adult subjects and more natural photographic texture: skincare hero, coastal supplements hero and matching portrait composition, man pouring water, and woman applying Copper Peptide Restore Cream. They remain illustrative brand imagery, not customer testimonials or product results. Files were encoded to WebP at quality 90 without compositing or skin retouching. The portrait coastal image was separately reframed with image generation for the mobile hero. Existing product packshots and results imagery are unchanged.

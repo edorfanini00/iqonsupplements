@@ -15,7 +15,7 @@ export function EverydayNote({skincare=false}:{skincare?:boolean}) {
 
 export function JournalPreview({skincare=false}:{skincare?:boolean}) {
  const skincareImages:Record<string,{image:string;imageAlt:string}>={
-  "a-simple-skincare-routine":{image:"/images/skincare/editorial/news-skincare-ritual-iqon-v11.webp",imageAlt:"A woman applying cream while holding IQON Copper Peptide Restore Cream"},
+  "a-simple-skincare-routine":{image:"/images/editorial/skincare-ritual-v24.webp",imageAlt:"A woman applying cream while holding IQON Copper Peptide Restore Cream"},
   "reading-a-supplement-label":{image:"/images/skincare/editorial/news-reading-labels-iqon-v11.webp",imageAlt:"IQON Hydra C + Ferulic Serum and cosmetic pads on a silver desk"},
  };
  const articles=skincare?[...journalArticles].map(a=>({...a,...skincareImages[a.slug]})).sort((a,b)=>Number(b.slug==="a-simple-skincare-routine")-Number(a.slug==="a-simple-skincare-routine")):journalArticles;
