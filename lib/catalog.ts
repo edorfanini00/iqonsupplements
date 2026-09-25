@@ -8,7 +8,7 @@ export type Product = {
   id: string; name: string; category: Category; type: string; number: string;
   price: number; size: string; descriptor: string; description: string;
   image: string; campaign: string; tone: string; ritual: string;
-  currency?: string; available?: boolean; pricePending?: boolean; variants?: ProductVariant[];
+  currency?: string; available?: boolean; pricePending?: boolean; comingSoon?: boolean; variants?: ProductVariant[];
   images?: {src:string; alt:string}[]; requiresSellingPlan?: boolean;
 };
 export type StoreCatalog = {mode:"preview"|"live"|"unavailable"; products:Product[]; currency:string};
@@ -67,7 +67,7 @@ const previewProducts: Product[] = [
   supplement("hair-skin-nails-gummies", "Hair, Skin & Nails Gummies", "Gummies", "60 gummies · Passion fruit",
     "A different kind of daily ritual.", "Passion-fruit-flavored Hair, Skin & Nails Gummies in a clear bottle of 60 gummies.",
     "10_pack_hair_and_skin_gummies", "14_hero_gummies_falling", 10),
-  ...skincareRange.map(p => ({...p, category: "skincare" as const, available: false, currency: "USD", tone: "silver", campaign: p.image,
+  ...skincareRange.map(p => ({...p, category: "skincare" as const, available: false, comingSoon: true, currency: "USD", tone: "silver", campaign: p.image,
     images: [{src:p.image, alt:`IQON ${p.name}, ${p.size}`}]})),
 ];
 

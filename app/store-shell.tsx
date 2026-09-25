@@ -70,7 +70,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   };
   const applyDiscounts=(codes:string[])=>transact({action:"discount",discountCodes:codes});
   const add=(id:string,quantity=1,purchase:Purchase="once",frequency="once",variantId?:string)=>{
-    const p=findProduct(id);if(!p||p.pricePending||p.available===false||mode==="unavailable")return;
+    const p=findProduct(id);if(!p||p.comingSoon||p.pricePending||p.available===false||mode==="unavailable")return;
     if(live){
       if(p.variants&&p.variants.length>1&&!variantId){router.push(`/products/${id}`);return;}
       const variant=p.variants?.find(v=>v.id===variantId)||p.variants?.find(v=>v.available);
@@ -139,7 +139,7 @@ export function ProductCard({product:p,compact=false}:{product:Product;compact?:
   <div className="product-card-title"><Link href={`/products/${p.id}`}><h3>{p.name}</h3></Link></div>
   <p>{p.descriptor}</p>
   <div className="product-card-info"><span className={p.pricePending?"price-pending":""}>{productPrice(p)}</span><span>{p.size}</span></div>
-  {p.pricePending||p.available===false?<Link className="button button-dark product-card-action" aria-label={`View ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add ${p.name} to bag`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
+  {p.comingSoon?<button className="button button-dark product-card-action" disabled aria-label={`${p.name} — Coming soon`}>Coming soon</button>:p.pricePending||p.available===false?<Link className="button button-dark product-card-action" aria-label={`View ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add ${p.name} to bag`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
  </article>;
 }
 function Footer(){const {mode,currency,department}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
