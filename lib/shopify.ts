@@ -50,7 +50,7 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
     price:first.price,currency:first.currency,size:first.title==="Default Title"?"":first.title,
     descriptor:"",description:p.description,image,campaign:images[1]?.src||image,tone:"silver",ritual:"",
     images:images.length?images:[{src:image,alt:"IQON material study; product photograph coming soon"}],variants,
-    available:p.availableForSale&&!p.requiresSellingPlan,requiresSellingPlan:p.requiresSellingPlan};
+    comingSoon:category==="skincare", available:category!=="skincare"&&p.availableForSale&&!p.requiresSellingPlan,requiresSellingPlan:p.requiresSellingPlan};
 }
 export type ShopifyCart = {
   id:string; checkoutUrl:string; totalQuantity:number;

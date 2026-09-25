@@ -81,6 +81,7 @@ export async function mutateCartResponse(request:Request) {
       const catalog=await readCatalog();
       const product=catalog.products.find(p=>p.id===input.id);
       const variant=product?.variants?.find(v=>v.id===input.variantId);
+      if(product?.comingSoon) throw new CommerceError("Skincare is coming soon.",422);
       if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);
       const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id);
       if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);
@@ -90,6 +91,12 @@ export async function mutateCartResponse(request:Request) {
     } else if(input.action==="update") {
       const quantity=validQuantity(input.quantity,true);
       if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));
+      if(quantity) {
+        const catalog=await readCatalog();
+        const line=current.lines.nodes.find(l=>l.id===input.lineId)!;
+        if(catalog.products.find(p=>p.id===line.merchandise.product.handle)?.comingSoon)
+          throw new CommerceError("Skincare is coming soon. Remove it from your bag to continue.",422,publicCart(current));
+      }
       result=quantity?await mutate(CART_UPDATE,{cartId:current.id,lines:[{id:input.lineId,quantity}]}):await mutate(CART_REMOVE,{cartId:current.id,lineIds:[input.lineId]});
     } else if(input.action==="discount") {
       const discountCodes=validDiscountCodes(input.discountCodes);
@@ -109,6 +116,10 @@ export async function checkoutResponse(request:Request) {
     // Refresh immediately before handing the buyer to Shopify's hosted checkout.
     const cart=await readCart();
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
+    const catalog=await readCatalog();
+    const comingSoonIds=new Set(catalog.products.filter(p=>p.comingSoon).map(p=>p.id));
+    if(cart.lines.nodes.some(line=>comingSoonIds.has(line.merchandise.product.handle)))
+      throw new CommerceError("Skincare is coming soon. Remove it from your bag to continue.",422,publicCart(cart));
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
     return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});

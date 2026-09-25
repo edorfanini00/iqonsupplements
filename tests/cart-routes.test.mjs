@@ -37,7 +37,8 @@ const request = (body, path = "cart") => new Request(`${origin}/api/${path}`, {
 const money = amount => ({amount: amount.toFixed(2), currencyCode: "USD"});
 const fixtureProducts = [
   {handle: "creatine-monohydrate", category: "supplements", price: 29, variantId: "gid://shopify/ProductVariant/1"},
-  {handle: "hydra-c-ferulic-serum", category: "skincare", price: 68, variantId: "gid://shopify/ProductVariant/2"},
+  {handle: "hydrolyzed-collagen-peptides", category: "supplements", price: 68, variantId: "gid://shopify/ProductVariant/2"},
+  {handle: "hydra-c-ferulic-serum", category: "skincare", price: 89, variantId: "gid://shopify/ProductVariant/3"},
 ];
 
 function fixture(t) {
@@ -106,7 +107,7 @@ function fixture(t) {
 }
 const add = item => routes.mutateCartResponse(request({action: "add", id: item.handle, variantId: item.variantId, quantity: 1}));
 
-test("a mixed-department bag persists, updates, discounts and reaches hosted checkout", async t => {
+test("a supplement bag persists, updates, discounts and reaches hosted checkout", async t => {
   fixture(t);
   assert.equal((await routes.getCartResponse()).status, 200);
   assert.equal((await add(fixtureProducts[0])).status, 200);
@@ -128,7 +129,7 @@ test("a mixed-department bag persists, updates, discounts and reaches hosted che
   bag = await (await routes.mutateCartResponse(request({action: "discount", discountCodes: []}))).json();
   assert.equal(bag.subtotal, 126);
   bag = await (await routes.mutateCartResponse(request({action: "update", lineId, quantity: 0}))).json();
-  assert.equal(bag.count, 1); assert.equal(bag.items[0].id, "hydra-c-ferulic-serum");
+  assert.equal(bag.count, 1); assert.equal(bag.items[0].id, "hydrolyzed-collagen-peptides");
 });
 
 test("expired carts clear the buyer's stale selection and a later add creates a fresh cart", async t => {
@@ -178,4 +179,39 @@ test("cart and checkout reject cross-origin writes and unsafe checkout links", a
   assert.equal((await routes.mutateCartResponse(request([]))).status, 400);
   await add(fixtureProducts[0]); state.cart.checkoutUrl = "http://iqon-test.myshopify.com/checkouts/test-only";
   assert.equal((await routes.checkoutResponse(request({}, "checkout"))).status, 502);
+});
+
+
+test("skincare remains coming soon even when Shopify has stock", async t => {
+  const state = fixture(t);
+  const catalog = await routes.getStoreCatalog();
+  const skin = catalog.products.find(p => p.id === fixtureProducts[2].handle);
+  assert.equal(skin.comingSoon, true);
+  assert.equal(skin.available, false);
+  assert.equal(catalog.products[0].available, true);
+  const response = await add(fixtureProducts[2]);
+  assert.equal(response.status, 422);
+  assert.match((await response.json()).error, /coming soon/i);
+  assert.ok(!state.operations.includes("IQONCartCreate"));
+});
+
+test("saved skincare lines cannot be increased or checked out but can be removed", async t => {
+  const state = fixture(t);
+  await add(fixtureProducts[0]);
+  const line = state.cart.lines.nodes[0];
+  const skin = fixtureProducts[2];
+  line.merchandise = {id: skin.variantId, title: "Default Title", product: {handle: skin.handle, title: skin.handle}};
+  const update = await routes.mutateCartResponse(request({action: "update", lineId: line.id, quantity: 2}));
+  assert.equal(update.status, 422);
+  assert.ok(!state.operations.includes("IQONCartUpdate"));
+  const checkout = await routes.checkoutResponse(request({}, "checkout"));
+  assert.equal(checkout.status, 422);
+  const body = await checkout.json();
+  assert.match(body.error, /coming soon/i);
+  assert.ok(!body.checkoutUrl);
+  const removed = await routes.mutateCartResponse(request({action: "update", lineId: line.id, quantity: 0}));
+  assert.equal(removed.status, 200);
+  assert.equal((await removed.json()).count, 0);
+  await add(fixtureProducts[0]);
+  assert.equal((await routes.checkoutResponse(request({}, "checkout"))).status, 200);
 });
