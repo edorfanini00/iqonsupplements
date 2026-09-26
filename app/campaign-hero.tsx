@@ -6,7 +6,7 @@ import type { Product } from "@/lib/catalog";
 export function CampaignHero({ skincare = false, featured }: { skincare?: boolean; featured?: Product }) {
   return <section className={`campaign-hero ${skincare ? "campaign-hero-skin" : ""}`}>
     <picture className="campaign-image">{!skincare&&<source media="(max-width:760px)" srcSet="/images/editorial/iqon-coastal-mobile-v24.webp"/>}<img
-      src={skincare ? "/images/editorial/iqon-skincare-hero-v27.webp" : "/images/editorial/iqon-coastal-hero-v24.webp"}
+      src={skincare ? "/images/editorial/iqon-skincare-hero-v28.webp" : "/images/editorial/iqon-coastal-hero-v24.webp"}
       alt={skincare ? "An everyday moment of skincare in soft window light" : "A shared moment beside the ocean after a run"}
       width={skincare ? 1536 : 1672} height={skincare ? 1024 : 941} fetchPriority="high" />
     </picture>
