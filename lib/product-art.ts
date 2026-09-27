@@ -1,4 +1,10 @@
 /** A cohesive photographic system. Metrics are label facts, never clinical outcomes. */
+import type { Product } from "./catalog";
+import { supplementDetails } from "./supplement-details";
+import skincareRange from "./skincare-range.json";
+
+export const packageContents = (product: Pick<Product, "id" | "size">) => product.size?.trim() || supplementDetails[product.id]?.contents || skincareRange.find(item => item.id === product.id)?.size || "";
+
 type ProductArt = { scene: string; sceneAlt: string; caption: string; metric: string; metricLabel: string; note: string; macro: string };
 const art = (id: string, sceneAlt: string, caption: string, metric: string, metricLabel: string, note: string, format: string): ProductArt => ({ scene: `/images/product-editorial/${id}.webp`, sceneAlt, caption, metric, metricLabel, note, macro: `/images/product-editorial/${format}-macro.webp` });
 export const productArt: Record<string, ProductArt> = {

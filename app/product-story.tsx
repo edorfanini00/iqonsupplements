@@ -8,6 +8,7 @@ import skincareRange from "@/lib/skincare-range.json";
 import { SupplementFormula, SupplementDirections } from "./supplement-information";
 import { dailyProductPrice } from "./product-essentials";
 import { productVisuals } from "@/lib/product-visuals";
+import { packageContents } from "@/lib/product-art";
 import { ProductFormulaExplorer } from "./product-formula-explorer";
 
 export function comparisonFor(product: Product, products: Product[]) {
@@ -46,7 +47,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
     </nav>
     <section id="product-benefits" className="pdp-benefits-v3 pdp-section" aria-labelledby="benefits-heading">
       <div className="benefits-introduction"><p className="eyebrow">{skin ? "YOUR SKIN, CONSIDERED" : "A PURPOSE IN YOUR ROUTINE"}</p><h2 id="benefits-heading">{visual?.whyTitle || content.title}</h2><p>{visual?.whyBody || content.description}</p></div>
-      <div className="benefits-editorial"><figure className="benefits-photo"><img src={p.image} alt={`IQON ${p.name}, ${p.size}`} width={1122} height={1402} loading="lazy"/><figcaption>{p.name}<span>{p.size}</span></figcaption></figure><div className="benefits-points"><h3>{content.title}</h3><ol>{content.benefits?.map((benefit, i) => <li key={benefit.title}><span>{String(i + 1).padStart(2, "0")}</span><div><h4>{benefit.title}</h4><p>{benefit.body}</p></div></li>)}</ol></div></div>
+      <div className="benefits-editorial"><figure className="benefits-photo"><img src={p.image} alt={`IQON ${p.name}, ${packageContents(p)}`} width={1122} height={1402} loading="lazy"/><figcaption>{p.name}<span>{packageContents(p)}</span></figcaption></figure><div className="benefits-points"><h3>{content.title}</h3><ol>{content.benefits?.map((benefit, i) => <li key={benefit.title}><span>{String(i + 1).padStart(2, "0")}</span><div><h4>{benefit.title}</h4><p>{benefit.body}</p></div></li>)}</ol></div></div>
     </section>
     {visual && <section id="formula-story" className="pdp-pathway pdp-section" aria-labelledby="pathway-heading"><div className="pdp-section-heading"><div><p className="eyebrow">{research ? "UNDERSTAND THE SCIENCE" : "THE FORMULA STORY"}</p><h2 id="pathway-heading">{visual.mechanismTitle}</h2></div><a className="pdp-text-link" href="#product-formula">Meet the ingredients <ArrowRight size={17}/></a></div><ol className="pathway-steps">{visual.mechanism.map((step, i) => <li key={step.title}><div className="pathway-number"><span>{String(i + 1).padStart(2, "0")}</span>{i < visual.mechanism.length - 1 && <ArrowRight size={22} aria-hidden="true"/>}</div><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>{research && <a className="pdp-text-link" href="#ingredient-science">Read the ingredient research <ArrowUpRight size={17}/></a>}</section>}
     <section id="product-formula" className="pdp-formula pdp-section" aria-labelledby="formula-heading">

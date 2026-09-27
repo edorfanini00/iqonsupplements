@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { products } from "../../lib/catalog";
 import { productArt } from "../../lib/product-art";
-import { productVisuals } from "../../lib/product-visuals";
 import { ProductGallery } from "../../app/product-gallery";
 import { ProductFormulaExplorer } from "../../app/product-formula-explorer";
 
@@ -17,14 +16,14 @@ describe("visual product guides", () => {
       expect(screen.getAllByText(productArt[product.id].metricLabel).length).toBe(1);
       for (const image of view.container.querySelectorAll('img')) expect(image.getAttribute('src')).toBeTruthy();
       fireEvent.click(screen.getByRole('button', { name: `Enlarge formula focus for ${product.name}` }));
-      expect(screen.getByRole('dialog').textContent).toContain(productVisuals[product.id].fact.body);
+      expect(screen.getByRole('dialog').textContent).toContain(productArt[product.id].note);
       cleanup();
     }
   });
   it("moves through the mobile gallery and preserves additional Shopify images", () => {
     Object.defineProperty(window, 'matchMedia', { configurable:true, value:vi.fn(() => ({ matches:true })) });
     HTMLElement.prototype.scrollTo = vi.fn();
-    const p = { ...products.find(p => p.id === 'nmn')!, images:[{src:'/first.webp',alt:'First'}, {src:'/second.webp',alt:'Second'}, {src:'/third.webp',alt:'Third Shopify image'}] };
+    const p = { ...products.find(p => p.id === 'nmn')!, size:'', images:[{src:'/first.webp',alt:'First'}, {src:'/second.webp',alt:'Second'}, {src:'/third.webp',alt:'Third Shopify image'}] };
     const { container } = render(React.createElement(ProductGallery, {product:p}));
     expect(screen.getByRole('button', {name:'Previous product panel'}).hasAttribute('disabled')).toBe(true);
     fireEvent.click(screen.getByRole('button', {name:'Next product panel'}));
@@ -32,6 +31,7 @@ describe("visual product guides", () => {
     fireEvent.keyDown(screen.getByRole('region'), {key:'ArrowLeft'});
     expect(screen.getByRole('button', {name:'View the daily ritual'}).getAttribute('aria-current')).toBe('true');
     expect(container.querySelector('img[alt="Third Shopify image"]')?.getAttribute('src')).toBe('/third.webp');
+    expect(screen.getByText('30 capsules')).toBeTruthy();
   });
   it("changes ingredient panels with the keyboard and keeps their labels connected", () => {
     const p = products.find(p => p.id === 'hydra-c-ferulic-serum')!;
