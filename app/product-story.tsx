@@ -8,7 +8,7 @@ import skincareRange from "@/lib/skincare-range.json";
 import { SupplementFormula, SupplementDirections } from "./supplement-information";
 import { dailyProductPrice } from "./product-essentials";
 import { productVisuals } from "@/lib/product-visuals";
-import { packageContents } from "@/lib/product-art";
+import { productPresentation } from "@/lib/product-presentation";
 import { ProductFormulaExplorer } from "./product-formula-explorer";
 
 export function comparisonFor(product: Product, products: Product[]) {
@@ -38,21 +38,21 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   const comparison = comparisonFor(p, products);
   const research = content.education;
   const visual = productVisuals[p.id];
+  const focus = productPresentation[p.id]?.focus;
   return <div className="product-experience">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">Benefits</a><a href="#product-formula">Ingredients</a>
-      {visual && <a href="#formula-story">How it works</a>}
+      {focus && <a href="#formula-story">In detail</a>}
       <a href="#product-routine">How to use</a>{research && <a href="#ingredient-science">Research</a>}
       <a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
     </nav>
-    <section id="product-benefits" className="pdp-benefits-v3 pdp-section" aria-labelledby="benefits-heading">
-      <div className="benefits-introduction"><p className="eyebrow">{skin ? "YOUR SKIN, CONSIDERED" : "A PURPOSE IN YOUR ROUTINE"}</p><h2 id="benefits-heading">{visual?.whyTitle || content.title}</h2><p>{visual?.whyBody || content.description}</p></div>
-      <div className="benefits-editorial"><figure className="benefits-photo"><img src={p.image} alt={`IQON ${p.name}, ${packageContents(p)}`} width={1122} height={1402} loading="lazy"/><figcaption>{p.name}<span>{packageContents(p)}</span></figcaption></figure><div className="benefits-points"><h3>{content.title}</h3><ol>{content.benefits?.map((benefit, i) => <li key={benefit.title}><span>{String(i + 1).padStart(2, "0")}</span><div><h4>{benefit.title}</h4><p>{benefit.body}</p></div></li>)}</ol></div></div>
+    <section id="product-benefits" className="pdp-benefits-compact pdp-section" aria-labelledby="benefits-heading">
+      <div className="pdp-section-heading"><div><p className="eyebrow">{p.name}</p><h2 id="benefits-heading">{content.title}</h2></div></div>
+      <ol className="benefit-columns">{content.benefits?.map((benefit, i) => <li key={benefit.title}><span>{String(i + 1).padStart(2, "0")}</span><h3>{benefit.title}</h3><p>{benefit.body}</p></li>)}</ol>
     </section>
-    {visual && <section id="formula-story" className="pdp-pathway pdp-section" aria-labelledby="pathway-heading"><div className="pdp-section-heading"><div><p className="eyebrow">{research ? "UNDERSTAND THE SCIENCE" : "THE FORMULA STORY"}</p><h2 id="pathway-heading">{visual.mechanismTitle}</h2></div><a className="pdp-text-link" href="#product-formula">Meet the ingredients <ArrowRight size={17}/></a></div><ol className="pathway-steps">{visual.mechanism.map((step, i) => <li key={step.title}><div className="pathway-number"><span>{String(i + 1).padStart(2, "0")}</span>{i < visual.mechanism.length - 1 && <ArrowRight size={22} aria-hidden="true"/>}</div><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>{research && <a className="pdp-text-link" href="#ingredient-science">Read the ingredient research <ArrowUpRight size={17}/></a>}</section>}
+    {focus && <section id="formula-story" className={`pdp-focus pdp-focus-${focus.layout} pdp-section`} aria-labelledby="focus-heading"><div className="pdp-focus-intro"><p className="eyebrow">{focus.eyebrow}</p><h2 id="focus-heading">{focus.title}</h2><p>{focus.body}</p>{research && <a className="pdp-text-link" href="#ingredient-science">Explore the research <ArrowUpRight size={16}/></a>}</div><dl className="focus-details">{focus.rows.map(row => <div key={row.label}><dt>{row.label}</dt><dd><strong>{row.value}</strong><p>{row.detail}</p></dd></div>)}</dl></section>}
     <section id="product-formula" className="pdp-formula pdp-section" aria-labelledby="formula-heading">
       <div className="pdp-section-heading"><div><p className="eyebrow">THE INGREDIENTS</p><h2 id="formula-heading">Inside the formula.</h2></div>
-        <p>{skin ? "Get to know the ingredients and the part each one plays in your skincare routine." : "The ingredients, their forms, and the details that help you choose."}</p>
       </div>
       <ProductFormulaExplorer key={p.id} product={p}/>
       <Accordion type="single" collapsible className="pdp-formula-accordion">
@@ -62,8 +62,8 @@ export function ProductStory({ product: p, products }: { product: Product; produ
       </Accordion>
     </section>
     {content.routine && <section id="product-routine" className="pdp-routine pdp-routine-v3 pdp-section" aria-labelledby="routine-heading">
-      <div className="pdp-routine-heading"><p className="eyebrow">HOW TO USE</p><h2 id="routine-heading">{visual?.ritualTitle || content.routine.title}</h2><p className="routine-intro">{content.guide?.details[0]?.body}</p>
-        <dl className="pdp-fit">{content.fit?.map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>
+      <div className="pdp-routine-heading"><p className="eyebrow">HOW TO USE</p><h2 id="routine-heading">{visual?.ritualTitle || content.routine.title}</h2>
+        {content.guide?.details[2] && <div className="routine-consideration"><h3>{skin ? "Plan your other steps" : "Before you begin"}</h3><p>{content.guide.details[2].body}</p></div>}
       </div>
       <div><ol className="pdp-routine-steps">{content.routine.steps.map((step, i) => <li key={step.title}>
         <span>{String(i + 1).padStart(2, "0")}</span><div><h3>{step.title}</h3><p>{step.body}</p></div>
@@ -76,7 +76,6 @@ export function ProductStory({ product: p, products }: { product: Product; produ
       <div><p className="eyebrow">{research.eyebrow}</p><h2 id="research-heading">{research.title}</h2><p className="pdp-research-scope">{research.scope}</p></div>
       <div><p className="pdp-research-body">{research.body}</p><div className="pdp-research-links">{research.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer"><span>{source.label}</span><ArrowUpRight size={18} aria-hidden="true" /></a>)}</div></div>
     </section>}
-    {content.guide && <section id="product-fit" className="pdp-expectations pdp-section" aria-labelledby="expectations-heading"><div><p className="eyebrow">MAKE IT WORK FOR YOU</p><h2 id="expectations-heading">What to expect.<br/>What to keep in mind.</h2></div><div className="expectations-grid">{content.guide.details.slice(1).map(detail => <article key={detail.title}><h3>{detail.title}</h3><p>{detail.body}</p></article>)}</div></section>}
     <section id="product-questions" className="pdp-questions pdp-section" aria-labelledby="questions-heading">
       <div><p className="eyebrow">A LITTLE MORE CLARITY</p><h2 id="questions-heading">Good questions.<br />Clear answers.</h2>
         <p>Still wondering about something?</p><Link className="pdp-text-link" href="/help">We’re here to help <ArrowUpRight size={17} /></Link>
@@ -95,7 +94,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
         const size = q.size || supplementDetails[q.id]?.contents || skincareRange.find(item => item.id === q.id)?.size;
         const dailyPrice = dailyProductPrice(q);
         return <article className={p.id === q.id ? "is-current" : ""} key={q.id}>
-        <Link className="pdp-comparison-image" href={`/products/${q.id}`} aria-label={`View ${q.name}`}><img src={q.image} alt={q.name} loading="lazy" width={1122} height={1402} />{p.id === q.id && <span>YOU’RE VIEWING</span>}</Link>
+        {p.id === q.id && <span className="comparison-current">YOU’RE VIEWING</span>}
         <h3><Link href={`/products/${q.id}`}>{q.name}</Link></h3><p>{productContent[q.id]?.descriptor || q.descriptor}</p>
         <dl>{qContent?.comparison && <><div><dt>Focus</dt><dd>{qContent.comparison.focus}</dd></div><div><dt>Routine</dt><dd>{qContent.comparison.routine}</dd></div><div><dt>Key detail</dt><dd>{qContent.comparison.difference}</dd></div></>}
         {size && <div><dt>Contents</dt><dd>{size}</dd></div>}<div><dt>Price</dt><dd>{productPrice(q)}</dd></div>{dailyPrice && <div><dt>Per day*</dt><dd>{dailyPrice}</dd></div>}</dl>

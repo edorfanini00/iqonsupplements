@@ -90,3 +90,15 @@ Revisited Timeline's Mitopure Softgels gallery after the visual-quality feedback
 - Retained full ingredients, instructions, cautions, evidence scope, comparison prices, FAQs, and commerce behavior.
 
 Validation: all 18 product galleries and expanded views; gallery keyboard navigation; additional merchant images; ingredient tabs; product education and live-price ownership; Next.js typecheck and production build.
+
+## Screenshot-led density and differentiation pass
+
+Reference pages directly inspected in the browser: Timeline Mitopure Softgels (`/products/mitopure-softgels-vegan`), Mitopure Powder (`/products/mitopure-powder`), and Mitopure Dewy Cream (`https://shop.timeline.com/products/dewy-cream`). Actual first-fold screenshots, expanded softgel facts artwork, and skincare ingredients section were reviewed. At the 1348px browser width the reference image frames measured approximately 379 × 474px, with 8px gutters; the gallery began near y=178px. The rejected IQON gallery began near y=272px with a 660px-wide square lead plus caption.
+
+The useful reference is the hierarchy: consistent portrait frames, a stable two-column image grid, concise copy, distinct photo/data/usage roles. Powder shows preparation and sachets; skincare shows skin and texture; softgels show delivery format and clinical evidence. IQON does not inherit Timeline's clinical results, reviews, certifications or before/after imagery.
+
+Implemented: original product pack first; equal 4:5 gallery frames and 8px gaps; product scene second, exact native-text facts third, a distinct detail photograph fourth. Removed large caption strips, repeated lower pack photography, and repeated current-product comparison images. Replaced capsule/water stock repetition with 13 new product-specific editorial details, plus five distinct approved detail assets. Product details are illustrative editorial images, not outcome evidence or authenticated ingredient photographs.
+
+Each of the 18 products now has authored facts and a specific educational focus. Formats include proportional composition (colostrum/resveratrol), preparation sequences, nutrient/ingredient roles, and relevant side-by-side comparisons. Lower-page focus layouts vary between process, specification and comparison. Shared section padding is 56px desktop / 38px mobile; removed redundant large intro and expectations sections. Ingredient explanations no longer repeat the same title in two oversized blocks. The comparison module now uses compact text rather than repeating pack images again.
+
+Verified label arithmetic: colostrum IgG is 575 / 2300 = 25%, included within the total; resveratrol's 600mg is the root complex, not pure trans-resveratrol. Undisclosed amounts remain undisclosed. Source statements, allergen information, usage directions, live Shopify prices and availability are preserved.

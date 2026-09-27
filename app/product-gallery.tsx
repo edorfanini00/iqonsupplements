@@ -5,27 +5,28 @@ import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { type Product } from "@/lib/catalog";
 import { packageContents, productArt } from "@/lib/product-art";
+import { productPresentation } from "@/lib/product-presentation";
+import { ProductFactArt } from "./product-fact-art";
 
-export const galleryChapters = ["The daily ritual", "Formula focus", "The packaging"];
+export const galleryChapters = ["The packaging", "The daily ritual", "Formula focus", "The detail"];
 
 export function ProductGalleryPanel({ product: p, index }: { product: Product; index: number }) {
   const art = productArt[p.id];
+  const presentation = productPresentation[p.id];
   const contents = packageContents(p);
-  if (art && index === 0) return <figure className="visual-panel visual-editorial">
+  if (art && index === 1) return <figure className="visual-panel visual-editorial">
     <div className="visual-image-frame"><img src={art.scene} alt={art.sceneAlt} width={1254} height={1254} fetchPriority="high" /></div>
-    <figcaption><span>THE DAILY RITUAL</span><p>{art.caption}</p></figcaption>
+    <figcaption><p>{art.caption}</p></figcaption>
   </figure>;
-  if (art && index === 1) return <figure className="visual-panel visual-formula-fact">
-    <div className="visual-image-frame">
-      <img src={art.macro} alt="" width={1254} height={1254} loading="lazy" />
-      <div className="visual-fact-copy"><strong className={art.metric.length > 5 ? "is-long" : undefined}>{art.metric}</strong><p>{art.metricLabel}</p></div>
-    </div>
-    <figcaption><span>FORMULA IN FOCUS</span><p>{art.note}</p></figcaption>
+  if (presentation && index === 2) return <figure className="visual-panel visual-formula-fact"><ProductFactArt data={presentation}/></figure>;
+  if (presentation && index === 3) return <figure className="visual-panel visual-detail">
+    <div className="visual-image-frame"><img src={presentation.detail} alt={presentation.detailAlt} width={1024} height={1280} loading="lazy" /></div>
+    <figcaption><p>{presentation.detailLabel}</p></figcaption>
   </figure>;
-  const extra = index > 2 ? p.images?.[index - 1] : undefined;
+  const extra = index > 3 ? p.images?.slice(2).filter(image => image.src !== p.image && image.src !== art?.scene && image.src !== presentation?.detail)[index - 4] : undefined;
   return <figure className="visual-panel visual-pack">
-    <div className="visual-image-frame"><img src={extra?.src || p.image} alt={extra?.alt || `IQON ${p.name} packaging, ${contents}`} width={1122} height={1402} loading="lazy" /></div>
-    <figcaption><span>{extra ? "PRODUCT DETAIL" : "THE PACKAGING"}</span><p>{extra ? extra.alt : contents}</p></figcaption>
+    <div className="visual-image-frame"><img src={extra?.src || p.image} alt={extra?.alt || `IQON ${p.name} packaging, ${contents}`} width={1122} height={1402} loading={index === 0 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : undefined} /></div>
+    <figcaption className="sr-only">{extra ? extra.alt : contents}</figcaption>
   </figure>;
 }
 
@@ -33,7 +34,8 @@ export function ProductGallery({ product }: { product: Product }) {
   const rail = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState<number | null>(null);
-  const chapters = productArt[product.id] ? [...galleryChapters, ...(product.images?.slice(2).map((_, i) => `Product detail ${i + 2}`) || [])] : ["The packaging"];
+  const extras = product.images?.slice(2).filter(image => image.src !== product.image && image.src !== productArt[product.id]?.scene && image.src !== productPresentation[product.id]?.detail) || [];
+  const chapters = productPresentation[product.id] ? [...galleryChapters, ...extras.map((_, i) => `Product detail ${i + 2}`)] : ["The packaging"];
   const count = chapters.length;
   const go = (index: number) => {
     const next = Math.min(count - 1, Math.max(0, index));
