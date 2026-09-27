@@ -1,5 +1,6 @@
 /* Photographic skincare stories. Scoped separately from the approved gallery. */
 .skincare-pdp-story{display:block;--skin-width:1220px;--skin-line:#ccd1d3;--skin-quiet:#616a6e;--skin-paper:#fafbfa;color:#282e30;background:var(--skin-paper)}
+.product-page .skincare-pdp-story section.skin-story-section{scroll-margin-top:64px}
 .skincare-pdp-story .skin-story-section{padding:64px max(calc((100% - var(--skin-width))/2),4vw);scroll-margin-top:64px}
 .skincare-pdp-story .skin-kicker{font-size:10px;line-height:1.5;letter-spacing:.1em;color:#627074;font-weight:500;margin:0 0 18px}
 .skincare-pdp-story h2{font-size:clamp(34px,3.4vw,47px);line-height:1.08;letter-spacing:-.042em;font-weight:400;margin:0}
@@ -70,6 +71,7 @@
  .skin-formula-perspective,.skin-routine-heading,.skin-routine-note{gap:34px}.skin-perspective-points{gap:20px}.skin-compare-table tr>th:first-child{width:13%}
 }
 @media(max-width:760px){
+ .product-page .skincare-pdp-story section.skin-story-section{scroll-margin-top:90px}
  .skincare-pdp-story .skin-story-section{padding:37px 22px;scroll-margin-top:90px}.skincare-pdp-story h2{font-size:34px;line-height:1.1;letter-spacing:-.04em}
  .skincare-pdp-story .skin-story-benefits{grid-template-columns:1fr;gap:27px;padding-top:26px}
  .skin-story-portrait{grid-row:2}.skin-story-portrait>img{min-height:0;height:auto;aspect-ratio:4/5;width:100%;object-fit:cover}.skin-story-portrait figcaption{font-size:10px;margin-top:9px}
