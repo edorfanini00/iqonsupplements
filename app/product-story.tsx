@@ -46,9 +46,8 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   return <div className="product-experience product-story-v4">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">Benefits</a><a href="#product-formula">Ingredients</a>
-      {focus && <a href="#formula-story">In detail</a>}
       <a href="#product-routine">How to use</a>{research && <a href="#ingredient-science">Research</a>}
-      <a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
+      {comparison.length > 1 && <a href="#compare">Compare</a>}<a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
     </nav>
     <section id="product-benefits" className="story-overview pdp-section" aria-labelledby="benefits-heading">
       <div className="story-benefit-copy"><p className="eyebrow">{p.name} / THE BENEFITS</p><h2 id="benefits-heading">{content.title}</h2>
@@ -85,15 +84,6 @@ export function ProductStory({ product: p, products }: { product: Product; produ
       <div><p className="eyebrow">{research.eyebrow}</p><h2 id="research-heading">{research.title}</h2><p className="pdp-research-scope">{research.scope}</p></div>
       <div><p className="pdp-research-body">{research.body}</p><div className="pdp-research-links">{research.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer"><span>{source.label}</span><ArrowUpRight size={18} aria-hidden="true" /></a>)}</div></div>
     </section>}
-    <section id="product-questions" className="pdp-questions pdp-section" aria-labelledby="questions-heading">
-      <div><p className="eyebrow">A LITTLE MORE CLARITY</p><h2 id="questions-heading">Good questions. Clear answers.</h2>
-        <p>Still wondering about something?</p><Link className="pdp-text-link" href="/help">We’re here to help <ArrowUpRight size={17} /></Link>
-      </div>
-      <Accordion type="single" collapsible className="pdp-faq-list">
-        {content.expectations && <AccordionItem value="expectations"><AccordionTrigger>{content.expectations.title}</AccordionTrigger><AccordionContent>{content.expectations.body}</AccordionContent></AccordionItem>}
-        {content.faqs.map((faq, i) => <AccordionItem key={faq.question} value={`faq-${i}`}><AccordionTrigger>{faq.question}</AccordionTrigger><AccordionContent>{faq.answer}</AccordionContent></AccordionItem>)}
-      </Accordion>
-    </section>
     {comparison.length > 1 && <section id="compare" className="pdp-comparison pdp-section" aria-labelledby="comparison-heading">
       <div className="pdp-section-heading"><div><p className="eyebrow">A CLEARER CHOICE</p><h2 id="comparison-heading">Compare the formulas.</h2></div>
         <Link className="pdp-text-link" href={`/collections/${p.category}`}>Explore {p.category}<ArrowUpRight size={17} /></Link>
@@ -114,6 +104,15 @@ export function ProductStory({ product: p, products }: { product: Product; produ
       </div>
       {comparison.some(q => dailyProductPrice(q)) && <p className="pdp-comparison-note">*At the listed price and suggested daily use. Shipping and taxes, where applicable, are calculated at checkout.</p>}
     </section>}
+    <section id="product-questions" className="pdp-questions pdp-section" aria-labelledby="questions-heading">
+      <div><p className="eyebrow">A LITTLE MORE CLARITY</p><h2 id="questions-heading">Good questions. Clear answers.</h2>
+        <p>Still wondering about something?</p><Link className="pdp-text-link" href="/help">We’re here to help <ArrowUpRight size={17} /></Link>
+      </div>
+      <Accordion type="single" collapsible className="pdp-faq-list">
+        {content.expectations && <AccordionItem value="expectations"><AccordionTrigger>{content.expectations.title}</AccordionTrigger><AccordionContent>{content.expectations.body}</AccordionContent></AccordionItem>}
+        {content.faqs.map((faq, i) => <AccordionItem key={faq.question} value={`faq-${i}`}><AccordionTrigger>{faq.question}</AccordionTrigger><AccordionContent>{faq.answer}</AccordionContent></AccordionItem>)}
+      </Accordion>
+    </section>
     {supplement && <p className="pdp-disclaimer">*{supplementDisclaimer}</p>}
   </div>;
 }
