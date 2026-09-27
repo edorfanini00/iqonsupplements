@@ -3,6 +3,7 @@ import "./globals.css";
 import "./experience.css";
 import "./refinement.css";
 import "./commerce.css";
+import "./product-experience.css";
 import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
 export const dynamic = "force-dynamic";

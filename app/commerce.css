@@ -494,9 +494,9 @@ body { background:#fafbfb; }
 .skincare-product-detail .gallery-main>img{object-fit:contain;padding:0}
 
 /* Keep the complete heads visible in the sunlit coastal photography. */
-.campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:center 40%; }
+.campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:center 20%; }
 @media (min-width:761px) and (max-width:1050px) {
- .campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:right 40%; }
+ .campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:right 20%; }
 }
 @media (max-width:760px) {
  .campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:center; }

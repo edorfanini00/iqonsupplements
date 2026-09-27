@@ -1,13 +1,13 @@
 {
   "creatine-monohydrate": {
-    "descriptor": "One ingredient. Ready for your routine.",
+    "descriptor": "Support the strength you build.",
     "description": "Unflavored creatine monohydrate with a single-ingredient formula. Made in the USA and presented in a 281 g jar.",
     "highlights": [
-      "Creatine monohydrate only",
-      "Unflavored powder",
-      "281 g · Made in the USA"
+      "Supports high-intensity exercise*",
+      "One ingredient · No added caffeine",
+      "Unflavored · 281 g"
     ],
-    "title": "Keep the formula focused.",
+    "title": "Made for the work you put in.",
     "story": "Creatine monohydrate is the sole ingredient in this unflavored powder. Mix it with water or juice using the product’s scoop directions. The formula is gluten-free, lactose-free, non-GMO, corn-free and vegan. The full preparation instructions below distinguish the initial loading phase from ongoing use.",
     "facts": [
       {
@@ -38,12 +38,20 @@
       {
         "question": "How should I store it?",
         "answer": "Store in a cool, dry place away from direct light. Keep out of reach of children and do not use if the safety seal is damaged or missing."
+      },
+      {
+        "question": "Is this a pre-workout?",
+        "answer": "It is a single-ingredient creatine powder, without caffeine or a stimulant blend. Its role is to support muscle creatine stores over time, rather than create an immediate stimulant effect."
+      },
+      {
+        "question": "How many grams are in a scoop?",
+        "answer": "Use the serving weight printed on your jar. Scoop volume alone does not establish a weight in grams, and we do not substitute a generic serving size for the product label."
       }
     ],
     "education": {
       "eyebrow": "Understand the ingredient",
-      "title": "Why muscle creatine stores matter.",
-      "body": "Creatine and phosphocreatine help maintain ATP availability during demanding muscle activity. Human research has measured how supplementation changes muscle creatine stores over time. These studies help explain the interest in creatine; their protocols are not directions for this product.",
+      "title": "A well-studied role in muscle energy.",
+      "body": "Creatine helps muscles replenish ATP during short, demanding efforts. Human studies show that regular intake increases muscle creatine stores; the strongest performance evidence concerns repeated high-intensity exercise alongside training.",
       "scope": "Ingredient education. The cited research did not test this IQON product.",
       "sources": [
         {
@@ -53,19 +61,79 @@
         {
           "label": "International Society of Sports Nutrition · Position stand, 2017",
           "url": "https://link.springer.com/article/10.1186/s12970-017-0173-z"
+        },
+        {
+          "label": "NIH Office of Dietary Supplements · Exercise & performance",
+          "url": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/"
         }
       ]
+    },
+    "benefits": [
+      {
+        "title": "High-intensity performance",
+        "body": "Creatine supports repeated, short bursts of demanding exercise, such as lifting and sprinting.*"
+      },
+      {
+        "title": "One focused ingredient",
+        "body": "Just creatine monohydrate. An unflavored powder with no added caffeine, colors or sweeteners."
+      },
+      {
+        "title": "An easy addition",
+        "body": "Mix into water or juice. Keep your daily serving alongside a routine you already follow."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Creatine monohydrate",
+        "role": "Muscle energy",
+        "detail": "Creatine helps replenish ATP, the energy your muscles use during brief, intense efforts.*"
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Measure",
+          "body": "Use the scoop supplied with your jar. Follow the loading and maintenance directions on the label."
+        },
+        {
+          "title": "Mix",
+          "body": "Stir each scoop into 8 oz of water or juice."
+        },
+        {
+          "title": "Keep a routine",
+          "body": "The label separates the first five days from ongoing use. Read the full directions before starting."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Routine",
+        "value": "Strength & power"
+      },
+      {
+        "label": "Format",
+        "value": "Unflavored powder"
+      },
+      {
+        "label": "Formula",
+        "value": "Single ingredient"
+      }
+    ],
+    "expectations": {
+      "title": "Consistency comes first.",
+      "body": "Creatine works by building muscle stores over time. Progress also depends on training, nutrition and recovery; it is not a stimulant you need to feel immediately."
     }
   },
   "hydrolyzed-collagen-peptides": {
-    "descriptor": "Grass-fed collagen. One simple ingredient.",
+    "descriptor": "Collagen that fits your everyday.",
     "description": "Unflavored, grass-fed bovine hide collagen peptides in a 280 g jar. A single-ingredient powder made in the USA.",
     "highlights": [
       "Bovine hide collagen peptides",
       "Unflavored · Types I & III",
       "One level scoop daily"
     ],
-    "title": "A simple addition to your daily drink.",
+    "title": "Your drink. One simple addition.",
     "story": "This grass-fed collagen powder contains bovine hide collagen peptides and is described as containing collagen types I and III. The unflavored formula has one listed ingredient. Add one level scoop to chilled water or a preferred beverage in a shaker cup, then mix for about five seconds.",
     "facts": [
       {
@@ -96,6 +164,14 @@
       {
         "question": "How does it differ from chocolate collagen?",
         "answer": "This option contains only bovine hide collagen peptides and comes in a 280 g jar. The 378 g chocolate option also includes cocoa, flavoring and other ingredients, and uses two scoops in its directions."
+      },
+      {
+        "question": "Is it suitable for a plant-based diet?",
+        "answer": "This powder is made from bovine hide and is not vegan or vegetarian."
+      },
+      {
+        "question": "Does it replace a balanced protein intake?",
+        "answer": "Use it as an addition to a varied diet. Collagen does not replace the range of protein sources and other nutrients your body needs."
       }
     ],
     "education": {
@@ -109,17 +185,73 @@
           "url": "https://pubmed.ncbi.nlm.nih.gov/23949208/"
         }
       ]
+    },
+    "benefits": [
+      {
+        "title": "A simple collagen ritual",
+        "body": "A single-ingredient source of hydrolyzed bovine collagen peptides, with no added flavors or sweeteners."
+      },
+      {
+        "title": "Make it yours",
+        "body": "The unflavored powder fits into chilled water or your preferred beverage."
+      },
+      {
+        "title": "Know the source",
+        "body": "Grass-fed bovine hide collagen, described as types I and III. A clear choice for an animal-derived collagen routine."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Bovine collagen peptides",
+        "role": "Hydrolyzed collagen",
+        "detail": "Collagen broken into smaller peptides. Bovine hide is the animal source; the formula has one listed ingredient."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Scoop",
+          "body": "Measure one level scoop using the scoop in your jar."
+        },
+        {
+          "title": "Mix",
+          "body": "Add to 8–10 oz of chilled water or a preferred beverage in a shaker."
+        },
+        {
+          "title": "Enjoy",
+          "body": "Shake for about five seconds. Enjoy one shake each day."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Routine",
+        "value": "Daily collagen"
+      },
+      {
+        "label": "Taste",
+        "value": "Unflavored"
+      },
+      {
+        "label": "Source",
+        "value": "Grass-fed bovine"
+      }
+    ],
+    "expectations": {
+      "title": "A habit, rather than a quick fix.",
+      "body": "Collagen studies examine changes over weeks and use specific preparations. Their findings help explain the ingredient, but cannot promise a particular skin or joint result from this formula."
     }
   },
   "collagen-peptides-chocolate": {
-    "descriptor": "Grass-fed collagen, with a chocolate note.",
+    "descriptor": "Your collagen ritual, with a little chocolate.",
     "description": "Chocolate-flavored hydrolyzed collagen peptides from bovine hide, with cocoa and stevia. Made in the USA in a 378 g jar.",
     "highlights": [
       "Grass-fed bovine collagen",
       "Chocolate flavor · With stevia",
       "378 g powder"
     ],
-    "title": "Make room for a chocolate ritual.",
+    "title": "A daily scoop worth looking forward to.",
     "story": "Hydrolyzed bovine collagen peptides are paired with cocoa powder, acacia powder, natural flavor and stevia extract. The formula is described as containing collagen types I and III. Mix two scoops with a favorite beverage in a shaker cup or blender, following the preparation directions.",
     "facts": [
       {
@@ -150,6 +282,10 @@
       {
         "question": "Is there an unflavored option?",
         "answer": "Yes. IQON Hydrolyzed Collagen Peptides is the unflavored, single-ingredient bovine collagen option in a 280 g jar. Its preparation directions use one level scoop."
+      },
+      {
+        "question": "Is the formula vegan?",
+        "answer": "No. The collagen is derived from bovine hide. Choose according to your dietary preferences and review the complete ingredient statement."
       }
     ],
     "education": {
@@ -163,17 +299,83 @@
           "url": "https://pubmed.ncbi.nlm.nih.gov/23949208/"
         }
       ]
+    },
+    "benefits": [
+      {
+        "title": "Collagen, made enjoyable",
+        "body": "Hydrolyzed bovine collagen in a cocoa-flavored powder you can mix into a daily drink."
+      },
+      {
+        "title": "A chocolate finish",
+        "body": "Cocoa and natural flavor provide the taste, with stevia extract as the listed sweetener."
+      },
+      {
+        "title": "A routine that fits",
+        "body": "A two-scoop preparation for a shaker or blender. Make it part of a moment you already enjoy."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Hydrolyzed collagen peptides",
+        "role": "Bovine source",
+        "detail": "Grass-fed collagen from bovine hide, described as types I and III."
+      },
+      {
+        "name": "Cocoa & natural flavor",
+        "role": "Taste",
+        "detail": "The ingredients behind the chocolate profile."
+      },
+      {
+        "name": "Stevia extract",
+        "role": "Sweetener",
+        "detail": "Stevia extract (Reb A) is included in the formula. See the full list for all ingredients."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Measure",
+          "body": "Adults measure two scoops using the scoop supplied."
+        },
+        {
+          "title": "Mix",
+          "body": "Combine with 8–10 oz of a favorite beverage in a shaker cup or blender."
+        },
+        {
+          "title": "Enjoy",
+          "body": "Mix well and make it part of your routine. Keep the jar cool, dry and away from direct light."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Routine",
+        "value": "Daily collagen"
+      },
+      {
+        "label": "Taste",
+        "value": "Chocolate"
+      },
+      {
+        "label": "Preparation",
+        "value": "Two scoops"
+      }
+    ],
+    "expectations": {
+      "title": "The same questions matter for every collagen.",
+      "body": "Check the source, formula and serving instructions. Research on a particular collagen preparation does not establish an identical result for every collagen powder."
     }
   },
   "colostrum-powder": {
-    "descriptor": "Bovine colostrum, clearly specified.",
+    "descriptor": "A clearly measured colostrum ritual.",
     "description": "Bovine colostrum powder providing 2300 mg per serving, standardized to 25% Immunoglobulin G. Made in the USA in a 69 g jar.",
     "highlights": [
       "2300 mg bovine colostrum per serving",
       "25% IgG · 575 mg per serving",
       "69 g powder · Adults only"
     ],
-    "title": "Know what is in each serving.",
+    "title": "Know what goes into your scoop.",
     "story": "Each serving provides 2300 mg of bovine colostrum, standardized to 25% Immunoglobulin G, supplying 575 mg of IgG within that amount. This milk-derived powder is intended for adults. Mix one scoop with cold water or a favorite beverage and consume within ten minutes of mixing.",
     "facts": [
       {
@@ -204,6 +406,10 @@
       {
         "question": "How do I prepare it?",
         "answer": "Adults use one scoop in 6–8 oz (177–237 ml) of cold water or a favorite beverage. Consume within ten minutes of mixing."
+      },
+      {
+        "question": "Is it suitable if I have a milk allergy?",
+        "answer": "No. Bovine colostrum is derived from milk. Review the allergen information and consult your clinician if you are uncertain about suitability."
       }
     ],
     "education": {
@@ -217,17 +423,80 @@
           "url": "https://pubmed.ncbi.nlm.nih.gov/21148400/"
         }
       ]
+    },
+    "benefits": [
+      {
+        "title": "2,300 mg per serving",
+        "body": "A defined amount of bovine colostrum, with the naturally occurring IgG content clearly specified."
+      },
+      {
+        "title": "25% IgG",
+        "body": "Each serving provides 575 mg of immunoglobulin G within the colostrum amount."
+      },
+      {
+        "title": "Simple to prepare",
+        "body": "One scoop mixed into a cold drink. A powder format for adults who prefer a scoop to capsules."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Bovine colostrum",
+        "role": "Milk-derived ingredient",
+        "detail": "Colostrum is the first milk produced after a cow gives birth. This formula is standardized for its IgG content.",
+        "amount": "2,300 mg"
+      },
+      {
+        "name": "Immunoglobulin G",
+        "role": "Naturally present protein",
+        "detail": "The colostrum provides 575 mg of IgG. This is part of the 2,300 mg serving, not an additional amount.",
+        "amount": "25% IgG"
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Scoop",
+          "body": "Adults use one scoop of powder."
+        },
+        {
+          "title": "Mix cold",
+          "body": "Combine with 6–8 oz of cold water or a favorite beverage."
+        },
+        {
+          "title": "Drink freshly mixed",
+          "body": "Consume within ten minutes of mixing."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Format",
+        "value": "One scoop"
+      },
+      {
+        "label": "Source",
+        "value": "Bovine milk"
+      },
+      {
+        "label": "Standardization",
+        "value": "25% IgG"
+      }
+    ],
+    "expectations": {
+      "title": "Keep the evidence in context.",
+      "body": "Colostrum has been studied for specific outcomes, including exercise-related changes in the gut barrier. This does not establish a universal benefit or a guaranteed result from this powder."
     }
   },
   "colon-gentle-cleanse": {
-    "descriptor": "Fiber, botanicals and enzymes. In a sachet.",
+    "descriptor": "Fiber and digestive ingredients, ready to mix.",
     "description": "A powder blend of psyllium husk, tamarind, digestive enzymes and ginger root. Made in Latvia, with 30 individual sachets per pack.",
     "highlights": [
       "Psyllium husk with ginger and tamarind",
       "Digestive enzyme blend",
       "30 sachets · 90 g"
     ],
-    "title": "A measured format for your routine.",
+    "title": "A simpler way to make room for fiber.",
     "story": "Psyllium husk seed powder is combined with tamarind fruit extract, ginger root and a digestive enzyme blend from fermented cereals. The enzymes listed are amylase, lactase, lipase and cellulase. Each sachet is mixed into still water and consumed immediately; the preparation can develop a characteristic jelly-like consistency.",
     "facts": [
       {
@@ -258,18 +527,92 @@
       {
         "question": "What should I know before using it?",
         "answer": "The directions specify at least two hours after medication and recommend consulting your doctor before use. It is not recommended for children under 12 or anyone sensitive to the components. Read the complete warnings before use."
+      },
+      {
+        "question": "Why does it become thicker?",
+        "answer": "Psyllium absorbs water. A jelly-like consistency is expected for this preparation; stir well and drink immediately."
+      },
+      {
+        "question": "Does a cleanse replace meals?",
+        "answer": "No. This supplement is not a substitute for food or a complete diet. Follow the directions and do not exceed the recommended daily amount."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Psyllium-based formula",
+        "body": "Psyllium husk is a water-absorbing fiber, combined here with botanicals and digestive enzymes."
+      },
+      {
+        "title": "Four named enzymes",
+        "body": "Amylase, lactase, lipase and cellulase are included in the enzyme blend."
+      },
+      {
+        "title": "Individually portioned",
+        "body": "Thirty sachets make the powder easy to measure, pack and prepare."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Psyllium husk",
+        "role": "Fiber",
+        "detail": "A water-absorbing plant fiber. Always mix with the full amount of water in the directions."
+      },
+      {
+        "name": "Digestive enzyme blend",
+        "role": "Four enzymes",
+        "detail": "Amylase, lactase, lipase and cellulase from fermented cereals."
+      },
+      {
+        "name": "Ginger & tamarind",
+        "role": "Botanical ingredients",
+        "detail": "Ginger root and tamarind fruit extract complete the ingredient statement."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Mix",
+          "body": "Pour one sachet into 200 ml of still water."
+        },
+        {
+          "title": "Drink immediately",
+          "body": "Stir thoroughly and drink straight away; a jelly-like consistency can develop."
+        },
+        {
+          "title": "Space it carefully",
+          "body": "Use once or twice daily, separate from meals and at least two hours after medication, following the label."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Format",
+        "value": "30 sachets"
+      },
+      {
+        "label": "Preparation",
+        "value": "200 ml water"
+      },
+      {
+        "label": "Key ingredient",
+        "value": "Psyllium husk"
+      }
+    ],
+    "expectations": {
+      "title": "Water is part of the routine.",
+      "body": "The powder changes consistency as it absorbs water. Prepare each serving as directed instead of swallowing it dry. Ask your clinician about use alongside medication."
+    }
   },
   "keto-5": {
-    "descriptor": "Five named ingredients. One capsule blend.",
+    "descriptor": "Five ingredients. A clear view of the blend.",
     "description": "Keto-5 combines raspberry ketone, green tea, caffeine anhydrous, green coffee bean and garcinia cambogia in a vegetable capsule. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
       "Five-ingredient Keto Blend",
       "Contains caffeine",
       "60 vegetable capsules"
     ],
-    "title": "Get to know the complete blend.",
+    "title": "Know your formula before you begin.",
     "story": "Keto-5 contains a blend of raspberry ketone, green tea, caffeine anhydrous, green coffee bean and garcinia cambogia fruit, enclosed in a cellulose vegetable capsule. The directions specify one capsule twice daily, taken before a meal with water. Read the ingredient statement and cautions when considering it for your routine.",
     "facts": [
       {
@@ -300,34 +643,104 @@
       {
         "question": "What is the capsule made from?",
         "answer": "The ingredient statement lists cellulose as the vegetable capsule material."
+      },
+      {
+        "question": "Will Keto-5 put me into ketosis?",
+        "answer": "The ingredient statement does not establish that this formula induces ketosis. The product name should not be used as a promise of ketosis or weight loss."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "A defined ingredient blend",
+        "body": "Raspberry ketone, green tea, caffeine anhydrous, green coffee bean and garcinia cambogia."
+      },
+      {
+        "title": "Contains caffeine",
+        "body": "A relevant detail when you also drink coffee, tea or use other caffeinated products."
+      },
+      {
+        "title": "A capsule routine",
+        "body": "Sixty vegetable capsules, with directions for one capsule twice a day."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Caffeine anhydrous",
+        "role": "Caffeine source",
+        "detail": "Caffeine is explicitly included. The total caffeine amount is not specified in the supplied ingredient statement."
+      },
+      {
+        "name": "Green tea & green coffee bean",
+        "role": "Plant ingredients",
+        "detail": "Two of the five ingredients in the Keto Blend; they may also contribute caffeine."
+      },
+      {
+        "name": "Raspberry ketone & garcinia",
+        "role": "Botanical blend",
+        "detail": "Included alongside the tea, coffee and caffeine ingredients. Individual ingredient amounts are not stated."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Review",
+          "body": "Consider other sources of caffeine in your day before use."
+        },
+        {
+          "title": "Take with water",
+          "body": "The label specifies one capsule with an 8 oz glass of water."
+        },
+        {
+          "title": "Follow the schedule",
+          "body": "Take twice daily, 20–30 minutes before a meal, or as directed by your healthcare professional."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Format",
+        "value": "60 capsules"
+      },
+      {
+        "label": "Capsule",
+        "value": "Vegetable cellulose"
+      },
+      {
+        "label": "Contains",
+        "value": "Caffeine"
+      }
+    ],
+    "expectations": {
+      "title": "Be clear about what the name means.",
+      "body": "Keto-5 is the product name. It does not establish that the formula induces ketosis, replaces a dietary plan or guarantees a change in weight."
+    }
   },
   "glp-1-support": {
-    "descriptor": "Digestive ingredients meet daily nutrients.",
+    "descriptor": "Daily nutrition and digestive support, together.",
     "description": "A capsule formula combining vitamins and minerals with ginger, peppermint, digestive enzymes, LactoSpore® and ashwagandha. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
-      "Vitamins, minerals and botanical blends",
-      "LactoSpore® and DigeZyme®",
-      "60 capsules · Two capsules daily"
+      "Digestive enzymes, ginger & probiotic*",
+      "Vitamins and minerals for daily nutrition*",
+      "2 capsules daily · 30-day supply"
     ],
-    "title": "One formula, with the details in view.",
+    "title": "Support for a changing routine.",
     "story": "The formula brings together magnesium, vitamins D3, B6 and B12, folate, biotin, iron and zinc with digestive and botanical ingredients. Its named blends include ginger, peppermint, bromelain and DigeZyme®, alongside LactoSpore®, ashwagandha and BioPerine®. The full ingredient statement lists the individual nutrients and blends so you can review the formula in detail.",
     "facts": [
       {
-        "label": "Format",
-        "value": "60 capsules",
-        "detail": "A capsule formula made in the USA."
+        "label": "Daily use",
+        "value": "2 capsules",
+        "detail": "Take with 6–8 oz of water."
       },
       {
-        "label": "Directions",
-        "value": "2 daily",
-        "detail": "For adults, taken with water."
+        "label": "Per bottle",
+        "value": "30 days",
+        "detail": "60 capsules at the suggested daily use."
       },
       {
-        "label": "Includes",
-        "value": "Iron · 18 mg",
-        "detail": "Read the iron warning before use."
+        "label": "Digestive blend",
+        "value": "325 mg",
+        "detail": "Ginger, peppermint, bromelain and DigeZyme®."
       }
     ],
     "faqs": [
@@ -342,18 +755,94 @@
       {
         "question": "What warning should I read first?",
         "answer": "This formula contains iron. Accidental overdose of iron-containing products can cause fatal poisoning in children under six. Keep it out of reach of children and read the complete warnings and storage information."
+      },
+      {
+        "question": "Can I take it with a GLP-1 prescription?",
+        "answer": "Ask your prescribing clinician or pharmacist to review the full formula first. It contains iron, vitamin B6, botanicals and black pepper extract; suitability depends on your medication, health and other supplements."
+      },
+      {
+        "question": "Can I combine it with a multivitamin?",
+        "answer": "Check the overlapping nutrients before combining them. This formula already includes vitamins D3, B6, B12, folate, biotin, iron, magnesium and zinc."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Digestive ingredients",
+        "body": "Ginger, peppermint, digestive enzymes and a probiotic come together in a digestion-focused formula.*"
+      },
+      {
+        "title": "Daily nutrient intake",
+        "body": "Includes vitamins D3, B6 and B12, folate, magnesium, iron and zinc to complement dietary intake.*"
+      },
+      {
+        "title": "One practical routine",
+        "body": "Two capsules a day, with 60 capsules per bottle. A 30-day supply at the suggested use."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Ginger, peppermint & enzymes",
+        "role": "Digestive formula",
+        "detail": "A 325 mg blend with Gingerols™, peppermint, bromelain and DigeZyme®. Individual blend amounts are not disclosed.",
+        "amount": "325 mg blend"
+      },
+      {
+        "name": "LactoSpore®",
+        "role": "Probiotic ingredient",
+        "detail": "Bacillus coagulans is listed at 166 mg. This weight is not a live-culture count; a CFU amount is not provided.",
+        "amount": "166 mg"
+      },
+      {
+        "name": "Vitamins & minerals",
+        "role": "Nutritional support",
+        "detail": "Includes methylcobalamin B12, P5P B6, folate, magnesium, zinc, iron and vitamin D3. Review all listed amounts before combining supplements."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Check your routine",
+          "body": "Review the ingredients with your clinician if you use medication or other vitamin and mineral supplements."
+        },
+        {
+          "title": "Take two capsules",
+          "body": "Adults take two capsules daily with 6–8 oz of water, following the label."
+        },
+        {
+          "title": "Keep food first",
+          "body": "Use as an addition to a varied diet. A capsule does not replace balanced meals, protein or hydration."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Suggested use",
+        "value": "2 capsules daily"
+      },
+      {
+        "label": "Supply",
+        "value": "30 days"
+      },
+      {
+        "label": "Includes",
+        "value": "Iron · 18 mg"
+      }
+    ],
+    "expectations": {
+      "title": "Support with clear boundaries.",
+      "body": "This is a dietary supplement. It does not act as a prescription GLP-1 medicine, replace treatment or promise to prevent medication side effects. If your appetite or intake changes, discuss your nutritional needs with your clinician."
+    }
   },
   "liver-support": {
-    "descriptor": "A closer look at the botanical blend.",
+    "descriptor": "A botanical blend for a thoughtful daily routine.",
     "description": "A capsule blend with turmeric, beet root, dandelion, artichoke, ginger, milk thistle, alfalfa and L-cysteine hydrochloride. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
       "Turmeric, artichoke and milk thistle",
       "Non-GMO",
       "60 capsules · Two capsules daily"
     ],
-    "title": "Know each ingredient in the blend.",
+    "title": "Eight ingredients, clearly introduced.",
     "story": "Liver Support combines root and leaf powders with artichoke extract standardized to 5% cynarin and L-cysteine hydrochloride. The ingredient list includes turmeric, beet root, dandelion, ginger, milk thistle and alfalfa. The adult directions specify two capsules daily with water.",
     "facts": [
       {
@@ -384,18 +873,89 @@
       {
         "question": "How is it taken?",
         "answer": "Adults take two capsules daily with 6–8 oz of water, or as directed by a healthcare professional. Read the complete cautions before use."
+      },
+      {
+        "question": "Is this a detox treatment?",
+        "answer": "No. This is a dietary supplement, not a treatment for liver disease or a substitute for medical care. Avoid interpreting the product name as a promise to remove toxins."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "A botanical focus",
+        "body": "Turmeric, beet root, dandelion, artichoke, ginger, milk thistle and alfalfa in one formula."
+      },
+      {
+        "title": "A specified extract",
+        "body": "Artichoke extract is standardized to 5% cynarin, with L-cysteine hydrochloride also included."
+      },
+      {
+        "title": "Simple daily use",
+        "body": "Two capsules with water. Sixty capsules provide a 30-day supply at the suggested use."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Milk thistle & turmeric",
+        "role": "Botanical powders",
+        "detail": "Two familiar plant ingredients in this multi-ingredient formula. Individual amounts are not disclosed."
+      },
+      {
+        "name": "Artichoke extract",
+        "role": "Standardized botanical",
+        "detail": "The extract is standardized to 5% cynarin; this is a composition specification, not an amount in milligrams.",
+        "amount": "5% cynarin"
+      },
+      {
+        "name": "L-cysteine hydrochloride",
+        "role": "Amino acid ingredient",
+        "detail": "Included with beet root, dandelion, ginger and alfalfa in the full formula."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Review the ingredients",
+          "body": "Check suitability with your healthcare professional, particularly if you take medication or have a medical condition."
+        },
+        {
+          "title": "Take with water",
+          "body": "Adults take two capsules daily with 6–8 oz of water."
+        },
+        {
+          "title": "Build the habit",
+          "body": "Keep a consistent routine alongside a balanced diet. Follow the label and store in a cool, dry place."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Daily use",
+        "value": "2 capsules"
+      },
+      {
+        "label": "Supply",
+        "value": "30 days"
+      },
+      {
+        "label": "Formula",
+        "value": "Non-GMO"
+      }
+    ],
+    "expectations": {
+      "title": "A supplement is one part of a routine.",
+      "body": "The formula is not a treatment for liver disease or a way to offset alcohol use. Research on individual botanicals does not establish an effect for this complete blend."
+    }
   },
   "nmn": {
-    "descriptor": "500 mg NMN. A daily capsule.",
+    "descriptor": "500 mg NMN for your daily longevity routine.",
     "description": "β-Nicotinamide mononucleotide in a vegetable capsule, providing 500 mg per serving with a stated purity of 99.9%. Made in the USA, with 30 capsules per bottle.",
     "highlights": [
       "500 mg β-NMN per serving",
-      "99.9% stated purity",
-      "30 vegetable capsules"
+      "A precursor to NAD+*",
+      "1 capsule daily · 30-day supply"
     ],
-    "title": "Begin with a clearly stated amount.",
+    "title": "A focused approach to cellular nutrition.",
     "story": "This formula contains β-nicotinamide mononucleotide at 500 mg per serving, with a stated purity of 99.9%. HPMC forms the vegetable capsule, with microcrystalline cellulose, silicon dioxide and magnesium stearate also listed. The adult directions specify one capsule daily with water.",
     "facts": [
       {
@@ -426,6 +986,10 @@
       {
         "question": "Are NMN and resveratrol the same?",
         "answer": "No. They are separate compounds and separate products in the IQON collection. Compare their individual ingredient statements and directions."
+      },
+      {
+        "question": "Is NMN the same as NAD+?",
+        "answer": "No. NMN is a precursor the body can use to make NAD+. They are related compounds, but they are not interchangeable names for the same ingredient."
       }
     ],
     "education": {
@@ -439,17 +1003,79 @@
           "url": "https://pubmed.ncbi.nlm.nih.gov/33888596/"
         }
       ]
+    },
+    "benefits": [
+      {
+        "title": "A defined amount",
+        "body": "Each serving provides 500 mg of β-nicotinamide mononucleotide, the compound known as NMN."
+      },
+      {
+        "title": "A role in NAD+ biology",
+        "body": "NMN is a precursor used by the body to make NAD+, a coenzyme involved in cellular energy metabolism.*"
+      },
+      {
+        "title": "One capsule daily",
+        "body": "Thirty vegetable capsules fit into a simple daily routine, with no mixing required."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "β-Nicotinamide mononucleotide",
+        "role": "NAD+ precursor",
+        "detail": "The single active ingredient, listed at 500 mg per serving. The specification states 99.9% purity.",
+        "amount": "500 mg"
+      },
+      {
+        "name": "HPMC capsule",
+        "role": "Vegetable capsule",
+        "detail": "The capsule shell is made from hypromellose. See the ingredient statement for the remaining formulation ingredients."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Take one capsule",
+          "body": "The suggested adult use is one capsule daily."
+        },
+        {
+          "title": "Add water",
+          "body": "Take with 6–8 oz of water, or as directed by your healthcare professional."
+        },
+        {
+          "title": "Stay consistent",
+          "body": "Keep the bottle in a cool, dry place and follow the product label."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Per serving",
+        "value": "500 mg β-NMN"
+      },
+      {
+        "label": "Daily use",
+        "value": "1 capsule"
+      },
+      {
+        "label": "Supply",
+        "value": "30 days"
+      }
+    ],
+    "expectations": {
+      "title": "Healthy-aging research is still developing.",
+      "body": "NMN studies examine specific biological markers and outcomes in defined groups. That research does not establish that this product extends lifespan or reverses aging."
     }
   },
   "resveratrol": {
-    "descriptor": "A root extract. A defined standardization.",
+    "descriptor": "A plant polyphenol, clearly specified.",
     "description": "A 600 mg resveratrol root complex standardized to 50% trans-resveratrol. Made in the USA in a bottle of 60 vegetable capsules.",
     "highlights": [
       "600 mg resveratrol complex",
       "Standardized to 50% trans-resveratrol",
       "60 vegetable capsules"
     ],
-    "title": "Read the amount and the form together.",
+    "title": "Look closely at the form you choose.",
     "story": "The resveratrol complex comes from Polygonum cuspidatum root and is standardized to 50% trans-resveratrol. The listed 600 mg describes the complex, rather than 600 mg of pure trans-resveratrol. The remaining ingredients are hypromellose for the vegetable capsule and microcrystalline cellulose.",
     "facts": [
       {
@@ -480,6 +1106,10 @@
       {
         "question": "How is it taken?",
         "answer": "Take one veggie capsule twice daily, 20–30 minutes before a meal, or as directed by your healthcare professional. Read the complete cautions before use."
+      },
+      {
+        "question": "Is this made from grapes?",
+        "answer": "The ingredient statement identifies Polygonum cuspidatum root as the source, rather than grapes."
       }
     ],
     "education": {
@@ -497,17 +1127,85 @@
           "url": "https://pubmed.ncbi.nlm.nih.gov/23102619/"
         }
       ]
+    },
+    "benefits": [
+      {
+        "title": "A botanical source",
+        "body": "A resveratrol complex derived from Polygonum cuspidatum root."
+      },
+      {
+        "title": "A defined standardization",
+        "body": "The complex is standardized to 50% trans-resveratrol, making the form as important as the headline amount."
+      },
+      {
+        "title": "A simple capsule format",
+        "body": "Sixty vegetable capsules, with one capsule taken twice daily according to the label."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Resveratrol root complex",
+        "role": "Plant polyphenol",
+        "detail": "The listed 600 mg describes the root complex, not 600 mg of pure trans-resveratrol.",
+        "amount": "600 mg complex"
+      },
+      {
+        "name": "Trans-resveratrol",
+        "role": "Standardized form",
+        "detail": "Trans-resveratrol makes up 50% of the specified complex. Read the form and amount together.",
+        "amount": "50%"
+      },
+      {
+        "name": "Hypromellose",
+        "role": "Vegetable capsule",
+        "detail": "The ingredient statement also lists microcrystalline cellulose."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Take one capsule",
+          "body": "Use one veggie capsule per dose."
+        },
+        {
+          "title": "Before a meal",
+          "body": "The label recommends 20–30 minutes before a meal."
+        },
+        {
+          "title": "Repeat as directed",
+          "body": "Take twice daily, or as directed by your healthcare professional."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Source",
+        "value": "Root extract"
+      },
+      {
+        "label": "Standardization",
+        "value": "50% trans"
+      },
+      {
+        "label": "Supply",
+        "value": "30 days"
+      }
+    ],
+    "expectations": {
+      "title": "Research deserves a closer look.",
+      "body": "Human resveratrol studies have produced different results in different populations. The ingredient’s presence is not a guarantee of a particular metabolic or healthy-aging outcome."
     }
   },
   "hair-skin-nails-gummies": {
-    "descriptor": "Vitamins and minerals, with a passion fruit note.",
+    "descriptor": "Daily nutrients, with a passion fruit finish.",
     "description": "Passion-fruit-flavored gummies with biotin, vitamins, zinc, iodine and fish-derived collagen. Made in the USA, with 60 gummies per bottle.",
     "highlights": [
       "Biotin, vitamins and minerals",
       "Passion fruit flavor",
       "60 gummies · Two gummies daily"
     ],
-    "title": "The ingredients behind the daily gummy.",
+    "title": "Make your nutrition routine a little easier.",
     "story": "This gummy formula brings together biotin, vitamins A, C, D, E, B6 and B12, folate, pantothenic acid, iodine and zinc, with PABA, collagen and silicon. The collagen is fish-derived. Glucose syrup, sugar and glucose are listed, alongside pectin and passion fruit flavor. The directions specify two gummies daily.",
     "facts": [
       {
@@ -538,34 +1236,116 @@
       {
         "question": "How many do I take?",
         "answer": "Take two gummies daily, or as directed by a healthcare professional. Do not exceed the suggested dosage and read the full warnings before use."
+      },
+      {
+        "question": "Should I mention them before a blood test?",
+        "answer": "Yes. Tell your clinician about all supplements. Biotin can interfere with certain laboratory tests, and your clinician can advise whether any pause is needed."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "A nutrient combination",
+        "body": "Biotin, vitamins and minerals in a chewable formula, including vitamins A, C, D and E."
+      },
+      {
+        "title": "A convenient format",
+        "body": "Two gummies daily, for people who prefer a chewable addition to their routine."
+      },
+      {
+        "title": "Know what is inside",
+        "body": "The formula includes fish-derived collagen and sugar. Check the full list against your dietary preferences."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Biotin & B vitamins",
+        "role": "Nutrient support",
+        "detail": "Biotin is a B vitamin involved in converting food into energy. The formula also includes B6, B12, folate and pantothenic acid."
+      },
+      {
+        "name": "Vitamins & minerals",
+        "role": "Daily nutrition",
+        "detail": "Includes vitamins A, C, D and E, zinc and iodine. Individual nutrient amounts are not included in the supplied ingredient statement."
+      },
+      {
+        "name": "Fish-derived collagen",
+        "role": "Animal-derived ingredient",
+        "detail": "Piscine collagen is listed. Pectin forms the gummy base, but the complete formula is not vegan."
+      }
+    ],
+    "routine": {
+      "title": "Make it part of your day.",
+      "steps": [
+        {
+          "title": "Take two",
+          "body": "Take two gummies daily, or as directed by a healthcare professional."
+        },
+        {
+          "title": "Stay within the serving",
+          "body": "Do not exceed the suggested use. Check overlap with other vitamin supplements."
+        },
+        {
+          "title": "Keep them safely stored",
+          "body": "Keep out of reach of children in a cool, dry place. They are supplements, not sweets."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Daily use",
+        "value": "2 gummies"
+      },
+      {
+        "label": "Flavor",
+        "value": "Passion fruit"
+      },
+      {
+        "label": "Supply",
+        "value": "30 days"
+      }
+    ],
+    "expectations": {
+      "title": "Nutrition is the foundation.",
+      "body": "These gummies complement nutrient intake. Biotin is not a guaranteed hair-growth treatment, and additional biotin has limited evidence for hair, skin or nail changes in people who already get enough."
+    },
+    "education": {
+      "eyebrow": "Ingredient research",
+      "title": "What biotin does—and what research can tell us.",
+      "body": "Biotin helps the body use carbohydrates, fats and proteins. Evidence for improving hair, skin and nails with extra biotin is limited in people without a deficiency. Nutritional support should not be mistaken for a guaranteed visible result.",
+      "scope": "Ingredient education. This is not a clinical study of the IQON formula.",
+      "sources": [
+        {
+          "label": "NIH Office of Dietary Supplements · Biotin",
+          "url": "https://ods.od.nih.gov/factsheets/Biotin-Consumer/"
+        }
+      ]
+    }
   },
   "anti-aging-cleanser-with-peptides": {
-    "descriptor": "A fresh start. A softer feel.",
+    "descriptor": "A clean start. Comfortable skin.",
     "description": "A peptide-enriched facial cleanser with glycerin and panthenol. Cleanses away daily buildup while helping skin feel comfortable.",
     "highlights": [
-      "Peptides, glycerin and panthenol",
-      "207 mL format",
-      "Cleanse step"
+      "A gentle daily cleanse",
+      "Hydration in the first step",
+      "A peptide-enriched formula"
     ],
-    "title": "A fresh start. A softer feel.",
+    "title": "Cleanse without the stripped feeling.",
     "story": "A peptide-enriched facial cleanser with glycerin and panthenol. Cleanses away daily buildup while helping skin feel comfortable.",
     "facts": [
       {
-        "label": "Format",
-        "value": "207 mL",
-        "detail": "Size shown on the supplied IQON packaging."
+        "label": "Focus",
+        "value": "Daily cleansing",
+        "detail": ""
       },
       {
-        "label": "Routine",
-        "value": "Cleanse",
-        "detail": "Choose the steps that suit your skin."
+        "label": "When",
+        "value": "AM & PM",
+        "detail": ""
       },
       {
-        "label": "Formula focus",
-        "value": "Peptides, glycerin and panthenol",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "label": "Step",
+        "value": "01 · Cleanse",
+        "detail": ""
       }
     ],
     "faqs": [
@@ -576,34 +1356,105 @@
       {
         "question": "What is the formula focus?",
         "answer": "Peptides, glycerin and panthenol. Check the packaging for the current complete ingredient list."
+      },
+      {
+        "question": "Does it contain fragrance?",
+        "answer": "Yes. Fragrance is listed in the formulation. If you are sensitive to fragrance, review the full list before use."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "A gentle daily cleanse",
+        "body": "Wash away everyday buildup with a cleanser designed to leave skin feeling comfortable."
+      },
+      {
+        "title": "Hydration in the first step",
+        "body": "Glycerin and panthenol bring moisture-focused ingredients into your cleansing routine."
+      },
+      {
+        "title": "A peptide-enriched formula",
+        "body": "Peptides sit alongside familiar cleansing and conditioning ingredients."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Glycerin",
+        "role": "Humectant",
+        "detail": "Helps attract water for a comfortable skin feel."
+      },
+      {
+        "name": "Panthenol",
+        "role": "Conditioning",
+        "detail": "A moisture-focused ingredient in the cleansing formula."
+      },
+      {
+        "name": "Peptides",
+        "role": "Formula focus",
+        "detail": "Palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7 are included in the formula."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Dampen",
+          "body": "Start with damp skin."
+        },
+        {
+          "title": "Massage",
+          "body": "Gently massage a small amount over the face."
+        },
+        {
+          "title": "Rinse",
+          "body": "Rinse thoroughly. Use morning and evening, then continue with your routine."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Daily cleansing"
+      },
+      {
+        "label": "When",
+        "value": "AM & PM"
+      },
+      {
+        "label": "Step",
+        "value": "01 · Cleanse"
+      }
+    ],
+    "expectations": {
+      "title": "Comfort at the first step.",
+      "body": "Notice how skin feels after rinsing. Adjust your routine if cleansing leaves skin feeling irritated or uncomfortable."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   },
   "hydrating-tonic": {
-    "descriptor": "A little hydration. Before everything else.",
+    "descriptor": "A light layer of hydration.",
     "description": "An aloe-based tonic with glycerin and sodium PCA. A light hydration step after cleansing, before your chosen serum.",
     "highlights": [
-      "Aloe, glycerin and sodium PCA",
-      "198 mL format",
-      "Hydrate step"
+      "Lightweight hydration",
+      "Aloe-based care",
+      "Easy to layer"
     ],
-    "title": "A little hydration. Before everything else.",
+    "title": "Give the next step a comfortable start.",
     "story": "An aloe-based tonic with glycerin and sodium PCA. A light hydration step after cleansing, before your chosen serum.",
     "facts": [
       {
-        "label": "Format",
-        "value": "198 mL",
-        "detail": "Size shown on the supplied IQON packaging."
+        "label": "Focus",
+        "value": "Dehydrated-feeling skin",
+        "detail": ""
       },
       {
-        "label": "Routine",
-        "value": "Hydrate",
-        "detail": "Choose the steps that suit your skin."
+        "label": "When",
+        "value": "AM & PM",
+        "detail": ""
       },
       {
-        "label": "Formula focus",
-        "value": "Aloe, glycerin and sodium PCA",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "label": "Step",
+        "value": "02 · Hydrate",
+        "detail": ""
       }
     ],
     "faqs": [
@@ -614,34 +1465,109 @@
       {
         "question": "What is the formula focus?",
         "answer": "Aloe, glycerin and sodium PCA. Check the packaging for the current complete ingredient list."
+      },
+      {
+        "question": "Does it replace moisturizer?",
+        "answer": "No. It is a light hydration step before your serum or moisturizer."
+      },
+      {
+        "question": "Is it fragrance-free?",
+        "answer": "No. The formula lists fragrance, along with colorants Yellow 5 and Blue 1."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Lightweight hydration",
+        "body": "A water-light layer with glycerin and sodium PCA to help skin hold moisture."
+      },
+      {
+        "title": "Aloe-based care",
+        "body": "Aloe and panthenol complement the hydrating formula."
+      },
+      {
+        "title": "Easy to layer",
+        "body": "Use after cleansing and before serum or moisturizer."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Glycerin",
+        "role": "Humectant",
+        "detail": "Attracts water to support hydration."
+      },
+      {
+        "name": "Sodium PCA",
+        "role": "Moisture binding",
+        "detail": "A humectant included to help skin retain water."
+      },
+      {
+        "name": "Aloe & panthenol",
+        "role": "Conditioning",
+        "detail": "Bring moisture-focused care to a light tonic format."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Cleanse",
+          "body": "Begin with freshly cleansed skin."
+        },
+        {
+          "title": "Sweep",
+          "body": "Apply to the face and neck using a cotton pad."
+        },
+        {
+          "title": "Layer",
+          "body": "Follow with serum and moisturizer. May be used morning and evening."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Dehydrated-feeling skin"
+      },
+      {
+        "label": "When",
+        "value": "AM & PM"
+      },
+      {
+        "label": "Step",
+        "value": "02 · Hydrate"
+      }
+    ],
+    "expectations": {
+      "title": "A light feel, an easy place in your routine.",
+      "body": "Use the tonic to add a layer of hydration. Follow with a moisturizer suited to your skin."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   },
   "exfoliating-pads": {
-    "descriptor": "A smoother-looking surface.",
+    "descriptor": "A smoother, brighter-looking complexion.",
     "description": "Pre-moistened pads with mandelic, lactic and salicylic acids. A focused exfoliating step for uneven texture and congested-looking skin.",
     "highlights": [
-      "Mandelic, lactic and salicylic acids",
-      "50 pads format",
-      "Refine step"
+      "Smoother-looking texture",
+      "A brighter-looking finish",
+      "Targeted application"
     ],
-    "title": "A smoother-looking surface.",
+    "title": "Refine the surface. Keep the routine simple.",
     "story": "Pre-moistened pads with mandelic, lactic and salicylic acids. A focused exfoliating step for uneven texture and congested-looking skin.",
     "facts": [
       {
+        "label": "Focus",
+        "value": "Texture & congestion",
+        "detail": ""
+      },
+      {
+        "label": "When",
+        "value": "Evening",
+        "detail": ""
+      },
+      {
         "label": "Format",
         "value": "50 pads",
-        "detail": "Size shown on the supplied IQON packaging."
-      },
-      {
-        "label": "Routine",
-        "value": "Refine",
-        "detail": "Choose the steps that suit your skin."
-      },
-      {
-        "label": "Formula focus",
-        "value": "Mandelic, lactic and salicylic acids",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "detail": ""
       }
     ],
     "faqs": [
@@ -652,34 +1578,109 @@
       {
         "question": "What is the formula focus?",
         "answer": "Mandelic, lactic and salicylic acids. Check the packaging for the current complete ingredient list."
+      },
+      {
+        "question": "Can I use them near my eyes?",
+        "answer": "No. Avoid the eye area."
+      },
+      {
+        "question": "Why is sun protection important?",
+        "answer": "The formula contains alpha hydroxy acids, which may increase sun sensitivity. Use sunscreen, wear protective clothing and limit sun exposure during use and for a week after."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Smoother-looking texture",
+        "body": "An acid blend helps exfoliate the surface for a more refined appearance."
+      },
+      {
+        "title": "A brighter-looking finish",
+        "body": "Mandelic, lactic and salicylic acids in a pre-moistened pad format."
+      },
+      {
+        "title": "Targeted application",
+        "body": "Sweep across the face or selected areas, avoiding the eye area."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Mandelic & lactic acids",
+        "role": "AHA exfoliants",
+        "detail": "Alpha hydroxy acids used for surface exfoliation."
+      },
+      {
+        "name": "Salicylic acid",
+        "role": "BHA exfoliant",
+        "detail": "Included alongside the AHAs for congested-looking and combination skin."
+      },
+      {
+        "name": "Glycerin & botanicals",
+        "role": "Supporting ingredients",
+        "detail": "Glycerin, chamomile, licorice and green tea are part of the formula."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Cleanse",
+          "body": "Start with cleansed skin. The formulation is recommended for nighttime use."
+        },
+        {
+          "title": "Sweep",
+          "body": "Gently sweep one pad over the intended areas, avoiding the eyes."
+        },
+        {
+          "title": "Moisturize & protect",
+          "body": "Follow with moisturizer. Use sunscreen, protective clothing and limit sun exposure during use and for a week afterwards."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Texture & congestion"
+      },
+      {
+        "label": "When",
+        "value": "Evening"
+      },
+      {
+        "label": "Format",
+        "value": "50 pads"
+      }
+    ],
+    "expectations": {
+      "title": "Let your skin set the pace.",
+      "body": "Follow the label for frequency. Avoid adding several new exfoliating steps at once, and reduce use if irritation develops."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   },
   "hydra-c-ferulic-serum": {
-    "descriptor": "Your daily moment of brightness.",
+    "descriptor": "Antioxidant care. A brighter-looking you.",
     "description": "A vitamin C and ferulic acid serum with sodium hyaluronate. Designed to bring antioxidant care and hydration to a routine for dull or uneven-looking skin.",
     "highlights": [
-      "Vitamin C, ferulic acid and sodium hyaluronate",
-      "30 mL format",
-      "Brighten step"
+      "For dull-looking skin",
+      "Hydration alongside treatment",
+      "A complementary antioxidant"
     ],
-    "title": "Your daily moment of brightness.",
+    "title": "A daily layer of brightness.",
     "story": "A vitamin C and ferulic acid serum with sodium hyaluronate. Designed to bring antioxidant care and hydration to a routine for dull or uneven-looking skin.",
     "facts": [
       {
-        "label": "Format",
-        "value": "30 mL",
-        "detail": "Size shown on the supplied IQON packaging."
+        "label": "Focus",
+        "value": "Dullness & dehydration",
+        "detail": ""
       },
       {
-        "label": "Routine",
-        "value": "Brighten",
-        "detail": "Choose the steps that suit your skin."
+        "label": "When",
+        "value": "AM & PM",
+        "detail": ""
       },
       {
-        "label": "Formula focus",
-        "value": "Vitamin C, ferulic acid and sodium hyaluronate",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "label": "Step",
+        "value": "Treat",
+        "detail": ""
       }
     ],
     "faqs": [
@@ -690,34 +1691,109 @@
       {
         "question": "What is the formula focus?",
         "answer": "Vitamin C, ferulic acid and sodium hyaluronate. Check the packaging for the current complete ingredient list."
+      },
+      {
+        "question": "Which form of vitamin C does it contain?",
+        "answer": "The ingredient list identifies ascorbic acid."
+      },
+      {
+        "question": "Does it contain fragrance?",
+        "answer": "Yes. Fragrance is included in the formulation."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "For dull-looking skin",
+        "body": "Vitamin C brings antioxidant care to a routine focused on a brighter-looking complexion."
+      },
+      {
+        "title": "Hydration alongside treatment",
+        "body": "Sodium hyaluronate helps add moisture without a heavy cream texture."
+      },
+      {
+        "title": "A complementary antioxidant",
+        "body": "Ferulic acid is paired with vitamin C in the formula."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Vitamin C",
+        "role": "Antioxidant",
+        "detail": "Ascorbic acid is the vitamin C form in this serum."
+      },
+      {
+        "name": "Ferulic acid",
+        "role": "Antioxidant partner",
+        "detail": "Included alongside vitamin C in the formulation."
+      },
+      {
+        "name": "Sodium hyaluronate",
+        "role": "Humectant",
+        "detail": "The hyaluronic acid salt used to support hydration."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Prepare",
+          "body": "Cleanse and tone."
+        },
+        {
+          "title": "Apply",
+          "body": "Smooth a small amount over the face and neck."
+        },
+        {
+          "title": "Finish",
+          "body": "Once absorbed, follow with moisturizer and daytime SPF. May be used twice daily."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Dullness & dehydration"
+      },
+      {
+        "label": "When",
+        "value": "AM & PM"
+      },
+      {
+        "label": "Step",
+        "value": "Treat"
+      }
+    ],
+    "expectations": {
+      "title": "Antioxidant care belongs beside SPF.",
+      "body": "Use sunscreen during the day. This serum complements a sun-protection routine; it is not a sunscreen."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   },
   "retinol-rx": {
-    "descriptor": "An evening ritual. A renewed look.",
+    "descriptor": "For smoother texture and softer-looking lines.",
     "description": "An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
     "highlights": [
-      "Encapsulated retinol, niacinamide and squalane",
-      "30 mL format",
-      "Renew step"
+      "Visible texture & lines",
+      "Controlled delivery",
+      "Moisture-focused support"
     ],
-    "title": "An evening ritual. A renewed look.",
+    "title": "A renewal ritual for the evening.",
     "story": "An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
     "facts": [
       {
+        "label": "Focus",
+        "value": "Texture & visible lines",
+        "detail": ""
+      },
+      {
+        "label": "When",
+        "value": "PM only",
+        "detail": ""
+      },
+      {
         "label": "Format",
-        "value": "30 mL",
-        "detail": "Size shown on the supplied IQON packaging."
-      },
-      {
-        "label": "Routine",
-        "value": "Renew",
-        "detail": "Choose the steps that suit your skin."
-      },
-      {
-        "label": "Formula focus",
-        "value": "Encapsulated retinol, niacinamide and squalane",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "value": "30 mL serum",
+        "detail": ""
       }
     ],
     "faqs": [
@@ -728,34 +1804,109 @@
       {
         "question": "What is the formula focus?",
         "answer": "Encapsulated retinol, niacinamide and squalane. Check the packaging for the current complete ingredient list."
+      },
+      {
+        "question": "Can I use it while pregnant or breastfeeding?",
+        "answer": "No. The formulation’s warning says not to use during pregnancy or breastfeeding."
+      },
+      {
+        "question": "Can I start with daily use?",
+        "answer": "Introduce gradually, follow the label and adjust to your skin’s tolerance. Do not push through persistent irritation."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Visible texture & lines",
+        "body": "An encapsulated retinol formula for the appearance of fine lines and uneven texture."
+      },
+      {
+        "title": "Controlled delivery",
+        "body": "Retinol is encapsulated as part of the delivery system."
+      },
+      {
+        "title": "Moisture-focused support",
+        "body": "Niacinamide, squalane and sodium hyaluronate round out the formula."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Encapsulated retinol",
+        "role": "Renewal ingredient",
+        "detail": "Retinol in an encapsulated delivery system. Introduce gradually according to the label."
+      },
+      {
+        "name": "Niacinamide",
+        "role": "Formula support",
+        "detail": "A vitamin B3 ingredient paired with retinol."
+      },
+      {
+        "name": "Squalane & sodium hyaluronate",
+        "role": "Emollient & humectant",
+        "detail": "Moisture-focused ingredients that complement the treatment step."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Use at night",
+          "body": "Apply as directed in your evening routine."
+        },
+        {
+          "title": "Build gradually",
+          "body": "Introduce gradually as tolerated and follow your product label for frequency."
+        },
+        {
+          "title": "Protect by day",
+          "body": "Wear SPF 30 or higher during the day."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Texture & visible lines"
+      },
+      {
+        "label": "When",
+        "value": "PM only"
+      },
+      {
+        "label": "Format",
+        "value": "30 mL serum"
+      }
+    ],
+    "expectations": {
+      "title": "Go gradually.",
+      "body": "A retinol routine takes consistency and tolerance. Avoid increasing frequency through irritation. Do not use while pregnant or breastfeeding."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   },
   "firming-peptide-eye-gel": {
-    "descriptor": "Care for the finer details.",
+    "descriptor": "A fresh feel for the finer details.",
     "description": "A cooling peptide eye gel with aloe and cucumber water. A light, targeted step for smoother-looking skin around the eyes.",
     "highlights": [
-      "Peptides, aloe and cucumber water",
-      "15 mL format",
-      "Eye care step"
+      "Smoother-looking eye area",
+      "Cooling gel texture",
+      "Hydrating ingredients"
     ],
-    "title": "Care for the finer details.",
+    "title": "Lightweight care. Right where you want it.",
     "story": "A cooling peptide eye gel with aloe and cucumber water. A light, targeted step for smoother-looking skin around the eyes.",
     "facts": [
       {
-        "label": "Format",
-        "value": "15 mL",
-        "detail": "Size shown on the supplied IQON packaging."
+        "label": "Focus",
+        "value": "Visible fine lines",
+        "detail": ""
       },
       {
-        "label": "Routine",
-        "value": "Eye care",
-        "detail": "Choose the steps that suit your skin."
+        "label": "Texture",
+        "value": "Cooling gel",
+        "detail": ""
       },
       {
-        "label": "Formula focus",
-        "value": "Peptides, aloe and cucumber water",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "label": "When",
+        "value": "AM & PM",
+        "detail": ""
       }
     ],
     "faqs": [
@@ -766,34 +1917,105 @@
       {
         "question": "What is the formula focus?",
         "answer": "Peptides, aloe and cucumber water. Check the packaging for the current complete ingredient list."
+      },
+      {
+        "question": "Is this a gel or a cream?",
+        "answer": "It is a cooling gel formula, offering a lighter-feeling option than a rich eye cream."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Smoother-looking eye area",
+        "body": "A peptide-enriched formula for the appearance of fine lines around the eyes."
+      },
+      {
+        "title": "Cooling gel texture",
+        "body": "A light, refreshing step for the delicate eye area."
+      },
+      {
+        "title": "Hydrating ingredients",
+        "body": "Aloe, cucumber water and humectants complement the peptide formula."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Peptide blend",
+        "role": "Targeted care",
+        "detail": "Palmitoyl tripeptide-5, palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7 are included."
+      },
+      {
+        "name": "Aloe & cucumber water",
+        "role": "Conditioning",
+        "detail": "Botanical ingredients in the cooling gel formula."
+      },
+      {
+        "name": "Sodium PCA & glycerin",
+        "role": "Humectants",
+        "detail": "Moisture-binding ingredients for the eye-area routine."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Cleanse",
+          "body": "Start with clean skin."
+        },
+        {
+          "title": "Apply gently",
+          "body": "Use a small amount around the eye area, avoiding direct eye contact."
+        },
+        {
+          "title": "Make it a habit",
+          "body": "Use morning and evening before completing your routine."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Visible fine lines"
+      },
+      {
+        "label": "Texture",
+        "value": "Cooling gel"
+      },
+      {
+        "label": "When",
+        "value": "AM & PM"
+      }
+    ],
+    "expectations": {
+      "title": "Gentle application matters.",
+      "body": "Use a light touch around the eyes. Keep the product out of the eyes and stop use if irritation occurs."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   },
   "copper-peptide-restore-cream": {
-    "descriptor": "Lasting comfort. A considered finish.",
+    "descriptor": "Rich hydration. A smoother, firmer-looking finish.",
     "description": "A rich multi-peptide moisturizer with copper peptide, shea butter and sodium hyaluronate. Delivers moisture for dry-feeling skin and a smoother, firmer-looking finish.",
     "highlights": [
-      "Copper peptide, shea butter and sodium hyaluronate",
-      "50 mL format",
-      "Moisturize step"
+      "Rich moisture",
+      "Multi-peptide care",
+      "Hydration that layers"
     ],
-    "title": "Lasting comfort. A considered finish.",
+    "title": "Comfort that completes your routine.",
     "story": "A rich multi-peptide moisturizer with copper peptide, shea butter and sodium hyaluronate. Delivers moisture for dry-feeling skin and a smoother, firmer-looking finish.",
     "facts": [
       {
-        "label": "Format",
-        "value": "50 mL",
-        "detail": "Size shown on the supplied IQON packaging."
+        "label": "Focus",
+        "value": "Dry-feeling skin",
+        "detail": ""
       },
       {
-        "label": "Routine",
+        "label": "Texture",
+        "value": "Rich cream",
+        "detail": ""
+      },
+      {
+        "label": "Step",
         "value": "Moisturize",
-        "detail": "Choose the steps that suit your skin."
-      },
-      {
-        "label": "Formula focus",
-        "value": "Copper peptide, shea butter and sodium hyaluronate",
-        "detail": "Based on the matching Global Beauty supplier formulation."
+        "detail": ""
       }
     ],
     "faqs": [
@@ -808,7 +2030,82 @@
       {
         "question": "Does this cream contain retinol?",
         "answer": "Yes. The supplier ingredient list includes retinol alongside copper peptide. Consider other retinoids in your routine and follow the final product label."
+      },
+      {
+        "question": "Is this just a copper peptide formula?",
+        "answer": "No. It is a multi-ingredient moisturizer with several peptides, emollients, humectants, retinol and niacinamide."
+      },
+      {
+        "question": "Can I use it after a professional treatment?",
+        "answer": "Follow your treating clinician’s aftercare instructions. Do not assume every active formula is appropriate immediately after a procedure."
       }
-    ]
+    ],
+    "benefits": [
+      {
+        "title": "Rich moisture",
+        "body": "Shea butter and emollients bring comfort to dry-feeling skin."
+      },
+      {
+        "title": "Multi-peptide care",
+        "body": "Copper peptide sits alongside other peptides in a formula focused on a firmer-looking finish."
+      },
+      {
+        "title": "Hydration that layers",
+        "body": "Sodium hyaluronate and glycerin complement the rich cream texture."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Copper peptide & peptide blend",
+        "role": "Formula focus",
+        "detail": "GHK-Cu is combined with palmitoyl tripeptide-5, acetyl hexapeptide-8 and palmitoyl dipeptide-5."
+      },
+      {
+        "name": "Shea butter",
+        "role": "Emollient",
+        "detail": "Adds richness and a soft, comfortable feel."
+      },
+      {
+        "name": "Sodium hyaluronate & glycerin",
+        "role": "Humectants",
+        "detail": "Moisture-binding ingredients. The full formula also includes retinol and niacinamide."
+      }
+    ],
+    "routine": {
+      "title": "A place in your routine.",
+      "steps": [
+        {
+          "title": "Cleanse & treat",
+          "body": "Begin after cleansing and serum application."
+        },
+        {
+          "title": "Moisturize",
+          "body": "Apply to the face and neck according to the label."
+        },
+        {
+          "title": "Finish with SPF",
+          "body": "Follow with sun protection in the morning. Consider the retinol in this cream when planning other active steps."
+        }
+      ]
+    },
+    "fit": [
+      {
+        "label": "Focus",
+        "value": "Dry-feeling skin"
+      },
+      {
+        "label": "Texture",
+        "value": "Rich cream"
+      },
+      {
+        "label": "Step",
+        "value": "Moisturize"
+      }
+    ],
+    "expectations": {
+      "title": "Build a routine your skin tolerates.",
+      "body": "The formula contains retinol as well as peptides. Consider your other retinoid products and introduce new active steps carefully."
+    },
+    "formulaNote": "Key ingredients are highlighted here. Refer to your product packaging for the current complete ingredient list."
   }
 }

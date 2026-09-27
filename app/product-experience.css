@@ -1,0 +1,131 @@
+/* IQON product education: cool neutrals and the approved pack photography. */
+.product-page .product-lead{max-width:36ch}
+.product-page .product-highlights{display:grid!important;grid-template-columns:1fr;gap:10px!important;margin:22px 0 26px!important}
+.product-page .product-highlights li{padding:0;background:none;border-radius:0;align-items:flex-start;font-size:14px!important;line-height:1.5}
+.product-page .product-highlights svg{flex-shrink:0;margin-top:3px;color:#5b7270}
+.product-summary-description{font-size:15px;line-height:1.7;color:#5a656b;margin:-8px 0 20px;max-width:52ch}
+.product-jump-links{display:flex;flex-wrap:wrap;gap:9px 24px;margin:22px 0 26px;padding-top:17px;border-top:1px solid #dce1e3}
+.product-jump-links a{display:inline-flex;gap:8px;align-items:center;font-size:13px;min-height:32px;text-decoration:underline;text-underline-offset:5px}
+.product-experience{--pdp-ink:#26353c;--pdp-muted:#5d6970;--pdp-line:#d4dcdf;color:var(--pdp-ink)}
+.product-experience .pdp-section-nav{position:sticky;top:122px;z-index:10;display:flex;align-items:center;justify-content:center;overflow-x:auto;white-space:nowrap;border-block:1px solid var(--pdp-line);backdrop-filter:blur(16px);background:rgba(250,251,251,.96);gap:clamp(25px,3.5vw,56px)!important;scrollbar-width:none}
+.product-experience .pdp-section-nav a{color:#58656c;text-decoration:none;transition:color .2s}
+.product-experience .pdp-section-nav a:hover,.product-experience .pdp-section-nav a:focus-visible{color:#17282e;text-decoration:underline;text-underline-offset:7px}
+.pdp-section{padding:88px max(var(--space-gutter),5vw);scroll-margin-top:208px}
+.pdp-section h2{font-family:var(--display);font-weight:400;font-size:clamp(32px,3.35vw,52px);line-height:1.12;letter-spacing:-.045em;text-wrap:balance;margin:0 0 24px}
+.pdp-section .eyebrow{font-size:11px;letter-spacing:.14em;line-height:1.5;color:#607078;margin:0 0 20px}
+.pdp-section h3{font-size:19px;font-weight:500;line-height:1.35;letter-spacing:-.02em;margin:0 0 9px}
+.pdp-section p{font-size:15px;line-height:1.75}
+.pdp-text-link{display:inline-flex;align-items:center;gap:18px;border-bottom:1px solid #879398;padding:10px 0;font-size:14px;line-height:1.5;text-decoration:none;min-height:44px;max-width:100%}
+.pdp-text-link svg{flex-shrink:0}
+.pdp-benefits{display:grid;grid-template-columns:1fr 1fr;gap:8%;align-items:center}
+.pdp-story-image{position:relative;overflow:hidden;background:#e8ebed;aspect-ratio:4/5;border-radius:5px}
+.pdp-story-image img{height:100%;width:100%;object-fit:cover}
+.pdp-story-image>span{position:absolute;left:24px;bottom:22px;letter-spacing:.13em;font-size:10px;color:#465359;background:rgba(249,250,250,.85);padding:8px 12px;border-radius:2px}
+.product-experience .pdp-story-copy .pdp-intro{font-size:17px!important;line-height:1.7!important;margin-top:0!important;color:var(--pdp-muted);margin-bottom:28px;max-width:55ch}
+.pdp-benefit-list{list-style:none;padding:0;margin:0 0 20px}
+.pdp-benefit-list li{display:grid;grid-template-columns:28px 1fr;gap:18px;border-top:1px solid var(--pdp-line);padding:22px 0}
+.pdp-benefit-list p{margin:0;color:var(--pdp-muted);font-size:14px;line-height:1.65}
+.pdp-step-number{font-size:11px;font-variant-numeric:tabular-nums;color:#708088;padding-top:5px}
+.pdp-fact-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 max(var(--space-gutter),5vw) 32px;padding:35px 0;border-block:1px solid var(--pdp-line)}
+.pdp-fact-strip>div{padding:0 32px;border-left:1px solid var(--pdp-line)}
+.pdp-fact-strip>div:first-child{padding-left:0;border-left:0}
+.pdp-fact-strip dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 13px;color:#64757c}
+.pdp-fact-strip dd{margin:0;font-family:var(--display);font-size:clamp(22px,2.5vw,36px);line-height:1.2;letter-spacing:-.035em;overflow-wrap:anywhere}
+.pdp-fact-strip p{font-size:12px;line-height:1.6;color:var(--pdp-muted);margin:11px 0 0;max-width:35ch}
+.pdp-section-heading{display:flex;justify-content:space-between;gap:8%;align-items:flex-end;margin-bottom:38px}
+.pdp-section-heading h2{margin-bottom:0}
+.pdp-section-heading>p{max-width:37ch;color:var(--pdp-muted);margin:0}
+.pdp-formula{background:#eef1f2;margin-top:60px}
+.pdp-ingredient-list{border-top:1px solid #cbd5d9}
+.pdp-ingredient-list>article{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1.3fr) auto;gap:24px;align-items:start;padding:30px 0;border-bottom:1px solid #cbd5d9}
+.pdp-ingredient-index{font-size:11px;color:#708088;padding-top:3px}
+.pdp-ingredient-list .eyebrow{font-size:10px;margin:0 0 9px}
+.pdp-ingredient-list h3{font-size:23px;margin:0;max-width:24ch}
+.pdp-ingredient-list article>p{color:var(--pdp-muted);margin:0;max-width:50ch;font-size:14px}
+.pdp-ingredient-amount{padding:6px 12px;border:1px solid #bbc9cd;border-radius:3px;font-size:12px;white-space:nowrap;color:#3d545b}
+.pdp-formula-accordion{margin-top:18px}
+.product-experience [data-slot='accordion-trigger']{font-weight:400;text-align:left;font-size:16px;line-height:1.45;padding:22px 0;gap:24px}
+.product-experience [data-slot='accordion-content']{font-size:14px;line-height:1.8;color:var(--pdp-muted)}
+.product-experience [data-slot='accordion-content'] p{font-size:14px;margin:0 0 18px}
+.pdp-formula-accordion [data-slot='accordion-item']{border-bottom:0}
+.pdp-routine{display:grid;grid-template-columns:1fr 1.05fr;gap:10%;background:#fafbfb}
+.pdp-routine-heading h2{max-width:12ch}
+.pdp-fit{margin-top:35px;max-width:390px}
+.pdp-fit>div{display:flex;justify-content:space-between;gap:20px;padding:15px 0;border-bottom:1px solid var(--pdp-line);font-size:13px;line-height:1.4}
+.pdp-fit dt{color:#6c7a80}.pdp-fit dd{margin:0;text-align:right}
+.pdp-routine-steps{list-style:none;padding:0;margin:0}
+.pdp-routine-steps>li{display:grid;grid-template-columns:38px 1fr;gap:22px;padding:0 0 29px;margin:0 0 24px;border-bottom:1px solid var(--pdp-line)}
+.pdp-routine-steps>li>span{width:36px;height:36px;border:1px solid #b8c6cb;border-radius:50%;display:grid;place-items:center;font-size:11px}
+.pdp-routine-steps p{margin:0;color:var(--pdp-muted);font-size:14px}
+.pdp-routine-steps h3{padding-top:5px}
+.pdp-directions-accordion [data-slot='accordion-item']{border-bottom:0}
+.pdp-directions-accordion [data-slot='accordion-trigger']{padding-top:0}
+.pdp-research{background:#293c43;color:#eef3f4;display:grid;grid-template-columns:1fr 1.05fr;gap:10%}
+.pdp-research .eyebrow{color:#b7c8cb}
+.pdp-research h2{max-width:17ch}
+.pdp-research .pdp-research-scope{font-size:12px;color:#bac9cd;line-height:1.7;max-width:47ch;margin-top:25px}
+.pdp-research .pdp-research-body{font-size:17px;line-height:1.8;color:#e1e9eb;margin:0 0 30px}
+.pdp-research-links{display:grid}
+.pdp-research-links a{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:17px 0;border-top:1px solid #52666e;font-size:13px;line-height:1.6;text-decoration:none}
+.pdp-research-links svg{flex-shrink:0;color:#bdd0d4}
+.pdp-questions{display:grid;grid-template-columns:1fr 1.05fr;gap:10%}
+.pdp-questions>div>p:not(.eyebrow){color:var(--pdp-muted);font-size:14px;margin:28px 0 2px}
+.pdp-faq-list{border-top:1px solid var(--pdp-line)}
+.pdp-faq-list [data-slot='accordion-item']{border-color:var(--pdp-line)}
+.pdp-comparison{padding-top:35px;background:#f4f6f6}
+.pdp-comparison-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}
+.pdp-comparison-grid:has(>article:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr));max-width:880px;margin-inline:auto}
+.pdp-comparison-image{display:block;position:relative;aspect-ratio:1/1;overflow:hidden;border-radius:4px;background:#e8ebed;margin-bottom:25px}
+.pdp-comparison-image img{width:100%;height:100%;object-fit:contain}
+.pdp-comparison-image>span{position:absolute;left:13px;top:13px;background:rgba(250,251,251,.92);padding:7px 10px;font-size:9px;letter-spacing:.1em;border-radius:2px}
+.pdp-comparison-grid h3{font-size:19px;min-height:52px;margin-bottom:7px}
+.pdp-comparison-grid>article>p{font-size:13px;color:var(--pdp-muted);line-height:1.65;min-height:44px;margin-bottom:20px}
+.pdp-comparison-grid dl{margin:0 0 19px;font-size:12px}
+.pdp-comparison-grid dl>div{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--pdp-line);padding:12px 0}
+.pdp-comparison-grid dt{color:#63747b}.pdp-comparison-grid dd{margin:0;text-align:right}
+.pdp-comparison-link{font-size:13px;display:flex;justify-content:space-between;align-items:center;padding:13px 0;min-height:44px;border-bottom:1px solid #6d7f87;text-decoration:none}
+.pdp-disclaimer{padding:30px max(var(--space-gutter),5vw);font-size:11px;line-height:1.7;color:#69777d;background:#f4f6f6;margin:0}
+.supplement-ingredient-list>strong,.supplement-cautions>strong{display:block;font-size:13px;color:#35474f;margin-bottom:10px}
+.supplement-ingredient-list p{line-height:1.85}.supplement-cautions{padding-top:18px;border-top:1px solid #d2dadf;margin-top:20px}
+.supplement-storage{margin-top:20px!important}
+@media(min-width:761px) and (max-width:1050px){
+ .pdp-section{padding:64px 5vw}.pdp-benefits{gap:5%}.pdp-story-image{aspect-ratio:3/4}
+ .pdp-ingredient-list>article{grid-template-columns:24px 1fr 1.1fr;gap:20px}.pdp-ingredient-amount{grid-column:2;justify-self:start}
+}
+@media(max-width:760px){
+ .product-page .product-highlights li{padding:0;font-size:14px!important}
+ .product-summary-description{font-size:14px;margin-bottom:16px}
+ .product-experience .pdp-section-nav{top:125px;gap:27px!important;padding:6px 23px!important}
+ .product-experience .pdp-section-nav a{font-size:13px!important}
+ .pdp-section{padding:49px 23px;scroll-margin-top:197px}
+ .pdp-section h2{font-size:34px;line-height:1.14;letter-spacing:-.04em;margin-bottom:20px}
+ .pdp-section .eyebrow{font-size:10px;margin-bottom:15px}
+ .pdp-benefits{grid-template-columns:1fr;gap:30px}
+ .pdp-story-image{aspect-ratio:1/1;max-height:480px}.pdp-story-image img{object-fit:cover}
+ .pdp-story-image>span{left:15px;bottom:15px;font-size:9px}
+ .pdp-benefit-list li{padding:19px 0;gap:10px;grid-template-columns:24px 1fr}
+ .pdp-section h3{font-size:18px}.product-experience .pdp-story-copy .pdp-intro{font-size:17px!important;line-height:1.7!important;margin-top:0!important;font-size:14px!important;margin-bottom:24px}
+ .pdp-fact-strip{margin:0 23px 15px;padding:25px 0;gap:14px}
+ .pdp-fact-strip>div{padding:0 0 0 14px}.pdp-fact-strip>div:first-child{padding:0}
+ .pdp-fact-strip dt{font-size:9px;letter-spacing:.08em;margin-bottom:9px}
+ .pdp-fact-strip dd{font-size:21px;line-height:1.25}.pdp-fact-strip p{font-size:11px;line-height:1.5;margin-top:9px}
+ .pdp-formula{margin-top:35px}
+ .pdp-section-heading{display:block;margin-bottom:29px}.pdp-section-heading>p{font-size:14px;max-width:none;margin-top:20px}
+ .pdp-ingredient-list>article{grid-template-columns:21px minmax(0,1fr);gap:15px 12px;padding:25px 0}
+ .pdp-ingredient-list article>p{grid-column:2;font-size:14px}.pdp-ingredient-list h3{font-size:22px}
+ .pdp-ingredient-list .eyebrow{font-size:9px;margin-bottom:7px}
+ .pdp-ingredient-amount{grid-column:2;justify-self:start;font-size:11px}
+ .product-experience [data-slot='accordion-trigger']{font-size:15px;padding:21px 0}
+ .pdp-routine,.pdp-research,.pdp-questions{grid-template-columns:1fr;gap:33px}
+ .pdp-routine-heading h2{max-width:15ch}.pdp-fit{margin-top:22px;max-width:none}
+ .pdp-routine-steps>li{grid-template-columns:32px 1fr;gap:15px;padding-bottom:23px;margin-bottom:23px}
+ .pdp-routine-steps>li>span{width:31px;height:31px}.pdp-routine-steps h3{padding-top:3px}
+ .pdp-directions-accordion [data-slot='accordion-trigger']{padding-top:0}
+ .pdp-research .pdp-research-body{font-size:16px}.pdp-research .pdp-research-scope{margin-top:19px}
+ .pdp-research-links a{font-size:12px}.pdp-questions>div>p:not(.eyebrow){margin-top:21px}
+ .pdp-comparison-grid,.pdp-comparison-grid:has(>article:nth-child(2):last-child){display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:17px;padding-bottom:18px;scrollbar-width:thin;max-width:none}
+ .pdp-comparison-grid>article{flex:0 0 77%;min-width:0;scroll-snap-align:start}
+ .pdp-comparison .pdp-section-heading .pdp-text-link{margin-top:2px}.pdp-comparison-grid h3{font-size:17px;min-height:46px}
+ .pdp-disclaimer{padding:18px 23px 30px;font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.product-experience *{scroll-behavior:auto;transition:none!important}}

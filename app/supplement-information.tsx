@@ -2,6 +2,7 @@ import type { SupplementDetails } from "@/lib/supplement-details";
 
 export function SupplementFormula({details}: {details: SupplementDetails}) {
   return <div className="supplement-formula">
+    <div className="supplement-ingredient-list"><strong>Ingredient statement</strong><p>{details.ingredients}</p></div>
     {details.amounts && <table className="supplement-amounts">
       <caption>Listed ingredient amounts</caption>
       <thead><tr><th scope="col">Ingredient</th><th scope="col">Amount</th></tr></thead>
@@ -19,5 +20,7 @@ export function SupplementDirections({details}: {details: SupplementDetails}) {
   return <div className="supplement-directions">
     {details.directions.map(text => <p key={text}>{text}</p>)}
     {details.notes?.map(text => <p key={text}>{text}</p>)}
+    {!!details.cautions.length && <div className="supplement-cautions"><strong>Before you begin</strong>{details.cautions.map(text => <p key={text}>{text}</p>)}</div>}
+    {details.storage && <p className="supplement-storage"><strong>Storage</strong> {details.storage}</p>}
   </div>;
 }
