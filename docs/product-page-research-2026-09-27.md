@@ -65,3 +65,14 @@ Comparison cards now include purpose, routine, key differences and contents. The
 The purchase header no longer renders an empty star rating when there are no customer reviews. Real reviews still appear automatically. Preview fixtures remain isolated. The outdated test that assumed every current SKU had a legacy design-review fixture was replaced with checks for empty live states, preview-only samples, and real-review precedence.
 
 Validation: all 18 product stories render, navigation anchors resolve in the product-page context, full supplement information is retained, comparisons use live prices, daily-price edge cases are covered, and genuine review data takes precedence over previews. Production build and live visual review are required before completion.
+
+## Visual merchandising rebuild — 27 September 2026
+
+The second text-led pass did not meet the requested standard. Re-reviewed Timeline's live Mitopure Softgels and Powder pages, including their expanded gallery cards, comparison matrix, ingredient accordions, clinical-study section and usage sequence.
+
+Reference: https://www.timeline.com/products/mitopure-softgels-vegan
+Reference: https://www.timeline.com/products/mitopure-powder
+
+Implementation: five authored visual panels per product (pack, benefits, formula fact, everyday ritual, ingredient summary), a desktop gallery grid and mobile swipe sequence, accessible enlarged panels, original copy for all 18 products, lifestyle-led benefit stories, three-part formula explanations, keyboard-operable ingredient exploration, clearer usage and expectations sections. Existing additional Shopify gallery images remain available. Approved IQON pack assets and editorial imagery are reused. Gallery information is live HTML text, so it stays readable, accessible and responsive rather than being baked into small raster text.
+
+The content distinguishes product specifications from ingredient research. No Timeline clinical outcomes, patents, certifications, testimonials or result timelines are transferred to IQON. NMN's precursor explanation checked against Yoshino et al. (Science, 2021): https://pubmed.ncbi.nlm.nih.gov/33888596/. Creatine's performance context checked against the NIH exercise fact sheet: https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/. Hydra C formula checked against supplier page: https://www.globalbeauty.net/product/hydra-c-plus-ferulic-serum/. Existing full label directions, ingredient statements, cautions, research references, live commerce and approved homepage heroes are retained.
