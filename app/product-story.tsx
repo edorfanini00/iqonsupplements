@@ -39,6 +39,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   const research = content.education;
   const visual = productVisuals[p.id];
   const focus = productPresentation[p.id]?.focus;
+  const formulaInFocus = ["collagen-peptides-chocolate", "colostrum-powder", "glp-1-support", "liver-support", "hair-skin-nails-gummies", "hydra-c-ferulic-serum"].includes(p.id);
   return <div className="product-experience">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">Benefits</a><a href="#product-formula">Ingredients</a>
@@ -51,10 +52,10 @@ export function ProductStory({ product: p, products }: { product: Product; produ
       <ol className="benefit-columns">{content.benefits?.map((benefit, i) => <li key={benefit.title}><span>{String(i + 1).padStart(2, "0")}</span><h3>{benefit.title}</h3><p>{benefit.body}</p></li>)}</ol>
     </section>
     {focus && <section id="formula-story" className={`pdp-focus pdp-focus-${focus.layout} pdp-section`} aria-labelledby="focus-heading"><div className="pdp-focus-intro"><p className="eyebrow">{focus.eyebrow}</p><h2 id="focus-heading">{focus.title}</h2><p>{focus.body}</p>{research && <a className="pdp-text-link" href="#ingredient-science">Explore the research <ArrowUpRight size={16}/></a>}</div><dl className="focus-details">{focus.rows.map(row => <div key={row.label}><dt>{row.label}</dt><dd><strong>{row.value}</strong><p>{row.detail}</p></dd></div>)}</dl></section>}
-    <section id="product-formula" className="pdp-formula pdp-section" aria-labelledby="formula-heading">
-      <div className="pdp-section-heading"><div><p className="eyebrow">THE INGREDIENTS</p><h2 id="formula-heading">Inside the formula.</h2></div>
+    <section id="product-formula" className={`pdp-formula pdp-section${formulaInFocus ? " pdp-formula-compact" : ""}`} aria-labelledby="formula-heading">
+      <div className={formulaInFocus ? "sr-only" : "pdp-section-heading"}><div><p className="eyebrow">THE INGREDIENTS</p><h2 id="formula-heading">Inside the formula.</h2></div>
       </div>
-      <ProductFormulaExplorer key={p.id} product={p}/>
+      {!formulaInFocus && <ProductFormulaExplorer key={p.id} product={p}/>}
       <Accordion type="single" collapsible className="pdp-formula-accordion">
         <AccordionItem value="complete-formula"><AccordionTrigger>{supplement ? "View full ingredient statement & listed amounts" : "View ingredients & formulation"}</AccordionTrigger>
           <AccordionContent>{supplement ? <SupplementFormula details={supplement} /> : skin && <><p><strong>Key ingredients:</strong> {skin.ingredients}.</p><p>{content.formulaNote}</p></>}</AccordionContent>
