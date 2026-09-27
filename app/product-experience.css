@@ -90,7 +90,9 @@
 .daynight-graphic{display:flex;align-items:center;justify-content:space-around;height:33cqw;max-height:160px;gap:6%}
 .daynight-graphic>span{width:37%;aspect-ratio:1;border:1px solid #83929d;border-radius:50%;display:grid;place-items:center}
 .daynight-graphic svg{width:44%;height:44%;color:#cbd4da}
-.daynight-graphic>i{width:11%;height:1px;background:#75828c}
+.daynight-graphic>span{position:relative}.daynight-graphic i{display:none}
+.daynight-graphic .daynight-connector{display:block;position:absolute;width:22%;height:1px;background:#75828c;left:110%;top:50%}
+.eye-graphic{width:100%;height:33cqw;max-height:170px;color:#c9d4dc;display:block}
 .pairing-graphic{display:flex;justify-content:center;padding-block:4%;min-height:0;gap:6%;position:relative}
 .pairing-graphic:before{content:"";position:absolute;top:50%;left:45%;width:10%;height:1px;background:#8f9ba5}
 .pairing-graphic>span{display:grid;place-items:center;width:45%;aspect-ratio:1;border:1px solid #a0adb7;border-radius:50%;background:#30363b;font-size:clamp(11px,3.7cqw,17px);letter-spacing:-.02em;z-index:1}

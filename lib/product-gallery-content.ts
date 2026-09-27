@@ -4,7 +4,7 @@
 export type GalleryGuide = {
   eyebrow: string;
   title: string;
-  design: "mix" | "capsule" | "gummy" | "amounts" | "daynight" | "routine" | "pairing";
+  design: "mix" | "capsule" | "gummy" | "amounts" | "daynight" | "routine" | "pairing" | "eye";
   main: string;
   unit: string;
   items: { value: string; label: string }[];
@@ -69,16 +69,16 @@ export const galleryGuides: Record<string, GalleryGuide> = {
     items: [{value:"AHA",label:"Mandelic + lactic acids"},{value:"BHA",label:"Salicylic acid"}], note: "Introduce as directed. Plan other exfoliants and retinoids carefully, and use daily SPF."
   },
   "hydra-c-ferulic-serum": {
-    eyebrow: "THE SUPPORTING LAYER", title: "Antioxidant care.\nWith hydration.", design: "pairing", main: "C + F", unit: "vitamin C + ferulic acid",
-    items: [{value:"Treat",label:"Two antioxidant ingredients"},{value:"Hydrate",label:"Sodium hyaluronate"}], note: "Apply before moisturizer. Finish your morning routine with SPF."
+    eyebrow: "YOUR SERUM STEP", title: "Find your place.\nMorning or evening.", design: "daynight", main: "AM / PM", unit: "after cleansing",
+    items: [{value:"AM",label:"Serum, moisturizer, then SPF"},{value:"PM",label:"Serum before moisturizer"}], note: "Apply to clean skin. Antioxidant care does not replace sunscreen."
   },
   "retinol-rx": {
     eyebrow: "PLAN YOUR ROUTINE", title: "Care by night.\nProtect by day.", design: "daynight", main: "PM / AM", unit: "two parts of your routine",
     items: [{value:"PM",label:"Introduce retinol gradually"},{value:"AM",label:"Use SPF 30 or higher"}], note: "Build frequency as tolerated. Follow the label and keep your other active steps in mind."
   },
   "firming-peptide-eye-gel": {
-    eyebrow: "A TARGETED FORMULA", title: "Peptide care.\nA light gel feel.", design: "pairing", main: "Light", unit: "targeted eye care",
-    items: [{value:"Peptides",label:"Targeted care for the eye area"},{value:"Humectants",label:"Sodium PCA + glycerin"}], note: "Apply a small amount morning and evening. Avoid direct contact with eyes."
+    eyebrow: "A TARGETED APPLICATION", title: "A small amount.\nA gentle touch.", design: "eye", main: "AM / PM", unit: "on clean skin",
+    items: [{value:"Gently pat",label:"A small amount around the eye area"},{value:"AM / PM",label:"Morning and evening, on clean skin"}], note: "Keep the gel outside the eye. Avoid direct contact with eyes."
   },
   "copper-peptide-restore-cream": {
     eyebrow: "MORE THAN MOISTURE", title: "Water binding.\nEmollient comfort.", design: "pairing", main: "Two roles", unit: "within your moisturizer",
