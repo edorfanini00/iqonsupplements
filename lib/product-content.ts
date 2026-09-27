@@ -12,6 +12,10 @@ export type ProductContent = {
   expectations?: { title: string; body: string };
   fit?: { label: string; value: string }[];
   formulaNote?: string;
+  essentials?: { label: string; value: string }[];
+  guide?: { title: string; introduction: string; details: { title: string; body: string }[] };
+  comparison?: { focus: string; routine: string; difference: string };
+  supplyDays?: number;
   education?: { eyebrow: string; title: string; body: string; scope: string; sources: { label: string; url: string }[] };
 };
 export const productContent: Record<string, ProductContent> = content;

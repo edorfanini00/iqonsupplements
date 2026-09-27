@@ -20,6 +20,7 @@ function reviewSummary(reviews:CustomerReview[],productId?:string,designPreview=
 export function ProductReviewLink({productId,designPreview=false}:{productId:string;designPreview?:boolean}) {
  const reviews=customerReviews.filter(review=>review.productId===productId);
  const {average,isSample,countLabel}=reviewSummary(reviews,productId,designPreview);
+ if(average===undefined)return null;
  return <a href="#reviews" className="product-review-link">
   <RatingStars rating={average} sample={isSample}/>
   <span>{average===undefined?"Customer reviews":`${average.toFixed(1)} / 5 · ${countLabel}`}</span>

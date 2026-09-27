@@ -1,15 +1,20 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { productPrice, type Product } from "@/lib/catalog";
 import { productContent } from "@/lib/product-content";
 import { supplementDetails, supplementDisclaimer } from "@/lib/supplement-details";
 import skincareRange from "@/lib/skincare-range.json";
 import { SupplementFormula, SupplementDirections } from "./supplement-information";
+import { dailyProductPrice } from "./product-essentials";
 
 export function comparisonFor(product: Product, products: Product[]) {
   const choices = product.category === "skincare"
-    ? ["anti-aging-cleanser-with-peptides", "hydra-c-ferulic-serum", "copper-peptide-restore-cream", "hydrating-tonic"]
+    ? ["hydra-c-ferulic-serum", "retinol-rx", "exfoliating-pads"].includes(product.id)
+      ? ["hydra-c-ferulic-serum", "retinol-rx", "exfoliating-pads"]
+      : ["anti-aging-cleanser-with-peptides", "hydrating-tonic", "copper-peptide-restore-cream"].includes(product.id)
+        ? ["anti-aging-cleanser-with-peptides", "hydrating-tonic", "copper-peptide-restore-cream"]
+        : ["firming-peptide-eye-gel", "hydrating-tonic", "copper-peptide-restore-cream"]
     : ["nmn", "resveratrol"].includes(product.id)
       ? ["nmn", "resveratrol"]
       : ["hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"].includes(product.id)
@@ -32,6 +37,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   return <div className="product-experience">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">Benefits</a><a href="#product-formula">Ingredients</a>
+      {content.guide && <a href="#product-fit">Your fit</a>}
       <a href="#product-routine">How to use</a>{research && <a href="#ingredient-science">Research</a>}
       <a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
     </nav>
@@ -69,6 +75,12 @@ export function ProductStory({ product: p, products }: { product: Product; produ
         </AccordionItem>
       </Accordion>
     </section>
+    {content.guide && <section id="product-fit" className="pdp-guide pdp-section" aria-labelledby="fit-heading">
+      <div className="pdp-guide-heading"><p className="eyebrow">FIND YOUR FIT</p><h2 id="fit-heading">{content.guide.title}</h2><p>{content.guide.introduction}</p></div>
+      <div className="pdp-guide-details">{content.guide.details.map((detail, i) => <div key={detail.title}>
+        <span aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><div><h3>{detail.title}</h3><p>{detail.body}</p></div>
+      </div>)}</div>
+    </section>}
     {content.routine && <section id="product-routine" className="pdp-routine pdp-section" aria-labelledby="routine-heading">
       <div className="pdp-routine-heading"><p className="eyebrow">HOW TO USE</p><h2 id="routine-heading">{content.routine.title}</h2>
         <dl className="pdp-fit">{content.fit?.map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>
@@ -94,15 +106,21 @@ export function ProductStory({ product: p, products }: { product: Product; produ
       </Accordion>
     </section>
     {comparison.length > 1 && <section id="compare" className="pdp-comparison pdp-section" aria-labelledby="comparison-heading">
-      <div className="pdp-section-heading"><div><p className="eyebrow">{skin ? "BUILD YOUR ROUTINE" : "FIND YOUR FIT"}</p><h2 id="comparison-heading">{skin ? "A place for every step." : "A closer look, side by side."}</h2></div>
+      <div className="pdp-section-heading"><div><p className="eyebrow">A CLEARER CHOICE</p><h2 id="comparison-heading">Compare the formulas.</h2></div>
         <Link className="pdp-text-link" href={`/collections/${p.category}`}>Explore {p.category}<ArrowUpRight size={17} /></Link>
       </div>
-      <div className="pdp-comparison-grid">{comparison.map(q => <article className={p.id === q.id ? "is-current" : ""} key={q.id}>
+      <div className="pdp-comparison-grid">{comparison.map(q => {
+        const qContent = productContent[q.id];
+        const size = q.size || supplementDetails[q.id]?.contents || skincareRange.find(item => item.id === q.id)?.size;
+        const dailyPrice = dailyProductPrice(q);
+        return <article className={p.id === q.id ? "is-current" : ""} key={q.id}>
         <Link className="pdp-comparison-image" href={`/products/${q.id}`} aria-label={`View ${q.name}`}><img src={q.image} alt={q.name} loading="lazy" width={1122} height={1402} />{p.id === q.id && <span>YOU’RE VIEWING</span>}</Link>
         <h3><Link href={`/products/${q.id}`}>{q.name}</Link></h3><p>{productContent[q.id]?.descriptor || q.descriptor}</p>
-        <dl><div><dt>{skin ? "Step" : "Format"}</dt><dd>{skin ? q.ritual : q.type}</dd></div>{q.size && <div><dt>Size</dt><dd>{q.size}</dd></div>}<div><dt>Price</dt><dd>{productPrice(q)}</dd></div></dl>
-        <Link className="pdp-comparison-link" href={`/products/${q.id}`}>{p.id === q.id ? "Back to product" : "Explore product"}{p.id === q.id ? <ArrowUpRight size={17} /> : <Plus size={17} />}</Link>
-      </article>)}</div>
+        <dl>{qContent?.comparison && <><div><dt>Focus</dt><dd>{qContent.comparison.focus}</dd></div><div><dt>Routine</dt><dd>{qContent.comparison.routine}</dd></div><div><dt>Key detail</dt><dd>{qContent.comparison.difference}</dd></div></>}
+        {size && <div><dt>Contents</dt><dd>{size}</dd></div>}<div><dt>Price</dt><dd>{productPrice(q)}</dd></div>{dailyPrice && <div><dt>Per day*</dt><dd>{dailyPrice}</dd></div>}</dl>
+        <Link className="pdp-comparison-link" href={p.id === q.id ? "#overview" : `/products/${q.id}`}>{p.id === q.id ? "Back to product" : "Explore product"}<ArrowUpRight size={17} /></Link>
+      </article>})}</div>
+      {comparison.some(q => dailyProductPrice(q)) && <p className="pdp-comparison-note">*At the listed price and suggested daily use. Shipping and taxes, where applicable, are calculated at checkout.</p>}
     </section>}
     {supplement && <p className="pdp-disclaimer">*{supplementDisclaimer}</p>}
   </div>;

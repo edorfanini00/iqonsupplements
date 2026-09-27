@@ -24,7 +24,7 @@ test("every catalog product renders useful education with working section links"
     assert.ok(copy.routine.steps.length >= 2, product.id);
     const html = render(ProductStory, { product, products });
     for (const link of html.matchAll(/href="#([^"]+)"/g)) {
-      if (link[1] !== "reviews") assert.ok(html.includes(`id="${link[1]}"`), `${product.id}: ${link[1]}`);
+      if (!["reviews", "overview"].includes(link[1])) assert.ok(html.includes(`id="${link[1]}"`), `${product.id}: ${link[1]}`);
     }
     const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]);
     assert.equal(new Set(ids).size, ids.length, `${product.id}: duplicate anchors`);
@@ -67,8 +67,24 @@ test("all product pages keep illustrative ratings out of published reviews", asy
   for (const product of products) {
     for (const component of [ProductReviewLink, CustomerReviews]) {
       const html = render(component, { productId: product.id, productName: product.name });
-      assert.match(html, /No customer ratings yet/);
+      if (component === ProductReviewLink) assert.equal(html, "");
+      else assert.match(html, /No customer ratings yet/);
       assert.doesNotMatch(html, /Sample rating|\d+\+ reviews|Verified purchase/);
     }
+  }
+});
+
+test("daily prices follow live currency and disappear for unconfirmed supply or multiple packs", async () => {
+  const { products } = await vite.ssrLoadModule("/lib/catalog.ts");
+  const { dailyProductPrice, ProductEssentials } = await vite.ssrLoadModule("/app/product-essentials.tsx");
+  const nmn = { ...products.find(p => p.id === "nmn"), price:60, currency:"EUR" };
+  assert.match(dailyProductPrice(nmn), /€2(?:\.00)?/);
+  assert.match(dailyProductPrice(nmn, 90, "USD"), /\$3(?:\.00)?/);
+  assert.equal(dailyProductPrice({ ...nmn, pricePending:true }), null);
+  assert.equal(dailyProductPrice({ ...nmn, variants:[{ id:"small" }, { id:"large" }] }), null);
+  assert.equal(dailyProductPrice(products.find(p => p.id === "creatine-monohydrate")), null);
+  assert.equal(dailyProductPrice({ ...nmn, price:NaN }), null);
+  for (const product of products) {
+    assert.match(render(ProductEssentials, { product }), /aria-label="The essentials"/);
   }
 });

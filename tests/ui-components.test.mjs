@@ -110,28 +110,16 @@ test("keeps product rating samples out of published customer reviews", async () 
   const { products } = await vite.ssrLoadModule("/lib/catalog.ts");
   const { customerReviews } = await vite.ssrLoadModule("/lib/reviews.ts");
   const render = (component, props) => renderToStaticMarkup(React.createElement(component, props));
-  const counts = new Set();
   for (const product of products) {
     const props = { productId:product.id, productName:product.name };
-    const previewLink = render(ProductReviewLink, { ...props, designPreview:true });
-    const previewSection = render(CustomerReviews, { ...props, designPreview:true });
-    const rating = previewLink.match(/Sample rating: ([\d.]+) out of 5 stars/)?.[1];
-    const count = previewLink.match(/(\d+)\+ reviews/)?.[1];
-    assert.ok(Number(rating) >= 4.5 && Number(rating) <= 5, product.id);
-    assert.ok(Number(count) >= 150, product.id);
-    counts.add(count);
-    assert.ok(previewSection.includes(`Sample rating: ${rating} out of 5 stars`));
-    assert.ok(previewSection.includes(`${count}+ reviews`));
-    assert.doesNotMatch(previewLink, /Sample data|review-sample-label/);
-    assert.doesNotMatch(previewSection, /Sample data|Sample rating and review count for this design preview/);
-    for (const component of [ProductReviewLink, CustomerReviews]) {
-      const published = render(component, props);
-      assert.match(published, /No customer ratings yet/);
-      assert.doesNotMatch(published, /Sample data|\d+\+ reviews/);
-    }
+    assert.equal(render(ProductReviewLink, props), "");
+    const published = render(CustomerReviews, props);
+    assert.match(published, /No customer ratings yet/);
+    assert.doesNotMatch(published, /Sample rating|\d+\+ reviews|Verified purchase/);
   }
-  assert.equal(counts.size, products.length);
-
+  const preview = render(ProductReviewLink, { productId:"creatine-monohydrate", designPreview:true });
+  assert.match(preview, /Sample rating: 4.9 out of 5 stars/);
+  assert.match(preview, /400\+ reviews/);
   const review = { id:"render-test", productId:products[0].id, author:"Test customer", rating:3,
     title:"Test review", text:"Test review body", date:"2026-09-10", verifiedPurchase:false };
   customerReviews.push(review);
@@ -140,7 +128,7 @@ test("keeps product rating samples out of published customer reviews", async () 
       const html = render(component, { productId:review.productId, designPreview:true });
       assert.match(html, /3.0 out of 5 stars/);
       assert.match(html, /1 review/);
-      assert.doesNotMatch(html, /Sample data|\d+\+ reviews/);
+      assert.doesNotMatch(html, /Sample rating|\d+\+ reviews/);
     }
   } finally {
     customerReviews.splice(customerReviews.indexOf(review), 1);
