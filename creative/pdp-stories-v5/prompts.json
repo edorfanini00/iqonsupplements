@@ -1,0 +1,378 @@
+{
+  "method": "Built-in image generation; original campaign imagery, not customer results",
+  "assets": [
+    {
+      "id": "retinol-rx",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-f5c43e42-3aad-4e77-b3dc-04b09bf1c589.png",
+      "asset": "public/images/pdp-stories-v5/retinol-rx.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "objective": "Create an original photographic editorial for the lower product page of IQON Retinol Rx. Use the reference solely as the exact packaging authority. This must feel like an expensive real studio photograph, not a computer render.",
+        "format": "portrait 4:5 high resolution",
+        "scene": "A single exact reference bottle lies diagonally on a smooth charcoal-grey satin-metal surface, cap towards upper right, base lower left. Tight considered macro composition: bottle occupies about 72% of image height with all edges intact. A single oblique band of cool late-evening window light traces the polished silver cap and a long soft shadow. Deep gray tonal backdrop, gently lighter at upper left. No props.",
+        "packaging": "Preserve the original upright serif IQON logo, white paper label, slim silver cylinder and long silver cap, dimensions and all original label wording: IQON / SKINCARE / Retinol Rx / 1 fl oz (30 ml). Keep label facing the camera readable with plausible cylindrical curvature.",
+        "photography": "90mm macro commercial product lens, realistic focus falloff but full label sharp. Real brushed metal microtexture, slightly imperfect highlight falloff, very fine paper texture, controlled cool highlights with genuine light reflections. Silver not chrome CGI. Understated luxury.",
+        "avoid": [
+          "people",
+          "hands",
+          "food",
+          "flowers",
+          "floating product",
+          "dramatic splash",
+          "water droplets",
+          "extra text",
+          "infographic",
+          "duplicated bottle",
+          "plastic render",
+          "marble",
+          "gold"
+        ]
+      }
+    },
+    {
+      "id": "retinol-rx-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-695bb1db-1142-4d22-be4e-d1ef413f1b1d.png",
+      "asset": "public/images/pdp-stories-v5/retinol-rx-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "Close-up portrait of a beautiful fictional 34-year-old brunette woman in three-quarter profile, crop includes full forehead, both eyes, cheek, lips and chin with 8% margins. Naturally olive skin with tiny freckles, dark hazel eyes looking slightly down, hair casually tucked behind ear. Fingertips of one hand gently rest on the lower cheek as she finishes evening skincare. No cream streak, no dropper. Slate-charcoal blurred background, calm blue-hour reflected window light with softly warm skin. Intimate confident adult expression, no smile."
+      }
+    },
+    {
+      "id": "hydra-c-ferulic-serum",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-9fdedadb-a9fb-4fe6-bd7d-a59b1c6848bc.png",
+      "asset": "public/images/pdp-stories-v5/hydra-c-ferulic-serum.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "objective": "Create an original premium photographic campaign still for IQON Hydra C + Ferulic Serum using this reference as exact packaging authority.",
+        "format": "portrait 4:5 high resolution",
+        "scene": "The exact reference bottle stands on a cool pale grey vanity surface in soft morning window light. One thick edge of clear architectural glass passes behind the bottle on the left, casting a subtle refracted curve of light on the background. Clear glass is a quiet material detail, no laboratory scene. Frame tight, bottle occupies about two thirds of image height, camera at bottle midheight, full bottle visible with comfortable crop margin. Asymmetric composition and authentic soft shadows.",
+        "packaging": "Exact white label, black serif IQON logo, original wordmark scale, silver cylindrical cap and silver base. Preserve original wording: IQON / SKINCARE / Hydra C + Ferulic Serum / 1 fl oz (30 ml). No added text.",
+        "photography": "Real 80mm medium format product photography. White label and metal physically believable. Cool silver-grey palette with a delicate neutral sunlit highlight. Subtle natural surface imperfections, not CGI. Strong product presence, background softly falls away.",
+        "avoid": [
+          "food",
+          "citrus",
+          "plants",
+          "hands",
+          "fake liquid",
+          "floating bottle",
+          "visual effects",
+          "extra text",
+          "warm orange cast",
+          "marble",
+          "gold",
+          "plastic render"
+        ]
+      }
+    },
+    {
+      "id": "hydra-c-ferulic-serum-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-671d7cac-76a7-4162-8f5a-2b9b402981eb.png",
+      "asset": "public/images/pdp-stories-v5/hydra-c-ferulic-serum-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "An elegant fictional 33-year-old Black woman in a tight face-and-neck beauty crop with a natural rounded afro softly outside focus. Slight three-quarter turn, eyes looking towards the daylight at frame left. Her cheek catches a broad soft morning highlight, tiny pores and subtle freckles visible. One hand gently presses the side of her face as part of skincare, bare short nails. Very light cool-grey background, skin rich and natural, no dramatic glitter or obvious product blobs. Confident relaxed expression, slightly parted natural lips."
+      }
+    },
+    {
+      "id": "anti-aging-cleanser-with-peptides",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-85d20d78-1f4a-42a1-9f7b-6f2505449e42.png",
+      "asset": "public/images/pdp-stories-v5/anti-aging-cleanser-with-peptides.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "format": "portrait 4:5 high resolution",
+        "objective": "An original premium IQON skincare product photograph for a detailed formula section. The input reference is the exact packaging authority, not the desired composition. Preserve the photographed serif IQON wordmark and all label text, cap, color, material, dimensions and proportions.",
+        "photography": "Real 90mm macro commercial photography, clear label, genuine physical light falloff, tactile label paper and plausible reflections, refined cool-grey, silver and white palette. Simple precise composition. Full product within the image with generous safe crop margins.",
+        "avoid": [
+          "people",
+          "hands",
+          "food",
+          "plants",
+          "marble",
+          "gold",
+          "floating objects",
+          "AI rendering",
+          "overlaid typography",
+          "text other than packaging",
+          "duplicated products"
+        ],
+        "scene": "Exact white cleanser bottle upright beside a softly curved brushed-steel basin edge, a few genuine tiny drops on the silver surface only. A folded pale charcoal face cloth partially enters the lower left edge. Bright clean window light, soft gray background, product fills about 62% of height. Quiet photographic sense of a morning cleanse. Not a bathroom wide shot."
+      }
+    },
+    {
+      "id": "anti-aging-cleanser-with-peptides-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-64dd6014-a647-4f50-897c-3b8025e19a36.png",
+      "asset": "public/images/pdp-stories-v5/anti-aging-cleanser-with-peptides-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "A handsome fictional 32-year-old man with dark short wavy hair, light stubble and warm medium skin, washing his face at a minimal grey bathroom basin. Close face crop, white crew neck shirt barely visible at lower edge. Both naturally proportioned hands gently massage cheeks with a SMALL amount of fine cleanser lather, a few tiny water drops at jaw. Eyes comfortably closed, authentic unposed moment, cool daylight, cropped basin lip at lower edge. No exaggerated foamy beard or splashing water."
+      }
+    },
+    {
+      "id": "hydrating-tonic",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-e304607b-55db-4ffd-aea6-f380e1b8cca9.png",
+      "asset": "public/images/pdp-stories-v5/hydrating-tonic.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "format": "portrait 4:5 high resolution",
+        "objective": "An original premium IQON skincare product photograph for a detailed formula section. The input reference is the exact packaging authority, not the desired composition. Preserve the photographed serif IQON wordmark and all label text, cap, color, material, dimensions and proportions.",
+        "photography": "Real 90mm macro commercial photography, clear label, genuine physical light falloff, tactile label paper and plausible reflections, refined cool-grey, silver and white palette. Simple precise composition. Full product within the image with generous safe crop margins.",
+        "avoid": [
+          "people",
+          "hands",
+          "food",
+          "plants",
+          "marble",
+          "gold",
+          "floating objects",
+          "AI rendering",
+          "overlaid typography",
+          "text other than packaging",
+          "duplicated products"
+        ],
+        "scene": "Exact white Hydrating Tonic bottle with silver flip-cap seen from a high three-quarter angle on a pale silver-grey surface, lying at a modest diagonal. Two pristine white cotton rounds beside the lower half, slightly overlapping, real delicate cotton fibers. A soft elongated light reflection, no liquid spills. Product fills about 68% of height. Airy and minimal."
+      }
+    },
+    {
+      "id": "hydrating-tonic-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-d93b6a24-a1a7-4655-8437-ecec692f385f.png",
+      "asset": "public/images/pdp-stories-v5/hydrating-tonic-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "A fictional 33-year-old woman with dark straight hair loosely tied back, naturally pale olive skin and a few small freckles. Tight side-angle portrait from forehead to shoulders. She lightly sweeps a soft round white cotton pad along the side of her neck below the jaw after cleansing; fingertips have short unpainted nails. Eyes look toward a mirror out of frame, calm neutral face. One shoulder of a plain cool gray tank top visible. Fresh soft daylight against silver-grey wall. Pad visible and skin is comfortably moist, not wet or foamy."
+      }
+    },
+    {
+      "id": "exfoliating-pads",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-6dfabdf2-3975-4958-a3d4-67a1d972e45b.png",
+      "asset": "public/images/pdp-stories-v5/exfoliating-pads.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "format": "portrait 4:5 high resolution",
+        "objective": "An original premium IQON skincare product photograph for a detailed formula section. The input reference is the exact packaging authority, not the desired composition. Preserve the photographed serif IQON wordmark and all label text, cap, color, material, dimensions and proportions.",
+        "photography": "Real 90mm macro commercial photography, clear label, genuine physical light falloff, tactile label paper and plausible reflections, refined cool-grey, silver and white palette. Simple precise composition. Full product within the image with generous safe crop margins.",
+        "avoid": [
+          "people",
+          "hands",
+          "food",
+          "plants",
+          "marble",
+          "gold",
+          "floating objects",
+          "AI rendering",
+          "overlaid typography",
+          "text other than packaging",
+          "duplicated products"
+        ],
+        "scene": "Exact Exfoliating Pads white squat jar with silver lid still closed, off center on a broad flat brushed-aluminum surface. Top-down-ish 45 degree view clearly shows front label and upper lid. One plain white textured cotton pad beside it as an application cue. Directional cool daylight creates defined but natural shadows. Product fills about 58% of width; balanced close-up composition."
+      }
+    },
+    {
+      "id": "exfoliating-pads-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-17810c5e-8315-4dcb-a2cd-d22a0b630dad.png",
+      "asset": "public/images/pdp-stories-v5/exfoliating-pads-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "An elegant fictional 35-year-old East Asian woman, glossy black hair tucked back. Tight three-quarter face crop with space around chin and forehead, looking slightly downward. She gently holds a small thin white textured pad flat against her outer cheek well away from the eye, using two naturally positioned fingers. Skin has healthy pores and small natural marks, no makeup or exaggerated shine. Cool charcoal-grey background and restrained soft studio daylight. Clear visible cotton-pad texture, no foam or cream."
+      }
+    },
+    {
+      "id": "firming-peptide-eye-gel",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-404b8365-5875-41bd-8d53-86f3fe7778d0.png",
+      "asset": "public/images/pdp-stories-v5/firming-peptide-eye-gel.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "format": "portrait 4:5 high resolution",
+        "objective": "Create a new premium IQON skincare campaign still using the supplied reference as exact packaging authority. Real photography, not CGI.",
+        "scene": "The exact slim 15 ml silver and white eye-gel bottle lies horizontally on a cool soft-grey surface, shot from overhead at a slight diagonal, with its reflection subtly seen in a small smoked mirror partly entering from the upper edge. The real bottle itself appears only once; one faint reflection is okay. Very quiet composition, close but fully within frame, controlled morning sidelight. Original label Firming Peptide Eye Gel / 0.5 fl oz (15 ml) is fully readable.",
+        "packaging": "Preserve original bottle proportions, long silver cap, silver lower body, white label, exact uppercase serif IQON wordmark and label layout. One product only. Keep margins around entire bottle.",
+        "photography": "Natural medium-format photographic realism, restrained cool-gray/charcoal palette, fine paper and metal texture, subtle physically plausible reflections. Slight authentic surface variations. No overlays, plants, food, flowers, hands, marble, gold or extra text."
+      }
+    },
+    {
+      "id": "firming-peptide-eye-gel-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-0d71e99f-3e28-4d2f-ae29-bf2521be58f2.png",
+      "asset": "public/images/pdp-stories-v5/firming-peptide-eye-gel-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "Extreme editorial macro crop of one hazel eye and upper cheek of a fictional 33-year-old woman with light neutral skin and a subtle freckle beside the temple. The camera includes the complete eyebrow and side of nose but not whole face. One ring fingertip lightly touches the orbital bone below the outer eye, away from lash line, short natural unpainted nail. A minute translucent dab barely visible on skin. Beautiful precise pores, individual lashes, tiny natural fine lines. Clear healthy eye with realistic reflection of a window. Background neutral silver-grey, no props."
+      }
+    },
+    {
+      "id": "copper-peptide-restore-cream",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-daeecf87-87b4-42b3-afe7-4e51c58596bf.png",
+      "asset": "public/images/pdp-stories-v5/copper-peptide-restore-cream.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_brand_product_editorial",
+        "use_case": "product-mockup",
+        "format": "portrait 4:5 high resolution",
+        "objective": "Create a new premium IQON skincare campaign still using the supplied reference as exact packaging authority. Real photography, not CGI.",
+        "scene": "The exact silver and white 50 ml Copper Peptide Restore Cream bottle stands in an intimate close-up against a gently curved charcoal metal backdrop. Restrained soft silver edge light and broad gray highlight on the cap. A pale grey folded linen face towel lies low in foreground with fine realistic fibers, below label height. Strong grounded product presence, not a floating rendering. Original label Copper Peptide Restore Cream / 1.7 fl oz (50 ml) remains fully readable.",
+        "packaging": "Preserve original bottle proportions, long silver cap, silver lower body, white label, exact uppercase serif IQON wordmark and label layout. One product only. Keep margins around entire bottle.",
+        "photography": "Natural medium-format photographic realism, restrained cool-gray/charcoal palette, fine paper and metal texture, subtle physically plausible reflections. Slight authentic surface variations. No overlays, plants, food, flowers, hands, marble, gold or extra text."
+      }
+    },
+    {
+      "id": "copper-peptide-restore-cream-use",
+      "source": "/workspace/scratch/f7b795baa0fb/generated_images/exec-9a44d721-a67c-4928-99b7-728cb38eabc2.png",
+      "asset": "public/images/pdp-stories-v5/copper-peptide-restore-cream-use.webp",
+      "prompt": {
+        "prompt_type": "photorealistic_skincare_editorial",
+        "use_case": "photorealistic-natural",
+        "format": "portrait 4:5 high resolution",
+        "purpose": "Original campaign photograph for a premium IQON skincare product story, showing a routine moment. It is not a testimonial or a before/after result. No text, no logos, no packaging.",
+        "photography": "Exceptional real-world skin detail: natural pores, subtle peach fuzz, delicate skin creases, uneven small freckles, individual brow hairs, realistic eyelash shadows. Polished skincare photography with very light retouching. NOT an airbrushed perfect AI face. Skin healthy and luminous but not waxy or wet. Adult features, age 32-36. Soft natural window key light, cool neutral background, believable warmth in skin. 90mm portrait lens, shallow optical depth of field. Comfortable safe crop margins, intentional close framing.",
+        "avoid": [
+          "plastic skin",
+          "oversmoothing",
+          "hyper-sharpening",
+          "heavy foundation",
+          "beauty filters",
+          "exaggerated wrinkles",
+          "teenage appearance",
+          "elderly hand",
+          "long acrylic nails",
+          "extra fingers",
+          "fashion jewelry",
+          "before and after",
+          "text",
+          "watermark",
+          "decorative props"
+        ],
+        "scene": "Close-up beauty editorial of a fictional 36-year-old woman with medium golden skin and dark wavy hair, face turned slightly towards the camera. Framing from forehead to collarbones, closed relaxed eyes. Two fingertips smooth a small visible ivory cream stroke on her lower cheek beside the jaw, away from eyes. She has adult cheekbone and jaw definition, naturally detailed skin, no heavy lines. Soft cool-grey window light and charcoal background, tranquil skincare moment, no packaging."
+      }
+    }
+  ]
+}

@@ -12,6 +12,8 @@ import { productPresentation } from "@/lib/product-presentation";
 import { ProductFormulaExplorer } from "./product-formula-explorer";
 import { formulaSpotlights, skincareNotes } from "@/lib/product-story-detail";
 import { ProductFormulaVisual } from "./product-formula-visual";
+import { SkincareProductStory } from "./skincare-product-story";
+import { skincareStories } from "@/lib/skincare-stories";
 
 export function comparisonFor(product: Product, products: Product[]) {
   const choices = product.category === "skincare"
@@ -38,6 +40,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   const supplement = supplementDetails[p.id];
   const skin = skincareRange.find(item => item.id === p.id);
   const comparison = comparisonFor(p, products);
+  if (skin && skincareStories[p.id]) return <SkincareProductStory product={p} comparison={comparison}/>;
   const research = content.education;
   const visual = productVisuals[p.id];
   const focus = productPresentation[p.id]?.focus;

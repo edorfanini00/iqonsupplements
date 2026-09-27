@@ -5,6 +5,7 @@ import "./refinement.css";
 import "./commerce.css";
 import "./product-experience.css";
 import "./product-story-v4.css";
+import "./skincare-product-story.css";
 import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
 export const dynamic = "force-dynamic";
