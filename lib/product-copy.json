@@ -1811,15 +1811,15 @@
       "steps": [
         {
           "title": "Dampen",
-          "body": "Start with damp skin."
+          "body": "Begin with pre-moistened skin. Use this as the first step of your morning or evening routine."
         },
         {
           "title": "Massage",
-          "body": "Gently massage a small amount over the face."
+          "body": "Gently massage a small amount over the skin to cleanse away everyday buildup."
         },
         {
-          "title": "Rinse",
-          "body": "Rinse thoroughly. Use morning and evening, then continue with your routine."
+          "title": "Rinse + continue",
+          "body": "Rinse thoroughly with water, then continue with your chosen tonic, treatment and moisturizer."
         }
       ]
     },
@@ -1960,16 +1960,16 @@
       "title": "A place in your routine.",
       "steps": [
         {
-          "title": "Cleanse",
-          "body": "Begin with freshly cleansed skin."
+          "title": "Start clean",
+          "body": "Cleanse and rinse first. The tonic sits between your rinse-off cleanser and leave-on treatment."
         },
         {
-          "title": "Sweep",
-          "body": "Apply to the face and neck using a cotton pad."
+          "title": "Sweep over skin",
+          "body": "Apply with a cotton pad over the face and neck, using a gentle sweeping motion."
         },
         {
-          "title": "Layer",
-          "body": "Follow with serum and moisturizer. May be used morning and evening."
+          "title": "Continue your routine",
+          "body": "Follow with your selected serum and moisturizer. May be used morning and evening."
         }
       ]
     },
@@ -2110,16 +2110,16 @@
       "title": "A place in your routine.",
       "steps": [
         {
-          "title": "Cleanse",
-          "body": "Start with cleansed skin. The formulation is recommended for nighttime use."
+          "title": "Cleanse first",
+          "body": "Start with clean skin. Keep this as a separate exfoliating step within your evening routine."
         },
         {
-          "title": "Sweep",
-          "body": "Gently sweep one pad over the intended areas, avoiding the eyes."
+          "title": "Sweep a pad",
+          "body": "Gently sweep over the face or targeted areas, avoiding the eye area. Follow the label for frequency."
         },
         {
-          "title": "Moisturize & protect",
-          "body": "Follow with moisturizer. Use sunscreen, protective clothing and limit sun exposure during use and for a week afterwards."
+          "title": "Moisturize + protect",
+          "body": "Follow with moisturizer. Use daily sun protection and plan any other exfoliants or retinoids carefully."
         }
       ]
     },
@@ -2261,15 +2261,15 @@
       "steps": [
         {
           "title": "Prepare",
-          "body": "Cleanse and tone."
+          "body": "Cleanse first and apply your tonic if you use one. The serum comes before your moisturizer."
         },
         {
-          "title": "Apply",
-          "body": "Smooth a small amount over the face and neck."
+          "title": "Apply to face + neck",
+          "body": "Smooth a small amount over the face and neck. Allow the serum to absorb before the next step."
         },
         {
-          "title": "Finish",
-          "body": "Once absorbed, follow with moisturizer and daytime SPF. May be used twice daily."
+          "title": "Finish the routine",
+          "body": "Follow with moisturizer and, in the morning, sunscreen. The serum may be used morning and evening."
         }
       ]
     },
@@ -2410,16 +2410,16 @@
       "title": "A place in your routine.",
       "steps": [
         {
-          "title": "Use at night",
-          "body": "Apply as directed in your evening routine."
+          "title": "Keep it for evening",
+          "body": "Apply as directed by the product label in your evening routine. Keep the supporting steps simple."
         },
         {
           "title": "Build gradually",
-          "body": "Introduce gradually as tolerated and follow your product label for frequency."
+          "body": "Introduce gradually as tolerated. Adjust frequency to your skin and avoid increasing use through irritation."
         },
         {
           "title": "Protect by day",
-          "body": "Wear SPF 30 or higher during the day."
+          "body": "Use SPF 30 or higher during the day. Consider any retinol or other active products already in your routine."
         }
       ]
     },
@@ -2556,16 +2556,16 @@
       "title": "A place in your routine.",
       "steps": [
         {
-          "title": "Cleanse",
-          "body": "Start with clean skin."
+          "title": "Start with clean skin",
+          "body": "Apply after cleansing, before completing the rest of your skincare routine."
         },
         {
-          "title": "Apply gently",
-          "body": "Use a small amount around the eye area, avoiding direct eye contact."
+          "title": "Use a gentle touch",
+          "body": "Apply a small amount around the eye area. Gently pat or massage in, avoiding direct eye contact."
         },
         {
-          "title": "Make it a habit",
-          "body": "Use morning and evening before completing your routine."
+          "title": "Morning + evening",
+          "body": "Use up to twice daily. Follow with the rest of your routine and daytime sun protection."
         }
       ]
     },
@@ -2710,16 +2710,16 @@
       "title": "A place in your routine.",
       "steps": [
         {
-          "title": "Cleanse & treat",
-          "body": "Begin after cleansing and serum application."
+          "title": "Prepare your skin",
+          "body": "Cleanse and apply your selected serum first. The cream is the moisturizing step that follows."
         },
         {
-          "title": "Moisturize",
-          "body": "Apply to the face and neck according to the label."
+          "title": "Apply the cream",
+          "body": "Smooth over the face and neck for a richer, cushioned finish to your routine."
         },
         {
-          "title": "Finish with SPF",
-          "body": "Follow with sun protection in the morning. Consider the retinol in this cream when planning other active steps."
+          "title": "Plan your active steps",
+          "body": "The formula also contains retinol. Account for other active products and finish with SPF when used in the morning."
         }
       ]
     },

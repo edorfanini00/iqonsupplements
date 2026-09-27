@@ -45,15 +45,14 @@ describe("visual product guides", () => {
       cleanup();
     }
   });
-  it("changes ingredient panels with the keyboard and keeps their labels connected", () => {
+  it("shows every key ingredient and its explanation without hiding them behind tabs", () => {
     const p = products.find(p => p.id === 'hydra-c-ferulic-serum')!;
-    render(React.createElement(ProductFormulaExplorer, {product:p}));
-    const tabs = screen.getAllByRole('tab');
-    expect(screen.getByRole('tabpanel').textContent).toContain('Ascorbic acid');
-    fireEvent.keyDown(tabs[0], {key:'ArrowRight'});
-    expect(tabs[1].getAttribute('aria-selected')).toBe('true');
-    expect(document.activeElement).toBe(tabs[1]);
-    expect(screen.getByRole('tabpanel').getAttribute('aria-labelledby')).toBe(tabs[1].id);
-    expect(screen.getByRole('tabpanel').textContent).toContain('Ferulic acid');
+    const {container}=render(React.createElement(ProductFormulaExplorer, {product:p}));
+    expect(screen.getAllByRole('article')).toHaveLength(3);
+    expect(screen.getByRole('heading',{name:'Vitamin C'})).toBeTruthy();
+    expect(screen.getByRole('heading',{name:'Ferulic acid'})).toBeTruthy();
+    expect(screen.getByRole('heading',{name:'Sodium hyaluronate'})).toBeTruthy();
+    expect(container.textContent).toContain('Ascorbic acid');
+    expect(container.querySelector('[hidden]')).toBeNull();
   });
 });
