@@ -5,11 +5,8 @@ export type ProductVisual = {
   fact: { value: string; label: string; body: string };
   whyTitle: string; whyBody: string; mechanismTitle: string;
   mechanism: { title: string; body: string }[];
-  ritualTitle: string; image: string; imageAlt: string;
+  ritualTitle: string;
 };
-const water = { image: "/images/editorial/daily-water-v24.webp", imageAlt: "A daily glass of water in a sunlit kitchen" };
-const movement = { image: "/images/editorial/iqon-pilates-editorial.webp", imageAlt: "Preparing for a daily movement routine" };
-const skin = { image: "/images/editorial/iqon-skincare-hero-v29.webp", imageAlt: "Natural skin in soft window light" };
 export const productVisuals: Record<string, ProductVisual> = {
   "creatine-monohydrate": {
     headline: "Made for your next rep.", lead: "Unflavored creatine monohydrate for repeated, high-intensity efforts. One ingredient that fits around the training you already do.*",
@@ -19,7 +16,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "The science behind the next effort.", mechanism: [
       { title: "Store", body: "Muscles store creatine, including as phosphocreatine." },
       { title: "Replenish", body: "Phosphocreatine helps regenerate ATP, the immediate energy source used by working muscles.*" },
-      { title: "Repeat", body: "This energy system matters most during repeated, short bursts of high-intensity exercise.*" }], ritualTitle: "A small step in your training routine.", ...movement
+      { title: "Repeat", body: "This energy system matters most during repeated, short bursts of high-intensity exercise.*" }], ritualTitle: "A small step in your training routine."
   },
   "hydrolyzed-collagen-peptides": {
     headline: "Collagen. Without the extras.", lead: "Grass-fed bovine collagen peptides in an unflavored, single-ingredient powder. A simple addition to the drink you already enjoy.",
@@ -29,7 +26,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Collagen, made clearer.", mechanism: [
       { title: "The source", body: "Bovine hide collagen is the only ingredient in this powder." },
       { title: "The form", body: "Hydrolyzed means the collagen has been broken down into smaller peptides." },
-      { title: "The evidence", body: "Specific collagen preparations have been studied for skin elasticity. The study below explains the findings and their limits." }], ritualTitle: "One scoop. Your everyday drink.", ...water
+      { title: "The evidence", body: "Specific collagen preparations have been studied for skin elasticity. The study below explains the findings and their limits." }], ritualTitle: "One scoop. Your everyday drink."
   },
   "collagen-peptides-chocolate": {
     headline: "Make collagen your favorite ritual.", lead: "Grass-fed collagen peptides with cocoa and a chocolate finish. A two-scoop addition for your shaker or blender.",
@@ -39,7 +36,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "The formula behind the flavor.", mechanism: [
       { title: "Collagen", body: "Hydrolyzed bovine collagen peptides form the foundation." },
       { title: "Cocoa", body: "Cocoa powder and natural flavor create the chocolate profile." },
-      { title: "Your mix", body: "Use a shaker or blender with the liquid you prefer. The full formula includes stevia, acacia and xanthan gum." }], ritualTitle: "Turn a daily drink into a ritual.", ...water
+      { title: "Your mix", body: "Use a shaker or blender with the liquid you prefer. The full formula includes stevia, acacia and xanthan gum." }], ritualTitle: "Turn a daily drink into a ritual."
   },
   "colostrum-powder": {
     headline: "Colostrum, clearly specified.", lead: "2,300 mg of bovine colostrum per serving, standardized to 25% IgG. One scoop for your cold drink.",
@@ -49,7 +46,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Understand the scoop.", mechanism: [
       { title: "Bovine colostrum", body: "Each serving contains 2,300 mg of this milk-derived ingredient." },
       { title: "Immunoglobulin G", body: "IgG is a naturally present protein. At 25%, the serving provides 575 mg." },
-      { title: "One total", body: "The IgG is included within the colostrum amount. It is not another 575 mg added on top." }], ritualTitle: "Cold mix. Freshly prepared.", ...water
+      { title: "One total", body: "The IgG is included within the colostrum amount. It is not another 575 mg added on top." }], ritualTitle: "Cold mix. Freshly prepared."
   },
   "colon-gentle-cleanse": {
     headline: "Make room for fiber.", lead: "Psyllium husk, ginger, tamarind and four digestive enzymes in individual sachets. A measured step for your daily routine.",
@@ -59,7 +56,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "A closer look at the blend.", mechanism: [
       { title: "Plant fiber", body: "Psyllium husk is the water-absorbing fiber at the center of the formula." },
       { title: "Four enzymes", body: "The blend names amylase, lactase, lipase and cellulase." },
-      { title: "Botanical finish", body: "Ginger root and tamarind fruit extract complete the ingredient list." }], ritualTitle: "Measure. Mix. Drink promptly.", ...water
+      { title: "Botanical finish", body: "Ginger root and tamarind fruit extract complete the ingredient list." }], ritualTitle: "Measure. Mix. Drink promptly."
   },
   "keto-5": {
     headline: "Five ingredients. One focused blend.", lead: "Raspberry ketone, green tea, caffeine, green coffee bean and garcinia in a vegetable capsule. A simple format with every blend ingredient named.",
@@ -69,7 +66,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Meet the five-part formula.", mechanism: [
       { title: "Tea & coffee", body: "Green tea and green coffee bean are two of the plant ingredients in the blend." },
       { title: "Caffeine", body: "Caffeine anhydrous is also included. Consider coffee, tea and other caffeine sources in your day." },
-      { title: "The rest of the blend", body: "Raspberry ketone and garcinia cambogia fruit complete the five ingredients. The individual amounts are not specified." }], ritualTitle: "Build the routine around your day.", ...movement
+      { title: "The rest of the blend", body: "Raspberry ketone and garcinia cambogia fruit complete the five ingredients. The individual amounts are not specified." }], ritualTitle: "Build the routine around your day."
   },
   "glp-1-support": {
     headline: "Keep nutrition in the picture.", lead: "A two-capsule formula combining essential vitamins and minerals with ginger, digestive enzymes and a probiotic. Nutritional support for a changing routine.*",
@@ -79,7 +76,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Three complementary parts of the formula.", mechanism: [
       { title: "Nutrient intake", body: "D3, B6, B12, folate, magnesium, iron and zinc complement dietary intake.*" },
       { title: "Digestive ingredients", body: "A 325 mg blend combines ginger, peppermint, bromelain and DigeZyme®." },
-      { title: "Probiotic component", body: "LactoSpore® adds Bacillus coagulans. The listed 166 mg is ingredient weight, not a CFU count." }], ritualTitle: "A daily moment to stay consistent.", ...water
+      { title: "Probiotic component", body: "LactoSpore® adds Bacillus coagulans. The listed 166 mg is ingredient weight, not a CFU count." }], ritualTitle: "A daily moment to stay consistent."
   },
   "liver-support": {
     headline: "Botanicals for your daily routine.", lead: "Seven botanical ingredients and L-cysteine in a two-capsule formula. Includes milk thistle, turmeric and artichoke extract standardized to 5% cynarin.",
@@ -89,7 +86,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Three ways to read the ingredient list.", mechanism: [
       { title: "Plant powders", body: "Milk thistle, turmeric, beet root, dandelion, ginger and alfalfa make up the powder portion." },
       { title: "Standardized extract", body: "Artichoke extract specifies 5% cynarin. This describes composition, not the milligram dose." },
-      { title: "L-cysteine", body: "L-cysteine hydrochloride is the amino acid ingredient alongside the botanicals." }], ritualTitle: "Two capsules. A familiar moment.", ...water
+      { title: "L-cysteine", body: "L-cysteine hydrochloride is the amino acid ingredient alongside the botanicals." }], ritualTitle: "Two capsules. A familiar moment."
   },
   "nmn": {
     headline: "Cellular nutrition. Made simple.", lead: "500 mg of NMN, a precursor your body uses to make NAD+. One vegetable capsule for your daily cellular-nutrition routine.*",
@@ -99,7 +96,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "From NMN to NAD+.", mechanism: [
       { title: "NMN", body: "β-Nicotinamide mononucleotide is a precursor: a compound used to make another molecule." },
       { title: "NAD+", body: "The body uses NMN in the biosynthesis of NAD+, a coenzyme found in cells.*" },
-      { title: "Cellular metabolism", body: "NAD+ participates in the reactions that help cells process energy. Ingredient biology is not a promise of a noticeable energy boost.*" }], ritualTitle: "One capsule. An everyday habit.", ...movement
+      { title: "Cellular metabolism", body: "NAD+ participates in the reactions that help cells process energy. Ingredient biology is not a promise of a noticeable energy boost.*" }], ritualTitle: "One capsule. An everyday habit."
   },
   "resveratrol": {
     headline: "Plant science. Clearly defined.", lead: "A Polygonum cuspidatum root complex standardized to 50% trans-resveratrol. A plant polyphenol in a convenient vegetable capsule.",
@@ -109,7 +106,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Source. Form. Amount.", mechanism: [
       { title: "Botanical source", body: "The complex is derived from Polygonum cuspidatum root." },
       { title: "Specified form", body: "It is standardized to contain 50% trans-resveratrol." },
-      { title: "Read together", body: "The ingredient statement lists 600 mg of the complex. Read that quantity alongside the standardization." }], ritualTitle: "A simple capsule routine.", ...water
+      { title: "Read together", body: "The ingredient statement lists 600 mg of the complex. Read that quantity alongside the standardization." }], ritualTitle: "A simple capsule routine."
   },
   "hair-skin-nails-gummies": {
     headline: "A little more care. Every day.", lead: "Biotin, vitamins, minerals and fish-derived collagen in passion-fruit gummies. A chewable addition to your daily nutrition routine.",
@@ -119,7 +116,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "More than biotin alone.", mechanism: [
       { title: "B vitamins", body: "Biotin sits alongside B6, B12, folate and pantothenic acid." },
       { title: "Vitamins & minerals", body: "Vitamins A, C, D and E, zinc and iodine broaden the nutrient combination." },
-      { title: "The gummy format", body: "Pectin gives the gummy its form. It also contains sugar and fish-derived collagen, so check dietary suitability." }], ritualTitle: "A chewable step in your day.", ...water
+      { title: "The gummy format", body: "Pectin gives the gummy its form. It also contains sugar and fish-derived collagen, so check dietary suitability." }], ritualTitle: "A chewable step in your day."
   },
   "anti-aging-cleanser-with-peptides": {
     headline: "A clean start. A comfortable finish.", lead: "A daily facial cleanser with peptides, glycerin and panthenol. Wash away buildup while keeping the focus on a soft, comfortable skin feel.",
@@ -129,7 +126,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Cleansing with a care-first approach.", mechanism: [
       { title: "Cleanse", body: "Massage onto damp skin to wash away daily buildup." },
       { title: "Condition", body: "Glycerin and panthenol bring moisture-focused care into the rinse-off formula." },
-      { title: "Prepare", body: "Rinse thoroughly, then move on to tonic, serum and moisturizer." }], ritualTitle: "Begin here. Morning and evening.", ...skin
+      { title: "Prepare", body: "Rinse thoroughly, then move on to tonic, serum and moisturizer." }], ritualTitle: "Begin here. Morning and evening."
   },
   "hydrating-tonic": {
     headline: "Give thirsty skin a fresh start.", lead: "An aloe-based tonic with glycerin and sodium PCA. Water-light hydration after cleansing, before the rest of your routine.",
@@ -139,7 +136,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Attract moisture. Keep it light.", mechanism: [
       { title: "Glycerin", body: "A humectant that attracts water to support hydration." },
       { title: "Sodium PCA", body: "Another moisture-binding ingredient that helps skin retain water." },
-      { title: "Aloe & panthenol", body: "Conditioning ingredients that complete the light tonic formula." }], ritualTitle: "Cleanse. Hydrate. Continue.", ...skin
+      { title: "Aloe & panthenol", body: "Conditioning ingredients that complete the light tonic formula." }], ritualTitle: "Cleanse. Hydrate. Continue."
   },
   "exfoliating-pads": {
     headline: "A smoother surface starts here.", lead: "Mandelic, lactic and salicylic acids in pre-moistened pads. A targeted exfoliating step for uneven texture and dull-looking skin.",
@@ -149,7 +146,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "A closer look at AHA + BHA.", mechanism: [
       { title: "Mandelic & lactic", body: "Alpha hydroxy acids used for surface exfoliation." },
       { title: "Salicylic", body: "A beta hydroxy acid in the formula for congested-looking skin." },
-      { title: "Supporting care", body: "Glycerin and botanicals sit alongside the acids. Introduce according to the label and use sun protection." }], ritualTitle: "Refine thoughtfully. Protect daily.", ...skin
+      { title: "Supporting care", body: "Glycerin and botanicals sit alongside the acids. Introduce according to the label and use sun protection." }], ritualTitle: "Refine thoughtfully. Protect daily."
   },
   "hydra-c-ferulic-serum": {
     headline: "Brighter-looking skin. A daily ritual.", lead: "Vitamin C and ferulic acid meet hydrating sodium hyaluronate. Antioxidant care for dull or uneven-looking skin, in a light serum step.",
@@ -159,7 +156,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Three ingredients. Complementary roles.", mechanism: [
       { title: "Vitamin C", body: "Ascorbic acid brings antioxidant care to a routine for dull-looking skin." },
       { title: "Ferulic acid", body: "A complementary antioxidant ingredient paired with vitamin C." },
-      { title: "Sodium hyaluronate", body: "A moisture-binding ingredient for hydration alongside treatment." }], ritualTitle: "Your serum step. Before cream and SPF.", ...skin
+      { title: "Sodium hyaluronate", body: "A moisture-binding ingredient for hydration alongside treatment." }], ritualTitle: "Your serum step. Before cream and SPF."
   },
   "retinol-rx": {
     headline: "Make room for renewal.", lead: "Encapsulated retinol with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
@@ -169,7 +166,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Treatment, thoughtfully supported.", mechanism: [
       { title: "Encapsulated retinol", body: "Retinol in an encapsulated delivery system, for visible lines and texture." },
       { title: "Niacinamide", body: "A vitamin B3 ingredient that complements the retinol formula." },
-      { title: "Squalane & hydration", body: "An emollient and moisture-binding ingredients round out the serum." }], ritualTitle: "Start slowly. Make evenings count.", ...skin
+      { title: "Squalane & hydration", body: "An emollient and moisture-binding ingredients round out the serum." }], ritualTitle: "Start slowly. Make evenings count."
   },
   "firming-peptide-eye-gel": {
     headline: "Fresh eyes. A lighter touch.", lead: "A cooling peptide eye gel with aloe and cucumber water. Targeted hydration for smoother-looking skin around the eyes.",
@@ -179,7 +176,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Targeted care, in three parts.", mechanism: [
       { title: "Peptides", body: "A blend including palmitoyl tripeptide-5, palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7." },
       { title: "Humectants", body: "Sodium PCA and glycerin provide moisture-binding care." },
-      { title: "Botanical ingredients", body: "Aloe and cucumber water complement the refreshing gel format." }], ritualTitle: "A small amount. A gentle touch.", ...skin
+      { title: "Botanical ingredients", body: "Aloe and cucumber water complement the refreshing gel format." }], ritualTitle: "A small amount. A gentle touch."
   },
   "copper-peptide-restore-cream": {
     headline: "Rich moisture. A firmer-looking finish.", lead: "A multi-peptide cream with copper peptide, shea butter and sodium hyaluronate. Comfort for dry-feeling skin, with care for a smoother-looking finish.",
@@ -189,6 +186,6 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Moisture and peptide care, together.", mechanism: [
       { title: "Peptide care", body: "GHK-Cu sits alongside palmitoyl tripeptide-5, acetyl hexapeptide-8 and palmitoyl dipeptide-5." },
       { title: "Emollient comfort", body: "Shea butter brings richness and a soft, cushioned feel." },
-      { title: "Moisture binding", body: "Glycerin and sodium hyaluronate complement the cream texture." }], ritualTitle: "Finish with comfort. Follow with daytime SPF.", ...skin
+      { title: "Moisture binding", body: "Glycerin and sodium hyaluronate complement the cream texture." }], ritualTitle: "Finish with comfort. Follow with daytime SPF."
   }
 };

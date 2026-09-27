@@ -76,3 +76,17 @@ Reference: https://www.timeline.com/products/mitopure-powder
 Implementation: five authored visual panels per product (pack, benefits, formula fact, everyday ritual, ingredient summary), a desktop gallery grid and mobile swipe sequence, accessible enlarged panels, original copy for all 18 products, lifestyle-led benefit stories, three-part formula explanations, keyboard-operable ingredient exploration, clearer usage and expectations sections. Existing additional Shopify gallery images remain available. Approved IQON pack assets and editorial imagery are reused. Gallery information is live HTML text, so it stays readable, accessible and responsive rather than being baked into small raster text.
 
 The content distinguishes product specifications from ingredient research. No Timeline clinical outcomes, patents, certifications, testimonials or result timelines are transferred to IQON. NMN's precursor explanation checked against Yoshino et al. (Science, 2021): https://pubmed.ncbi.nlm.nih.gov/33888596/. Creatine's performance context checked against the NIH exercise fact sheet: https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/. Hydra C formula checked against supplier page: https://www.globalbeauty.net/product/hydra-c-plus-ferulic-serum/. Existing full label directions, ingredient statements, cautions, research references, live commerce and approved homepage heroes are retained.
+
+
+## Photography and clarity refinement
+
+Revisited Timeline's Mitopure Softgels gallery after the visual-quality feedback. Applied its restrained hierarchy to IQON's own cool grey, charcoal and silver identity: one photographic subject and one short message per frame. No competitor statistics or claims were carried over.
+
+- Produced 18 new square product photographs using each approved IQON pack as its reference.
+- Produced six coordinated macro photographs (capsule, plain powder, cocoa, gummies, sachets, water on brushed metal). These are editorial format visuals, not clinical or microscope evidence.
+- Replaced the five-panel text-heavy gallery with a new product scene, a single formula fact over a macro photograph, and the approved packaging view. Additional merchant gallery images remain accessible.
+- Kept captions as accessible HTML, separate from labels. Product scenes stay square and packaging uses contain, so no product is cropped to fill a mismatched frame.
+- Removed shared lifestyle/model photography from product education, using correctly framed product packaging instead. Kept the approved homepage heroes intact.
+- Retained full ingredients, instructions, cautions, evidence scope, comparison prices, FAQs, and commerce behavior.
+
+Validation: all 18 product galleries and expanded views; gallery keyboard navigation; additional merchant images; ingredient tabs; product education and live-price ownership; Next.js typecheck and production build.
