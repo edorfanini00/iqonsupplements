@@ -12,7 +12,7 @@ export function SkincareProductStory({product:p,comparison}:{product:Product;com
   const skin=skincareRange.find(s=>s.id===p.id);
   if(!story||!copy||!skin) return null;
   const asset=`/images/pdp-stories-v5/${p.id}`;
-  return <div className="product-experience skin-story">
+  return <div className="product-experience skincare-pdp-story">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">The benefits</a><a href="#product-formula">Inside the formula</a><a href="#product-routine">Your routine</a><a href="#compare">Find your fit</a><a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
     </nav>
