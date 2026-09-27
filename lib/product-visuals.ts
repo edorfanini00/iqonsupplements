@@ -163,7 +163,7 @@ export const productVisuals: Record<string, ProductVisual> = {
   },
   "retinol-rx": {
     headline: "Make room for renewal.", lead: "Encapsulated retinol with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
-    benefitTitle: "A more refined-looking tomorrow.", benefits: ["For the appearance of fine lines", "Targets uneven-looking texture", "Encapsulated retinol with moisture support"],
+    benefitTitle: "Care for texture and fine lines.", benefits: ["For the appearance of fine lines", "Targets uneven-looking texture", "Encapsulated retinol with moisture support"],
     fact: { value: "PM", label: "an evening treatment step.", body: "Introduce gradually as tolerated, following the label. Use SPF 30 or higher in the daytime." },
     whyTitle: "An evening step with a clear purpose.", whyBody: "Retinol is the focus; the supporting ingredients matter too. This serum pairs encapsulated retinol with niacinamide, squalane and sodium hyaluronate to bring moisture-focused care into your treatment routine.",
     mechanismTitle: "Treatment, thoughtfully supported.", mechanism: [

@@ -86,7 +86,7 @@
       {
         "name": "Creatine monohydrate",
         "role": "Muscle energy",
-        "detail": "Creatine helps replenish ATP, the energy your muscles use during brief, intense efforts.*"
+        "detail": "Creatine helps replenish ATP, the immediate energy your muscles use during lifting, sprinting and other brief, intense efforts. Monohydrate is the well-studied form used in this unflavored, single-ingredient powder.*"
       }
     ],
     "routine": {
@@ -241,7 +241,7 @@
       {
         "name": "Bovine collagen peptides",
         "role": "Hydrolyzed collagen",
-        "detail": "Collagen broken into smaller peptides. Bovine hide is the animal source; the formula has one listed ingredient."
+        "detail": "Hydrolyzed collagen has been broken down into smaller peptides. This powder uses bovine hide collagen as its only ingredient, so you can add collagen to your drink without adding flavor or sweeteners."
       }
     ],
     "routine": {
@@ -392,17 +392,17 @@
       {
         "name": "Hydrolyzed collagen peptides",
         "role": "Bovine source",
-        "detail": "Grass-fed collagen from bovine hide, described as types I and III."
+        "detail": "Grass-fed bovine hide collagen, described as types I and III, forms the foundation of this powder. Hydrolysis breaks the collagen down into smaller peptides."
       },
       {
         "name": "Cocoa & natural flavor",
         "role": "Taste",
-        "detail": "The ingredients behind the chocolate profile."
+        "detail": "Cocoa powder brings the chocolate character, with natural flavor rounding out the taste. A practical choice if you want your collagen drink to have its own flavor."
       },
       {
         "name": "Stevia extract",
         "role": "Sweetener",
-        "detail": "Stevia extract (Reb A) is included in the formula. See the full list for all ingredients."
+        "detail": "Stevia extract provides sweetness alongside the cocoa. The complete formula also includes acacia, xanthan gum and a small amount of sodium chloride."
       }
     ],
     "routine": {
@@ -553,13 +553,13 @@
       {
         "name": "Bovine colostrum",
         "role": "Milk-derived ingredient",
-        "detail": "Colostrum is the first milk produced after a cow gives birth. This formula is standardized for its IgG content.",
+        "detail": "Colostrum is the first milk produced after a cow gives birth. Each serving provides 2,300 mg of bovine colostrum standardized to 25% IgG.",
         "amount": "2,300 mg"
       },
       {
         "name": "Immunoglobulin G",
         "role": "Naturally present protein",
-        "detail": "The colostrum provides 575 mg of IgG. This is part of the 2,300 mg serving, not an additional amount.",
+        "detail": "Immunoglobulin G is a naturally present protein in colostrum. The 575 mg of IgG is included within the 2,300 mg serving, giving you a clear measure of its composition.",
         "amount": "25% IgG"
       }
     ],
@@ -703,17 +703,17 @@
       {
         "name": "Psyllium husk",
         "role": "Fiber",
-        "detail": "A water-absorbing plant fiber. Always mix with the full amount of water in the directions."
+        "detail": "Psyllium is a plant fiber that absorbs water and becomes gel-like. That behavior is why preparation matters: mix with the full 200 mL of water and drink immediately."
       },
       {
         "name": "Digestive enzyme blend",
         "role": "Four enzymes",
-        "detail": "Amylase, lactase, lipase and cellulase from fermented cereals."
+        "detail": "Four enzymes are named in the blend: amylase, lactase, lipase and cellulase. The formula combines this fermented-cereal enzyme blend with psyllium and botanicals."
       },
       {
         "name": "Ginger & tamarind",
         "role": "Botanical ingredients",
-        "detail": "Ginger root and tamarind fruit extract complete the ingredient statement."
+        "detail": "Ginger root and tamarind fruit extract add the botanical component to the psyllium-based formula. See the full ingredient statement and follow the preparation directions."
       }
     ],
     "routine": {
@@ -852,17 +852,17 @@
       {
         "name": "Caffeine anhydrous",
         "role": "Caffeine source",
-        "detail": "Caffeine is explicitly included. The total caffeine amount is not specified in the ingredient statement."
+        "detail": "Caffeine anhydrous is a concentrated caffeine ingredient. Count it alongside your coffee, tea and other caffeinated supplements; this formula does not specify its total caffeine amount."
       },
       {
         "name": "Green tea & green coffee bean",
         "role": "Plant ingredients",
-        "detail": "Two of the five ingredients in the Keto Blend; they may also contribute caffeine."
+        "detail": "Green tea and green coffee bean are the tea and coffee ingredients in the Keto Blend. Both can contribute caffeine in addition to the caffeine anhydrous."
       },
       {
         "name": "Raspberry ketone & garcinia",
         "role": "Botanical blend",
-        "detail": "Included alongside the tea, coffee and caffeine ingredients. Individual ingredient amounts are not stated."
+        "detail": "Raspberry ketone and garcinia cambogia fruit complete the five-part blend. Their individual amounts are not stated, so the formula should not be treated as evidence of a weight-loss outcome."
       }
     ],
     "routine": {
@@ -1006,19 +1006,19 @@
       {
         "name": "Ginger, peppermint & enzymes",
         "role": "Digestive formula",
-        "detail": "A 325 mg blend with Gingerols™, peppermint, bromelain and DigeZyme®. Individual blend amounts are not disclosed.",
+        "detail": "Gingerols™ ginger, peppermint, bromelain and DigeZyme® make up the 325 mg digestive blend. This combines botanical ingredients and enzymes in the same daily serving; individual blend amounts are not disclosed.",
         "amount": "325 mg blend"
       },
       {
         "name": "LactoSpore®",
         "role": "Probiotic ingredient",
-        "detail": "Bacillus coagulans is listed at 166 mg. This weight is not a live-culture count; a CFU amount is not provided.",
+        "detail": "LactoSpore® supplies Bacillus coagulans, the probiotic component of the formula. The ingredient statement lists 166 mg by weight; a CFU count is not provided.",
         "amount": "166 mg"
       },
       {
         "name": "Vitamins & minerals",
         "role": "Nutritional support",
-        "detail": "Includes methylcobalamin B12, P5P B6, folate, magnesium, zinc, iron and vitamin D3. Review all listed amounts before combining supplements."
+        "detail": "The nutrient combination includes D3, P5P B6, methylcobalamin B12, folate, magnesium, zinc and iron. These complement dietary intake; review the full amounts to avoid unnecessary overlap with other supplements.*"
       }
     ],
     "routine": {
@@ -1158,18 +1158,18 @@
       {
         "name": "Milk thistle & turmeric",
         "role": "Botanical powders",
-        "detail": "Two familiar plant ingredients in this multi-ingredient formula. Individual amounts are not disclosed."
+        "detail": "Milk thistle and turmeric are two of the seven botanicals in the formula. Both are included as powders, alongside beet root, dandelion, ginger and alfalfa."
       },
       {
         "name": "Artichoke extract",
         "role": "Standardized botanical",
-        "detail": "The extract is standardized to 5% cynarin; this is a composition specification, not an amount in milligrams.",
+        "detail": "Standardization identifies the proportion of a particular plant compound. Here, artichoke extract contains 5% cynarin; that percentage describes its composition rather than a milligram dose.",
         "amount": "5% cynarin"
       },
       {
         "name": "L-cysteine hydrochloride",
         "role": "Amino acid ingredient",
-        "detail": "Included with beet root, dandelion, ginger and alfalfa in the full formula."
+        "detail": "L-cysteine hydrochloride is the amino acid ingredient in this otherwise botanical blend. It appears alongside the seven plants in the complete ingredient statement."
       }
     ],
     "routine": {
@@ -1321,13 +1321,13 @@
       {
         "name": "β-Nicotinamide mononucleotide",
         "role": "NAD+ precursor",
-        "detail": "The single active ingredient, listed at 500 mg per serving. The specification states 99.9% purity.",
+        "detail": "NMN is a precursor the body uses to make NAD+, a coenzyme involved in cellular energy metabolism. IQON provides 500 mg per serving in a single daily capsule.*",
         "amount": "500 mg"
       },
       {
         "name": "HPMC capsule",
         "role": "Vegetable capsule",
-        "detail": "The capsule shell is made from hypromellose. See the ingredient statement for the remaining formulation ingredients."
+        "detail": "Hypromellose forms the vegetable capsule shell. It makes a measured NMN serving convenient to take with water, without preparing or mixing a powder."
       }
     ],
     "routine": {
@@ -1483,19 +1483,19 @@
       {
         "name": "Resveratrol root complex",
         "role": "Plant polyphenol",
-        "detail": "The listed 600 mg describes the root complex, not 600 mg of pure trans-resveratrol.",
+        "detail": "The complex is derived from Polygonum cuspidatum root. The listed 600 mg refers to that root complex, so it should be read alongside the 50% trans-resveratrol standardization.",
         "amount": "600 mg complex"
       },
       {
         "name": "Trans-resveratrol",
         "role": "Standardized form",
-        "detail": "Trans-resveratrol makes up 50% of the specified complex. Read the form and amount together.",
+        "detail": "Trans-resveratrol is the specified form within the botanical complex. The 50% standardization tells you its proportion, making the composition clearer than the total complex weight alone.",
         "amount": "50%"
       },
       {
         "name": "Hypromellose",
         "role": "Vegetable capsule",
-        "detail": "The ingredient statement also lists microcrystalline cellulose."
+        "detail": "Hypromellose is the material used for the vegetable capsule shell. The formula also includes microcrystalline cellulose; see the full list for the complete composition."
       }
     ],
     "routine": {
@@ -1635,17 +1635,17 @@
       {
         "name": "Biotin & B vitamins",
         "role": "Nutrient support",
-        "detail": "Biotin is a B vitamin involved in converting food into energy. The formula also includes B6, B12, folate and pantothenic acid."
+        "detail": "Biotin helps the body use carbohydrates, fats and proteins. It is paired with B6, B12, folate and pantothenic acid in this broader nutrient formula.*"
       },
       {
         "name": "Vitamins & minerals",
         "role": "Daily nutrition",
-        "detail": "Includes vitamins A, C, D and E, zinc and iodine. Individual nutrient amounts are not included in the ingredient statement."
+        "detail": "Vitamins A, C, D and E sit alongside zinc and iodine. They broaden the nutrient combination beyond biotin; individual nutrient amounts are not included in the ingredient statement."
       },
       {
         "name": "Fish-derived collagen",
         "role": "Animal-derived ingredient",
-        "detail": "Piscine collagen is listed. Pectin forms the gummy base, but the complete formula is not vegan."
+        "detail": "The collagen comes from fish. Although the gummy uses pectin, the complete formula is not vegan, and anyone with a fish allergy should account for this ingredient."
       }
     ],
     "routine": {
@@ -1793,17 +1793,17 @@
       {
         "name": "Glycerin",
         "role": "Humectant",
-        "detail": "Helps attract water for a comfortable skin feel."
+        "detail": "Glycerin attracts water to help support a comfortable skin feel. It brings moisture-focused care into the first step of the routine, alongside the cleansing ingredients."
       },
       {
         "name": "Panthenol",
         "role": "Conditioning",
-        "detail": "A moisture-focused ingredient in the cleansing formula."
+        "detail": "Panthenol is a conditioning ingredient that complements glycerin. Together, they keep the formula focused on comfort as well as cleansing away everyday buildup."
       },
       {
         "name": "Peptides",
         "role": "Formula focus",
-        "detail": "Palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7 are included in the formula."
+        "detail": "Palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7 give this cleanser its peptide component. They are part of a rinse-off formula designed for daily cleansing and conditioning."
       }
     ],
     "routine": {
@@ -1943,17 +1943,17 @@
       {
         "name": "Glycerin",
         "role": "Humectant",
-        "detail": "Attracts water to support hydration."
+        "detail": "Glycerin attracts water and helps the skin feel hydrated. In this light tonic, it delivers moisture-focused care without the richness of a cream."
       },
       {
         "name": "Sodium PCA",
         "role": "Moisture binding",
-        "detail": "A humectant included to help skin retain water."
+        "detail": "Sodium PCA is a humectant: an ingredient that binds water. It complements glycerin in the hydration step between your cleanser and your chosen serum."
       },
       {
         "name": "Aloe & panthenol",
         "role": "Conditioning",
-        "detail": "Bring moisture-focused care to a light tonic format."
+        "detail": "Aloe and panthenol bring conditioning care to the water-light formula. Sweep the tonic over the face and neck before moving on to treatment and moisturizer."
       }
     ],
     "routine": {
@@ -2093,17 +2093,17 @@
       {
         "name": "Mandelic & lactic acids",
         "role": "AHA exfoliants",
-        "detail": "Alpha hydroxy acids used for surface exfoliation."
+        "detail": "Mandelic and lactic acids are alpha hydroxy acids, or AHAs. They exfoliate at the skin surface to help refine the appearance of uneven texture."
       },
       {
         "name": "Salicylic acid",
         "role": "BHA exfoliant",
-        "detail": "Included alongside the AHAs for congested-looking and combination skin."
+        "detail": "Salicylic acid is the beta hydroxy acid, or BHA, in this blend. It complements the AHAs in a formula for congested-looking and uneven-looking skin."
       },
       {
         "name": "Glycerin & botanicals",
         "role": "Supporting ingredients",
-        "detail": "Glycerin, chamomile, licorice and green tea are part of the formula."
+        "detail": "Glycerin brings moisture-binding care, while chamomile, licorice and green tea complete the supporting botanical blend. Use the pads as an exfoliating step, with daily sun protection."
       }
     ],
     "routine": {
@@ -2243,17 +2243,17 @@
       {
         "name": "Vitamin C",
         "role": "Antioxidant",
-        "detail": "Ascorbic acid is the vitamin C form in this serum."
+        "detail": "Ascorbic acid is the vitamin C form in this serum. It provides antioxidant care against environmental stressors and supports a routine for brighter-looking skin."
       },
       {
         "name": "Ferulic acid",
         "role": "Antioxidant partner",
-        "detail": "Included alongside vitamin C in the formulation."
+        "detail": "Ferulic acid is an antioxidant that complements vitamin C and helps stabilize it in the formula. The pairing brings two forms of antioxidant care into one serum."
       },
       {
         "name": "Sodium hyaluronate",
         "role": "Humectant",
-        "detail": "The hyaluronic acid salt used to support hydration."
+        "detail": "Sodium hyaluronate binds water to help keep skin hydrated. It adds moisture alongside the antioxidant ingredients, giving this treatment step a second role in your routine."
       }
     ],
     "routine": {
@@ -2393,17 +2393,17 @@
       {
         "name": "Encapsulated retinol",
         "role": "Renewal ingredient",
-        "detail": "Retinol in an encapsulated delivery system. Introduce gradually according to the label."
+        "detail": "The delivery system encloses retinol to help protect it from light and oxygen and release it gradually. The formula targets the appearance of fine lines and uneven texture."
       },
       {
         "name": "Niacinamide",
         "role": "Formula support",
-        "detail": "A vitamin B3 ingredient paired with retinol."
+        "detail": "Niacinamide, a form of vitamin B3, complements the retinol treatment. It is part of the supporting formula alongside squalane and moisture-binding ingredients."
       },
       {
         "name": "Squalane & sodium hyaluronate",
         "role": "Emollient & humectant",
-        "detail": "Moisture-focused ingredients that complement the treatment step."
+        "detail": "Squalane adds emollient softness while sodium hyaluronate binds water. They bring moisture-focused care to the evening treatment, alongside the encapsulated retinol."
       }
     ],
     "routine": {
@@ -2539,17 +2539,17 @@
       {
         "name": "Peptide blend",
         "role": "Targeted care",
-        "detail": "Palmitoyl tripeptide-5, palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7 are included."
+        "detail": "Palmitoyl tripeptide-5, palmitoyl tripeptide-1 and palmitoyl tetrapeptide-7 make up the peptide focus. The gel is designed for a smoother-looking eye area."
       },
       {
         "name": "Aloe & cucumber water",
         "role": "Conditioning",
-        "detail": "Botanical ingredients in the cooling gel formula."
+        "detail": "Aloe and cucumber water complement the light, cooling gel texture. They bring botanical conditioning to a targeted step for the delicate skin around the eyes."
       },
       {
         "name": "Sodium PCA & glycerin",
         "role": "Humectants",
-        "detail": "Moisture-binding ingredients for the eye-area routine."
+        "detail": "Sodium PCA and glycerin attract and bind water. Their role is hydration, complementing the peptides in a lightweight formula for morning and evening use."
       }
     ],
     "routine": {
@@ -2693,17 +2693,17 @@
       {
         "name": "Copper peptide & peptide blend",
         "role": "Formula focus",
-        "detail": "GHK-Cu is combined with palmitoyl tripeptide-5, acetyl hexapeptide-8 and palmitoyl dipeptide-5."
+        "detail": "Copper peptide, also called GHK-Cu, joins three other peptides in this cream. The blend brings peptide care into a moisturizing step for a firmer-looking finish."
       },
       {
         "name": "Shea butter",
         "role": "Emollient",
-        "detail": "Adds richness and a soft, comfortable feel."
+        "detail": "Shea butter is an emollient that gives the cream richness. It softens the feel of skin and makes this a useful choice when you prefer a more cushioned finish."
       },
       {
         "name": "Sodium hyaluronate & glycerin",
         "role": "Humectants",
-        "detail": "Moisture-binding ingredients. The full formula also includes retinol and niacinamide."
+        "detail": "These humectants bind water, complementing the emollient ingredients with hydration. The wider formula also includes retinol and niacinamide, so consider your other active skincare steps."
       }
     ],
     "routine": {
