@@ -19,7 +19,7 @@ export function SkincareProductStory({product:p,comparison}:{product:Product;com
 
     <section id="product-benefits" className="skin-story-section skin-story-benefits" aria-labelledby="benefits-heading">
       <figure className="skin-story-portrait">
-        <img src={`${asset}-use.webp`} alt={story.imageAlt} width={1122} height={1402} loading="lazy" decoding="async"/>
+        <img src={`/images/pdp-materials-v6/${p.id}.webp`} alt={story.imageAlt} width={1122} height={1402} loading="lazy" decoding="async"/>
         <figcaption>{story.photoCaption}</figcaption>
       </figure>
       <div className="skin-benefit-content">

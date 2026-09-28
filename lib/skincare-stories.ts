@@ -14,7 +14,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "retinol-rx": {
     eyebrow:"THE EVENING TREATMENT", title:"Make room for renewal.",
     introduction:"For visible lines and uneven texture. Encapsulated retinol takes the lead, with niacinamide, squalane and sodium hyaluronate supporting the formula.",
-    imageAlt:"Evening skincare editorial: a woman gently touches her cheek",photoCaption:"An evening ritual, introduced at your skin’s pace.",
+    imageAlt:"Close application detail of fingertips gently smoothing skincare along an adult woman's cheek",photoCaption:"A considered treatment step. Introduce at your skin’s pace.",
     benefits:[{title:"Refine the look of texture",body:"A targeted retinol step for skin that looks uneven, with care for the appearance of fine lines."},{title:"Consider the delivery",body:"Encapsulation helps protect retinol from light and oxygen and allows it to release gradually."},{title:"Keep moisture in the picture",body:"Squalane adds emollient softness. Sodium hyaluronate binds water alongside the treatment ingredients."}],
     facts:[{value:"PM",label:"Evening care",detail:"Introduce gradually, as tolerated."},{value:"30 mL",label:"Serum format",detail:"A treatment step before moisturizer."},{value:"SPF 30+",label:"Your daytime partner",detail:"Daily sun protection is part of the routine."}],
     formulaTitle:"Retinol at the center. Support around it.",formulaIntro:"The active ingredient is only part of the story. Delivery, conditioning and moisture each have a place in this formula.",
@@ -24,7 +24,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "hydra-c-ferulic-serum": {
     eyebrow:"BRIGHTNESS + HYDRATION",title:"A brighter outlook for your skin.",
     introduction:"Vitamin C and ferulic acid bring antioxidant care to dull-looking skin. Sodium hyaluronate adds hydration in the same serum step.",
-    imageAlt:"Morning skincare editorial: a woman gently presses her cheek in soft daylight",photoCaption:"Antioxidant care with a place in your daily routine.",
+    imageAlt:"Serum texture study: a clear glass pipette and a small pool of translucent serum",photoCaption:"Serum texture study. Antioxidant care meets hydration.",
     benefits:[{title:"Care for dull-looking skin",body:"Ascorbic acid is the vitamin C form in this formula, supporting a routine for a brighter-looking complexion."},{title:"Pair complementary antioxidants",body:"Ferulic acid sits alongside vitamin C, bringing another source of antioxidant care."},{title:"Add a layer of hydration",body:"Sodium hyaluronate binds water, bringing moisture to the skin alongside the antioxidant ingredients."}],
     facts:[{value:"C + F",label:"Antioxidant pairing",detail:"Ascorbic acid with ferulic acid."},{value:"30 mL",label:"Serum format",detail:"Apply to the face and neck."},{value:"AM / PM",label:"A daily step",detail:"Follow with moisturizer; SPF by day."}],
     formulaTitle:"Two antioxidants. A hydration partner.",formulaIntro:"Three key ingredients, with complementary roles in one daily serum.",
@@ -34,7 +34,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "anti-aging-cleanser-with-peptides": {
     eyebrow:"A CONSIDERED FIRST STEP",title:"Start clean. Keep the comfort.",
     introduction:"A daily facial cleanser with peptides, glycerin and panthenol. Wash away buildup while keeping a soft, comfortable skin feel in focus.",
-    imageAlt:"Skincare application editorial: a man massages a small amount of cleanser onto damp cheeks",photoCaption:"A small amount. Damp skin. A thorough rinse.",
+    imageAlt:"Close cleansing detail of hands working a small amount of fine lather above a grey basin",photoCaption:"A small amount. Damp skin. A thorough rinse.",
     benefits:[{title:"Lift daily buildup",body:"Massage onto damp skin as the first step in your morning or evening routine."},{title:"Make space for comfort",body:"Glycerin and panthenol bring moisture-focused conditioning into the cleansing formula."},{title:"Prepare for what follows",body:"Rinse thoroughly, then continue with your chosen tonic, serum and moisturizer."}],
     facts:[{value:"01",label:"The first step",detail:"Begin with cleansing."},{value:"207 mL",label:"Daily cleanser",detail:"A rinse-off facial formula."},{value:"AM / PM",label:"Morning and evening",detail:"Massage onto damp skin, then rinse."}],
     formulaTitle:"Cleansing, with supporting care.",formulaIntro:"A rinse-off formula that brings conditioning ingredients into your first skincare step.",
@@ -44,7 +44,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "hydrating-tonic": {
     eyebrow:"LIGHTWEIGHT HYDRATION",title:"A fresh layer of moisture.",
     introduction:"An aloe-based tonic with glycerin and sodium PCA. A water-light layer between cleansing and the rest of your routine.",
-    imageAlt:"Tonic application editorial: a woman sweeps a cotton pad over her neck below the jaw",photoCaption:"Sweep over the face and neck after cleansing.",
+    imageAlt:"Water-light material study with a fine stream and soft ripples in shallow clear glass",photoCaption:"A study in lightness. Hydration before your serum.",
     benefits:[{title:"Bring in moisture",body:"Glycerin and sodium PCA are humectants: ingredients that attract and bind water."},{title:"Keep the layer light",body:"A water-light tonic adds hydration before the richer products in your routine."},{title:"Condition as you go",body:"Aloe and panthenol round out the formula’s conditioning care."}],
     facts:[{value:"198 mL",label:"Hydrating tonic",detail:"A light layer after cleansing."},{value:"AM / PM",label:"Twice-daily use",detail:"Sweep over the face and neck."},{value:"02",label:"Before your serum",detail:"Cleanse, then add this hydration step."}],
     formulaTitle:"Water-binding ingredients. Weightless care.",formulaIntro:"Humectants and conditioning ingredients work together in the tonic step.",
@@ -54,7 +54,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "exfoliating-pads": {
     eyebrow:"TARGETED EXFOLIATION",title:"A more refined-looking surface.",
     introduction:"Mandelic, lactic and salicylic acids in pre-moistened pads. A focused exfoliating step for uneven texture and dull-looking skin.",
-    imageAlt:"Application editorial: a woman holds an exfoliating pad against her outer cheek away from the eye",photoCaption:"Target the area. Keep clear of the eyes.",
+    imageAlt:"Close material study of a thin damp exfoliating pad showing fine fibers over a brushed silver tray",photoCaption:"The pad, in detail. A format for focused application.",
     benefits:[{title:"Refine visible texture",body:"An acid-based exfoliating step for areas that look dull or feel uneven."},{title:"Combine AHA + BHA",body:"Mandelic and lactic acids are AHAs; salicylic acid brings the BHA component."},{title:"Make application practical",body:"Pre-moistened pads let you focus application on the areas you want to exfoliate."}],
     facts:[{value:"03",label:"Exfoliating acids",detail:"Mandelic, lactic and salicylic."},{value:"02",label:"Acid families",detail:"AHA and BHA in one formula."},{value:"50",label:"Pre-moistened pads",detail:"Ready for targeted application."}],
     formulaTitle:"Three acids. Two complementary families.",formulaIntro:"Meet the exfoliating blend and the supporting ingredients alongside it.",
@@ -64,7 +64,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "firming-peptide-eye-gel": {
     eyebrow:"CARE FOR THE EYE AREA",title:"A little care. A lighter feel.",
     introduction:"A peptide eye gel with aloe, cucumber water and moisture-binding ingredients. A targeted step for those who prefer a light gel around the eyes.",
-    imageAlt:"Eye-care application editorial showing a fingertip gently touching skin below the outer eye",photoCaption:"A small amount, applied gently around the eye area.",
+    imageAlt:"Gel texture study: a thin translucent trail with tiny natural air bubbles on smoke-grey glass",photoCaption:"Gel texture study. A lighter approach to the eye step.",
     benefits:[{title:"Target the eye area",body:"A dedicated application step for the skin around the eyes, used with a gentle touch."},{title:"Choose a gel texture",body:"A lightweight alternative for those who prefer a less rich feel than an eye cream."},{title:"Bring peptides and hydration together",body:"Three named peptides sit alongside aloe, cucumber water and humectants."}],
     facts:[{value:"03",label:"Named peptides",detail:"Tripeptide-5, tripeptide-1 and tetrapeptide-7."},{value:"15 mL",label:"Eye gel",detail:"A targeted, lightweight format."},{value:"AM / PM",label:"Twice-daily care",detail:"Apply gently after cleansing."}],
     formulaTitle:"Peptide care, in a light gel.",formulaIntro:"A focused blend with conditioning ingredients and moisture support for the eye-area step.",
@@ -74,7 +74,7 @@ export const skincareStories:Record<string,SkincareStory> = {
   "copper-peptide-restore-cream": {
     eyebrow:"PEPTIDES + RICHER MOISTURE",title:"Give your routine a softer finish.",
     introduction:"Copper peptide and a supporting peptide blend meet shea butter and sodium hyaluronate. A richer cream step with both treatment ingredients and moisture-focused care.",
-    imageAlt:"Moisturizer application editorial: a woman gently smooths a small amount of cream over her cheek",photoCaption:"Apply to the face and neck after your serum.",
+    imageAlt:"Cream texture study: an irregular ivory smear and a brushed silver cosmetic spatula",photoCaption:"Cream texture study. Emollient care for a softer finish.",
     benefits:[{title:"Choose richer care",body:"Shea butter brings emollient softness to a cream finish."},{title:"Support hydration",body:"Glycerin and sodium hyaluronate bind water within the formula."},{title:"Look at the complete blend",body:"Copper peptide is joined by other peptides, niacinamide and retinol—details to consider when layering."}],
     facts:[{value:"GHK-Cu",label:"Copper peptide",detail:"Alongside a supporting peptide blend."},{value:"50 mL",label:"Cream format",detail:"Apply to the face and neck."},{value:"Retinol",label:"Also in this formula",detail:"Account for your other active products."}],
     formulaTitle:"Peptides. Humectants. Emollients.",formulaIntro:"Three different roles within a richer cream, with ingredient details that matter to your routine.",

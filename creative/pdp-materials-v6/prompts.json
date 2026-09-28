@@ -1,0 +1,185 @@
+{
+  "method": "Built-in image generation",
+  "date": "2026-09-28",
+  "scope": "Replacement of seven lower skincare benefits portraits; approved galleries and original packaging assets unchanged.",
+  "assets": [
+    {
+      "id": "copper-peptide-restore-cream",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare lower product-page editorial, portrait 4:5",
+        "subject": "One real stainless steel cosmetic spatula resting diagonally on a sheet of very pale cool grey glass. An irregular thin smear of ivory face cream is drawn from its rounded tip, thick at one end and translucent at the feathered edge. This is a close photograph of an ordinary physical smear, not a perfect swoosh.",
+        "composition": "Top-down close-up. The handle enters naturally at the lower-left and the cream occupies the middle and upper-right. Crop some of the handle at the edge. No packaging, no person, no words. Enough material detail to be interesting at full-page size.",
+        "photography": "A high-end skincare photographer working with one large window and a black bounce card. 100mm macro lens, f/8. Off-axis natural illumination reveals subtle drag ridges and one or two tiny air pinholes. Cream has a soft satin surface, not plastic shine. Real steel has faint fine scratches and restrained reflections. Honest fine photographic grain, slightly uneven focus at the distant edge.",
+        "palette": "IQON ivory, cool light grey and brushed silver. Neutral white balance. Avoid warm beige scenery.",
+        "avoid": [
+          "CGI",
+          "3D render",
+          "perfectly smooth symmetrical cream sculpture",
+          "frosting",
+          "food",
+          "plastic sheen",
+          "extreme sharpening",
+          "floating objects",
+          "fake molecule diagrams",
+          "text",
+          "watermark"
+        ],
+        "instruction": "Create a restrained, physically plausible editorial photograph. Keep the smear small enough to read as a real fingertip-size amount captured closely; natural imperfection, no decorative props."
+      },
+      "output": "public/images/pdp-materials-v6/copper-peptide-restore-cream.webp"
+    },
+    {
+      "id": "hydra-c-ferulic-serum",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare material editorial, vertical 4:5 photograph",
+        "subject": "Extreme close-up of a real clear glass laboratory pipette releasing one almost-clear slightly viscous cosmetic serum drop onto a small irregular liquid pool on cool grey glass. The pipette is a plain generic formulation tool, not product packaging. Only one drop attached naturally to the tip. No floating spheres.",
+        "composition": "Cropped glass pipette descends diagonally from upper right, its tip in the upper-middle. The liquid pool lies below in the lower half. Very close, physical scale of several centimeters, enough off-center empty grey area. Portrait 4:5.",
+        "photography": "Real studio tabletop photographed on a 100mm macro lens, f/5.6. Soft cool window light from left. In-focus glass edge and liquid meniscus, naturally out-of-focus far background. Restrained tiny optical distortions in glass and a few irregular minuscule bubbles in the pool. Gentle highlight rolloff, neutral grey backdrop, subtle photographic grain, no computer-rendered radiance.",
+        "palette": "Cool light grey, clear translucent liquid, a very faint straw hue only where liquid thickens, restrained silver reflections.",
+        "avoid": [
+          "glowing liquid",
+          "gold color",
+          "large suspended orb",
+          "CGI",
+          "3D render",
+          "perfect geometric spheres",
+          "hyper-sharpened texture",
+          "food",
+          "fruit",
+          "botanical props",
+          "text",
+          "logos",
+          "watermark"
+        ],
+        "instruction": "Make it feel like a simple physical cosmetic texture photograph, quietly tactile and believable rather than a special-effects image."
+      },
+      "output": "public/images/pdp-materials-v6/hydra-c-ferulic-serum.webp"
+    },
+    {
+      "id": "exfoliating-pads",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare material editorial, portrait 4:5",
+        "subject": "A close-up photograph of one thin wet white nonwoven cosmetic exfoliating pad draped over the edge of a shallow brushed stainless-steel tray. Two more thin pads are mostly out of focus below it. The top pad is slightly folded, showing the fine irregular fibers and subtly embossed texture of a real disposable skincare pad.",
+        "composition": "Oblique 35 degree tabletop camera angle, tight framing on pad material, top pad fills about two thirds of width. Tray edge sweeps from bottom left to right middle. Pale cool grey seamless background. No package, no hands, no words.",
+        "photography": "90mm macro lens, f/8. One large soft window off left; gentle side shadow reveals thin flexible fabric. Fine natural fibers, realistic softness with slightly damp translucent edges, no excessive sparkle. Focus on central edge, background softly defocused. An actual material study, not a flawless 3D object.",
+        "palette": "White, cool pale grey, understated brushed silver.",
+        "avoid": [
+          "thick cotton puff",
+          "towel",
+          "foam sponge",
+          "stack of pancakes",
+          "food",
+          "floating disks",
+          "perfectly repeated fiber pattern",
+          "metallic fabric",
+          "plastic",
+          "CGI",
+          "ultra HDR",
+          "text",
+          "watermark"
+        ],
+        "instruction": "Quiet, natural material photography for a premium skincare product page. Show the thinness and tactile surface of the pad with believable small imperfections."
+      },
+      "output": "public/images/pdp-materials-v6/exfoliating-pads.webp"
+    },
+    {
+      "id": "hydrating-tonic",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare material editorial, portrait 4:5 photograph",
+        "subject": "An actual shallow clear glass dish containing a thin layer of water on a matte cool-grey tabletop, viewed almost directly overhead. A tiny clear stream enters from the upper crop and makes one gentle irregular ripple. No splash crown, no theatrical frozen explosion. The dish has a real thin rim and slight optical distortion.",
+        "composition": "Off-center composition: the circular dish is cropped at left and lower edges, occupying about three quarters of the frame. One small soft folded grey cotton cloth edge in the top-right, quiet and partly out of focus. No product bottle, no text, no human.",
+        "photography": "Medium-format editorial still-life with 80mm lens, natural window light at upper-left, f/8, 1/250 second so the thin stream has a trace of motion. Light passes through shallow liquid onto the table, subtle real caustics and gentle contrast. Natural imperfections in glass, subtle photographic grain. The ripples are irregular soft arcs, not perfect nested rings.",
+        "palette": "Cool grey, ivory white, clear glass, neutral daylight, a faint green-grey tint only along thick glass rim.",
+        "avoid": [
+          "CGI",
+          "3D render",
+          "perfect geometric concentric circles",
+          "oversharpening",
+          "stylized turquoise water",
+          "blue glowing liquid",
+          "water splash sculpture",
+          "floating objects",
+          "fruit",
+          "food",
+          "flowers",
+          "text",
+          "watermark"
+        ],
+        "instruction": "Create a tactile photograph communicating a water-light skincare step. It must feel like a small tabletop photographed by a skilled human, natural and quiet."
+      },
+      "output": "public/images/pdp-materials-v6/hydrating-tonic.webp"
+    },
+    {
+      "id": "firming-peptide-eye-gel",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare gel material editorial, portrait 4:5",
+        "subject": "A real translucent colorless cosmetic gel spread once across a flat piece of charcoal-tinted glass. A single short irregular finger-drawn trail, not a perfect swoosh. The clear gel is thick in one gently rounded patch, thinning into uneven almost invisible edges with several tiny trapped air bubbles of different sizes.",
+        "composition": "Macro crop, gel trail runs diagonally from lower center toward upper-left across the charcoal grey glass. The glass occupies the whole image; no bottle, tools or hands. A calm empty area remains toward the upper-right. Low oblique camera angle, physical scale about four centimeters.",
+        "photography": "100mm macro lens, f/8, a broad soft window produces a restrained silvery reflection in the gel. Real optical transparency, slight differences of thickness, subtle drag marks, edges on the same glass plane, faint photographic grain. Gentle darker grey background. No black void or extreme glossy advertising lighting.",
+        "palette": "Smoke grey, translucent clear gel, soft silver, neutral whites, understated contrast.",
+        "avoid": [
+          "perfect transparent sculpture",
+          "shiny plastic",
+          "glass ice cube",
+          "huge bubbles",
+          "floating spheres",
+          "CGI",
+          "3D render",
+          "fake microscopic imagery",
+          "blue gel",
+          "gold light",
+          "text",
+          "watermark"
+        ],
+        "instruction": "A believable close photographic study of a light gel, visually distinct from a cream smear or bottle pack shot. Keep it simple and physically imperfect."
+      },
+      "output": "public/images/pdp-materials-v6/firming-peptide-eye-gel.webp"
+    },
+    {
+      "id": "retinol-rx",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare application editorial, portrait 4:5 photograph",
+        "subject": "A tightly cropped, unposed photograph of a fictional adult woman age 32 gently smoothing a tiny nearly absorbed amount of skincare along her cheek with the pads of two fingers. Only the lower cheek, a little of the relaxed closed mouth, jaw and fingers appear; the eyes, forehead and rest of the head are outside the crop. Natural light olive skin, clean short unpainted nails.",
+        "composition": "Editorial detail, 85mm portrait lens at close distance. Cheek and jaw occupy most of the left and center, two relaxed fingertips enter from lower right, a narrow out-of-focus cool grey bathroom background at right. No full face and no eye contact. Do not zoom to a clinical microscope scale.",
+        "photography": "Soft indirect daylight through a north-facing window, neutral white balance, f/5.6. Real camera skin rendering: gentle tonal variation, faint peach fuzz visible only near the light, a couple of tiny natural marks, fine pores that are not exaggerated or individually sharpened. Normal living skin, healthy satin finish, not wet or glass-like. Focus falls off gently toward the near fingers and far ear area. Light photographic grain.",
+        "styling": "Bare-looking skin, no heavy makeup, no lipstick or lip gloss, no jewelry. Adult natural proportions. Simple restrained skincare campaign.",
+        "avoid": [
+          "airbrushed beauty face",
+          "wax skin",
+          "uniform procedural pores",
+          "overly freckled skin",
+          "coarse wrinkles",
+          "baby face",
+          "hyper-sharpened skin",
+          "glass skin",
+          "orange color grade",
+          "CGI",
+          "hand anatomy errors",
+          "excess fingers",
+          "text",
+          "watermark"
+        ],
+        "instruction": "Prioritize the believability of a quiet real photographic moment over beautification or extreme detail. Do not show an entire face. No product packaging."
+      },
+      "output": "public/images/pdp-materials-v6/retinol-rx.webp"
+    },
+    {
+      "id": "anti-aging-cleanser-with-peptides",
+      "prompt": {
+        "use_case": "photorealistic-natural",
+        "asset_type": "IQON skincare product-page photograph, portrait 4:5",
+        "scene": "An everyday bathroom sink in cool grey and white. Close photograph of an adult washing their hands with a small amount of gentle cleanser, captured from above the sink. Plain grey long sleeves rolled to the wrists. Short unpainted nails.",
+        "photography": "Natural window light, documentary skincare editorial, 70mm camera lens, slight softness at the edge of the frame, realistic skin and modest fine soap lather. The cupped left palm and right fingertips form a relaxed normal hand-washing gesture. Pale ceramic basin softly blurred behind. Neutral color and gentle contrast.",
+        "composition": "Only hands, wrists, and part of the basin are in frame. No face. The hands are central, slightly off-axis. Do not put words or products in the image.",
+        "constraints": "Look like a real photograph taken during hand washing, with subtle ordinary imperfections and restrained foam. No splashing effects, no glossy computer-rendered surfaces, no text."
+      },
+      "output": "public/images/pdp-materials-v6/anti-aging-cleanser-with-peptides.webp"
+    }
+  ]
+}
