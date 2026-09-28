@@ -28,6 +28,7 @@ All images were created with the built-in image-generation tool and reviewed bef
 
 - Final assets: `public/images/pdp-materials-v6/`
 - Full structured prompt set: `creative/pdp-materials-v6/prompts.json`
+- Reviewed desktop view: [Cream product page](skincare-materials-v6-review.jpg)
 - Source images: generated PNG originals; each delivered WebP keeps the original 1122 × 1402 dimensions.
 - Delivery: WebP quality 87; every completed file is decoded and checked before atomic replacement.
 
