@@ -20,7 +20,7 @@ export const skincareVisualContent: Record<string, SkinVisualContent> = {
       {title:"A finishing step",body:"Apply after your chosen serum.",icon:"face"}
     ],
     ingredients: [
-      {art:"peptide",artLabel:"Peptide blend",kind:"peptide",summary:"GHK-Cu joins three other peptides in a richer moisturizing step.",tags:["PEPTIDE CARE","FIRMER-LOOKING SKIN"]},
+      {art:"copper-peptide",artLabel:"Copper tripeptide-1 / GHK-Cu",kind:"molecule",summary:"GHK-Cu joins three other peptides in a richer moisturizing step.",tags:["PEPTIDE CARE","FIRMER-LOOKING SKIN"]},
       {art:"emollient",artLabel:"Emollient care",kind:"emollient",summary:"A rich emollient that softens the feel of skin.",tags:["SOFTNESS","RICHER TEXTURE"]},
       {art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Water-binding ingredients complement the cream’s emollients.",tags:["HUMECTANTS","HYDRATION"]}
     ],
@@ -58,14 +58,14 @@ export const skincareVisualContent: Record<string, SkinVisualContent> = {
   "firming-peptide-eye-gel": {
     texture:"Light gel / targeted eye care",
     benefits:[{title:"A focused step",body:"Peptide care for the eye area.",icon:"face"},{title:"A lighter feel",body:"A gel texture for those who prefer less richness.",icon:"feather"},{title:"Peptide blend",body:"Three named peptides in the formula.",icon:"layers"},{title:"Moisture support",body:"Glycerin and sodium PCA add hydration.",icon:"droplet"}],
-    ingredients:[{art:"peptide",artLabel:"Three-peptide blend",kind:"peptide",summary:"Palmitoyl tripeptide-5, tripeptide-1 and tetrapeptide-7.",tags:["PEPTIDE CARE","EYE-AREA FOCUS"]},{art:"botanical",artLabel:"Botanical conditioning",kind:"botanical",summary:"Botanical conditioning complements the light gel texture.",tags:["ALOE + CUCUMBER WATER","CONDITIONING"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Water-binding humectants bring hydration to the eye step.",tags:["HUMECTANTS","LIGHT HYDRATION"]}],
+    ingredients:[{art:"palmitoyl-tripeptide",artLabel:"Palmitoyl tripeptide-1",kind:"molecule",summary:"Palmitoyl tripeptide-5, tripeptide-1 and tetrapeptide-7.",tags:["PEPTIDE CARE","EYE-AREA FOCUS"]},{art:"botanical",artLabel:"Botanical conditioning",kind:"botanical",summary:"Botanical conditioning complements the light gel texture.",tags:["ALOE + CUCUMBER WATER","CONDITIONING"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Water-binding humectants bring hydration to the eye step.",tags:["HUMECTANTS","LIGHT HYDRATION"]}],
     routineTitle:"A small amount. A gentle touch.",timing:"AM + PM / AFTER CLEANSING",
     steps:[{title:"Start clean",body:"Apply after cleansing your skin.",icon:"cleanse"},{title:"Pat gently",body:"Use a small amount around the eye area.",icon:"eye"},{title:"Complete",body:"Avoid direct eye contact. Finish your usual routine.",icon:"layers"}]
   },
   "anti-aging-cleanser-with-peptides": {
     texture:"Daily cleanser / fine lather",
     benefits:[{title:"Daily cleansing",body:"Massage onto damp skin to lift buildup.",icon:"rinse"},{title:"Comfort in focus",body:"Glycerin and panthenol condition the skin.",icon:"feather"},{title:"Peptide support",body:"A peptide component in a rinse-off formula.",icon:"layers"},{title:"A fresh start",body:"Prepare for your serum and moisturizer.",icon:"droplet"}],
-    ingredients:[{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Moisture-focused care for a comfortable skin feel.",tags:["HUMECTANT","COMFORT"]},{art:"panthenol",artLabel:"Panthenol / provitamin B5",kind:"molecule",summary:"Conditioning care that complements glycerin.",tags:["PROVITAMIN B5","CONDITIONING"]},{art:"peptide",artLabel:"Peptide blend",kind:"peptide",summary:"Palmitoyl tripeptide-1 and tetrapeptide-7 support the formula.",tags:["PEPTIDE CARE","RINSE-OFF FORMULA"]}],
+    ingredients:[{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Moisture-focused care for a comfortable skin feel.",tags:["HUMECTANT","COMFORT"]},{art:"panthenol",artLabel:"Panthenol / provitamin B5",kind:"molecule",summary:"Conditioning care that complements glycerin.",tags:["PROVITAMIN B5","CONDITIONING"]},{art:"palmitoyl-tripeptide",artLabel:"Palmitoyl tripeptide-1",kind:"molecule",summary:"Palmitoyl tripeptide-1 and tetrapeptide-7 support the formula.",tags:["PEPTIDE CARE","RINSE-OFF FORMULA"]}],
     routineTitle:"The first step, done well.",timing:"AM + PM / RINSE OFF",
     steps:[{title:"Dampen",body:"Begin with pre-moistened skin.",icon:"cleanse"},{title:"Massage",body:"Gently work a small amount over the skin.",icon:"apply"},{title:"Rinse",body:"Rinse thoroughly, then continue your routine.",icon:"layers"}]
   }

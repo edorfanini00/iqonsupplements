@@ -78,5 +78,21 @@
     "formula": "C9H19NO4",
     "smiles": "CC(C)(CO)C(C(=O)NCCCO)O",
     "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/panthenol/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "copper-peptide",
+    "name": "copper tripeptide-1",
+    "cid": 71587328,
+    "formula": "C14H23CuN6O4+",
+    "smiles": "C1=C(NC=N1)C[C@@H](C(=O)N[C@@H](CCCCN)C(=O)[O-])NC(=O)CN.[Cu+2]",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/copper%20tripeptide-1/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "palmitoyl-tripeptide",
+    "name": "palmitoyl tripeptide-1",
+    "cid": 10231864,
+    "formula": "C30H54N6O5",
+    "smiles": "CCCCCCCCCCCCCCCC(=O)NCC(=O)N[C@@H](CC1=CN=CN1)C(=O)N[C@@H](CCCCN)C(=O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/palmitoyl%20tripeptide-1/property/IsomericSMILES,MolecularFormula/JSON"
   }
 ]
