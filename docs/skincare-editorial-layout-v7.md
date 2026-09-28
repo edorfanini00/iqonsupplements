@@ -31,3 +31,17 @@ The material and application assets from v6 remain in use. No new image generati
 - `app/skincare-product-story.css`
 
 Skincare-only scope. Supplement product pages, top purchase galleries and checkout behavior are preserved.
+
+## Verification
+
+- Vercel preview deployment `360fac5` built successfully.
+- Next.js TypeScript check passed (`npm run typecheck:next`).
+- Existing product storytelling suite passed all four tests.
+- Desktop screenshots reviewed for benefits, ingredients, application, comparison and FAQs.
+- Responsive layouts reviewed at 375 px and 900 px, including Copper Peptide Restore Cream and Retinol Rx image crops.
+- Application directions and product FAQ accordions open correctly.
+- Temporary responsive QA page removed before publication.
+
+Review screenshot: `skincare-editorial-layout-v7-review.jpg`.
+
+A generic root `tsc --noEmit` run also encountered existing Cloudflare worker type and unrelated affiliate test/worktree errors. The storefront-specific Next.js check and Vercel build are the applicable successful gates for this change.
