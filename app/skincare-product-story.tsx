@@ -5,66 +5,33 @@ import { type Product, productPrice } from "@/lib/catalog";
 import { productContent } from "@/lib/product-content";
 import { skincareStories } from "@/lib/skincare-stories";
 import skincareRange from "@/lib/skincare-range.json";
+import { skincareVisualContent } from "@/lib/skincare-visual-content";
+import { SkincareIngredientExplorer } from "./skincare-ingredient-explorer";
+import { SkincareVisualBenefits, SkincareVisualRoutine } from "./skincare-visual-sections";
 
 export function SkincareProductStory({product:p,comparison}:{product:Product;comparison:Product[]}) {
   const story=skincareStories[p.id];
   const copy=productContent[p.id];
   const skin=skincareRange.find(s=>s.id===p.id);
-  if(!story||!copy||!skin) return null;
-  const asset=`/images/pdp-stories-v5/${p.id}`;
-  return <div className="product-experience skincare-pdp-story">
+  const visual=skincareVisualContent[p.id];
+  if(!story||!copy||!skin||!visual) return null;
+  return <div className="product-experience skincare-pdp-story skin-visual-story">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">The benefits</a><a href="#product-formula">Inside the formula</a><a href="#product-routine">Your routine</a><a href="#compare">Find your fit</a><a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
     </nav>
 
     <section id="product-benefits" className="skin-story-section skin-story-benefits" aria-labelledby="benefits-heading">
-      <header className="skin-benefit-heading">
-        <p className="skin-kicker">{story.eyebrow}</p>
-        <h2 id="benefits-heading">{story.title}</h2>
-        <p className="skin-introduction">{story.introduction}</p>
-      </header>
-      <div className="skin-benefits-feature">
-        <div className="skin-at-a-glance">
-          <p className="skin-kicker">THE FORMULA AT A GLANCE</p>
-          <dl className="skin-feature-facts">{story.facts.map(f=><div key={f.label}>
-            <dt>{f.label}</dt><dd><strong>{f.value}</strong><span>{f.detail}</span></dd>
-          </div>)}</dl>
-        </div>
-        <figure className="skin-material-visual">
-          <img src={`/images/pdp-materials-v6/${p.id}.webp`} alt={story.imageAlt} width={1122} height={1402} loading="lazy" decoding="async"/>
-          <figcaption>{story.photoCaption}</figcaption>
-        </figure>
-      </div>
-      <div className="skin-benefit-grid">{story.benefits.map((benefit,i)=><article key={benefit.title}>
-        <span className="skin-small-number" aria-hidden="true">0{i+1}</span><h3>{benefit.title}</h3><p>{benefit.body}</p>
-      </article>)}</div>
+      <SkincareVisualBenefits id={p.id} story={story} visual={visual}/>
     </section>
 
     <section id="product-formula" className="skin-story-section skin-story-formula" aria-labelledby="formula-heading">
-      <header className="skin-section-title"><p className="skin-kicker">INSIDE THE FORMULA</p><h2 id="formula-heading">{story.formulaTitle}</h2><p>{story.formulaIntro}</p></header>
-      <div className="skin-ingredients-editorial">{copy.ingredients?.map((item,i)=><article className="skin-ingredient-row" key={item.name}>
-        <span className="skin-ingredient-index" aria-hidden="true">0{i+1}</span>
-        <div className="skin-ingredient-heading"><p className="skin-ingredient-role">{item.role}</p><h3>{item.name}</h3></div>
-        <p className="skin-ingredient-description">{item.detail}</p>
-      </article>)}</div>
+      <header className="skin-section-title"><p className="skin-kicker">INSIDE THE FORMULA</p><h2 id="formula-heading">{story.formulaTitle}</h2></header>
+      <SkincareIngredientExplorer ingredients={copy.ingredients||[]} visuals={visual.ingredients}/>
       <Accordion type="single" collapsible className="skin-formulation-accordion"><AccordionItem value="formula"><AccordionTrigger>Ingredients & formulation details</AccordionTrigger><AccordionContent><p><strong>Key ingredients:</strong> {skin.ingredients}.</p><p>{copy.formulaNote}</p></AccordionContent></AccordionItem></Accordion>
-      <aside id="formula-story" className="skin-formula-perspective">
-        <div><p className="skin-kicker">{story.perspective.eyebrow}</p><h3>{story.perspective.title}</h3></div>
-        <div className="skin-perspective-points">{story.perspective.points.map(point=><article key={point.title}><h4>{point.title}</h4><p>{point.body}</p></article>)}</div>
-      </aside>
     </section>
 
     <section id="product-routine" className="skin-story-section skin-story-routine" aria-labelledby="routine-heading">
-      <header className="skin-routine-heading"><div><p className="skin-kicker">THE APPLICATION</p><h2 id="routine-heading">{copy.routine?.title || "Make it part of your routine."}</h2></div><p>{story.routineIntro}</p></header>
-      <div className="skin-routine-layout">
-        <div className="skin-routine-instructions">
-          <ol className="skin-use-steps">{copy.routine?.steps.map((step,i)=><li key={step.title}>
-            <span className="skin-step-number" aria-hidden="true">0{i+1}</span><div><h3>{step.title}</h3><p>{step.body}</p></div>
-          </li>)}</ol>
-          <div className="skin-routine-note"><p><strong>Keep in mind</strong>{story.routineNote}</p><Accordion type="single" collapsible><AccordionItem value="directions"><AccordionTrigger>Read the complete directions</AccordionTrigger><AccordionContent>{skin.directions}</AccordionContent></AccordionItem></Accordion></div>
-        </div>
-        <figure className="skin-routine-product"><img src={`${asset}.webp`} alt={`${p.name} — IQON product editorial`} width={1122} height={1402} loading="lazy" decoding="async"/><figcaption><div><span className="skin-kicker">YOUR ROUTINE / IQON</span><strong>{p.name}</strong></div><span>{skin.size}</span></figcaption></figure>
-      </div>
+      <SkincareVisualRoutine id={p.id} name={p.name} size={skin.size} directions={skin.directions} story={story} visual={visual}/>
     </section>
 
     <section id="compare" className="skin-story-section skin-story-compare" aria-labelledby="comparison-heading">

@@ -1,0 +1,82 @@
+[
+  {
+    "key": "glycerin",
+    "name": "glycerol",
+    "cid": 753,
+    "formula": "C3H8O3",
+    "smiles": "C(C(CO)O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/glycerol/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "niacinamide",
+    "name": "nicotinamide",
+    "cid": 936,
+    "formula": "C6H6N2O",
+    "smiles": "C1=CC(=CN=C1)C(=O)N",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/nicotinamide/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "vitamin-c",
+    "name": "ascorbic acid",
+    "cid": 54670067,
+    "formula": "C6H8O6",
+    "smiles": "C([C@@H]([C@@H]1C(=C(C(=O)O1)O)O)O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ascorbic%20acid/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "ferulic-acid",
+    "name": "ferulic acid",
+    "cid": 445858,
+    "formula": "C10H10O4",
+    "smiles": "COC1=C(C=CC(=C1)/C=C/C(=O)O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/ferulic%20acid/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "retinol",
+    "name": "retinol",
+    "cid": 445354,
+    "formula": "C20H30O",
+    "smiles": "CC1=C(C(CCC1)(C)C)/C=C/C(=C/C=C/C(=C/CO)/C)/C",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/retinol/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "squalane",
+    "name": "squalane",
+    "cid": 8089,
+    "formula": "C30H62",
+    "smiles": "CC(C)CCCC(C)CCCC(C)CCCCC(C)CCCC(C)CCCC(C)C",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/squalane/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "mandelic-acid",
+    "name": "mandelic acid",
+    "cid": 1292,
+    "formula": "C8H8O3",
+    "smiles": "C1=CC=C(C=C1)C(C(=O)O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/mandelic%20acid/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "salicylic-acid",
+    "name": "salicylic acid",
+    "cid": 338,
+    "formula": "C7H6O3",
+    "smiles": "C1=CC=C(C(=C1)C(=O)O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/salicylic%20acid/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "sodium-pca",
+    "name": "sodium pidolate",
+    "cid": 23668602,
+    "formula": "C5H6NNaO3",
+    "smiles": "C1CC(=O)N[C@@H]1C(=O)[O-].[Na+]",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/sodium%20pidolate/property/IsomericSMILES,MolecularFormula/JSON"
+  },
+  {
+    "key": "panthenol",
+    "name": "panthenol",
+    "cid": 4678,
+    "formula": "C9H19NO4",
+    "smiles": "CC(C)(CO)C(C(=O)NCCCO)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/panthenol/property/IsomericSMILES,MolecularFormula/JSON"
+  }
+]

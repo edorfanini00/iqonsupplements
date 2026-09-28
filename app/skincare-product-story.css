@@ -108,3 +108,97 @@
  .skincare-pdp-story .skin-story-faq{grid-template-columns:1fr;gap:23px}.skin-faq-heading{padding:0}.skin-faq-heading h2{font-size:34px}.skin-faq-heading .skin-story-link{margin-top:18px}.skin-story-faq [data-slot='accordion-trigger']{font-size:14px;padding-block:19px}
 }
 @media(prefers-reduced-motion:reduce){.skincare-pdp-story{scroll-behavior:auto}}
+
+/* Visual skincare chapters: shared IQON photography, fine rules and restrained controls. */
+.skin-visual-story :is(.skin-story-benefits,.skin-story-formula,.skin-story-routine){padding-block:70px}
+.skin-visual-story .skin-story-benefits{padding-top:60px;padding-bottom:64px}
+.skin-benefits-editorial{display:grid;grid-template-columns:minmax(0,.91fr) minmax(0,1.09fr);gap:66px;align-items:center}
+.skin-benefits-copy h2{font-size:clamp(35px,3.4vw,48px);max-width:17ch;line-height:1.09;letter-spacing:-.045em;text-wrap:balance}
+.skin-benefits-copy>.skin-kicker{font-size:10px;margin-bottom:19px}
+.skincare-pdp-story .skin-benefits-intro{font-size:14px;line-height:1.7;max-width:51ch;margin-top:22px}
+.skin-benefit-points{display:grid;grid-template-columns:1fr 1fr;gap:28px 29px;margin-top:32px}
+.skin-benefit-points article{border-top:1px solid #cbd3d7;padding-top:18px}
+.skin-benefit-points svg{color:#687e89;margin-bottom:15px}
+.skin-benefit-points h3{font-size:18px;letter-spacing:-.03em;margin:0 0 8px;line-height:1.3}
+.skin-benefit-points p{font-size:12px;line-height:1.6;max-width:28ch}
+.skin-benefits-photo{position:relative;aspect-ratio:1/1.045;align-self:stretch;min-height:510px;overflow:hidden;border-radius:5px;background:#e0e6e8;isolation:isolate}
+.skincare-pdp-story .skin-benefits-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 45%;z-index:-2}
+.skin-benefits-photo::after{content:'';position:absolute;inset:70% 0 0;background:linear-gradient(transparent,#1c282f55);z-index:-1}
+.skin-photo-label{position:absolute;top:24px;left:24px;background:#fafcf9eb;padding:7px 11px;border-radius:2px;font-size:9px;line-height:1.4;letter-spacing:.1em;color:#465961}
+.skin-benefits-photo figcaption{position:absolute;bottom:27px;left:28px;right:28px;font-size:16px;letter-spacing:-.015em;line-height:1.5;color:#fff}
+.skin-visual-story .skin-story-formula{background:#f0f3f4;border-top:1px solid #dce2e5}
+.skin-visual-story .skin-section-title{max-width:920px;margin-bottom:36px}
+.skin-visual-story .skin-section-title h2{font-size:clamp(34px,3.3vw,47px);max-width:30ch}
+.skin-visual-story .skin-section-title .skin-kicker{margin-bottom:18px}
+.skin-formula-explorer{display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(0,1.07fr);gap:25px;align-items:stretch}
+.skin-formula-art-panel{min-width:0;min-height:570px;border-radius:5px;overflow:hidden;background:#2b353b;color:#eef2f1;display:flex;flex-direction:column;position:relative}
+.skin-art-topline{display:flex;justify-content:space-between;gap:15px;padding:25px 28px 0;font-size:9px;letter-spacing:.12em;line-height:1.5;color:#c6d2d7}
+.skin-art-stage{position:relative;display:grid;place-items:center;min-height:230px;flex:1;padding:0 12px;background:radial-gradient(ellipse at center,#82929c15,transparent 68%)}
+.skin-art-stage>.skin-molecule{filter:invert(92%) sepia(5%) saturate(153%);max-height:260px;width:100%;object-fit:contain}
+.skin-ingredient-artwork{width:100%;height:auto;max-height:260px;color:#d2dce0}
+.skin-art-caption{padding:0 28px 24px;text-align:center}
+.skin-art-caption>span{display:block;font-size:8px;letter-spacing:.13em;color:#aabcc5;margin-bottom:10px}
+.skin-art-caption>strong{display:block;font-size:22px;font-weight:400;line-height:1.25;letter-spacing:-.025em;color:#f6f8f5}
+.skin-art-detail{margin:0 28px;border-top:1px solid #59656c;padding:23px 0 28px}
+.skin-art-detail h3{color:#edf2ef;font-size:19px;line-height:1.3;margin-bottom:12px;max-width:30ch}
+.skincare-pdp-story .skin-art-detail p{font-size:12px;line-height:1.7;color:#becbd1;max-width:60ch}
+.skin-formula-plus{display:flex;flex-direction:column;align-items:center;gap:19px;padding-block:40px;color:#8b9ba2}
+.skin-formula-plus>span{width:1px;flex:1;border-left:1px dotted #aebcc3}
+.skin-ingredient-selections{align-self:center;min-width:0}
+.skin-ingredient-selections>.skin-kicker{font-size:9px;letter-spacing:.12em;margin:0 0 20px 2px}
+.skin-ingredient-selections article{border-bottom:1px solid #c9d3d8}
+.skin-ingredient-selections button{display:grid;grid-template-columns:112px minmax(0,1fr) 17px;gap:20px;align-items:center;background:none;border:0;padding:20px 0;width:100%;text-align:left;border-radius:3px;transition:background .2s}
+.skin-ingredient-selections article:first-of-type button{padding-top:0}
+.skin-ingredient-thumbnail{display:grid;place-items:center;aspect-ratio:1;background:#e4e9e9;border:1px solid transparent;border-radius:3px;overflow:hidden;color:#546974;transition:background .2s,border-color .2s}
+.skin-ingredient-thumbnail>.skin-molecule{width:130%;max-width:none;height:auto;object-fit:contain;opacity:.74}
+.skin-ingredient-thumbnail>.skin-ingredient-artwork{width:120%;max-width:none;color:#526874}
+.skin-ingredient-selections .is-selected .skin-ingredient-thumbnail{background:#fbfcf9;border-color:#83949c}
+.skin-ingredient-selections button:hover .skin-ingredient-thumbnail{border-color:#83949c}
+.skin-ingredient-short{display:block;min-width:0}
+.skin-ingredient-name{display:block;font-size:18px;line-height:1.25;letter-spacing:-.025em;margin-bottom:9px;color:#2e3d45}
+.skin-ingredient-summary{display:block;font-size:12px;line-height:1.6;color:#65747c;max-width:36ch}
+.skin-ingredient-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.skin-ingredient-tags>span{font-size:7px;letter-spacing:.06em;line-height:1.45;background:#e1e7e9;color:#5c6b72;padding:4px 5px}
+.skin-ingredient-arrow{color:#526c79;opacity:0;transition:opacity .2s}
+.is-selected .skin-ingredient-arrow,button:hover .skin-ingredient-arrow,button:focus-visible .skin-ingredient-arrow{opacity:1}
+.skincare-pdp-story .skin-explore-hint{font-size:10px;color:#72838c;margin:17px 0 0 2px}
+.skin-visual-story .skin-formulation-accordion{margin-top:25px}
+.skin-visual-story .skin-formulation-accordion [data-slot='accordion-trigger']{font-size:12px;padding-block:18px}
+.skin-application-heading{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:32px}
+.skin-application-heading h2{font-size:clamp(33px,3.2vw,45px);max-width:23ch;text-wrap:balance}
+.skin-timing-label{display:flex;gap:12px;align-items:center;flex-shrink:0;font-size:8px;letter-spacing:.08em;line-height:1.6;color:#687d87;border-bottom:1px solid #c7d0d5;padding-bottom:10px;max-width:225px}
+.skin-application-board{display:grid;grid-template-columns:260px minmax(0,1fr);gap:48px;align-items:center;background:#e9eef0;border-radius:5px;padding:24px 34px 24px 24px}
+.skin-application-photo{overflow:hidden;border-radius:3px;background:#d5dde1;position:relative}
+.skincare-pdp-story .skin-application-photo>img{width:100%;aspect-ratio:4/5;object-fit:contain}
+.skin-application-photo figcaption{padding:14px 16px;background:#dbe3e7;font-size:10px;display:flex;gap:16px;justify-content:space-between;align-items:end;line-height:1.4;color:#596f7c}
+.skin-application-photo figcaption strong{font-weight:400;font-size:12px;color:#3c5260;max-width:22ch}.skin-application-photo figcaption>span{white-space:nowrap}
+.skin-application-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:29px;list-style:none;margin:0;padding:0}
+.skin-application-steps>li{min-width:0;padding-top:15px;border-top:1px solid #b8c6cd;align-self:stretch}
+.skin-step-top{display:flex;justify-content:space-between;align-items:start;min-height:89px;gap:10px;color:#6c8490}
+.skin-step-top>span{font-size:10px;letter-spacing:.06em}.skin-step-top>svg{margin-top:9px}
+.skin-application-steps h3{font-size:23px;line-height:1.2;letter-spacing:-.035em;margin:0 0 13px}
+.skin-application-steps p{font-size:12px;line-height:1.7;max-width:27ch}
+.skin-application-details{display:grid;grid-template-columns:1.15fr 1fr;gap:80px;margin-top:26px;align-items:start}
+.skin-application-details>p{font-size:11px;line-height:1.75}.skin-application-details>p>strong{font-weight:500;color:#3b5360;display:block;font-size:11px;margin-bottom:6px}
+.skin-application-details [data-slot='accordion-trigger']{font-size:12px;padding-top:0;padding-bottom:16px}.skin-application-details [data-slot='accordion-content']{font-size:12px}
+@media(max-width:1100px){
+ .skin-benefits-editorial{gap:38px;grid-template-columns:1fr 1fr}.skin-benefits-copy h2{font-size:38px}.skin-benefits-photo{min-height:530px}.skin-benefit-points{gap:23px 20px}.skin-benefit-points h3{font-size:17px}
+ .skin-formula-explorer{grid-template-columns:minmax(0,1fr) 24px minmax(0,1.05fr);gap:16px}.skin-formula-art-panel{min-height:560px}.skin-ingredient-selections button{grid-template-columns:85px minmax(0,1fr);gap:15px}.skin-ingredient-arrow{display:none}.skin-ingredient-name{font-size:17px}.skin-ingredient-summary{font-size:11px}.skin-ingredient-tags>span{font-size:6.5px}.skin-art-detail{margin-inline:24px}.skin-art-topline{padding-inline:24px}
+ .skin-application-heading{gap:25px}.skin-application-board{grid-template-columns:210px minmax(0,1fr);gap:28px;padding:22px}.skin-application-steps{gap:18px}.skin-application-steps h3{font-size:20px}.skin-application-steps p{font-size:11px}.skin-application-details{gap:40px}
+}
+@media(max-width:760px){
+ .skin-visual-story .skin-story-section{padding-block:42px}.skin-visual-story .skin-story-benefits{padding-top:34px;padding-bottom:42px}
+ .skin-benefits-editorial{display:flex;flex-direction:column;gap:28px}.skin-benefits-copy h2{font-size:37px;max-width:20ch}.skin-benefits-copy>.skin-kicker{font-size:9px;margin-bottom:15px}.skincare-pdp-story .skin-benefits-intro{font-size:13px;margin-top:18px}
+ .skin-benefit-points{gap:23px 20px;margin-top:25px}.skin-benefit-points article{padding-top:15px}.skin-benefit-points svg{width:24px;height:24px;margin-bottom:12px}.skin-benefit-points h3{font-size:17px}.skin-benefit-points p{font-size:11px;line-height:1.6}
+ .skin-benefits-photo{min-height:0;aspect-ratio:1.1;width:100%}.skin-photo-label{top:16px;left:16px;font-size:8px;padding:6px 9px}.skin-benefits-photo figcaption{left:19px;right:19px;bottom:20px;font-size:14px}
+ .skin-visual-story .skin-section-title{text-align:left;margin-bottom:27px}.skin-visual-story .skin-section-title h2{font-size:33px;max-width:23ch;margin:0}.skin-visual-story .skin-section-title .skin-kicker{font-size:9px;margin-bottom:15px}
+ .skin-formula-explorer{display:flex;flex-direction:column;gap:22px}.skin-formula-art-panel{min-height:0;width:100%;order:2}.skin-formula-plus{display:none}.skin-ingredient-selections{width:100%;order:1}.skin-ingredient-selections>.skin-kicker{font-size:8px;margin-bottom:13px}
+ .skin-ingredient-selections button{grid-template-columns:78px minmax(0,1fr);gap:16px;padding:17px 0}.skin-ingredient-name{font-size:17px;line-height:1.25;margin-bottom:7px}.skin-ingredient-summary{font-size:11px;line-height:1.6}.skin-ingredient-tags{gap:4px;margin-top:8px}.skin-ingredient-tags>span{font-size:6px;padding:3px 4px}.skincare-pdp-story .skin-explore-hint{font-size:9px;margin-top:14px}
+ .skin-art-topline{padding:20px 22px 0;font-size:8px}.skin-art-stage{min-height:195px;padding:0 18px}.skin-art-stage>.skin-molecule,.skin-art-stage>.skin-ingredient-artwork{max-height:205px}.skin-art-caption{padding:0 22px 20px}.skin-art-caption>strong{font-size:21px}.skin-art-caption>span{font-size:7px}.skin-art-detail{margin-inline:22px;padding:19px 0 23px}.skin-art-detail h3{font-size:18px}.skincare-pdp-story .skin-art-detail p{font-size:12px}
+ .skin-visual-story .skin-formulation-accordion{margin-top:15px}.skin-visual-story .skin-formulation-accordion [data-slot='accordion-trigger']{font-size:12px}
+ .skin-application-heading{display:block;margin-bottom:24px}.skin-application-heading h2{font-size:33px;max-width:19ch}.skin-timing-label{font-size:8px;display:inline-flex;margin-top:22px;padding-bottom:9px;max-width:none}
+ .skin-application-board{display:flex;flex-direction:column;gap:27px;padding:18px;width:100%}.skin-application-photo{display:grid;grid-template-columns:96px minmax(0,1fr);width:100%;background:#dbe3e7}.skin-application-photo figcaption{display:flex;flex-direction:column;align-items:start;justify-content:center;gap:10px;padding:15px}.skin-application-photo figcaption strong{font-size:16px;line-height:1.3}.skin-application-photo figcaption>span{font-size:10px}
+ .skin-application-steps{display:flex;flex-direction:column;gap:22px;width:100%}.skin-application-steps>li{display:grid;grid-template-columns:48px minmax(0,1fr);gap:5px 17px;padding-top:18px}.skin-step-top{grid-row:1/3;display:flex;flex-direction:column;gap:11px;justify-content:start;min-height:0}.skin-step-top>svg{margin:0;width:27px;height:27px}.skin-step-top>span{font-size:9px}.skin-application-steps h3{font-size:21px;margin:0}.skin-application-steps p{font-size:12px;max-width:none}
+ .skin-application-details{display:block;margin-top:22px}.skin-application-details>p{font-size:11px}.skin-application-details [data-slot='accordion-trigger']{padding-block:18px;font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){.skin-ingredient-selections button,.skin-ingredient-thumbnail,.skin-ingredient-arrow{transition:none}}
