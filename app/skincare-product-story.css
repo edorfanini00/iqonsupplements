@@ -150,7 +150,7 @@
 .skin-ingredient-selections button{display:grid;grid-template-columns:112px minmax(0,1fr) 17px;gap:20px;align-items:center;background:none;border:0;padding:20px 0;width:100%;text-align:left;border-radius:3px;transition:background .2s}
 .skin-ingredient-selections article:first-of-type button{padding-top:0}
 .skin-ingredient-thumbnail{display:grid;place-items:center;aspect-ratio:1;background:#e4e9e9;border:1px solid transparent;border-radius:3px;overflow:hidden;color:#546974;transition:background .2s,border-color .2s}
-.skin-ingredient-thumbnail>.skin-molecule{width:130%;max-width:none;height:auto;object-fit:contain;opacity:.74}
+.skin-ingredient-thumbnail>.skin-molecule{width:100%;max-width:100%;height:auto;object-fit:contain;opacity:.74}
 .skin-ingredient-thumbnail>.skin-ingredient-artwork{width:120%;max-width:none;color:#526874}
 .skin-ingredient-selections .is-selected .skin-ingredient-thumbnail{background:#fbfcf9;border-color:#83949c}
 .skin-ingredient-selections button:hover .skin-ingredient-thumbnail{border-color:#83949c}
