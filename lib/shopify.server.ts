@@ -2,6 +2,7 @@ import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
+import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
 import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
@@ -62,8 +63,19 @@ function fail(error:unknown) {
   return Response.json({error:error instanceof CommerceError?error.message:"We couldn’t update your bag. Please try again.",
     ...(error instanceof CommerceError&&error.cart?{cart:error.cart}:{})},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
 }
+function blockedSkincareLines(cart:ShopifyCart) {
+  return cart.lines.nodes.filter(line=>SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p))));
+}
+async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<{cart:ShopifyCart|null;removed:boolean}> {
+  if(!cart)return {cart:null,removed:false};
+  const blocked=blockedSkincareLines(cart);
+  if(!blocked.length)return {cart,removed:false};
+  const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
+  return {cart:result.cart,removed:true};
+}
+const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
 export async function getCartResponse() {
-  try {return Response.json(publicCart(await readCart()),{headers:responseHeaders});}catch(error){return fail(error);}
+  try {const {cart,removed}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:skincareNotice}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
 }
 export async function mutateCartResponse(request:Request) {
   try {
@@ -74,18 +86,24 @@ export async function mutateCartResponse(request:Request) {
     let input:Record<string,unknown>;
     try {input=JSON.parse(text);}catch {throw new CommerceError("Invalid request.",400);}
     if(!input||typeof input!=="object"||Array.isArray(input)) throw new CommerceError("Invalid request.",400);
-    let current=await readCart();
+    const refreshed=await removeUpcomingProducts(await readCart());
+    let current=refreshed.cart;
     let result:CartPayload;
     if(input.action==="add") {
       const quantity=validQuantity(input.quantity);
       const catalog=await readCatalog();
       const product=catalog.products.find(p=>p.id===input.id);
       const variant=product?.variants?.find(v=>v.id===input.variantId);
+      if(product&&isComingSoon(product)) throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422,publicCart(current));
       if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);
-      const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id);
+      if(input.sellingPlanId!==undefined&&(typeof input.sellingPlanId!=="string"||!/^gid:\/\/shopify\/SellingPlan\/\d+$/.test(input.sellingPlanId))) throw new CommerceError("Choose an available subscription plan.",400);
+      const plan=input.sellingPlanId?variant.sellingPlans?.find(plan=>plan.id===input.sellingPlanId):undefined;
+      if(input.sellingPlanId&&!plan) throw new CommerceError("This subscription is not available for the selected option.",422);
+      if((product.requiresSellingPlan||input.purchase==="subscription")&&!plan) throw new CommerceError("Choose a subscription plan before adding this product.",422);
+      const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&(l.sellingPlanAllocation?.sellingPlan.id||undefined)===plan?.id);
       if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);
       if(!existing && current && current.lines.nodes.length>=99) throw new CommerceError("Your bag is full. Please complete this order first.",422);
-      const lines=[{merchandiseId:variant.id,quantity}];
+      const lines=[{merchandiseId:variant.id,quantity,...(plan?{sellingPlanId:plan.id}:{})}];
       result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
     } else if(input.action==="update") {
       const quantity=validQuantity(input.quantity,true);
@@ -99,7 +117,8 @@ export async function mutateCartResponse(request:Request) {
     current=result.cart!;
     await setCartId(current.id,request);
     const snapshot=publicCart(current);
-    if(result.warnings?.length) snapshot.notice=result.warnings.map(w=>w.message).join(" ");
+    const notices=[...(refreshed.removed?[skincareNotice]:[]),...(result.warnings?.map(w=>w.message)||[])];
+    if(notices.length) snapshot.notice=notices.join(" ");
     return Response.json(snapshot,{headers:responseHeaders});
   } catch(error) {return fail(error);}
 }
@@ -107,8 +126,11 @@ export async function checkoutResponse(request:Request) {
   try {
     sameOrigin(request);
     // Refresh immediately before handing the buyer to Shopify's hosted checkout.
-    const cart=await readCart();
+    const refreshed=await removeUpcomingProducts(await readCart());
+    const cart=refreshed.cart;
+    if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
+    if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
     return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});

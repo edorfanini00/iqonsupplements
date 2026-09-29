@@ -11,7 +11,7 @@ export function CampaignHero({ skincare = false, featured }: { skincare?: boolea
       width={skincare ? 1536 : 1672} height={skincare ? 1024 : 941} fetchPriority="high" />
     </picture>
     <div className="campaign-copy">
-      <p className="eyebrow">IQON / {skincare ? "SKINCARE" : "DAILY ESSENTIALS"}</p>
+      <p className="eyebrow">IQON / {skincare ? "SKINCARE / COMING SOON" : "DAILY ESSENTIALS"}</p>
       <h1>{skincare ? <>A little care.<br />A lot of you.</> : <>For the life<br />you want to live.</>}</h1>
       <p>{skincare ? "Cleanse. Treat. Moisturize. A routine that’s yours." : "Everyday essentials, made to fit your life."}</p>
       <Link href={`/collections/${skincare ? "skincare" : "supplements"}`} className="button button-light">Explore {skincare ? "skincare" : "supplements"}<ArrowRight size={18}/></Link>

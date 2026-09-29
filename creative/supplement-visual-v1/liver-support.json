@@ -1,0 +1,28 @@
+{
+  "prompt_type": "photorealistic_natural_editorial_material_study",
+  "asset_type": "IQON supplement product page benefits photograph",
+  "objective": "Create one extremely believable premium editorial photograph for an IQON supplement website, matching restrained skincare material photography in cool gray, silver and ivory. This is a format illustration; no efficacy or before-and-after message.",
+  "canvas": {
+    "orientation": "portrait",
+    "aspect_ratio": "4:5",
+    "framing": "One cohesive close-up photograph; safe focal point in central 70% so both square mobile and taller desktop crops work."
+  },
+  "photographic_style": {
+    "camera": "Full-frame macro lens, 85mm equivalent, plausible shallow depth of field, physically believable perspective",
+    "lighting": "Soft directional window light, gentle fill, controlled natural highlights and true contact shadows",
+    "rendering": "Unretouched product editorial realism; subtle sensor grain; fine material detail; slight organic irregularity; no CGI perfection",
+    "palette": "Cool gray, charcoal, ivory, brushed silver. Any accent is highly desaturated."
+  },
+  "constraints": [
+    "No text, logos, labels, captions, watermarks or UI.",
+    "No hands, faces, bodies, food decorations or plants.",
+    "Nothing floating; gravity and reflections must be physically plausible.",
+    "No oversized dose claims or exact serving measurement depicted.",
+    "No decorative abstract 3D blobs, glow effects, excessive gloss, perfect symmetry or plastic textures."
+  ],
+  "scene": {
+    "subject": "Macro still life of three opaque warm-ivory two-piece supplement capsules arranged casually on a frosted desaturated sage-gray glass plate. One capsule in the lower foreground sharp, two more receding softly. Each real capsule shows the overlap seam. Directional soft daylight, no botanical props or food."
+  },
+  "website_caption": "Capsule detail / botanical blend",
+  "generated_source": "exec-57a66722-bd17-42d0-9ed6-55a0fe823ab2.png"
+}

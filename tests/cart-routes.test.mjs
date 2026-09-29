@@ -19,13 +19,16 @@ const bindingsUrl = dataUrl(`
   export const headers = async () => new Headers();
 `);
 const { jar, cookieOptions } = await import(bindingsUrl);
+const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
+const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)));
 const imports = {
+  "./commerce-policy": policyUrl,
   react: dataUrl("export const cache = fn => fn;"),
   "next/headers": bindingsUrl,
   "./catalog": dataUrl("export const products = [];"),
-  "./merchandise": dataUrl(compile("../lib/merchandise.ts")),
+  "./merchandise": withPolicy("../lib/merchandise.ts"),
   "./shopify-operations": dataUrl(compile("../lib/shopify-operations.ts")),
-  "./shopify": dataUrl(compile("../lib/shopify.ts")),
+  "./shopify": withPolicy("../lib/shopify.ts"),
 };
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);
@@ -37,9 +40,12 @@ const request = (body, path = "cart") => new Request(`${origin}/api/${path}`, {
 const money = amount => ({amount: amount.toFixed(2), currencyCode: "USD"});
 const fixtureProducts = [
   {handle: "creatine-monohydrate", category: "supplements", price: 29, variantId: "gid://shopify/ProductVariant/1"},
-  {handle: "hydra-c-ferulic-serum", category: "skincare", price: 68, variantId: "gid://shopify/ProductVariant/2"},
+  {handle: "nmn", category: "supplements", price: 68, variantId: "gid://shopify/ProductVariant/2"},
+  {handle: "hydra-c-ferulic-serum", category: "skincare", price: 68, variantId: "gid://shopify/ProductVariant/3"},
 ];
 
+const plans = [{id:"gid://shopify/SellingPlan/10",name:"Deliver every month",price:26.10}, {id:"gid://shopify/SellingPlan/20",name:"Deliver every 2 months",price:27.55}];
+const planAllocation = plan => ({sellingPlan:{id:plan.id,name:plan.name,recurringDeliveries:true,options:[{name:"Delivery",value:plan.name}],priceAdjustments:[{orderCount:null}]},priceAdjustments:[{price:money(plan.price),compareAtPrice:money(29),perDeliveryPrice:money(plan.price)}]});
 function fixture(t) {
   jar.clear(); cookieOptions.clear();
   const previous = {...process.env};
@@ -50,13 +56,14 @@ function fixture(t) {
     for (const key of ["SHOPIFY_STORE_DOMAIN", "SHOPIFY_STOREFRONT_PRIVATE_TOKEN", "SHOPIFY_API_VERSION"])
       previous[key] === undefined ? delete process.env[key] : process.env[key] = previous[key];
   });
-  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false};
+  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false};
   const recalculate = () => {
     const discount = state.cart.discountCodes.some(code => code.code === "SAVE10");
     let total = 0;
     for (const line of state.cart.lines.nodes) {
       const item = fixtureProducts.find(p => p.variantId === line.merchandise.id);
-      const amount = item.price * line.quantity * (discount ? .9 : 1);
+      const selectedPlan = plans.find(p => p.id === line.sellingPlanAllocation?.sellingPlan.id);
+      const amount = (selectedPlan?.price ?? item.price) * line.quantity * (discount ? .9 : 1);
       line.cost = {totalAmount: money(amount)}; total += amount;
     }
     state.cart.totalQuantity = state.cart.lines.nodes.reduce((sum, line) => sum + line.quantity, 0);
@@ -69,8 +76,8 @@ function fixture(t) {
     if (operation === "IQONCatalog") return Response.json({data: {products: {
       pageInfo: {hasNextPage: false, endCursor: null}, nodes: fixtureProducts.map(p => ({
         handle: p.handle, title: p.handle, description: "Fixture", productType: "Fixture", tags: [`iqon-${p.category}`],
-        availableForSale: state.available, requiresSellingPlan: false, images: {nodes: []},
-        variants: {pageInfo: {hasNextPage: false}, nodes: [{id: p.variantId, title: "Default Title", availableForSale: state.available, price: money(p.price)}]},
+        availableForSale: state.available, requiresSellingPlan: state.requiresSellingPlan, images: {nodes: []},
+        variants: {pageInfo: {hasNextPage: false}, nodes: [{id: p.variantId, title: "Default Title", availableForSale: state.available, price: money(p.price), sellingPlanAllocations:{pageInfo:{hasNextPage:false},nodes:p===fixtureProducts[0]?plans.map(planAllocation):[]}}]},
       })),
     }}});
     if (operation === "IQONCartRead") return Response.json({data: {cart: state.cart?.id === variables.id ? state.cart : null}});
@@ -82,11 +89,12 @@ function fixture(t) {
     if (operation === "IQONCartCreate" || operation === "IQONCartAdd") {
       mutation ||= "cartLinesAdd";
       for (const input of variables.input?.lines || variables.lines) {
-        const existing = state.cart.lines.nodes.find(line => line.merchandise.id === input.merchandiseId);
+        const existing = state.cart.lines.nodes.find(line => line.merchandise.id === input.merchandiseId && line.sellingPlanAllocation?.sellingPlan.id === input.sellingPlanId);
         const item = fixtureProducts.find(p => p.variantId === input.merchandiseId);
         if (existing) existing.quantity += input.quantity;
-        else state.cart.lines.nodes.push({id: `line-${item.handle}`, quantity: input.quantity,
-          merchandise: {id: item.variantId, title: "Default Title", product: {handle: item.handle, title: item.handle}}});
+        else state.cart.lines.nodes.push({id: `line-${item.handle}-${input.sellingPlanId?.split("/").at(-1)||"once"}`, quantity: input.quantity,
+          sellingPlanAllocation:input.sellingPlanId ? planAllocation(plans.find(p=>p.id===input.sellingPlanId)) : null,
+          merchandise: {id: item.variantId, title: "Default Title", product: {handle: item.handle, title: item.handle,tags:[`iqon-${item.category}`]}}});
       }
     } else if (operation === "IQONCartUpdate") {
       mutation = "cartLinesUpdate";
@@ -106,7 +114,7 @@ function fixture(t) {
 }
 const add = item => routes.mutateCartResponse(request({action: "add", id: item.handle, variantId: item.variantId, quantity: 1}));
 
-test("a mixed-department bag persists, updates, discounts and reaches hosted checkout", async t => {
+test("a supplement bag persists, updates, discounts and reaches hosted checkout", async t => {
   fixture(t);
   assert.equal((await routes.getCartResponse()).status, 200);
   assert.equal((await add(fixtureProducts[0])).status, 200);
@@ -128,7 +136,7 @@ test("a mixed-department bag persists, updates, discounts and reaches hosted che
   bag = await (await routes.mutateCartResponse(request({action: "discount", discountCodes: []}))).json();
   assert.equal(bag.subtotal, 126);
   bag = await (await routes.mutateCartResponse(request({action: "update", lineId, quantity: 0}))).json();
-  assert.equal(bag.count, 1); assert.equal(bag.items[0].id, "hydra-c-ferulic-serum");
+  assert.equal(bag.count, 1); assert.equal(bag.items[0].id, "nmn");
 });
 
 test("expired carts clear the buyer's stale selection and a later add creates a fresh cart", async t => {
@@ -178,4 +186,57 @@ test("cart and checkout reject cross-origin writes and unsafe checkout links", a
   assert.equal((await routes.mutateCartResponse(request([]))).status, 400);
   await add(fixtureProducts[0]); state.cart.checkoutUrl = "http://iqon-test.myshopify.com/checkouts/test-only";
   assert.equal((await routes.checkoutResponse(request({}, "checkout"))).status, 502);
+});
+
+test("one-time and subscription lines remain distinct and use exact Shopify prices", async t => {
+  fixture(t);
+  await add(fixtureProducts[0]);
+  const subscribe=()=>routes.mutateCartResponse(request({action:"add",id:fixtureProducts[0].handle,variantId:fixtureProducts[0].variantId,quantity:1,purchase:"subscription",sellingPlanId:plans[0].id}));
+  let response=await subscribe();assert.equal(response.status,200);
+  let bag=await response.json();assert.equal(bag.items.length,2);assert.equal(bag.subtotal,55.1);
+  const line=bag.items.find(i=>i.purchase==="subscription");
+  assert.equal(line.sellingPlanId,plans[0].id);assert.equal(line.sellingPlanName,plans[0].name);assert.equal(line.amount,26.1);
+  bag=await (await subscribe()).json();assert.equal(bag.items.length,2);assert.equal(bag.subtotal,81.2);
+  bag=await (await routes.mutateCartResponse(request({action:"update",lineId:line.lineId,quantity:3}))).json();
+  assert.equal(bag.items.find(i=>i.lineId===line.lineId).sellingPlanId,plans[0].id);assert.equal(bag.subtotal,107.3);
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+});
+
+test("unavailable, cross-product and missing subscription plans are rejected", async t => {
+  const state=fixture(t);
+  const input={action:"add",id:fixtureProducts[0].handle,variantId:fixtureProducts[0].variantId,quantity:1,purchase:"subscription"};
+  assert.equal((await routes.mutateCartResponse(request(input))).status,422);
+  assert.equal((await routes.mutateCartResponse(request({...input,sellingPlanId:"invalid"}))).status,400);
+  assert.equal((await routes.mutateCartResponse(request({...input,sellingPlanId:"gid://shopify/SellingPlan/999"}))).status,422);
+  assert.equal((await routes.mutateCartResponse(request({...input,id:fixtureProducts[1].handle,variantId:fixtureProducts[1].variantId,sellingPlanId:plans[0].id}))).status,422);
+  state.requiresSellingPlan=true;
+  assert.equal((await add(fixtureProducts[0])).status,422);
+  assert.equal(state.cart,null);
+});
+
+function insertOldSkincare(state) {
+  const p=fixtureProducts[2];
+  state.cart.lines.nodes.push({id:"old-skincare-line",quantity:1,cost:{totalAmount:money(p.price)},merchandise:{id:p.variantId,title:"Default Title",product:{handle:p.handle,title:p.handle,tags:["iqon-skincare"]}}});
+  state.cart.totalQuantity++;
+}
+
+test("skincare cannot be added, even when Shopify reports available stock", async t => {
+  fixture(t);
+  const response=await add(fixtureProducts[2]);
+  assert.equal(response.status,422);assert.match((await response.json()).error,/coming soon/i);
+});
+
+test("loading an old bag removes skincare and preserves supplements", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldSkincare(state);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.equal(bag.items.length,1);assert.equal(bag.items[0].id,fixtureProducts[0].handle);assert.equal(bag.subtotal,29);
+  assert.match(bag.notice,/coming soon/i);assert.ok(state.operations.includes("IQONCartRemove"));
+});
+
+test("checkout removes old skincare and requires review before handing off to Shopify", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldSkincare(state);
+  const response=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(response.status,422);
+  const data=await response.json();assert.equal(data.cart.items.length,1);assert.ok(!data.checkoutUrl);
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
 });

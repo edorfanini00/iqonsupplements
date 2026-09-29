@@ -1,0 +1,28 @@
+{
+  "prompt_type": "photorealistic_natural_editorial_material_study",
+  "asset_type": "IQON supplement product page benefits photograph",
+  "objective": "Create one extremely believable premium editorial photograph for an IQON supplement website, matching restrained skincare material photography in cool gray, silver and ivory. This is a format illustration; no efficacy or before-and-after message.",
+  "canvas": {
+    "orientation": "portrait",
+    "aspect_ratio": "4:5",
+    "framing": "One cohesive close-up photograph; safe focal point in central 70% so both square mobile and taller desktop crops work."
+  },
+  "photographic_style": {
+    "camera": "Full-frame macro lens, 85mm equivalent, plausible shallow depth of field, physically believable perspective",
+    "lighting": "Soft directional window light, gentle fill, controlled natural highlights and true contact shadows",
+    "rendering": "Unretouched product editorial realism; subtle sensor grain; fine material detail; slight organic irregularity; no CGI perfection",
+    "palette": "Cool gray, charcoal, ivory, brushed silver. Any accent is highly desaturated."
+  },
+  "constraints": [
+    "No text, logos, labels, captions, watermarks or UI.",
+    "No hands, faces, bodies, food decorations or plants.",
+    "Nothing floating; gravity and reflections must be physically plausible.",
+    "No oversized dose claims or exact serving measurement depicted.",
+    "No decorative abstract 3D blobs, glow effects, excessive gloss, perfect symmetry or plastic textures."
+  ],
+  "scene": {
+    "subject": "Top-down macro photograph of a simple straight-sided clear glass containing a chocolate-brown supplement drink. A small asymmetrical swirl and a few tiny bubbles on the surface, softly reflected rectangular window light. The glass is offset to the lower right on a cool gray tabletop. No toppings, no dessert, no cocoa beans, no food styling."
+  },
+  "website_caption": "Chocolate / mix into your ritual",
+  "generated_source": "exec-9aa764f9-5001-40a0-84a6-ce566f9fc61b.png"
+}

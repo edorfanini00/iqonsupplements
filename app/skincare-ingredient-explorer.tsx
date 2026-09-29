@@ -5,8 +5,8 @@ import { ArrowUpRight, Plus } from "lucide-react";
 import type { IngredientVisual } from "@/lib/skincare-visual-content";
 
 /** Conceptual ingredient-family artwork is separate from the sourced molecular diagrams. */
-function IngredientArtwork({visual,compact=false}:{visual:IngredientVisual;compact?:boolean}) {
-  if(visual.kind==="molecule") return <img className="skin-molecule" src={`/images/skincare-ingredients/${visual.art}.svg`} alt={compact?"":`Molecular structure of ${visual.artLabel}`} width={520} height={360} loading="lazy"/>;
+export function IngredientArtwork({visual,compact=false}:{visual:IngredientVisual;compact?:boolean}) {
+  if(visual.imageSrc||visual.kind==="molecule") return <img className="skin-molecule" src={visual.imageSrc||`/images/skincare-ingredients/${visual.art}.svg`} alt={compact?"":`${visual.kind==="molecule"?"Molecular structure of":"Illustration of"} ${visual.artLabel}`} width={520} height={360} loading="lazy"/>;
   return <svg className={`skin-ingredient-artwork art-${visual.kind}`} viewBox="0 0 520 360" fill="none" aria-hidden="true">
     {visual.kind==="peptide"&&<>
       <path d="M91 245 160 144 245 225 323 110 413 176" stroke="currentColor" strokeWidth="2"/>

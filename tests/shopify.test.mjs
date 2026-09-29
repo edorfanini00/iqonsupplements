@@ -4,7 +4,9 @@ import fs from "node:fs";
 import ts from "typescript";
 
 const source=fs.readFileSync(new URL("../lib/shopify.ts",import.meta.url),"utf8");
-const js=ts.transpile(source,{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022});
+const policy=ts.transpile(fs.readFileSync(new URL("../lib/commerce-policy.ts",import.meta.url),"utf8"),{module:ts.ModuleKind.ESNext});
+const policyUrl="data:text/javascript;base64,"+Buffer.from(policy).toString("base64");
+const js=ts.transpile(source,{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}).replace('"./commerce-policy"',JSON.stringify(policyUrl));
 const {shopifyConfig,shopifyRequest,mapProduct,publicCart,sameOrigin,validQuantity}=await import("data:text/javascript;base64,"+Buffer.from(js).toString("base64"));
 const config={domain:"iqon-test.myshopify.com",token:"test-token",version:"2026-07"};
 const product={handle:"actual-product",title:"Actual product",description:"Merchant supplied description",productType:"Capsules",tags:["iqon-supplements"],availableForSale:true,requiresSellingPlan:false,
@@ -73,4 +75,20 @@ test("cart writes reject foreign origins, non-JSON bodies, and malformed quantit
   assert.throws(()=>sameOrigin(new Request("https://iqon.example/api/cart")));
   for(const value of [0,-1,21,1.5,"2",null,NaN,Infinity])assert.throws(()=>validQuantity(value));
   assert.equal(validQuantity(20),20);assert.equal(validQuantity(0,true),0);
+});
+
+const subscriptionAllocation = {sellingPlan:{id:"gid://shopify/SellingPlan/1",name:"Every month",recurringDeliveries:true,options:[{name:"Delivery",value:"Monthly"}],priceAdjustments:[{orderCount:3}]},priceAdjustments:[{price:{amount:"40.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"40.00",currencyCode:"EUR"}},{price:{amount:"42.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"42.00",currencyCode:"EUR"}}]};
+const withPlans = allocations => ({...product,requiresSellingPlan:true,variants:{pageInfo:{hasNextPage:false},nodes:[{...product.variants.nodes[1],sellingPlanAllocations:{pageInfo:{hasNextPage:false},nodes:allocations}}]}});
+test("subscriptions retain exact Shopify pricing phases and allow required recurring purchases",()=>{
+  const p=mapProduct(withPlans([subscriptionAllocation]),0);
+  assert.equal(p.available,true);
+  assert.equal(p.variants[0].sellingPlans[0].price,40);
+  assert.equal(p.variants[0].sellingPlans[0].recurringPrice,42);
+  assert.equal(p.variants[0].sellingPlans[0].initialOrderCount,3);
+  assert.equal(p.variants[0].sellingPlans[0].compareAtPrice,45.75);
+});
+test("preorders are excluded and skincare stays unavailable even with a live Shopify listing",()=>{
+  assert.equal(mapProduct(withPlans([{...subscriptionAllocation,sellingPlan:{...subscriptionAllocation.sellingPlan,recurringDeliveries:false}}]),0).available,false);
+  const p=mapProduct({...withPlans([subscriptionAllocation]),tags:["iqon-skincare"]},0);
+  assert.equal(p.available,false);assert.deepEqual(p.variants[0].sellingPlans,[]);
 });
