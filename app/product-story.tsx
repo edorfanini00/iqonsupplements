@@ -14,6 +14,8 @@ import { formulaSpotlights, skincareNotes } from "@/lib/product-story-detail";
 import { ProductFormulaVisual } from "./product-formula-visual";
 import { SkincareProductStory } from "./skincare-product-story";
 import { skincareStories } from "@/lib/skincare-stories";
+import { SupplementProductStory } from "./supplement-product-story";
+import { supplementVisualContent } from "@/lib/supplement-visual-content";
 
 export function comparisonFor(product: Product, products: Product[]) {
   const choices = product.category === "skincare"
@@ -28,7 +30,11 @@ export function comparisonFor(product: Product, products: Product[]) {
         ? ["hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"]
         : product.type === "Powder"
           ? ["creatine-monohydrate", "hydrolyzed-collagen-peptides", "colostrum-powder"]
-          : ["glp-1-support", "hair-skin-nails-gummies", "colon-gentle-cleanse"];
+          : ["keto-5", "liver-support", "glp-1-support"].includes(product.id)
+            ? ["glp-1-support", "liver-support", "keto-5"]
+            : product.id === "hair-skin-nails-gummies"
+              ? ["hair-skin-nails-gummies", "hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"]
+              : ["colon-gentle-cleanse", "colostrum-powder", "glp-1-support"];
   return [product.id, ...choices.filter(id => id !== product.id)]
     .map(id => products.find(p => p.id === id))
     .filter((p): p is Product => Boolean(p)).slice(0, 3);
@@ -41,6 +47,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   const skin = skincareRange.find(item => item.id === p.id);
   const comparison = comparisonFor(p, products);
   if (skin && skincareStories[p.id]) return <SkincareProductStory product={p} comparison={comparison}/>;
+  if (supplement && supplementVisualContent[p.id]) return <SupplementProductStory product={p} comparison={comparison}/>;
   const research = content.education;
   const visual = productVisuals[p.id];
   const focus = productPresentation[p.id]?.focus;

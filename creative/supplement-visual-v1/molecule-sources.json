@@ -1,0 +1,56 @@
+[
+  {
+    "name": "creatine monohydrate",
+    "cid": 80116,
+    "smiles": "CN(CC(=O)O)C(=N)N.O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/compound/80116",
+    "retrieved": "2026-09-29",
+    "art": "creatine-monohydrate",
+    "rendered": "RDKit 2D, stereochemistry retained; diagram of the named compound, not finished product efficacy"
+  },
+  {
+    "name": "beta-Nicotinamide mononucleotide",
+    "cid": 14180,
+    "smiles": "C1=CC(=C[N+](=C1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)(O)[O-])O)O)C(=O)N",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/compound/14180",
+    "retrieved": "2026-09-29",
+    "art": "beta-nmn",
+    "rendered": "RDKit 2D, stereochemistry retained; diagram of the named compound, not finished product efficacy"
+  },
+  {
+    "name": "trans-resveratrol",
+    "cid": 445154,
+    "smiles": "C1=CC(=CC=C1/C=C/C2=CC(=CC(=C2)O)O)O",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/compound/445154",
+    "retrieved": "2026-09-29",
+    "art": "trans-resveratrol",
+    "rendered": "RDKit 2D, stereochemistry retained; diagram of the named compound, not finished product efficacy"
+  },
+  {
+    "name": "caffeine",
+    "cid": 2519,
+    "smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/compound/2519",
+    "retrieved": "2026-09-29",
+    "art": "caffeine",
+    "rendered": "RDKit 2D, stereochemistry retained; diagram of the named compound, not finished product efficacy"
+  },
+  {
+    "name": "biotin",
+    "cid": 171548,
+    "smiles": "C1[C@H]2[C@@H]([C@@H](S1)CCCCC(=O)O)NC(=O)N2",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/compound/171548",
+    "retrieved": "2026-09-29",
+    "art": "biotin",
+    "rendered": "RDKit 2D, stereochemistry retained; diagram of the named compound, not finished product efficacy"
+  },
+  {
+    "name": "L-cysteine hydrochloride",
+    "cid": 60960,
+    "smiles": "C([C@@H](C(=O)O)N)S.Cl",
+    "source": "https://pubchem.ncbi.nlm.nih.gov/compound/60960",
+    "retrieved": "2026-09-29",
+    "art": "l-cysteine-hydrochloride",
+    "rendered": "RDKit 2D, stereochemistry retained; diagram of the named compound, not finished product efficacy"
+  }
+]

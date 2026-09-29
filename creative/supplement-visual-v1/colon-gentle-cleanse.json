@@ -1,0 +1,28 @@
+{
+  "prompt_type": "photorealistic_natural_editorial_material_study",
+  "asset_type": "IQON supplement product page benefits photograph",
+  "objective": "Create one extremely believable premium editorial photograph for an IQON supplement website, matching restrained skincare material photography in cool gray, silver and ivory. This is a format illustration; no efficacy or before-and-after message.",
+  "canvas": {
+    "orientation": "portrait",
+    "aspect_ratio": "4:5",
+    "framing": "One cohesive close-up photograph; safe focal point in central 70% so both square mobile and taller desktop crops work."
+  },
+  "photographic_style": {
+    "camera": "Full-frame macro lens, 85mm equivalent, plausible shallow depth of field, physically believable perspective",
+    "lighting": "Soft directional window light, gentle fill, controlled natural highlights and true contact shadows",
+    "rendering": "Unretouched product editorial realism; subtle sensor grain; fine material detail; slight organic irregularity; no CGI perfection",
+    "palette": "Cool gray, charcoal, ivory, brushed silver. Any accent is highly desaturated."
+  },
+  "constraints": [
+    "No text, logos, labels, captions, watermarks or UI.",
+    "No hands, faces, bodies, food decorations or plants.",
+    "Nothing floating; gravity and reflections must be physically plausible.",
+    "No oversized dose claims or exact serving measurement depicted.",
+    "No decorative abstract 3D blobs, glow effects, excessive gloss, perfect symmetry or plastic textures."
+  ],
+  "scene": {
+    "subject": "A plain unprinted matte ivory single-serving sachet with a neatly torn opening rests on a pale blue-gray counter beside a clear glass of still water. A small amount of fine light beige fiber powder near the sachet opening. Quiet practical preparation still life. Glass occupies the right half, sachet lies diagonally lower left. No branding or readable text."
+  },
+  "website_caption": "One sachet / freshly mixed",
+  "generated_source": "exec-6fe4bc6e-236f-424c-b48d-9022496cb977.png"
+}

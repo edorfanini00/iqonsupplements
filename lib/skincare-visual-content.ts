@@ -1,8 +1,8 @@
 /** Short-form editorial copy from the existing supplier-grounded product copy.
  * Molecules show the named ingredient, not finished-product efficacy. */
 export type IngredientVisual = {
-  art: string; artLabel: string; kind: "molecule" | "peptide" | "moisture" | "emollient" | "botanical";
-  summary: string; tags: string[]; label?: string;
+  art: string; artLabel: string; kind: "molecule" | "peptide" | "moisture" | "emollient" | "botanical" | "illustration";
+  summary: string; tags: string[]; label?: string; imageSrc?: string;
 };
 export type SkinVisualContent = {
   texture: string; photoLabel: string;

@@ -1,0 +1,68 @@
+/* Supplements share the approved skincare rhythm; these rules handle formula-size differences. */
+.supplement-pdp-story .skin-benefits-copy h2{max-width:18ch}
+.supplement-pdp-story .skin-application-photo{background:#eef1f1}
+.supplement-pdp-story .skin-application-photo>img{mix-blend-mode:multiply}
+.supplement-pdp-story .skin-application-photo figcaption{flex-wrap:wrap;gap:7px 12px}
+.supplement-pdp-story .skin-application-photo figcaption strong{max-width:none}
+.supplement-pdp-story .skin-art-detail .supp-ingredient-amount{display:inline-block;margin:0 0 12px;padding:4px 8px;border:1px solid #64747d;font-size:10px;line-height:1.5;color:#e0e9eb}
+.supplement-explorer.ingredient-count-1{grid-template-columns:minmax(0,1fr) 52px minmax(0,1.07fr)}
+.supp-single-ingredient{align-self:center;min-width:0}
+.supp-single-ingredient dl{margin:0}
+.supp-single-ingredient dl>div{position:relative;border-top:1px solid #c3ced3;padding:22px 0}
+.supp-single-ingredient dt{font-size:11px;color:#5f727c;line-height:1.5;letter-spacing:.01em;margin-bottom:8px}
+.supp-single-ingredient dd{margin:0;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr);gap:20px;align-items:center}
+.supp-single-ingredient dd strong{font-size:34px;line-height:1.2;letter-spacing:-.04em;font-weight:400;color:#354850}
+.supp-single-ingredient dd span{font-size:12px;line-height:1.65;color:#60717a}
+.supp-fact-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;border-top:1px solid #c6d1d6;margin:34px 0 0;padding:25px 0 0}
+.supp-fact-strip>div{min-width:0}.supp-fact-strip dt{font-size:10px;line-height:1.6;color:#617680;margin-bottom:8px}
+.supp-fact-strip dd{margin:0}.supp-fact-strip strong{display:block;font-size:29px;line-height:1.2;letter-spacing:-.035em;font-weight:400;color:#334951;margin-bottom:9px}
+.supp-fact-strip dd>span{display:block;font-size:12px;line-height:1.6;color:#63737c;max-width:32ch}
+.supp-composition{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:55px;padding:28px 30px;margin-top:30px;background:#e1e8eb;border-radius:4px}
+.supplement-pdp-story .supp-composition .skin-kicker{font-size:9px;margin:0 0 10px}
+.supplement-pdp-story .supp-composition h3{font-size:24px;margin-bottom:10px}
+.supplement-pdp-story .supp-composition p:not(.skin-kicker){font-size:12px;max-width:54ch}
+.supp-composition-measure>div:first-child{display:flex;align-items:baseline;gap:12px}
+.supp-composition-measure strong{font-size:47px;line-height:1;letter-spacing:-.045em;font-weight:400;color:#3b515d}
+.supp-composition-measure span{font-size:12px;line-height:1.5;color:#556c77}
+.supp-composition-track{height:12px;background:#c2cdd3;margin:17px 0 10px;overflow:hidden;border-radius:2px}
+.supp-composition-track>span{display:block;height:100%;background:#5b7381}
+.supplement-pdp-story .supp-composition-measure>p{font-size:10px}
+.supplement-pdp-story .supp-research{display:grid;grid-template-columns:.8fr 1.2fr;gap:80px;background:#f0f3f3;border-top:1px solid #d9e0e2}
+.supp-research-heading>svg{color:#6a828d;margin-bottom:19px}
+.supplement-pdp-story .supp-research h2{font-size:34px;max-width:21ch;line-height:1.17}
+.supplement-pdp-story .supp-research-heading>.skin-kicker{text-transform:uppercase;font-size:9px}
+.supplement-pdp-story .supp-research-copy>p{font-size:14px;line-height:1.8}
+.supp-research-links{display:grid;margin:23px 0 17px;border-top:1px solid #c7d2d6}
+.supp-research-links a{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid #c7d2d6;color:#465f6c;font-size:11px;line-height:1.6}
+.supp-research-links svg{flex-shrink:0}
+.supplement-pdp-story .supp-research-copy>.supp-research-scope{font-size:11px;line-height:1.7;color:#6c7e87}
+.supplement-pdp-story>.pdp-disclaimer{padding:0 max(calc((100% - var(--skin-width))/2),4vw) 48px;font-size:10px;color:#758189;max-width:none}
+.supplement-pdp-story .supplement-amounts{width:100%;table-layout:fixed;margin-top:22px}
+.supplement-pdp-story .supplement-amounts th:first-child{width:75%}
+.supplement-pdp-story .supplement-amounts td{white-space:nowrap}
+.supplement-pdp-story .supplement-amounts small{display:block;line-height:1.6;font-size:11px;font-weight:400}
+@media(max-width:1100px){
+ .supplement-explorer.ingredient-count-1{grid-template-columns:minmax(0,1fr) 24px minmax(0,1.05fr)}
+ .supp-single-ingredient dd{grid-template-columns:1fr;gap:12px}.supp-single-ingredient dd strong{font-size:31px}
+ .supp-composition{gap:30px;padding:25px}
+ .supplement-pdp-story .supp-research{gap:40px}
+ .supp-fact-strip{gap:25px}
+}
+@media(max-width:760px){
+ .supplement-pdp-story .skin-benefits-copy h2{max-width:19ch}
+ .supplement-explorer.ingredient-count-2 .skin-ingredient-selections{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .supplement-explorer.ingredient-count-2 .skin-ingredient-thumbnail{aspect-ratio:1.3}
+ .supplement-explorer.ingredient-count-1 .skin-formula-art-panel{order:0}
+ .supp-single-ingredient{width:100%;order:1}
+ .supp-single-ingredient .skin-kicker{font-size:8px;margin-bottom:15px}
+ .supp-single-ingredient dl>div{padding:18px 0}.supp-single-ingredient dd{grid-template-columns:minmax(0,.9fr) minmax(0,1fr);gap:17px}
+ .supp-single-ingredient dd strong{font-size:28px}.supp-single-ingredient dd span{font-size:11px}.supp-single-ingredient dt{font-size:10px}
+ .supp-fact-strip{gap:20px;margin-top:25px;padding-top:22px;grid-template-columns:1fr}
+ .supp-fact-strip>div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:5px 20px}
+ .supp-fact-strip dt{grid-column:2;grid-row:1;margin:0;font-size:11px;align-self:end}
+ .supp-fact-strip dd{display:contents}.supp-fact-strip strong{grid-column:1;grid-row:1/3;font-size:25px;margin:0;align-self:center}
+ .supp-fact-strip dd>span{grid-column:2;grid-row:2;font-size:11px;max-width:none}
+ .supp-composition{grid-template-columns:1fr;gap:25px;padding:23px 21px;margin-top:25px}.supplement-pdp-story .supp-composition h3{font-size:23px}.supp-composition-measure strong{font-size:40px}
+ .supplement-pdp-story .supp-research{grid-template-columns:1fr;gap:23px}.supplement-pdp-story .supp-research h2{font-size:30px;max-width:22ch}.supplement-pdp-story .supp-research-copy>p{font-size:13px}.supp-research-links{margin-top:18px}
+ .supplement-pdp-story>.pdp-disclaimer{padding:0 22px 35px}
+}

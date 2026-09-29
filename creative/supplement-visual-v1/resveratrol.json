@@ -1,0 +1,28 @@
+{
+  "prompt_type": "photorealistic_natural_editorial_material_study",
+  "asset_type": "IQON supplement product page benefits photograph",
+  "objective": "Create one extremely believable premium editorial photograph for an IQON supplement website, matching restrained skincare material photography in cool gray, silver and ivory. This is a format illustration; no efficacy or before-and-after message.",
+  "canvas": {
+    "orientation": "portrait",
+    "aspect_ratio": "4:5",
+    "framing": "One cohesive close-up photograph; safe focal point in central 70% so both square mobile and taller desktop crops work."
+  },
+  "photographic_style": {
+    "camera": "Full-frame macro lens, 85mm equivalent, plausible shallow depth of field, physically believable perspective",
+    "lighting": "Soft directional window light, gentle fill, controlled natural highlights and true contact shadows",
+    "rendering": "Unretouched product editorial realism; subtle sensor grain; fine material detail; slight organic irregularity; no CGI perfection",
+    "palette": "Cool gray, charcoal, ivory, brushed silver. Any accent is highly desaturated."
+  },
+  "constraints": [
+    "No text, logos, labels, captions, watermarks or UI.",
+    "No hands, faces, bodies, food decorations or plants.",
+    "Nothing floating; gravity and reflections must be physically plausible.",
+    "No oversized dose claims or exact serving measurement depicted.",
+    "No decorative abstract 3D blobs, glow effects, excessive gloss, perfect symmetry or plastic textures."
+  ],
+  "scene": {
+    "subject": "Two opaque ivory two-piece vegetable capsules at a gentle diagonal on an understated smoky mauve-gray glass surface. Late-afternoon soft directional light, dimensional grounded shadows, a slightly blurred silver tray edge in upper left. Macro photo with realistic capsule seams and understated material texture."
+  },
+  "website_caption": "Vegetable capsules / twice daily",
+  "generated_source": "exec-7646cbde-134e-426a-80aa-7397f347ab5d.png"
+}
