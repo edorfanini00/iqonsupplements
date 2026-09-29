@@ -7,7 +7,15 @@ export const CATALOG_QUERY = `query IQONCatalog($after: String) {
       images(first: 10) { nodes { url altText } }
       variants(first: 100) {
         pageInfo { hasNextPage }
-        nodes { id title availableForSale price { amount currencyCode } }
+        nodes { id title availableForSale price { amount currencyCode }
+          sellingPlanAllocations(first: 50) {
+            pageInfo { hasNextPage }
+            nodes {
+              sellingPlan { id name description recurringDeliveries options { name value } priceAdjustments { orderCount } }
+              priceAdjustments { price { amount currencyCode } compareAtPrice { amount currencyCode } perDeliveryPrice { amount currencyCode } }
+            }
+          }
+        }
       }
     }
   }
@@ -21,9 +29,10 @@ const CART_FRAGMENT = `fragment IQONCart on Cart {
     pageInfo { hasNextPage }
     nodes {
       id quantity cost { totalAmount { amount currencyCode } }
+      sellingPlanAllocation { sellingPlan { id name options { name value } } }
       merchandise { ... on ProductVariant {
         id title image { url altText }
-        product { handle title }
+        product { handle title tags }
       } }
     }
   }

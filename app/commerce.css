@@ -501,3 +501,18 @@ body { background:#fafbfb; }
 @media (max-width:760px) {
  .campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:center top; }
 }
+
+/* Real Shopify subscription choices; pricing remains supplied by the store. */
+.product-purchase-choices { margin-top:4px; }
+.subscription-saving { display:inline-block; margin-left:8px; padding:3px 6px; background:#dde4e7; color:#37434b; font-size:10px; font-weight:500; font-style:normal; letter-spacing:.02em; }
+.subscription-details { padding:16px; border:1px solid var(--line); border-top:0; background:#f6f7f7; }
+.subscription-schedule { display:flex; flex-direction:column; gap:8px; }
+.subscription-schedule label,.subscription-plan-name { font-size:12px; font-weight:500; }
+.subscription-schedule select { width:100%; min-height:44px; padding:10px 30px 10px 12px; border:1px solid #cbd0d2; border-radius:0; background:#fff; font:inherit; font-size:13px; color:inherit; }
+.subscription-terms,.subscription-description { margin:12px 0 0; font-size:12px; line-height:1.65; color:#61686d; }
+.product-page .skincare-launch-note { margin:4px 0 20px; padding:22px; background:#f0f2f3; border:1px solid #e2e5e7; }
+.product-page .skincare-launch-note .launch-status { margin:0 0 8px; color:#343d44; font-size:20px; font-family:var(--serif); }
+.product-page .skincare-launch-note>p:not(.launch-status) { margin:0 0 18px; font-size:14px; line-height:1.6; }
+.skincare-launch-note .button:disabled { opacity:1; background:#dfe3e5; color:#656e74; border-color:#dfe3e5; cursor:default; }
+.skincare-launch-note .under-link { margin-top:16px; font-size:12px; }
+@media(max-width:600px) { .subscription-saving { margin-left:0; margin-top:4px; display:table; } }

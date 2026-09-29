@@ -1,4 +1,5 @@
 import type { CartItem, Product } from "./catalog";
+import { isComingSoon } from "./commerce-policy";
 
 export type ShopifyConfig = {domain:string; token:string; version:string};
 export class CommerceError extends Error {
@@ -29,18 +30,35 @@ export async function shopifyRequest<T>(config:ShopifyConfig, query:string, vari
   return result.data;
 }
 
+type ShopifyMoney={amount:string;currencyCode:string};
+type ShopifyPlanAllocation={
+  sellingPlan:{id:string;name:string;description?:string|null;recurringDeliveries:boolean;options:{name:string;value:string}[];priceAdjustments?:{orderCount:number|null}[]};
+  priceAdjustments:{price:ShopifyMoney;compareAtPrice:ShopifyMoney;perDeliveryPrice:ShopifyMoney}[];
+};
 export type ShopifyProduct = {
   handle:string; title:string; description:string; productType:string; tags:string[];
   availableForSale:boolean; requiresSellingPlan:boolean;
   images:{nodes:{url:string;altText:string|null}[]};
-  variants:{pageInfo:{hasNextPage:boolean};nodes:{id:string;title:string;availableForSale:boolean;price:{amount:string;currencyCode:string}}[]};
+  variants:{pageInfo:{hasNextPage:boolean};nodes:{id:string;title:string;availableForSale:boolean;price:ShopifyMoney;sellingPlanAllocations?:{pageInfo:{hasNextPage:boolean};nodes:ShopifyPlanAllocation[]}}[]};
 };
 export function mapProduct(p:ShopifyProduct, index:number):Product|null {
   // Explicit merchandising tags prevent unrelated products entering this catalog.
   const category=p.tags.includes("iqon-supplements")?"supplements":p.tags.includes("iqon-skincare")?"skincare":null;
   if(!category) return null;
   if(p.variants.pageInfo.hasNextPage) throw new CommerceError("This product’s options are temporarily unavailable.");
-  const variants=p.variants.nodes.map(v=>({id:v.id,title:v.title,price:Number(v.price.amount),currency:v.price.currencyCode,available:v.availableForSale}));
+  const variants=p.variants.nodes.map(v=>{
+    if(v.sellingPlanAllocations?.pageInfo.hasNextPage) throw new CommerceError("This product’s subscription options are temporarily unavailable.");
+    const sellingPlans=category==="supplements"?(v.sellingPlanAllocations?.nodes||[]).filter(a=>a.sellingPlan.recurringDeliveries).flatMap(a=>{
+      const first=a.priceAdjustments[0];
+      if(!first||!Number.isFinite(Number(first.price.amount))||Number(first.price.amount)<0||first.price.currencyCode!==v.price.currencyCode) return [];
+      const next=a.priceAdjustments[1];
+      return [{id:a.sellingPlan.id,name:a.sellingPlan.name,description:a.sellingPlan.description,options:a.sellingPlan.options,
+        price:Number(first.price.amount),currency:first.price.currencyCode,compareAtPrice:Number(first.compareAtPrice.amount),perDeliveryPrice:Number(first.perDeliveryPrice.amount),
+        ...(next?{recurringPrice:Number(next.price.amount),initialOrderCount:a.sellingPlan.priceAdjustments?.[0]?.orderCount}:{}),
+      }];
+    }):[];
+    return {id:v.id,title:v.title,price:Number(v.price.amount),currency:v.price.currencyCode,available:v.availableForSale,sellingPlans};
+  });
   const first=variants.find(v=>v.available) || variants[0];
   if(!first || !Number.isFinite(first.price)) return null;
   const images=p.images.nodes.filter(i=>i.url.startsWith("https://")).map(i=>({src:i.url,alt:i.altText||p.title}));
@@ -50,13 +68,13 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
     price:first.price,currency:first.currency,size:first.title==="Default Title"?"":first.title,
     descriptor:"",description:p.description,image,campaign:images[1]?.src||image,tone:"silver",ritual:"",
     images:images.length?images:[{src:image,alt:"IQON material study; product photograph coming soon"}],variants,
-    available:p.availableForSale&&!p.requiresSellingPlan,requiresSellingPlan:p.requiresSellingPlan};
+    available:!isComingSoon({category})&&p.availableForSale&&variants.some(v=>v.available&&(!p.requiresSellingPlan||v.sellingPlans.length>0)),requiresSellingPlan:p.requiresSellingPlan};
 }
 export type ShopifyCart = {
   id:string; checkoutUrl:string; totalQuantity:number;
   discountCodes?:{code:string;applicable:boolean}[];
   cost:{subtotalAmount:{amount:string;currencyCode:string};totalAmount:{amount:string;currencyCode:string}};
-  lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{totalAmount:{amount:string;currencyCode:string}};merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string}}}[]};
+  lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{totalAmount:ShopifyMoney};sellingPlanAllocation?:{sellingPlan:{id:string;name:string;options:{name:string;value:string}[]}}|null;merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string;tags?:string[]}}}[]};
 };
 export type CartSnapshot = {items:CartItem[];subtotal:number;currency:string;count:number;discountCodes:{code:string;applicable:boolean}[];notice?:string};
 export function publicCart(cart:ShopifyCart|null):CartSnapshot {
@@ -64,7 +82,8 @@ export function publicCart(cart:ShopifyCart|null):CartSnapshot {
   if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.");
   return {items:cart.lines.nodes.map(line=>({id:line.merchandise.product.handle,lineId:line.id,
     variantId:line.merchandise.id,variantTitle:line.merchandise.title,name:line.merchandise.product.title,
-    image:line.merchandise.image?.url,quantity:line.quantity,purchase:"once",frequency:"once",
+    image:line.merchandise.image?.url,quantity:line.quantity,purchase:line.sellingPlanAllocation?"subscription":"once",frequency:line.sellingPlanAllocation?.sellingPlan.options.map(o=>o.value).join(" / ")||"once",
+    ...(line.sellingPlanAllocation?{sellingPlanId:line.sellingPlanAllocation.sellingPlan.id,sellingPlanName:line.sellingPlanAllocation.sellingPlan.name}:{}),
     amount:Number(line.cost.totalAmount.amount),currency:line.cost.totalAmount.currencyCode})),
     subtotal:Number(cart.cost.subtotalAmount.amount),currency:cart.cost.subtotalAmount.currencyCode,count:cart.totalQuantity,
     discountCodes:cart.discountCodes||[]};

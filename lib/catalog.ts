@@ -1,9 +1,15 @@
 import { productContent } from "./product-content";
 import skincareRange from "./skincare-range.json";
 import approvedPrices from "./approved-prices.json";
+import { isComingSoon } from "./commerce-policy";
 export type Category = "supplements" | "skincare";
 export type Purchase = "once" | "subscription";
-export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean};
+export type ProductSellingPlan = {
+  id:string; name:string; description?:string|null; options:{name:string;value:string}[];
+  price:number; currency:string; compareAtPrice:number; perDeliveryPrice:number;
+  recurringPrice?:number; initialOrderCount?:number|null;
+};
+export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean; sellingPlans?:ProductSellingPlan[]};
 export type Product = {
   id: string; name: string; category: Category; type: string; number: string;
   price: number; size: string; descriptor: string; description: string;
@@ -75,11 +81,11 @@ export const products: Product[] = previewProducts.map(p => ({...p, descriptor: 
 
 export const findProduct = (id: string) => products.find(p => p.id === id);
 export const money = (amount: number, currency="USD") => new Intl.NumberFormat("en-US", {style:"currency",currency,maximumFractionDigits:amount % 1 ? 2 : 0}).format(amount);
-export const productPrice = (p: Product) => p.pricePending ? "Coming soon" : money(p.price, p.currency);
-export const unitPrice = (p: Product, purchase: Purchase) => purchase === "subscription" && !p.variants ? Math.round(p.price * 85) / 100 : p.price;
-export type CartItem = {id: string; quantity: number; purchase: Purchase; frequency: string; lineId?:string; variantId?:string; variantTitle?:string; name?:string; image?:string; amount?:number; currency?:string};
-export const lineKey = (item: Pick<CartItem,"id"|"purchase"|"frequency"|"lineId">) => item.lineId || `${item.id}:${item.purchase}:${item.frequency}`;
+export const productPrice = (p: Product) => isComingSoon(p) || p.pricePending ? "Coming soon" : money(p.price, p.currency);
+export const unitPrice = (p: Product, _purchase: Purchase = "once") => p.price;
+export type CartItem = {id: string; quantity: number; purchase: Purchase; frequency: string; lineId?:string; variantId?:string; variantTitle?:string; name?:string; image?:string; amount?:number; currency?:string; sellingPlanId?:string; sellingPlanName?:string};
+export const lineKey = (item: Pick<CartItem,"id"|"purchase"|"frequency"|"lineId"|"sellingPlanId">) => item.lineId || `${item.id}:${item.purchase}:${item.sellingPlanId||item.frequency}`;
 export function validateCart(input: unknown): CartItem[] {
   if (!Array.isArray(input)) return [];
-  return input.filter((i): i is CartItem => !!i && typeof i === "object" && typeof i.id === "string" && !!findProduct(i.id) && !findProduct(i.id)?.pricePending && findProduct(i.id)?.available!==false && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 20 && ["once","subscription"].includes(i.purchase) && ["once","30","60","90"].includes(i.frequency));
+  return input.filter((i): i is CartItem => !!i && typeof i === "object" && typeof i.id === "string" && !!findProduct(i.id) && !isComingSoon(findProduct(i.id)!) && !findProduct(i.id)?.pricePending && findProduct(i.id)?.available!==false && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 20 && i.purchase==="once" && i.frequency==="once");
 }

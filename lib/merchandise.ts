@@ -1,15 +1,16 @@
 import type { Product } from "./catalog";
+import { isComingSoon } from "./commerce-policy";
 
 /** Show the approved upcoming catalog without granting it live inventory.
- * A matching Shopify record always owns price, currency, variants and availability. */
+ * Shopify owns prices, currency and variants; the launch hold can restrict availability. */
 export function mergeCatalogMerchandise(live: Product[], editorial: Product[]): Product[] {
   const upcoming = editorial;
   const mapped = live.map(p => {
     const copy = upcoming.find(item => item.id === p.id);
-    if (!copy) return p;
+    if (!copy) return isComingSoon(p) ? {...p,available:false} : p;
     const approvedSkincareImage = p.category === "skincare" && copy.category === "skincare"
       && copy.image?.startsWith("/images/skincare/products/");
-    return {...p, descriptor: copy.descriptor, ritual: copy.ritual,
+    return {...p, ...(isComingSoon(p)?{available:false}:{}), descriptor: copy.descriptor, ritual: copy.ritual,
       ...(approvedSkincareImage ? {
         image: copy.image,
         images: [{src: copy.image, alt: copy.images?.[0]?.alt || `IQON ${copy.name}`}, ...(p.images || []).slice(1)],
