@@ -3,7 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import type { SkincareStory } from "@/lib/skincare-stories";
 import type { SkinVisualContent } from "@/lib/skincare-visual-content";
 
-const benefitIcons={droplet:Droplets,layers:Layers2,spark:Sparkles,face:ScanFace,moon:Moon,sun:Sun,feather:Feather,rinse:Waves};
+const benefitIcons={droplet:Droplets,layers:Layers2,spark:Sparkles,face:ScanFace,moon:Moon,sun:Sun,feather:Feather,rinse:Waves,pad:CircleDashed};
 const routineIcons={cleanse:Waves,apply:Hand,sun:Sun,moon:Moon,layers:Layers2,pad:CircleDashed,eye:Eye};
 
 export function SkincareVisualBenefits({id,story,visual}:{id:string;story:SkincareStory;visual:SkinVisualContent}) {

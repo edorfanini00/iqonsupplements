@@ -235,4 +235,5 @@
  .skin-ingredient-name{hyphens:none}
  .skin-timing-label{max-width:100%;flex-shrink:1}
  .skin-photo-label{max-width:calc(100% - 32px)}
+ .skincare-pdp-story .skin-benefits-photo{margin-top:25px}
 }

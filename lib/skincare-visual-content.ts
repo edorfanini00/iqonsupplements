@@ -8,7 +8,7 @@ export type SkinVisualContent = {
   texture: string; photoLabel: string;
   ingredientOrder: [number, number, number];
   routineEyebrow: string; timingIcon: "day-night" | "moon" | "layers";
-  benefits: { title: string; body: string; icon: "droplet" | "layers" | "spark" | "face" | "moon" | "sun" | "feather" | "rinse" }[];
+  benefits: { title: string; body: string; icon: "droplet" | "layers" | "spark" | "face" | "moon" | "sun" | "feather" | "rinse" | "pad" }[];
   ingredients: IngredientVisual[];
   routineTitle: string; timing: string; steps: { title: string; body: string; icon: "cleanse" | "apply" | "sun" | "moon" | "layers" | "pad" | "eye" }[];
 };
@@ -49,7 +49,7 @@ export const skincareVisualContent: Record<string, SkinVisualContent> = {
   "exfoliating-pads": {
     photoLabel:"THE PAD IN DETAIL", ingredientOrder:[0,1,2], routineEyebrow:"YOUR EXFOLIATION STEP", timingIcon:"moon",
     texture:"Pre-moistened pads / focused application",
-    benefits:[{title:"Refined texture",body:"Surface exfoliation for uneven texture and dull-looking skin.",icon:"face"},{title:"Two acid families",body:"Mandelic and lactic AHAs, with salicylic BHA.",icon:"layers"},{title:"Targeted application",body:"Sweep over the areas you want to exfoliate.",icon:"feather"},{title:"Ready to use",body:"50 pre-moistened pads. Follow the label for frequency.",icon:"feather"}],
+    benefits:[{title:"Refined texture",body:"Surface exfoliation for uneven texture and dull-looking skin.",icon:"face"},{title:"Two acid families",body:"Mandelic and lactic AHAs, with salicylic BHA.",icon:"layers"},{title:"Targeted application",body:"Sweep over the areas you want to exfoliate.",icon:"feather"},{title:"Ready to use",body:"50 pre-moistened pads. Follow the label for frequency.",icon:"pad"}],
     ingredients:[{label:"Mandelic + lactic acids",art:"mandelic-acid",artLabel:"Mandelic acid / AHA",kind:"molecule",summary:"Two alpha hydroxy acids for surface exfoliation.",tags:["AHA","SURFACE TEXTURE"]},{art:"salicylic-acid",artLabel:"Salicylic acid / BHA",kind:"molecule",summary:"The beta hydroxy acid component for congested-looking skin.",tags:["BHA","TARGETED CARE"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Moisture-binding care alongside chamomile, licorice and green tea.",tags:["HUMECTANT","SUPPORTING BOTANICALS"]}],
     routineTitle:"Sweep. Refine. Follow with care.",timing:"PM / FOLLOW LABEL FREQUENCY",
     steps:[{title:"Cleanse first",body:"Begin with clean skin in your evening routine.",icon:"cleanse"},{title:"Sweep a pad",body:"Pass over your chosen areas, avoiding the eyes.",icon:"pad"},{title:"Care + protect",body:"Moisturize afterwards. Use sunscreen during the day.",icon:"sun"}]
@@ -58,7 +58,7 @@ export const skincareVisualContent: Record<string, SkinVisualContent> = {
     photoLabel:"A WATER-LIGHT LAYER", ingredientOrder:[1,0,2], routineEyebrow:"YOUR HYDRATION STEP", timingIcon:"day-night",
     texture:"Water-light tonic / fresh hydration",
     benefits:[{title:"Water-light hydration",body:"A fresh layer for dehydrated-feeling skin.",icon:"droplet"},{title:"Humectant pairing",body:"Glycerin and sodium PCA bind water.",icon:"layers"},{title:"Aloe-based care",body:"Aloe and panthenol bring conditioning to the tonic.",icon:"feather"},{title:"Easy to layer",body:"After your cleanser, before serum and cream.",icon:"rinse"}],
-    ingredients:[{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"A water-attracting ingredient for a hydrated skin feel.",tags:["HUMECTANT","LIGHT HYDRATION"]},{art:"sodium-pca",artLabel:"Sodium PCA",kind:"molecule",summary:"A second humectant that complements glycerin.",tags:["WATER BINDING","MOISTURE"]},{art:"panthenol",artLabel:"Panthenol / provitamin B5",kind:"molecule",summary:"Conditioning ingredients in a water-light formula.",tags:["CONDITIONING","LIGHTWEIGHT"]}],
+    ingredients:[{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"A water-attracting ingredient for a hydrated skin feel.",tags:["HUMECTANT","LIGHT HYDRATION"]},{art:"sodium-pca",artLabel:"Sodium PCA",kind:"molecule",summary:"Water-binding care that complements glycerin.",tags:["WATER BINDING","MOISTURE"]},{art:"panthenol",artLabel:"Panthenol / provitamin B5",kind:"molecule",summary:"Conditioning ingredients in a water-light formula.",tags:["CONDITIONING","LIGHTWEIGHT"]}],
     routineTitle:"A light layer before treatment.",timing:"AM + PM / AFTER CLEANSING",
     steps:[{title:"Cleanse",body:"Start with freshly cleansed, rinsed skin.",icon:"cleanse"},{title:"Sweep",body:"Use a cotton pad over the face and neck.",icon:"pad"},{title:"Continue",body:"Follow with your chosen serum and moisturizer.",icon:"layers"}]
   },
