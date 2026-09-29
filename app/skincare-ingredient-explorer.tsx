@@ -48,7 +48,7 @@ export function SkincareIngredientExplorer({ingredients,visuals}:{ingredients:{n
       {ingredients.map((item,i)=><article key={item.name} className={selected===i?"is-selected":""}>
         <button aria-label={`Explore ${item.name}`} aria-pressed={selected===i} aria-controls={panelId} onClick={()=>setSelected(i)}>
           <span className="skin-ingredient-thumbnail"><IngredientArtwork visual={visuals[i]} compact/></span>
-          <span className="skin-ingredient-short"><span className="skin-ingredient-name">{item.name}</span><span className="skin-ingredient-summary">{visuals[i].summary}</span><span className="skin-ingredient-tags">{visuals[i].tags.map(tag=><span key={tag}>{tag}</span>)}</span></span>
+          <span className="skin-ingredient-short"><span className="skin-ingredient-name">{visuals[i].label||item.name}</span><span className="skin-ingredient-summary">{visuals[i].summary}</span><span className="skin-ingredient-tags">{visuals[i].tags.map(tag=><span key={tag}>{tag}</span>)}</span></span>
           <ArrowUpRight size={17} strokeWidth={1.25} className="skin-ingredient-arrow"/>
         </button>
       </article>)}

@@ -23,10 +23,28 @@ describe("skincare ingredient exploration",()=>{
     expect(screen.getByRole('button',{name:'Explore Vitamin C'}).getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByRole('button',{name:'Explore Sodium hyaluronate'})).toBeTruthy();
   });
+  it.each(Object.keys(skincareVisualContent))("keeps %s artwork and explanations paired in its editorial order",(id)=>{
+    const content=skincareVisualContent[id];
+    const ingredients=content.ingredientOrder.map(index=>productContent[id].ingredients![index]);
+    const visuals=content.ingredientOrder.map(index=>content.ingredients[index]);
+    render(React.createElement(SkincareIngredientExplorer,{ingredients,visuals}));
+    const panel=screen.getByRole('region',{name:'Ingredient spotlight'});
+    expect(within(panel).getByRole('heading').textContent).toBe(ingredients[0].name);
+    for(const [index,ingredient] of ingredients.entries()){
+      const control=screen.getByRole('button',{name:`Explore ${ingredient.name}`});
+      fireEvent.click(control);
+      expect(control.getAttribute('aria-pressed')).toBe('true');
+      expect(within(panel).getByRole('heading').textContent).toBe(ingredient.name);
+      expect(panel.textContent).toContain(ingredient.detail);
+      expect(panel.textContent).toContain(visuals[index].artLabel);
+      if(visuals[index].kind==='molecule') expect(within(panel).getByRole('img').getAttribute('src')).toContain(`${visuals[index].art}.svg`);
+    }
+  });
   it("provides matching ingredient artwork for every skincare formula",()=>{
     expect(Object.keys(skincareVisualContent)).toHaveLength(7);
     for(const [id,content] of Object.entries(skincareVisualContent)){
       expect(content.ingredients).toHaveLength(productContent[id].ingredients!.length);
+      expect([...content.ingredientOrder].sort()).toEqual([0,1,2]);
       for(const visual of content.ingredients)if(visual.kind==='molecule'){
         expect(existsSync(`public/images/skincare-ingredients/${visual.art}.svg`)).toBe(true);
       }

@@ -26,7 +26,7 @@ export function SkincareProductStory({product:p,comparison}:{product:Product;com
 
     <section id="product-formula" className="skin-story-section skin-story-formula" aria-labelledby="formula-heading">
       <header className="skin-section-title"><p className="skin-kicker">INSIDE THE FORMULA</p><h2 id="formula-heading">{story.formulaTitle}</h2></header>
-      <SkincareIngredientExplorer ingredients={copy.ingredients||[]} visuals={visual.ingredients}/>
+      <SkincareIngredientExplorer key={p.id} ingredients={visual.ingredientOrder.map(index=>copy.ingredients![index])} visuals={visual.ingredientOrder.map(index=>visual.ingredients[index])}/>
       <Accordion type="single" collapsible className="skin-formulation-accordion"><AccordionItem value="formula"><AccordionTrigger>Ingredients & formulation details</AccordionTrigger><AccordionContent><p><strong>Key ingredients:</strong> {skin.ingredients}.</p><p>{copy.formulaNote}</p></AccordionContent></AccordionItem></Accordion>
     </section>
 
