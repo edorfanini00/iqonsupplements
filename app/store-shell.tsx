@@ -15,8 +15,9 @@ import type { CartSnapshot } from "@/lib/shopify";
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 const StoreContext = createContext<StoreContextType | null>(null);
 export function useStore() {const value=useContext(StoreContext); if(!value) throw new Error("Store context missing"); return value;}
-// The supplied logo is used verbatim. The viewBox removes only its transparent canvas.
-export function Wordmark({large=false}:{large?:boolean}) {return <svg className={`wordmark wordmark-artwork ${large?"wordmark-large":""}`} viewBox="172 64 265 97" role="img" aria-label="IQON" focusable="false"><image href="/images/brand/iqon-logo.png" width="600" height="225"/></svg>;}
+// Use the supplied label artwork verbatim for the black header wordmark.
+// The viewBox trims transparent padding; the white footer retains its existing artwork.
+export function Wordmark({large=false}:{large?:boolean}) {return <svg className={`wordmark wordmark-artwork ${large?"wordmark-large":""}`} viewBox={large?"172 64 265 97":"44 46 363 132"} role="img" aria-label="IQON" focusable="false"><image href={large?"/images/brand/iqon-logo.png":"/images/brand/iqon-logo-label-original.png"} width={large?600:450} height="225"/></svg>;}
 
 export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreCatalog}) {
   const {products,mode}=catalog; const router=useRouter(); const findProduct=(id:string)=>products.find(p=>p.id===id);
