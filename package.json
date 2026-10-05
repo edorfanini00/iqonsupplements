@@ -21,6 +21,7 @@
     "affiliates:migrate": "node scripts/disabled-affiliate-migration.mjs",
     "affiliates:bootstrap": "node --import tsx scripts/bootstrap-affiliates.ts",
     "test:affiliates": "node --import tsx --test tests/affiliates/*.test.ts",
+    "test:order-emails": "node --import tsx --test tests/orders/*.test.ts",
     "test:affiliate-ui": "vitest run --config tests/ui/vitest.config.mjs",
     "typecheck:next": "tsc -p tsconfig.next.json --noEmit --incremental false"
   },

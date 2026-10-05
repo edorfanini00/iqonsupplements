@@ -494,3 +494,31 @@ model PortalRateLimit {
   @@index([expiresAt])
   @@map("supplements_portal_rate_limits")
 }
+
+// Customer transactional emails (order confirmation, shipping confirmation)
+// sent from Shopify webhooks. One row per (kind, dedupe_key): the unique
+// constraint is the durable idempotency claim, so a given order or fulfilment
+// can only ever produce one email. `snapshot` keeps the minimum order detail
+// the shipping email needs later (no payment data).
+model TransactionalEmail {
+  id              String    @id @default(cuid())
+  kind            String
+  dedupeKey       String    @map("dedupe_key")
+  status          String
+  attempts        Int       @default(1)
+  claimToken      String?   @map("claim_token")
+  orderId         String?   @map("order_id")
+  resendMessageId String?   @map("resend_message_id")
+  lastError       String?   @map("last_error")
+  /// Set once any attempt may have reached Resend without a confirmed outcome. Never cleared.
+  sendUncertain   Boolean   @default(false) @map("send_uncertain")
+  snapshot        Json?
+  claimedAt       DateTime? @map("claimed_at")
+  sentAt          DateTime? @map("sent_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@unique([kind, dedupeKey])
+  @@index([orderId])
+  @@map("supplements_transactional_emails")
+}
