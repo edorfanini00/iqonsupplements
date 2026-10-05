@@ -510,6 +510,8 @@ model TransactionalEmail {
   orderId         String?   @map("order_id")
   resendMessageId String?   @map("resend_message_id")
   lastError       String?   @map("last_error")
+  /// Set once any attempt may have reached Resend without a confirmed outcome. Never cleared.
+  sendUncertain   Boolean   @default(false) @map("send_uncertain")
   snapshot        Json?
   claimedAt       DateTime? @map("claimed_at")
   sentAt          DateTime? @map("sent_at")

@@ -4,16 +4,28 @@
  *
  * claim() is the only way to get permission to send. It either inserts a new
  * row (unique on kind + dedupe_key) or takes over a row that previously
- * failed or whose `sending` claim has gone stale. Both paths are a single
+ * failed or whose `sending` claim has gone stale. Every path is a single
  * atomic statement, so concurrent duplicate deliveries yield exactly one
- * winner. A `sent` or `skipped` row is never claimed again.
+ * winner. `sent`, `skipped` and `sent_unconfirmed` rows are never claimed again.
+ *
+ * Resend only remembers an idempotency key for 24 hours. A stale `sending`
+ * row (the outcome update was lost) or a failure that may still have been
+ * delivered (timeout, network error, 5xx) marks the row `send_uncertain`.
+ * Such a row is retried only within AMBIGUOUS_SEND_WINDOW_MS of its first
+ * claim, while the key still protects the customer. After that it becomes the
+ * terminal `sent_unconfirmed`: a later fulfillments/update (shipment_status
+ * changes arrive days later) must never produce a second email.
  */
 import { randomUUID } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
 import type { OrderSnapshot } from "../emails/types";
 
 export type EmailKind = "order_confirmation" | "shipping_confirmation";
-export type EmailStatus = "sending" | "sent" | "failed" | "skipped";
+export type EmailStatus = "sending" | "sent" | "failed" | "skipped" | "sent_unconfirmed";
+export const TERMINAL_STATUSES: readonly EmailStatus[] = ["sent", "skipped", "sent_unconfirmed"];
+
+/** Under Resend's 24h idempotency key lifetime, measured from the first claim. */
+export const AMBIGUOUS_SEND_WINDOW_MS = 23 * 3600_000;
 
 export interface ClaimInput {
   kind: EmailKind;
@@ -24,13 +36,15 @@ export interface ClaimInput {
 }
 
 export type ClaimResult =
-  | { claimed: true; token: string; attempts: number }
+  /** `snapshot` is the one stored by the first claim (reclaims never overwrite it). */
+  | { claimed: true; token: string; attempts: number; snapshot: unknown }
   | { claimed: false; status: EmailStatus | "unknown" };
 
 export interface TransactionalEmailStore {
   claim(input: ClaimInput): Promise<ClaimResult>;
   markSent(kind: EmailKind, dedupeKey: string, token: string, messageId: string | null): Promise<void>;
-  markFailed(kind: EmailKind, dedupeKey: string, token: string, error: string): Promise<void>;
+  /** `uncertain`: the email may have been accepted by Resend (timeout, network error, 5xx). */
+  markFailed(kind: EmailKind, dedupeKey: string, token: string, error: string, uncertain: boolean): Promise<void>;
   markSkipped(kind: EmailKind, dedupeKey: string, token: string, reason: string): Promise<void>;
   /** Snapshot saved by orders/paid, used to build the shipping email. */
   getOrderSnapshot(orderId: string): Promise<OrderSnapshot | null>;
@@ -41,6 +55,8 @@ export interface TransactionalEmailStore {
 /** Shipping rows store only line item ids and quantities, to detect partial shipments. */
 export interface ShipmentLedgerSnapshot {
   lineItems: { id: string; quantity: number }[];
+  /** Exact render input of the first attempt, so a retry sends the same body. */
+  shipment?: unknown;
 }
 
 function isUniqueViolation(error: unknown): boolean {
@@ -57,30 +73,50 @@ export function prismaTransactionalEmailStore(prisma: PrismaClient, now: () => D
       const at = now();
       const json = snapshot === undefined ? undefined : (JSON.parse(JSON.stringify(snapshot)) as object);
       try {
-        await table.create({ data: { kind, dedupeKey, orderId, status: "sending", attempts: 1, claimToken: token, claimedAt: at, snapshot: json } });
-        return { claimed: true, token, attempts: 1 };
+        await table.create({ data: { kind, dedupeKey, orderId, status: "sending", attempts: 1, claimToken: token, claimedAt: at, createdAt: at, snapshot: json } });
+        return { claimed: true, token, attempts: 1, snapshot: json ?? null };
       } catch (error) {
         if (!isUniqueViolation(error)) throw error;
       }
-      // Single conditional UPDATE: Postgres re-checks the WHERE clause after
-      // acquiring the row lock, so only one concurrent reclaim can match.
-      const reclaimed = await table.updateMany({
-        where: {
-          kind,
-          dedupeKey,
-          OR: [{ status: "failed" }, { status: "sending", claimedAt: { lt: new Date(at.getTime() - staleAfterMs) } }],
-        },
-        data: { status: "sending", claimToken: token, claimedAt: at, attempts: { increment: 1 }, lastError: null, ...(json ? { snapshot: json } : {}) },
+      const stale = new Date(at.getTime() - staleAfterMs);
+      const windowStart = new Date(at.getTime() - AMBIGUOUS_SEND_WINDOW_MS);
+      const take = { status: "sending", claimToken: token, claimedAt: at, attempts: { increment: 1 }, lastError: null };
+      // Each step is one conditional UPDATE: Postgres re-checks the WHERE clause
+      // after acquiring the row lock, so only one concurrent claimer can match.
+      let reclaimed = await table.updateMany({
+        where: { kind, dedupeKey, status: "failed", OR: [{ sendUncertain: false }, { createdAt: { gte: windowStart } }] },
+        data: take,
       });
-      const row = await table.findUnique({ where: { kind_dedupeKey: { kind, dedupeKey } }, select: { status: true, attempts: true, claimToken: true } });
-      if (reclaimed.count === 1 && row?.claimToken === token) return { claimed: true, token, attempts: row.attempts };
+      if (reclaimed.count === 0) {
+        // The previous owner vanished mid send: it may have been delivered.
+        reclaimed = await table.updateMany({
+          where: { kind, dedupeKey, status: "sending", claimedAt: { lt: stale }, createdAt: { gte: windowStart } },
+          data: { ...take, sendUncertain: true },
+        });
+      }
+      if (reclaimed.count === 0) {
+        await table.updateMany({
+          where: {
+            kind,
+            dedupeKey,
+            createdAt: { lt: windowStart },
+            OR: [{ status: "failed", sendUncertain: true }, { status: "sending", claimedAt: { lt: stale } }],
+          },
+          data: { status: "sent_unconfirmed", claimToken: null, sendUncertain: true, lastError: "ambiguous_send_expired" },
+        });
+      }
+      const row = await table.findUnique({ where: { kind_dedupeKey: { kind, dedupeKey } }, select: { status: true, attempts: true, claimToken: true, snapshot: true } });
+      if (reclaimed.count === 1 && row?.claimToken === token) return { claimed: true, token, attempts: row.attempts, snapshot: row.snapshot ?? null };
       return { claimed: false, status: (row?.status as EmailStatus | undefined) ?? "unknown" };
     },
     async markSent(kind, dedupeKey, token, messageId) {
       await table.updateMany({ where: { kind, dedupeKey, claimToken: token }, data: { status: "sent", sentAt: now(), resendMessageId: messageId, lastError: null } });
     },
-    async markFailed(kind, dedupeKey, token, error) {
-      await table.updateMany({ where: { kind, dedupeKey, claimToken: token, status: "sending" }, data: { status: "failed", lastError: error.slice(0, MAX_ERROR) } });
+    async markFailed(kind, dedupeKey, token, error, uncertain) {
+      await table.updateMany({
+        where: { kind, dedupeKey, claimToken: token, status: "sending" },
+        data: { status: "failed", lastError: error.slice(0, MAX_ERROR), ...(uncertain ? { sendUncertain: true } : {}) },
+      });
     },
     async markSkipped(kind, dedupeKey, token, reason) {
       await table.updateMany({ where: { kind, dedupeKey, claimToken: token, status: "sending" }, data: { status: "skipped", lastError: reason.slice(0, MAX_ERROR) } });
@@ -92,7 +128,7 @@ export function prismaTransactionalEmailStore(prisma: PrismaClient, now: () => D
     },
     async shippedQuantities(orderId, excludeDedupeKey) {
       const rows = await table.findMany({
-        where: { kind: "shipping_confirmation", orderId, status: { in: ["sent", "sending"] }, dedupeKey: { not: excludeDedupeKey } },
+        where: { kind: "shipping_confirmation", orderId, status: { in: ["sent", "sending", "sent_unconfirmed"] }, dedupeKey: { not: excludeDedupeKey } },
         select: { snapshot: true },
         take: 50,
       });

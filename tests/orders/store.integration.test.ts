@@ -15,7 +15,10 @@ import { FakeSender } from "./memory";
 
 const url = process.env.ORDER_EMAILS_TEST_DATABASE_URL;
 const skip = url ? false : "ORDER_EMAILS_TEST_DATABASE_URL not set";
-const MIGRATION = new URL("../../prisma/migrations/20261005000000_supplements_transactional_emails/migration.sql", import.meta.url);
+const MIGRATIONS = [
+  "20261005000000_supplements_transactional_emails",
+  "20261006000000_transactional_emails_send_uncertain",
+].map((name) => new URL(`../../prisma/migrations/${name}/migration.sql`, import.meta.url));
 
 let clients: PrismaClient[] = [];
 
@@ -25,8 +28,10 @@ before(async () => {
   clients = Array.from({ length: 4 }, () => new PrismaClient({ datasourceUrl: url }));
   const admin = clients[0];
   await admin.$executeRawUnsafe('DROP TABLE IF EXISTS "supplements_transactional_emails"');
-  for (const statement of readFileSync(MIGRATION, "utf8").split(";").map((s) => s.replace(/--.*$/gm, "").trim()).filter(Boolean)) {
-    await admin.$executeRawUnsafe(statement);
+  for (const migration of MIGRATIONS) {
+    for (const statement of readFileSync(migration, "utf8").split(";").map((s) => s.replace(/--.*$/gm, "").trim()).filter(Boolean)) {
+      await admin.$executeRawUnsafe(statement);
+    }
   }
 });
 
@@ -49,7 +54,7 @@ test("concurrent reclaims of a failed row: exactly one winner, attempts incremen
   const stores = clients.map((c) => prismaTransactionalEmailStore(c));
   const first = await stores[0].claim(claimInput("race-2"));
   assert.ok(first.claimed);
-  await stores[0].markFailed("order_confirmation", "race-2", first.token, "resend_timeout");
+  await stores[0].markFailed("order_confirmation", "race-2", first.token, "resend_timeout", true);
   const results = await Promise.all(Array.from({ length: 16 }, (_, i) => stores[i % stores.length].claim(claimInput("race-2"))));
   assert.equal(results.filter((r) => r.claimed).length, 1);
   const row = await clients[0].transactionalEmail.findUniqueOrThrow({ where: { kind_dedupeKey: { kind: "order_confirmation", dedupeKey: "race-2" } } });
@@ -97,4 +102,37 @@ test("end to end on Postgres: 10 concurrent orders/paid deliveries send one emai
   const snapshot = await store.getOrderSnapshot("7000000000001");
   assert.equal(snapshot?.orderName, "#2001");
   assert.equal(snapshot?.lineItems.length, 3);
+});
+
+test("Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable", { skip }, async () => {
+  let now = new Date("2026-10-05T12:00:00Z");
+  const store = prismaTransactionalEmailStore(clients[0], () => now);
+  const find = (dedupeKey: string) => clients[0].transactionalEmail.findUniqueOrThrow({ where: { kind_dedupeKey: { kind: "shipping_confirmation", dedupeKey } } });
+  const input = (dedupeKey: string) => ({ ...claimInput(dedupeKey), kind: "shipping_confirmation" as const, snapshot: { lineItems: [{ id: "1", quantity: 1 }], shipment: { fulfillmentId: dedupeKey } } });
+
+  // Lost markSent: row stays `sending`.
+  assert.ok((await store.claim(input("w-lost"))).claimed);
+  // Uncertain failure (timeout) and certain failure (Resend refused it).
+  const timedOut = await store.claim(input("w-timeout"));
+  assert.ok(timedOut.claimed);
+  await store.markFailed("shipping_confirmation", "w-timeout", timedOut.token, "resend_timeout", true);
+  const refused = await store.claim(input("w-refused"));
+  assert.ok(refused.claimed);
+  await store.markFailed("shipping_confirmation", "w-refused", refused.token, "resend_rate_limit_exceeded", false);
+
+  // Inside the window a stale claim is retried and becomes sticky uncertain; the stored snapshot comes back.
+  now = new Date(now.getTime() + 10 * 60_000);
+  const retry = await store.claim({ ...input("w-lost"), snapshot: { lineItems: [], shipment: { fulfillmentId: "changed" } } });
+  assert.ok(retry.claimed);
+  assert.deepEqual((retry.snapshot as { shipment: unknown }).shipment, { fulfillmentId: "w-lost" });
+  assert.equal((await find("w-lost")).sendUncertain, true);
+
+  now = new Date(now.getTime() + 3 * 24 * 3600_000);
+  const concurrent = await Promise.all(clients.map((c) => prismaTransactionalEmailStore(c, () => now).claim(input("w-lost"))));
+  assert.ok(concurrent.every((r) => !r.claimed && r.status === "sent_unconfirmed"));
+  assert.deepEqual(await store.claim(input("w-timeout")), { claimed: false, status: "sent_unconfirmed" });
+  assert.equal((await find("w-timeout")).lastError, "ambiguous_send_expired");
+  assert.ok((await store.claim(input("w-refused"))).claimed);
+  // sent_unconfirmed rows still count as shipped for partial shipment detection.
+  assert.deepEqual(await store.shippedQuantities("w-lost", "other"), { "1": 1 });
 });

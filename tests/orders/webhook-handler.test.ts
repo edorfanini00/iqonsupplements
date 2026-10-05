@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { handleShopifyOrderWebhook, readLimitedBody, type WebhookDeps } from "../../lib/orders/webhooks/handler";
+import { handleShopifyOrderWebhook, readLimitedBody, verifyShopifyHmac, type WebhookDeps } from "../../lib/orders/webhooks/handler";
+import { classifyResendError } from "../../lib/orders/webhooks/sender";
 import { MORE_TO_FOLLOW_COPY } from "../../lib/orders/emails/shipping-confirmation";
 import { verifyShopifyWebhookSignature } from "../../lib/affiliates/shopify-webhook";
 import { BRAND, ORDER_ID, SECRET, fulfillmentPayload, orderPaidPayload, partialFirst, partialSecond, sign, visibleText, webhookHeaders } from "./fixtures";
@@ -78,8 +79,9 @@ test("unknown topics are acknowledged and ignored; oversized bodies are refused"
   assert.equal(res.body.ignored, true);
   const huge = "x".repeat(1_000_001);
   assert.equal((await handleShopifyOrderWebhook(huge, webhookHeaders("orders/paid", huge), deps)).status, 413);
-  assert.equal(await readLimitedBody(new Request("https://x.test", { method: "POST", body: huge })), null);
-  assert.equal(await readLimitedBody(new Request("https://x.test", { method: "POST", body: "{}" })), "{}");
+  assert.deepEqual(await readLimitedBody(new Request("https://x.test", { method: "POST", body: huge })), { ok: false, status: 413, reason: "too_large" });
+  const small = await readLimitedBody(new Request("https://x.test", { method: "POST", body: "{}" }));
+  assert.ok(small.ok && small.body.toString("utf8") === "{}");
   assert.equal(sender.sent.length, 0);
 });
 
@@ -130,7 +132,7 @@ test("a stale sending claim is reclaimed and sent; a fresh one is not", async ()
 });
 
 test("transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key", async () => {
-  const sender = new FakeSender([{ ok: false, retryable: true, error: "resend_internal_server_error" }]);
+  const sender = new FakeSender([{ ok: false, retryable: true, uncertain: true, error: "resend_internal_server_error" }]);
   const { deps, store } = setup({ sender });
   const first = await deliver(deps, "orders/paid", orderPaidPayload());
   assert.equal(first.status, 503);
@@ -156,7 +158,7 @@ test("a hung Resend call is cut off inside the budget and retried later", async 
 });
 
 test("a permanent Resend rejection is recorded and acknowledged (no endless retries)", async () => {
-  const sender = new FakeSender([{ ok: false, retryable: false, error: "resend_validation_error" }]);
+  const sender = new FakeSender([{ ok: false, retryable: false, uncertain: false, error: "resend_validation_error" }]);
   const { deps, store } = setup({ sender });
   const res = await deliver(deps, "orders/paid", orderPaidPayload());
   assert.equal(res.status, 200);
@@ -293,4 +295,156 @@ test("a database outage before the claim returns 503 and sends nothing", async (
   const { deps, sender } = setup({ store });
   assert.equal((await deliver(deps, "orders/paid", orderPaidPayload())).status, 503);
   assert.equal(sender.sent.length, 0);
+});
+
+const HOUR = 3600_000;
+const DAY = 24 * HOUR;
+
+/** A clock shared by the handler and the store, so tests can jump days ahead. */
+function clocked(overrides: Partial<WebhookDeps> = {}) {
+  const clock = { now: 1_800_000_000_000 };
+  const store = new MemoryStore(() => clock.now);
+  const ctx = setup({ store, now: () => clock.now, ...overrides });
+  return { ...ctx, clock, store, sender: ctx.deps.sender as FakeSender };
+}
+
+test("REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email", async () => {
+  const { clock, deps, sender, store, logs } = clocked();
+  store.failMarkSent = 2; // both tries fail: the email went out but the ledger still says `sending`
+  const first = await deliver(deps, "fulfillments/create", fulfillmentPayload());
+  assert.equal(first.status, 200);
+  assert.equal(first.body.sent, true);
+  assert.equal(store.get("shipping_confirmation", "5550000000001")!.status, "sending");
+  assert.equal(logs.filter((l) => l.event === "mark_sent_failed").length, 2);
+  clock.now += 3 * DAY;
+  const delivered = await deliver(deps, "fulfillments/update", fulfillmentPayload({ shipment_status: "delivered" }));
+  assert.equal(delivered.status, 200);
+  assert.equal(delivered.body.duplicate, true);
+  assert.equal(delivered.body.status, "sent_unconfirmed");
+  assert.equal(sender.attempts.length, 1, "exactly one send");
+  assert.equal(store.get("shipping_confirmation", "5550000000001")!.status, "sent_unconfirmed");
+  // And it stays terminal.
+  clock.now += DAY;
+  assert.equal((await deliver(deps, "fulfillments/update", fulfillmentPayload({ shipment_status: "out_for_delivery" }))).body.duplicate, true);
+  assert.equal(sender.attempts.length, 1);
+});
+
+test("markSent is retried once, so a single lost update still records `sent`", async () => {
+  const { deps, store, logs } = clocked();
+  store.failMarkSent = 1;
+  assert.equal((await deliver(deps, "orders/paid", orderPaidPayload())).body.sent, true);
+  assert.equal(store.get("order_confirmation", String(ORDER_ID))!.status, "sent");
+  assert.equal(logs.filter((l) => l.event === "mark_sent_failed").length, 1);
+});
+
+test("within Resend's window a stale `sending` row is retried with the same key and the same body", async () => {
+  let images = true;
+  const { clock, deps, sender, store } = clocked({
+    imageLookup: async () => {
+      if (!images) throw new Error("storefront down");
+      return new Map([["8001", { handle: "creatine-monohydrate", imageUrl: "https://cdn.shopify.com/s/files/creatine.jpg" }]]);
+    },
+  });
+  store.failMarkSent = 2;
+  await deliver(deps, "orders/paid", orderPaidPayload());
+  images = false; // the retry would otherwise resolve different images
+  clock.now += 10 * 60_000;
+  const retried = await deliver(deps, "orders/paid", orderPaidPayload());
+  assert.equal(retried.body.sent, true);
+  assert.equal(sender.attempts.length, 2);
+  assert.equal(sender.attempts[0].idempotencyKey, sender.attempts[1].idempotencyKey);
+  assert.equal(sender.attempts[0].html, sender.attempts[1].html, "retry renders the stored snapshot");
+  const row = store.get("order_confirmation", String(ORDER_ID))!;
+  assert.equal(row.status, "sent");
+  assert.equal(row.sendUncertain, true);
+});
+
+test("an uncertain failure (timeout) is retried inside 23h but never after", async () => {
+  const timeout = { ok: false as const, retryable: true, uncertain: true, error: "resend_timeout" };
+  const early = clocked({ sender: new FakeSender([timeout]) });
+  assert.equal((await deliver(early.deps, "orders/paid", orderPaidPayload())).status, 503);
+  early.clock.now += 2 * HOUR;
+  assert.equal((await deliver(early.deps, "orders/paid", orderPaidPayload())).body.sent, true);
+
+  const late = clocked({ sender: new FakeSender([timeout]) });
+  assert.equal((await deliver(late.deps, "fulfillments/create", fulfillmentPayload())).status, 503);
+  late.clock.now += 3 * DAY;
+  const res = await deliver(late.deps, "fulfillments/update", fulfillmentPayload({ shipment_status: "delivered" }));
+  assert.equal(res.status, 200);
+  assert.equal(res.body.status, "sent_unconfirmed");
+  assert.equal(late.sender.attempts.length, 1);
+});
+
+test("a certain rejection (Resend refused it) may be retried even after 23h", async () => {
+  const { clock, deps, sender } = clocked({ sender: new FakeSender([{ ok: false, retryable: true, uncertain: false, error: "resend_rate_limit_exceeded" }]) });
+  assert.equal((await deliver(deps, "fulfillments/create", fulfillmentPayload())).status, 503);
+  clock.now += 2 * DAY;
+  assert.equal((await deliver(deps, "fulfillments/update", fulfillmentPayload({ shipment_status: "in_transit" }))).body.sent, true);
+  assert.equal(sender.sent.length, 1);
+});
+
+test("uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h", async () => {
+  const { clock, deps, sender, store } = clocked({ sender: new FakeSender([{ ok: true, id: "msg_1" }, { ok: false, retryable: true, uncertain: false, error: "resend_rate_limit_exceeded" }]) });
+  store.failMarkSent = 2;
+  await deliver(deps, "fulfillments/create", fulfillmentPayload()); // delivered, ledger lost
+  clock.now += 10 * 60_000;
+  assert.equal((await deliver(deps, "fulfillments/update", fulfillmentPayload())).status, 503); // reclaim, Resend 429
+  clock.now += 2 * DAY;
+  assert.equal((await deliver(deps, "fulfillments/update", fulfillmentPayload({ shipment_status: "delivered" }))).body.status, "sent_unconfirmed");
+  assert.equal(sender.attempts.length, 2);
+});
+
+test("a shipment_status only update for a fulfilment already sent is a duplicate", async () => {
+  const { deps, sender } = setup();
+  await deliver(deps, "fulfillments/create", fulfillmentPayload());
+  for (const status of ["in_transit", "out_for_delivery", "delivered"]) {
+    const res = await deliver(deps, "fulfillments/update", fulfillmentPayload({ shipment_status: status }));
+    assert.equal(res.body.duplicate, true);
+    assert.equal(res.body.status, "sent");
+  }
+  assert.equal(sender.attempts.length, 1);
+});
+
+test("ledger writes after the claim are bounded by the budget", async () => {
+  const store = new MemoryStore();
+  store.markSkipped = () => new Promise(() => {});
+  const { deps } = setup({ store, budgetMs: 1500 });
+  const started = Date.now();
+  const res = await deliver(deps, "orders/paid", orderPaidPayload({ email: null, contact_email: null, customer: null }));
+  assert.ok(Date.now() - started < 2500, "answered inside the budget");
+  assert.equal(res.status, 503);
+});
+
+test("Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain", () => {
+  const domain = classifyResendError({ name: "validation_error", statusCode: 403, message: "The iqonbody.com domain is not verified. Please, add and verify your domain." });
+  assert.deepEqual([domain.retryable, domain.uncertain], [true, false]);
+  for (const name of ["invalid_api_key", "missing_api_key", "restricted_api_key", "invalid_from_address", "daily_quota_exceeded", "rate_limit_exceeded"]) {
+    const c = classifyResendError({ name, statusCode: 403, message: "x" });
+    assert.deepEqual([c.retryable, c.uncertain], [true, false], name);
+  }
+  const payload = classifyResendError({ name: "validation_error", statusCode: 422, message: "Invalid `to` field." });
+  assert.deepEqual([payload.retryable, payload.uncertain], [false, false]);
+  for (const name of ["internal_server_error", "application_error", "concurrent_idempotent_requests"]) {
+    const c = classifyResendError({ name, statusCode: 500, message: "x" });
+    assert.deepEqual([c.retryable, c.uncertain], [true, true], name);
+  }
+});
+
+test("HMAC is computed over the raw bytes, not a re-encoded string", async () => {
+  const raw = Buffer.concat([Buffer.from('{"note":"'), Buffer.from([0xff, 0xfe]), Buffer.from('"}')]);
+  const signature = sign(raw);
+  assert.equal(verifyShopifyHmac(raw, signature, SECRET), true);
+  assert.equal(verifyShopifyHmac(Buffer.from(raw.toString("utf8")), signature, SECRET), false);
+  const { deps } = setup();
+  const res = await handleShopifyOrderWebhook(raw, webhookHeaders("orders/create", "", { "x-shopify-hmac-sha256": signature }), deps);
+  assert.equal(res.status, 200);
+  assert.equal(res.body.ignored, true);
+});
+
+test("a body that trickles in past the read deadline is refused with 408", async () => {
+  const stream = new ReadableStream<Uint8Array>({ start(controller) { controller.enqueue(new TextEncoder().encode("{")); } });
+  const started = Date.now();
+  const res = await readLimitedBody(new Request("https://x.test", { method: "POST", body: stream, duplex: "half" } as RequestInit), 1000, 200);
+  assert.deepEqual(res, { ok: false, status: 408, reason: "body_timeout" });
+  assert.ok(Date.now() - started < 1000);
 });

@@ -19,10 +19,10 @@ export const maxDuration = 10;
 const headers = { "Cache-Control": "no-store" };
 
 export async function POST(request: Request) {
-  const raw = await readLimitedBody(request);
-  if (raw === null) return Response.json({ ok: false, reason: "too_large" }, { status: 413, headers });
+  const read = await readLimitedBody(request);
+  if (!read.ok) return Response.json({ ok: false, reason: read.reason }, { status: read.status, headers });
   const env = process.env;
-  const result = await handleShopifyOrderWebhook(raw, request.headers, {
+  const result = await handleShopifyOrderWebhook(read.body, request.headers, {
     env,
     store: env.SUPPLEMENTS_DATABASE_URL?.trim() ? prismaTransactionalEmailStore(prisma) : null,
     sender: resendSender(env),
