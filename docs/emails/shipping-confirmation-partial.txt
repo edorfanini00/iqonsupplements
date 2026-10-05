@@ -3,7 +3,7 @@ Preheader: Your parcel is with USPS. Track it any time.
 
 Order #1042
 
-Good news, Ava. Your order is on its way.
+Good news, Ava. Part of your order is on its way.
 
 Your parcel has left us and is now with USPS. Shipping usually takes 3 to 5 business days.
 
@@ -12,7 +12,7 @@ This parcel holds part of your order. The rest will follow in a separate shipmen
 Carrier: USPS
 Tracking number: 9400111899223197428490
 Track your parcel: https://parcelsapp.com/en/tracking/9400111899223197428490
-View your order details: https://www.iqonbody.com/
+View your order details: https://www.iqonbody.com/68512342/orders/7f3c2a9e41b84d6c9e0a5b1d2c3e4f50/authenticate?key=preview
 
 IN THIS SHIPMENT
 
