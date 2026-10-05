@@ -6,7 +6,7 @@ export const SECRET = "synthetic-webhook-secret-for-tests";
 export const SHOP = "nr9zd0-t5.myshopify.com";
 export const BRAND: EmailBrandConfig = { assetOrigin: "https://www.iqonbody.com", siteUrl: "https://www.iqonbody.com/", supportEmail: "support@iqonsupplements.com" };
 
-export function sign(body: string, secret = SECRET): string {
+export function sign(body: string | Buffer, secret = SECRET): string {
   return createHmac("sha256", secret).update(body).digest("base64");
 }
 
@@ -47,6 +47,13 @@ const address = {
   phone: "5555550100",
 };
 
+/**
+ * Real Shopify semantics (REST Order): total_line_items_price is the pre
+ * discount line sum, (current_)subtotal_price is AFTER discounts, total_discounts
+ * includes line and order discounts, total_shipping_price_set is before
+ * shipping discounts. Here: lines 39 + 2 x 34 + 36 = 143.00, WELCOME15 takes
+ * 21.45, subtotal_price 121.55, tax 10.48 (8.625% of 121.55), total 132.03.
+ */
 export function orderPaidPayload(overrides: Record<string, unknown> = {}) {
   return {
     id: ORDER_ID,
@@ -61,15 +68,26 @@ export function orderPaidPayload(overrides: Record<string, unknown> = {}) {
     taxes_included: false,
     financial_status: "paid",
     order_status_url: "https://www.iqonbody.com/68512342/orders/abc123/authenticate?key=synthetic",
-    current_subtotal_price: "143.00",
-    current_subtotal_price_set: money("143.00"),
+    total_line_items_price: "143.00",
+    total_line_items_price_set: money("143.00"),
+    subtotal_price: "121.55",
+    subtotal_price_set: money("121.55"),
+    total_discounts: "21.45",
+    total_discounts_set: money("21.45"),
+    total_tax: "10.48",
+    total_tax_set: money("10.48"),
+    total_price: "132.03",
+    total_price_set: money("132.03"),
+    current_subtotal_price: "121.55",
+    current_subtotal_price_set: money("121.55"),
     current_total_discounts: "21.45",
     current_total_discounts_set: money("21.45"),
-    current_total_tax: "10.94",
-    current_total_tax_set: money("10.94"),
-    current_total_price: "132.49",
-    current_total_price_set: money("132.49"),
+    current_total_tax: "10.48",
+    current_total_tax_set: money("10.48"),
+    current_total_price: "132.03",
+    current_total_price_set: money("132.03"),
     total_shipping_price_set: money("0.00"),
+    shipping_lines: [{ id: 4400000000001, title: "Standard", price: "0.00", discounted_price: "0.00", price_set: money("0.00") }],
     discount_codes: [{ code: "WELCOME15", amount: "21.45", type: "percentage" }],
     customer: { id: 7001, first_name: "Ava", last_name: "Morgan", email: "ava.morgan@example.com" },
     billing_address: { ...address, address1: "PRIVATE BILLING" },
@@ -78,9 +96,9 @@ export function orderPaidPayload(overrides: Record<string, unknown> = {}) {
     payment_gateway_names: ["shopify_payments"],
     browser_ip: "203.0.113.9",
     line_items: [
-      { id: LINE_CREATINE, admin_graphql_api_id: `gid://shopify/LineItem/${LINE_CREATINE}`, product_id: 9001, variant_id: 8001, title: "Creatine Monohydrate", variant_title: "Default Title", name: "Creatine Monohydrate", quantity: 1, current_quantity: 1, price: "39.00", price_set: money("39.00"), requires_shipping: true, selling_plan_allocation: { selling_plan: { name: "Delivered every 30 days, save 10%" } } },
-      { id: LINE_COLLAGEN, admin_graphql_api_id: `gid://shopify/LineItem/${LINE_COLLAGEN}`, product_id: 9002, variant_id: 8002, title: "Hydrolyzed Collagen Peptides", variant_title: "Unflavored", quantity: 2, current_quantity: 2, price: "34.00", price_set: money("34.00"), requires_shipping: true },
-      { id: LINE_NMN, admin_graphql_api_id: `gid://shopify/LineItem/${LINE_NMN}`, product_id: 9003, variant_id: 8003, title: "NMN", variant_title: null, quantity: 1, current_quantity: 1, price: "36.00", price_set: money("36.00"), requires_shipping: true },
+      { id: LINE_CREATINE, admin_graphql_api_id: `gid://shopify/LineItem/${LINE_CREATINE}`, product_id: 9001, variant_id: 8001, title: "Creatine Monohydrate", variant_title: "Default Title", name: "Creatine Monohydrate", quantity: 1, current_quantity: 1, price: "39.00", price_set: money("39.00"), discount_allocations: [{ amount: "5.85", amount_set: money("5.85"), discount_application_index: 0 }], requires_shipping: true, selling_plan_allocation: { selling_plan: { name: "Delivered every 30 days, save 10%" } } },
+      { id: LINE_COLLAGEN, admin_graphql_api_id: `gid://shopify/LineItem/${LINE_COLLAGEN}`, product_id: 9002, variant_id: 8002, title: "Hydrolyzed Collagen Peptides", variant_title: "Unflavored", quantity: 2, current_quantity: 2, price: "34.00", price_set: money("34.00"), discount_allocations: [{ amount: "10.20", amount_set: money("10.20"), discount_application_index: 0 }], requires_shipping: true },
+      { id: LINE_NMN, admin_graphql_api_id: `gid://shopify/LineItem/${LINE_NMN}`, product_id: 9003, variant_id: 8003, title: "NMN", variant_title: null, quantity: 1, current_quantity: 1, price: "36.00", price_set: money("36.00"), discount_allocations: [{ amount: "5.40", amount_set: money("5.40"), discount_application_index: 0 }], requires_shipping: true },
     ],
     ...overrides,
   };

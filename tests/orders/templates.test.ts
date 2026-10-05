@@ -5,7 +5,8 @@ import { MORE_TO_FOLLOW_COPY, SHIPPING_TIME_COPY, renderShippingConfirmationEmai
 import { brandConfig, maskEmail } from "../../lib/orders/emails/format";
 import { resolveLineItemImages, storefrontImageLookup } from "../../lib/orders/emails/images";
 import type { OrderSnapshot, ShipmentDetails } from "../../lib/orders/emails/types";
-import { hasMoreToFollow, parseFulfillment, parseOrderPaid, shipmentReadiness } from "../../lib/orders/webhooks/shopify-payload";
+import { hasMoreToFollow, parseFulfillment, parseOrderPaid, shipmentReadiness, totalsMismatch } from "../../lib/orders/webhooks/shopify-payload";
+import { totalRows } from "../../lib/orders/emails/layout";
 import { BRAND, DASH, FORBIDDEN_HEALTH_WORDS, fulfillmentPayload, orderPaidPayload, partialFirst, visibleText } from "./fixtures";
 
 async function snapshot(overrides: Record<string, unknown> = {}): Promise<OrderSnapshot> {
@@ -41,18 +42,92 @@ test("order payload parsing uses current totals, presentment currency and drops 
   assert.equal(order.orderId, "6123456789012");
   assert.equal(order.orderName, "#1042");
   assert.equal(order.firstName, "Ava");
+  // Pre discount line sum, not Shopify's post discount subtotal_price (121.55).
   assert.equal(order.subtotal, "143.00");
   assert.equal(order.discounts, "21.45");
-  assert.equal(order.total, "132.49");
+  assert.equal(order.tax, "10.48");
+  assert.equal(order.total, "132.03");
   assert.deepEqual(order.discountCodes, ["WELCOME15"]);
   assert.equal(order.lineItems[0].sellingPlanName, "Delivered every 30 days, save 10%");
   assert.equal(order.lineItems[1].lineTotal, "68.00");
   assert.equal(order.shippingAddress?.province, "CA");
   assert.ok(!JSON.stringify(order).includes("PRIVATE BILLING"));
   assert.equal(parseOrderPaid({ id: "not-a-number" }), null);
-  const eur = parseOrderPaid(orderPaidPayload({ presentment_currency: "EUR", current_total_price_set: { shop_money: { amount: "132.49" }, presentment_money: { amount: "121.00" } } }))!;
+  const eur = parseOrderPaid(orderPaidPayload({ presentment_currency: "EUR", current_total_price_set: { shop_money: { amount: "132.03" }, presentment_money: { amount: "121.00" } } }))!;
   assert.equal(eur.currency, "EUR");
   assert.equal(eur.total, "121.00");
+});
+
+const usd = (amount: string) => ({ shop_money: { amount, currency_code: "USD" }, presentment_money: { amount, currency_code: "USD" } });
+const eur = (amount: string) => ({ shop_money: { amount, currency_code: "EUR" }, presentment_money: { amount, currency_code: "EUR" } });
+
+/** Realistic Shopify orders/paid totals, each internally consistent the way Shopify reports them. */
+const TOTALS_SCENARIOS: [string, Record<string, unknown>, { subtotal: string; discounts: string; shipping: string; total: string }][] = [
+  ["percentage code, free shipping (base fixture)", {}, { subtotal: "143.00", discounts: "21.45", shipping: "0.00", total: "132.03" }],
+  [
+    "paid shipping removed by a shipping discount",
+    {
+      current_total_discounts: "28.40", current_total_discounts_set: usd("28.40"),
+      total_shipping_price_set: usd("6.95"),
+      shipping_lines: [{ id: 1, title: "Standard", price: "6.95", discounted_price: "0.00", price_set: usd("6.95") }],
+    },
+    { subtotal: "143.00", discounts: "28.40", shipping: "6.95", total: "132.03" },
+  ],
+  [
+    "no discount, paid shipping",
+    {
+      discount_codes: [], current_total_discounts: "0.00", current_total_discounts_set: usd("0.00"),
+      current_subtotal_price: "143.00", current_subtotal_price_set: usd("143.00"),
+      current_total_tax: "12.33", current_total_tax_set: usd("12.33"),
+      total_shipping_price_set: usd("6.95"),
+      current_total_price: "162.28", current_total_price_set: usd("162.28"),
+    },
+    { subtotal: "143.00", discounts: "0.00", shipping: "6.95", total: "162.28" },
+  ],
+  [
+    "tax included in prices (EUR), discount and shipping",
+    {
+      currency: "EUR", presentment_currency: "EUR", taxes_included: true,
+      line_items: [{ id: 1, product_id: 9002, variant_id: 8002, title: "Hydrolyzed Collagen Peptides", quantity: 2, current_quantity: 2, price: "30.00", price_set: eur("30.00"), requires_shipping: true }],
+      current_subtotal_price: "54.00", current_subtotal_price_set: eur("54.00"),
+      current_total_discounts: "6.00", current_total_discounts_set: eur("6.00"),
+      total_shipping_price_set: eur("4.90"),
+      current_total_tax: "9.40", current_total_tax_set: eur("9.40"),
+      current_total_price: "58.90", current_total_price_set: eur("58.90"),
+    },
+    { subtotal: "60.00", discounts: "6.00", shipping: "4.90", total: "58.90" },
+  ],
+  [
+    "order edited after checkout: one line removed (current_quantity 0)",
+    {
+      line_items: (orderPaidPayload().line_items as Record<string, unknown>[]).map((line, i) => (i === 0 ? { ...line, current_quantity: 0 } : line)),
+      current_subtotal_price: "88.40", current_subtotal_price_set: usd("88.40"),
+      current_total_discounts: "15.60", current_total_discounts_set: usd("15.60"),
+      current_total_tax: "7.62", current_total_tax_set: usd("7.62"),
+      current_total_price: "96.02", current_total_price_set: usd("96.02"),
+    },
+    { subtotal: "104.00", discounts: "15.60", shipping: "0.00", total: "96.02" },
+  ],
+];
+
+test("receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total", () => {
+  for (const [label, overrides, expected] of TOTALS_SCENARIOS) {
+    const payload = orderPaidPayload(overrides);
+    const order = parseOrderPaid(payload)!;
+    assert.deepEqual(
+      { subtotal: order.subtotal, discounts: order.discounts, shipping: order.shipping, total: order.total },
+      expected,
+      label,
+    );
+    assert.ok(Math.abs(totalsMismatch(order)) <= 0.01, `${label}: off by ${totalsMismatch(order)}`);
+    // Shopify's own subtotal_price is after discounts; showing it would double count.
+    if (Number(order.discounts) > 0) assert.notEqual(order.subtotal, (payload as Record<string, unknown>).current_subtotal_price, label);
+    // The rendered rows carry the same arithmetic.
+    const rows = Object.fromEntries(totalRows(order).map((row) => [row.label.replace(/ \(.*\)$/, ""), row.value]));
+    assert.ok(rows.Subtotal.endsWith(expected.subtotal.replace(/\.00$/, ".00")), label);
+  }
+  // A mismatch (for example a tip the email does not itemise) is detectable.
+  assert.equal(totalsMismatch({ subtotal: "10.00", discounts: "0.00", shipping: "0.00", tax: "0.00", taxesIncluded: false, total: "12.00" }), 2);
 });
 
 test("fulfilment readiness: tracking required, live statuses only", () => {
@@ -83,14 +158,14 @@ test("order confirmation renders every required detail", async () => {
   for (const expected of [
     "Order #1042", "Thank you, Ava.", "Creatine Monohydrate", "Hydrolyzed Collagen Peptides", "NMN", "Unflavored", "Qty 2",
     "Subscription: Delivered every 30 days, save 10%", "$39.00", "$68.00", "$36.00", "Subtotal", "$143.00",
-    "Discount (WELCOME15)", "$21.45 off", "Shipping", "Free", "Tax", "$10.94", "Total", "$132.49 USD",
+    "Discount (WELCOME15)", "$21.45 off", "Shipping", "Free", "Tax", "$10.48", "Total", "$132.03 USD",
     "Ava Morgan", "1 Market Street", "Apartment 4B", "San Francisco, CA 94105", "United States",
     "support@iqonsupplements.com", "View your order",
   ]) assert.ok(visible.includes(expected), `missing ${expected}`);
   assert.ok(!visible.includes("Default Title"));
   // Preheader is the first hidden element in the body.
   assert.match(email.html, /<body[^>]*>\s*<div style="display:none;[^"]*mso-hide:all;[^"]*">Thank you for your order\./);
-  assert.ok(email.text.includes("Creatine Monohydrate  $39.00") && email.text.includes("Total: $132.49 USD"));
+  assert.ok(email.text.includes("Creatine Monohydrate  $39.00") && email.text.includes("Total: $132.03 USD"));
   assertCustomerCopyClean(email.html, email.text);
 });
 
@@ -119,7 +194,10 @@ test("shipping confirmation with tracking", async () => {
   assert.equal(email.subject, "Your IQON order #1042 is on its way");
   for (const expected of ["Good news, Ava. Your order is on its way.", "UPS", "1Z999AA10123456784", "Track your parcel", SHIPPING_TIME_COPY, "Creatine Monohydrate", "Delivering to", "1 Market Street"])
     assert.ok(visible.includes(expected), `missing ${expected}`);
-  assert.ok(email.html.includes('href="https://www.ups.com/track?tracknum=1Z999AA10123456784"'));
+  // Same preference as lib/orders/tracking.ts resolveTrackingUrl: universal tracker by number first.
+  assert.ok(email.html.includes('href="https://parcelsapp.com/en/tracking/1Z999AA10123456784"'));
+  const urlOnly = renderShippingConfirmationEmail(shipment(order, { trackingNumber: null }), BRAND);
+  assert.ok(urlOnly.html.includes('href="https://www.ups.com/track?tracknum=1Z999AA10123456784"'));
   assert.ok(!visible.includes("$39.00"), "shipping email does not repeat prices");
   assert.ok(!visible.includes(MORE_TO_FOLLOW_COPY));
   assert.ok(email.text.includes("Tracking number: 1Z999AA10123456784"));
@@ -134,6 +212,8 @@ test("shipping confirmation, partial shipment, no carrier URL", async () => {
   );
   const visible = visibleText(email.html);
   assert.equal(email.subject, "Part of your IQON order #1042 is on its way");
+  assert.ok(visible.includes("Good news, Ava. Part of your order is on its way."));
+  assert.ok(!visible.includes("Your order is on its way"));
   assert.ok(visible.includes(MORE_TO_FOLLOW_COPY));
   assert.ok(visible.includes("In this shipment"));
   assert.ok(!visible.includes("NMN"));

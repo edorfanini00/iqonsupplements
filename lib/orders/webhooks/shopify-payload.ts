@@ -50,6 +50,20 @@ function currentMoney(order: Json, base: string): string {
     : money(order, `${base}_set`, base);
 }
 
+const cents = (value: string) => Math.round(Number(value) * 100);
+
+/**
+ * Pre discount merchandise subtotal. Shopify's (current_)subtotal_price is
+ * already AFTER discounts, so it cannot sit above a "Discount" row. Sum the
+ * lines at their current quantities (edits and removals applied), falling back
+ * to total_line_items_price when no line is usable.
+ */
+function lineSubtotal(order: Json, lines: EmailLineItem[]): string {
+  if (!lines.length) return money(order, "total_line_items_price_set", "total_line_items_price");
+  return (lines.reduce((sum, line) => sum + cents(line.lineTotal), 0) / 100).toFixed(2);
+}
+
+/** Shipping before shipping discounts (those are part of total_discounts). */
 function shippingTotal(order: Json): string {
   const set = obj(order.total_shipping_price_set);
   if (set) return money(order, "total_shipping_price_set", "total_shipping_price");
@@ -130,10 +144,9 @@ export function parseOrderPaid(payload: unknown): OrderSnapshot | null {
   const orderId = id(order.id) ?? id(order.admin_graphql_api_id);
   if (!orderId) return null;
   const currency = (str(order.presentment_currency, 3) ?? str(order.currency, 3) ?? "USD").toUpperCase();
-  const lines = (Array.isArray(order.line_items) ? order.line_items : [])
+  const allLines = (Array.isArray(order.line_items) ? order.line_items : [])
     .map((line) => parseLineItem(line, "current_quantity"))
-    .filter((line): line is EmailLineItem => !!line)
-    .slice(0, 100);
+    .filter((line): line is EmailLineItem => !!line);
   const codes = (Array.isArray(order.discount_codes) ? order.discount_codes : [])
     .map((d) => str(obj(d)?.code, 60))
     .filter((c): c is string => !!c);
@@ -144,8 +157,8 @@ export function parseOrderPaid(payload: unknown): OrderSnapshot | null {
     firstName: firstName(order),
     currency: /^[A-Z]{3}$/.test(currency) ? currency : "USD",
     test: order.test === true,
-    lineItems: lines,
-    subtotal: currentMoney(order, "subtotal_price"),
+    lineItems: allLines.slice(0, 100),
+    subtotal: lineSubtotal(order, allLines),
     discounts: currentMoney(order, "total_discounts"),
     discountCodes: codes,
     shipping: shippingTotal(order),
@@ -201,6 +214,17 @@ export function parseFulfillment(payload: unknown): ParsedFulfillment | null {
     payloadShowsRemaining: rawLines.some((line) => Number(obj(line)?.fulfillable_quantity) > 0),
     name: str(f.name, 40),
   };
+}
+
+/**
+ * Receipt arithmetic: subtotal minus discounts plus shipping plus tax (unless
+ * tax is included in prices) must equal the total. Returns the difference in
+ * the order currency; anything beyond a cent means Shopify charged something
+ * the email does not itemise (tips, duties) and is logged by the handler.
+ */
+export function totalsMismatch(order: Pick<OrderSnapshot, "subtotal" | "discounts" | "shipping" | "tax" | "taxesIncluded" | "total">): number {
+  const computed = cents(order.subtotal) - cents(order.discounts) + cents(order.shipping) + (order.taxesIncluded ? 0 : cents(order.tax));
+  return (cents(order.total) - computed) / 100;
 }
 
 /** A shipping email goes out only for a live fulfilment that carries tracking. */

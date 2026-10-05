@@ -1,4 +1,4 @@
-import { buildUniversalTrackingUrl } from "../tracking";
+import { resolveTrackingUrl } from "../tracking";
 import { brandConfig, safeHttpsUrl } from "./format";
 import {
   addressHtml, button, detailBlock, detailValue, eyebrow, heading, lineItemsTable, paragraph, sectionTitle, shell,
@@ -11,9 +11,13 @@ export const SHIPPING_TIME_COPY = "Shipping usually takes 3 to 5 business days."
 export const MORE_TO_FOLLOW_COPY =
   "This parcel holds part of your order. The rest will follow in a separate shipment, and we will email you again when it is on its way.";
 
-/** Carrier link from Shopify when it is https, otherwise a universal lookup by number. */
-export function shipmentTrackingUrl(shipment: Pick<ShipmentDetails, "trackingUrl" | "trackingNumber">): string | null {
-  return safeHttpsUrl(shipment.trackingUrl) ?? buildUniversalTrackingUrl(shipment.trackingNumber);
+/**
+ * Same preference as the storefront's order tracking (lib/orders/tracking.ts):
+ * the universal tracker keyed on the number (carrier pages such as USPS stall
+ * on anti bot interstitials), else Shopify's carrier link when it is https.
+ */
+export function shipmentTrackingUrl(shipment: Pick<ShipmentDetails, "trackingUrl" | "trackingNumber" | "carrier">): string | null {
+  return resolveTrackingUrl({ provider: shipment.carrier, number: shipment.trackingNumber, url: safeHttpsUrl(shipment.trackingUrl) });
 }
 
 /** Customer facing "on its way" email sent once per fulfilment. Pure. */
@@ -27,7 +31,8 @@ export function renderShippingConfirmationEmail(shipment: ShipmentDetails, brand
   const preheader = shipment.carrier
     ? `Your parcel is with ${shipment.carrier}. Track it any time.`
     : "Your parcel is on its way. Track it any time.";
-  const title = name ? `Good news, ${name}. Your order is on its way.` : "Good news. Your order is on its way.";
+  const what = partial ? "Part of your order is on its way." : "Your order is on its way.";
+  const title = name ? `Good news, ${name}. ${what}` : `Good news. ${what}`;
   const intro = `Your parcel has left us and is now${carrierPhrase || " on its way to you"}. ${SHIPPING_TIME_COPY}`;
   const trackingUrl = shipmentTrackingUrl(shipment);
   const orderStatusUrl = safeHttpsUrl(shipment.orderStatusUrl);
