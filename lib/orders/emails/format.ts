@@ -1,8 +1,8 @@
 import type { EmailAddress, EmailBrandConfig } from "./types";
 
 export const DEFAULT_ASSET_ORIGIN = "https://www.iqonbody.com";
-/** Same support inbox the existing contact reply mailer documents. */
-export const DEFAULT_SUPPORT_EMAIL = "support@iqonsupplements.com";
+/** Owner decision: the IQON support inbox, also used as Reply-To. */
+export const DEFAULT_SUPPORT_EMAIL = "info@iqonhealth.com";
 
 export function escapeHtml(value: unknown): string {
   return String(value ?? "")

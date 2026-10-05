@@ -1,6 +1,6 @@
 /**
  * Resend delivery for order emails. Shares SUPPLEMENTS_RESEND_API_KEY with the
- * other supplements mailers. The From is IQON <orders@iqonhealth.com> (owner
+ * other supplements mailers. The From is IQON <info@iqonhealth.com> (owner
  * decision, verified in Resend) unless SUPPLEMENTS_ORDER_EMAIL_FROM overrides it.
  * Every send carries a
  * Resend idempotency key (kept by Resend for 24h) so a retried webhook cannot
@@ -40,7 +40,7 @@ type Env = Record<string, string | undefined>;
  * deliberately NOT consulted, so changing that mailer's sender can never move
  * order mail onto an unverified domain. Override only via SUPPLEMENTS_ORDER_EMAIL_FROM.
  */
-export const DEFAULT_ORDER_EMAIL_FROM = "IQON <orders@iqonhealth.com>";
+export const DEFAULT_ORDER_EMAIL_FROM = "IQON <info@iqonhealth.com>";
 
 export function orderEmailFrom(env: Env = process.env): string {
   return env.SUPPLEMENTS_ORDER_EMAIL_FROM?.trim() || DEFAULT_ORDER_EMAIL_FROM;

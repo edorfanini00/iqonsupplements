@@ -4,7 +4,7 @@ import type { EmailBrandConfig } from "../../lib/orders/emails/types";
 
 export const SECRET = "synthetic-webhook-secret-for-tests";
 export const SHOP = "nr9zd0-t5.myshopify.com";
-export const BRAND: EmailBrandConfig = { assetOrigin: "https://www.iqonbody.com", siteUrl: "https://www.iqonbody.com/", supportEmail: "support@iqonsupplements.com" };
+export const BRAND: EmailBrandConfig = { assetOrigin: "https://www.iqonbody.com", siteUrl: "https://www.iqonbody.com/", supportEmail: "info@iqonhealth.com" };
 
 export function sign(body: string | Buffer, secret = SECRET): string {
   return createHmac("sha256", secret).update(body).digest("base64");
@@ -67,6 +67,11 @@ export function orderPaidPayload(overrides: Record<string, unknown> = {}) {
     presentment_currency: "USD",
     taxes_included: false,
     financial_status: "paid",
+    // Created by hosted checkout (headless storefront orders carry the channel's app id as source_name).
+    source_name: "web",
+    checkout_id: 3100000000001,
+    checkout_token: "synthetic-checkout-token-1042",
+    cart_token: "synthetic-cart-token-1042",
     order_status_url: "https://www.iqonbody.com/68512342/orders/abc123/authenticate?key=synthetic",
     total_line_items_price: "143.00",
     total_line_items_price_set: money("143.00"),
@@ -102,6 +107,40 @@ export function orderPaidPayload(overrides: Record<string, unknown> = {}) {
     ],
     ...overrides,
   };
+}
+
+export const RENEWAL_ORDER_ID = 6123456789099;
+
+/**
+ * Renewal order as created by a Shopify Subscriptions billing attempt: no
+ * checkout or cart, source_name "subscription_contract", subscription lines only.
+ */
+export function renewalOrderPayload(overrides: Record<string, unknown> = {}) {
+  const base = orderPaidPayload();
+  return orderPaidPayload({
+    id: RENEWAL_ORDER_ID,
+    admin_graphql_api_id: `gid://shopify/Order/${RENEWAL_ORDER_ID}`,
+    name: "#1077",
+    order_number: 1077,
+    source_name: "subscription_contract",
+    checkout_id: null,
+    checkout_token: null,
+    cart_token: null,
+    discount_codes: [],
+    line_items: [base.line_items[0]],
+    ...overrides,
+  });
+}
+
+export function renewalFulfillmentPayload(overrides: Record<string, unknown> = {}) {
+  return fulfillmentPayload({
+    id: 5550000000077,
+    admin_graphql_api_id: "gid://shopify/Fulfillment/5550000000077",
+    order_id: RENEWAL_ORDER_ID,
+    name: "#1077.1",
+    line_items: [fulfillmentLine(LINE_CREATINE, 9001, 8001, "Creatine Monohydrate", 1)],
+    ...overrides,
+  });
 }
 
 function fulfillmentLine(id: number, productId: number, variantId: number, title: string, quantity: number, fulfillableQuantity = 0) {

@@ -2,9 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { handleShopifyOrderWebhook, readLimitedBody, verifyShopifyHmac, type WebhookDeps } from "../../lib/orders/webhooks/handler";
 import { DEFAULT_ORDER_EMAIL_FROM, classifyResendError, orderEmailConfigured, orderEmailFrom, resendSender } from "../../lib/orders/webhooks/sender";
+import { isSubscriptionRenewal, orderSource } from "../../lib/orders/webhooks/shopify-payload";
 import { MORE_TO_FOLLOW_COPY } from "../../lib/orders/emails/shipping-confirmation";
 import { verifyShopifyWebhookSignature } from "../../lib/affiliates/shopify-webhook";
-import { BRAND, ORDER_ID, SECRET, fulfillmentPayload, orderPaidPayload, partialFirst, partialSecond, sign, visibleText, webhookHeaders } from "./fixtures";
+import { BRAND, ORDER_ID, RENEWAL_ORDER_ID, SECRET, fulfillmentPayload, orderPaidPayload, partialFirst, partialSecond, renewalFulfillmentPayload, renewalOrderPayload, sign, visibleText, webhookHeaders } from "./fixtures";
 import { FakeSender, MemoryStore } from "./memory";
 
 function setup(overrides: Partial<WebhookDeps> = {}) {
@@ -571,9 +572,9 @@ test("the handler itself ignores a stored snapshot when the claim reports no unc
 
 
 test("order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM", async () => {
-  assert.equal(DEFAULT_ORDER_EMAIL_FROM, "IQON <orders@iqonhealth.com>");
-  assert.equal(orderEmailFrom({}), "IQON <orders@iqonhealth.com>");
-  assert.equal(orderEmailFrom({ SUPPLEMENTS_EMAIL_FROM: "IQON <support@iqonsupplements.com>" }), "IQON <orders@iqonhealth.com>");
+  assert.equal(DEFAULT_ORDER_EMAIL_FROM, "IQON <info@iqonhealth.com>");
+  assert.equal(orderEmailFrom({}), "IQON <info@iqonhealth.com>");
+  assert.equal(orderEmailFrom({ SUPPLEMENTS_EMAIL_FROM: "IQON <hello@unverified.example>" }), "IQON <info@iqonhealth.com>");
   assert.equal(orderEmailFrom({ SUPPLEMENTS_ORDER_EMAIL_FROM: " IQON <orders@example.com> " }), "IQON <orders@example.com>");
   assert.equal(orderEmailConfigured({}), false, "an API key is still required");
   assert.equal(orderEmailConfigured({ SUPPLEMENTS_RESEND_API_KEY: "re_test" }), true);
@@ -582,5 +583,106 @@ test("order emails default to the owner approved sender and ignore the shared SU
   const sender = resendSender({ SUPPLEMENTS_RESEND_API_KEY: "re_test", SUPPLEMENTS_EMAIL_FROM: "Other <x@unverified.example>" }, client as never)!;
   const outcome = await sender.send({ to: "a@example.com", subject: "s", html: "h", text: "t", idempotencyKey: "k", tag: "order_confirmation" }, 1000);
   assert.equal(outcome.ok, true);
-  assert.equal(seen[0].from, "IQON <orders@iqonhealth.com>");
+  assert.equal(seen[0].from, "IQON <info@iqonhealth.com>");
+});
+
+// Owner decision: no thank you email for subscription renewals; their shipments still get one.
+
+test("a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal", async () => {
+  const { deps, sender, store, logs } = setup();
+  const res = await deliver(deps, "orders/paid", renewalOrderPayload());
+  assert.equal(res.status, 200);
+  assert.deepEqual(res.body, { ok: true, skipped: true, reason: "subscription_renewal" });
+  assert.equal(sender.attempts.length, 0);
+  const row = store.get("order_confirmation", String(RENEWAL_ORDER_ID))!;
+  assert.equal(row.status, "skipped");
+  assert.equal(row.lastError, "subscription_renewal");
+  assert.ok(logs.some((e) => e.event === "skipped" && e.reason === "subscription_renewal" && e.signal === "source_name:subscription_contract"));
+});
+
+test("a duplicate renewal webhook is still skipped and sends nothing", async () => {
+  const { deps, sender } = setup();
+  await deliver(deps, "orders/paid", renewalOrderPayload());
+  const again = await deliver(deps, "orders/paid", renewalOrderPayload());
+  assert.equal(again.status, 200);
+  assert.equal(again.body.duplicate, true);
+  assert.equal(again.body.status, "skipped");
+  const concurrent = await Promise.all([1, 2, 3].map(() => deliver(deps, "orders/paid", renewalOrderPayload())));
+  assert.ok(concurrent.every((r) => r.status === 200));
+  assert.equal(sender.attempts.length, 0);
+});
+
+test("the first subscription order (checkout with a selling plan line) gets the thank you email", async () => {
+  const { deps, sender } = setup();
+  // Same subscription line as a renewal, but created by checkout.
+  const first = orderPaidPayload({ line_items: [renewalOrderPayload().line_items[0]] });
+  const res = await deliver(deps, "orders/paid", first);
+  assert.equal(res.body.sent, true);
+  assert.equal(sender.sent.length, 1);
+  assert.ok(visibleText(sender.sent[0].html).includes("Subscription: Delivered every 30 days, save 10%"));
+});
+
+test("a one time order gets the thank you email", async () => {
+  const { deps, sender } = setup();
+  const oneTime = orderPaidPayload({ line_items: orderPaidPayload().line_items.slice(1) });
+  const res = await deliver(deps, "orders/paid", oneTime);
+  assert.equal(res.body.sent, true);
+  assert.equal(sender.sent.length, 1);
+});
+
+test("a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row", async () => {
+  const { deps, sender, store } = setup();
+  await deliver(deps, "orders/paid", renewalOrderPayload());
+  assert.equal(store.get("order_confirmation", String(RENEWAL_ORDER_ID))!.status, "skipped");
+  const res = await deliver(deps, "fulfillments/create", renewalFulfillmentPayload({ email: null }));
+  assert.equal(res.body.sent, true);
+  assert.equal(sender.sent.length, 1);
+  const shipped = sender.sent[0];
+  assert.equal(shipped.to, "ava.morgan@example.com", "recipient recovered from the skipped row's snapshot");
+  assert.equal(shipped.idempotencyKey, "shipped/5550000000077");
+  const text = visibleText(shipped.html);
+  assert.ok(text.includes("#1077"));
+  assert.ok(text.includes("Good news, Ava."));
+  assert.ok(text.includes("Subscription: Delivered every 30 days, save 10%"));
+  assert.ok(!text.includes(MORE_TO_FOLLOW_COPY), "a single line renewal shipped in full has nothing more to follow");
+});
+
+test("a renewal shipment with no stored order snapshot still sends from the fulfilment payload", async () => {
+  const { deps, sender, store } = setup();
+  const res = await deliver(deps, "fulfillments/create", renewalFulfillmentPayload());
+  assert.equal(res.body.sent, true);
+  assert.equal(store.get("order_confirmation", String(RENEWAL_ORDER_ID)), undefined);
+  assert.equal(sender.sent[0].to, "ava.morgan@example.com");
+  assert.ok(visibleText(sender.sent[0].html).includes("#1077"));
+});
+
+test("isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals", () => {
+  assert.deepEqual(isSubscriptionRenewal(renewalOrderPayload()), { renewal: true, signal: "source_name:subscription_contract" });
+  // Value seen on renewals since about October 2025; source_name wins even if a checkout token is present.
+  assert.deepEqual(isSubscriptionRenewal(renewalOrderPayload({ source_name: "subscription_contract_checkout_one", checkout_token: "t" })),
+    { renewal: true, signal: "source_name:subscription_contract_checkout_one" });
+  assert.equal(isSubscriptionRenewal(renewalOrderPayload({ source_name: "Subscription_Contract" })).renewal, true);
+  assert.deepEqual(isSubscriptionRenewal(orderPaidPayload({ tags: "Subscription, Subscription Recurring Order" })), { renewal: true, signal: "tag:subscription_recurring_order" });
+  // First subscription order: selling plan line, but created by checkout.
+  assert.equal(isSubscriptionRenewal(orderPaidPayload({ line_items: [renewalOrderPayload().line_items[0]], tags: "Subscription, Subscription First Order" })).renewal, false);
+  // Headless channel orders carry the channel app id as source_name.
+  assert.equal(isSubscriptionRenewal(orderPaidPayload({ source_name: "1234567" })).renewal, false);
+  // Draft or API orders have no checkout either; without a renewal signal they still get the email.
+  assert.equal(isSubscriptionRenewal(orderPaidPayload({ source_name: "shopify_draft_order", checkout_token: null, checkout_id: null })).renewal, false);
+  assert.equal(isSubscriptionRenewal(orderPaidPayload({ source_name: undefined, tags: undefined })).renewal, false);
+  assert.equal(isSubscriptionRenewal(null).renewal, false);
+});
+
+test("every paid order logs its origin (no PII) so the renewal rule can be checked on real orders", async () => {
+  const { deps, logs } = setup();
+  await deliver(deps, "orders/paid", orderPaidPayload());
+  await deliver(deps, "orders/paid", renewalOrderPayload({ app_id: 580111 }));
+  const sources = logs.filter((e) => e.event === "order_source");
+  assert.deepEqual(sources.map((e) => [e.orderId, e.renewal, e.sourceName, e.hasCheckoutToken]), [
+    [String(ORDER_ID), false, "web", true],
+    [String(RENEWAL_ORDER_ID), true, "subscription_contract", false],
+  ]);
+  assert.equal(sources[1].appId, "580111");
+  assert.ok(!JSON.stringify(sources).includes("@"), "no email address in the origin log");
+  assert.equal(orderSource(orderPaidPayload()).sellingPlanLines, 1);
 });

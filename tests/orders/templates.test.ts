@@ -160,7 +160,7 @@ test("order confirmation renders every required detail", async () => {
     "Subscription: Delivered every 30 days, save 10%", "$39.00", "$68.00", "$36.00", "Subtotal", "$143.00",
     "Discount (WELCOME15)", "$21.45 off", "Shipping", "Free", "Tax", "$10.48", "Total", "$132.03 USD",
     "Ava Morgan", "1 Market Street", "Apartment 4B", "San Francisco, CA 94105", "United States",
-    "support@iqonsupplements.com", "View your order",
+    "info@iqonhealth.com", "View your order",
   ]) assert.ok(visible.includes(expected), `missing ${expected}`);
   assert.ok(!visible.includes("Default Title"));
   // Preheader is the first hidden element in the body.
@@ -250,6 +250,7 @@ test("every dynamic value is HTML escaped (XSS)", async () => {
 
 test("brand config: env overrides, unsafe origins ignored, emails masked for logs", () => {
   assert.deepEqual(brandConfig({}), BRAND);
+  assert.equal(brandConfig({}).supportEmail, "info@iqonhealth.com", "owner decision: support inbox and Reply-To");
   assert.equal(brandConfig({ SUPPLEMENTS_EMAIL_ASSET_ORIGIN: "https://preview.iqonbody.com/x" }).assetOrigin, "https://preview.iqonbody.com");
   assert.equal(brandConfig({ SUPPLEMENTS_EMAIL_ASSET_ORIGIN: "http://insecure.test" }).assetOrigin, "https://www.iqonbody.com");
   assert.equal(brandConfig({ SUPPLEMENTS_SUPPORT_EMAIL: "help@iqonbody.com" }).supportEmail, "help@iqonbody.com");

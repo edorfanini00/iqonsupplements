@@ -252,3 +252,60 @@ export function hasMoreToFollow(
   for (const line of shipment.lineItems) shipped.set(line.id, (shipped.get(line.id) ?? 0) + line.quantity);
   return order.lineItems.some((line) => line.requiresShipping && (shipped.get(line.id) ?? 0) < line.quantity);
 }
+
+export type RenewalCheck = { renewal: true; signal: string } | { renewal: false };
+
+/**
+ * Whether an orders/paid payload is a subscription RENEWAL (an order created
+ * by a subscription contract billing attempt), as opposed to a one time order
+ * or the first subscription order, which is placed through checkout.
+ *
+ * The store bills subscriptions through the Shopify Subscriptions app
+ * (docs/commerce/purchase-options.md), which creates renewals with
+ * subscriptionBillingAttemptCreate. Shopify does not document a field that
+ * marks a renewal, so this uses the signals with the most evidence:
+ *
+ *  1. source_name starting with "subscription_contract". Renewals were
+ *     "subscription_contract" for years and became
+ *     "subscription_contract_checkout_one" around October 2025 (Shopify
+ *     community.shopify.dev thread 23868). Shopify says source_name is a free
+ *     string, so any value with this prefix counts. The first subscription
+ *     order is placed through checkout and carries the storefront's
+ *     source_name ("web", or the headless channel's app id), never this one.
+ *  2. The tag "Subscription Recurring Order" (Recharge style tagging; Shopify
+ *     Subscriptions may add tags only minutes after the webhook, so this is a
+ *     secondary signal only).
+ *
+ * Deliberately NOT used: selling plan data (the first order has it too, and
+ * REST webhook line items do not carry it before API 2026-10), and a missing
+ * checkout_token on its own (draft and API created orders have none either,
+ * and Shopify has not documented whether "checkout_one" renewals carry one).
+ * When unsure, the answer is "not a renewal": an extra thank you email is
+ * better than a first order without one. The handler logs source_name, app_id
+ * and checkout presence for every paid order so the rule can be checked
+ * against a real renewal (go live verification in docs/order-emails.md).
+ */
+export function isSubscriptionRenewal(payload: unknown): RenewalCheck {
+  const order = obj(payload);
+  if (!order) return { renewal: false };
+  const source = str(order.source_name, 100)?.toLowerCase();
+  if (source?.startsWith("subscription_contract")) return { renewal: true, signal: `source_name:${source}` };
+  const tags = (str(order.tags, 2000) ?? "").split(",").map((tag) => tag.trim().toLowerCase());
+  if (tags.includes("subscription recurring order")) return { renewal: true, signal: "tag:subscription_recurring_order" };
+  return { renewal: false };
+}
+
+/** Non PII origin facts of an order, logged so the renewal rule can be verified on real orders. */
+export function orderSource(payload: unknown): Record<string, unknown> {
+  const order = obj(payload) ?? {};
+  return {
+    sourceName: str(order.source_name, 100),
+    appId: str(order.app_id, 40),
+    hasCheckoutToken: !!str(order.checkout_token),
+    hasCheckoutId: !!str(order.checkout_id),
+    sellingPlanLines: (Array.isArray(order.line_items) ? order.line_items : []).filter((line) => {
+      const l = obj(line);
+      return !!l && (l.selling_plan_id != null || !!obj(l.selling_plan_allocation));
+    }).length,
+  };
+}

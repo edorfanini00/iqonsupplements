@@ -10,7 +10,8 @@
  * Response contract (Shopify retries anything that is not 2xx):
  *   200  sent, duplicate (sent, deliberately skipped, or sent_unconfirmed: an
  *        uncertain attempt older than Resend's 24h idempotency window), deliberate skip
- *        (no recipient, cancelled fulfilment, awaiting tracking), unknown topic,
+ *        (no recipient, subscription renewal order, cancelled fulfilment, awaiting
+ *        tracking), unknown topic,
  *        or a permanent Resend rejection that a retry cannot fix
  *   401  wrong shop or bad signature
  *   400  unreadable JSON
@@ -28,7 +29,7 @@ import { renderShippingConfirmationEmail } from "../emails/shipping-confirmation
 import type { EmailBrandConfig, EmailLineItem, OrderSnapshot, RenderedEmail, ShipmentDetails } from "../emails/types";
 import type { AdminOrderInfo, AdminOrderLookup } from "./admin-order";
 import type { EmailSender, SendOutcome } from "./sender";
-import { hasMoreToFollow, parseFulfillment, parseOrderPaid, shipmentReadiness, totalsMismatch } from "./shopify-payload";
+import { hasMoreToFollow, isSubscriptionRenewal, orderSource, parseFulfillment, parseOrderPaid, shipmentReadiness, totalsMismatch } from "./shopify-payload";
 import { TERMINAL_STATUSES, type ClaimResult, type EmailKind, type ShipmentLedgerSnapshot, type TransactionalEmailStore } from "./store";
 
 export const SUPPORTED_TOPICS = ["orders/paid", "fulfillments/create", "fulfillments/update"] as const;
@@ -300,6 +301,9 @@ async function orderPaid(payload: unknown, ctx: Ctx): Promise<WebhookResult> {
     return ok({ skipped: true, reason: "invalid_order_payload" });
   }
   const ids = { orderId: parsed.orderId, test: parsed.test };
+  const renewal = isSubscriptionRenewal(payload);
+  ctx.log({ event: "order_source", renewal: renewal.renewal, ...orderSource(payload), ...ids });
+  if (renewal.renewal) return renewalOrder(parsed, renewal.signal, ctx, ids);
   const mismatch = totalsMismatch(parsed);
   if (Math.abs(mismatch) > 0.01) ctx.log({ event: "totals_mismatch", difference: mismatch.toFixed(2), ...ids });
   // Enrichment is best effort and runs in parallel inside a fixed slice of the budget.
@@ -330,6 +334,29 @@ async function orderPaid(payload: unknown, ctx: Ctx): Promise<WebhookResult> {
     await write(ctx, ctx.deps.store.markFailed("order_confirmation", order.orderId, claim.token, errorMessage(error), false), "mark_failed").catch(() => {});
     throw error;
   }
+}
+
+/**
+ * Owner decision: subscription renewals get no order confirmation (the customer
+ * already got one for the first subscription order); their shipments still get
+ * a shipping email. The row is stored as `skipped` (reason subscription_renewal)
+ * WITH the parsed order snapshot, so a duplicate delivery is a 200 duplicate and
+ * the shipping email can still use the order name, first name and subscription
+ * labels. No enrichment: nothing is rendered now, and the shipping path resolves
+ * images itself.
+ */
+async function renewalOrder(parsed: OrderSnapshot, signal: string, ctx: Ctx, ids: Record<string, unknown>): Promise<WebhookResult> {
+  const claim = await claimOrRetry(ctx, { kind: "order_confirmation", dedupeKey: parsed.orderId, orderId: parsed.orderId, snapshot: parsed, staleAfterMs: ctx.deps.staleClaimMs ?? DEFAULT_STALE_CLAIM_MS });
+  if (!claim.claimed) return duplicate(ctx, claim, { orderId: parsed.orderId });
+  try {
+    await write(ctx, ctx.deps.store.markSkipped("order_confirmation", parsed.orderId, claim.token, "subscription_renewal"), "mark_skipped");
+  } catch (error) {
+    // Nothing was sent: release the claim as a certain failure so Shopify's retry can record the skip.
+    await write(ctx, ctx.deps.store.markFailed("order_confirmation", parsed.orderId, claim.token, errorMessage(error), false), "mark_failed").catch(() => {});
+    throw error;
+  }
+  ctx.log({ event: "skipped", reason: "subscription_renewal", signal, ...ids });
+  return ok({ skipped: true, reason: "subscription_renewal" });
 }
 
 async function fulfillment(payload: unknown, ctx: Ctx): Promise<WebhookResult> {

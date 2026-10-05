@@ -12,7 +12,7 @@ import { readFileSync } from "node:fs";
 import { PrismaClient } from "@prisma/client";
 import { prismaTransactionalEmailStore } from "../../lib/orders/webhooks/store";
 import { handleShopifyOrderWebhook } from "../../lib/orders/webhooks/handler";
-import { BRAND, SECRET, orderPaidPayload, webhookHeaders } from "./fixtures";
+import { BRAND, RENEWAL_ORDER_ID, SECRET, orderPaidPayload, renewalFulfillmentPayload, renewalOrderPayload, webhookHeaders } from "./fixtures";
 import { FakeSender } from "./memory";
 
 const url = process.env.ORDER_EMAILS_TEST_DATABASE_URL;
@@ -180,4 +180,24 @@ test("snapshot on Postgres: replaced after a certain failure, kept after an unce
   assert.equal(third.sendUncertain, true);
   assert.equal((third.snapshot as { marker: string }).marker, "v2", "uncertain attempt: replay its body");
   assert.equal(third.previousError, "resend_timeout");
+});
+
+test("renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it", { skip }, async () => {
+  const sender = new FakeSender();
+  const deps = { env: { SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET: SECRET }, store: prismaTransactionalEmailStore(clients[0]), sender, imageLookup: null, adminOrderLookup: null, brand: BRAND, log: () => {} };
+  const run = (topic: string, payload: unknown) => {
+    const body = JSON.stringify(payload);
+    return handleShopifyOrderWebhook(body, webhookHeaders(topic, body), deps);
+  };
+  assert.equal((await run("orders/paid", renewalOrderPayload())).body.reason, "subscription_renewal");
+  assert.equal((await run("orders/paid", renewalOrderPayload())).body.duplicate, true);
+  const row = await clients[0].transactionalEmail.findUniqueOrThrow({ where: { kind_dedupeKey: { kind: "order_confirmation", dedupeKey: String(RENEWAL_ORDER_ID) } } });
+  assert.equal(row.status, "skipped");
+  assert.equal(row.lastError, "subscription_renewal");
+  assert.equal((await deps.store.getOrderSnapshot(String(RENEWAL_ORDER_ID)))?.orderName, "#1077");
+  assert.equal(sender.attempts.length, 0);
+  const shipped = await run("fulfillments/create", renewalFulfillmentPayload({ email: null }));
+  assert.equal(shipped.body.sent, true);
+  assert.equal(sender.sent.length, 1);
+  assert.equal(sender.sent[0].to, "ava.morgan@example.com");
 });

@@ -2,7 +2,7 @@
  * Send the three order email previews to the owner's inbox for visual QA.
  *
  *   RESEND_API_KEY=... node --import tsx scripts/send-order-email-preview.ts \
- *     [--to edorfanini@icloud.com] [--from "IQON <orders@iqonhealth.com>"] [--asset-base https://...]
+ *     [--to edorfanini@icloud.com] [--from "IQON <info@iqonhealth.com>"] [--asset-base https://...]
  *
  * Hard allowlist: refuses any recipient other than the owner. Subjects are
  * prefixed with [TEST]. --asset-base lets previews load images from a pushed
@@ -18,7 +18,7 @@ const ALLOWED_RECIPIENTS = new Set(["edorfanini@icloud.com"]);
 const args = process.argv.slice(2);
 const flag = (name: string) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 const to = (flag("--to") ?? "edorfanini@icloud.com").trim().toLowerCase();
-const from = flag("--from") ?? "IQON <orders@iqonhealth.com>";
+const from = flag("--from") ?? "IQON <info@iqonhealth.com>";
 const assetBase = flag("--asset-base");
 
 if (!ALLOWED_RECIPIENTS.has(to)) {
