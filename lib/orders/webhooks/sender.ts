@@ -1,7 +1,8 @@
 /**
- * Resend delivery for order emails. Uses the same env convention as the other
- * supplements mailers (SUPPLEMENTS_RESEND_API_KEY, SUPPLEMENTS_EMAIL_FROM) with
- * an optional SUPPLEMENTS_ORDER_EMAIL_FROM override. Every send carries a
+ * Resend delivery for order emails. Shares SUPPLEMENTS_RESEND_API_KEY with the
+ * other supplements mailers. The From is IQON <orders@iqonhealth.com> (owner
+ * decision, verified in Resend) unless SUPPLEMENTS_ORDER_EMAIL_FROM overrides it.
+ * Every send carries a
  * Resend idempotency key (kept by Resend for 24h) so a retried webhook cannot
  * produce a second email even if our own ledger update was lost. store.ts
  * covers what happens once that window has passed.
@@ -33,8 +34,16 @@ export interface EmailSender {
 
 type Env = Record<string, string | undefined>;
 
-export function orderEmailFrom(env: Env = process.env): string | null {
-  return env.SUPPLEMENTS_ORDER_EMAIL_FROM?.trim() || env.SUPPLEMENTS_EMAIL_FROM?.trim() || null;
+/**
+ * Owner decision: order emails are sent from the Resend verified iqonhealth.com
+ * domain. SUPPLEMENTS_EMAIL_FROM (used by the contact/affiliate mailers) is
+ * deliberately NOT consulted, so changing that mailer's sender can never move
+ * order mail onto an unverified domain. Override only via SUPPLEMENTS_ORDER_EMAIL_FROM.
+ */
+export const DEFAULT_ORDER_EMAIL_FROM = "IQON <orders@iqonhealth.com>";
+
+export function orderEmailFrom(env: Env = process.env): string {
+  return env.SUPPLEMENTS_ORDER_EMAIL_FROM?.trim() || DEFAULT_ORDER_EMAIL_FROM;
 }
 
 export function orderEmailConfigured(env: Env = process.env): boolean {
@@ -73,7 +82,7 @@ type ResendLike = Pick<Resend, "emails">;
 export function resendSender(env: Env = process.env, client?: ResendLike): EmailSender | null {
   if (!orderEmailConfigured(env)) return null;
   const resend = client ?? new Resend(env.SUPPLEMENTS_RESEND_API_KEY!.trim());
-  const from = orderEmailFrom(env)!;
+  const from = orderEmailFrom(env);
   return {
     async send(message, timeoutMs) {
       let timer: ReturnType<typeof setTimeout> | undefined;

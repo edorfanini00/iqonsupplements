@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { handleShopifyOrderWebhook, readLimitedBody, verifyShopifyHmac, type WebhookDeps } from "../../lib/orders/webhooks/handler";
-import { classifyResendError, resendSender } from "../../lib/orders/webhooks/sender";
+import { DEFAULT_ORDER_EMAIL_FROM, classifyResendError, orderEmailConfigured, orderEmailFrom, resendSender } from "../../lib/orders/webhooks/sender";
 import { MORE_TO_FOLLOW_COPY } from "../../lib/orders/emails/shipping-confirmation";
 import { verifyShopifyWebhookSignature } from "../../lib/affiliates/shopify-webhook";
 import { BRAND, ORDER_ID, SECRET, fulfillmentPayload, orderPaidPayload, partialFirst, partialSecond, sign, visibleText, webhookHeaders } from "./fixtures";
@@ -567,4 +567,20 @@ test("the handler itself ignores a stored snapshot when the claim reports no unc
   await deliver(deps, "orders/paid", orderPaidPayload({ customer: { id: 7001, first_name: "Changed", last_name: "Morgan", email: "ava.morgan@example.com" } }));
   assert.equal(sender.sent.length, 1);
   assert.ok(sender.sent[0].html.includes("Changed"));
+});
+
+
+test("order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM", async () => {
+  assert.equal(DEFAULT_ORDER_EMAIL_FROM, "IQON <orders@iqonhealth.com>");
+  assert.equal(orderEmailFrom({}), "IQON <orders@iqonhealth.com>");
+  assert.equal(orderEmailFrom({ SUPPLEMENTS_EMAIL_FROM: "IQON <support@iqonsupplements.com>" }), "IQON <orders@iqonhealth.com>");
+  assert.equal(orderEmailFrom({ SUPPLEMENTS_ORDER_EMAIL_FROM: " IQON <orders@example.com> " }), "IQON <orders@example.com>");
+  assert.equal(orderEmailConfigured({}), false, "an API key is still required");
+  assert.equal(orderEmailConfigured({ SUPPLEMENTS_RESEND_API_KEY: "re_test" }), true);
+  const seen: Array<Record<string, unknown>> = [];
+  const client = { emails: { send: async (payload: Record<string, unknown>) => { seen.push(payload); return { data: { id: "m1" }, error: null }; } } };
+  const sender = resendSender({ SUPPLEMENTS_RESEND_API_KEY: "re_test", SUPPLEMENTS_EMAIL_FROM: "Other <x@unverified.example>" }, client as never)!;
+  const outcome = await sender.send({ to: "a@example.com", subject: "s", html: "h", text: "t", idempotencyKey: "k", tag: "order_confirmation" }, 1000);
+  assert.equal(outcome.ok, true);
+  assert.equal(seen[0].from, "IQON <orders@iqonhealth.com>");
 });

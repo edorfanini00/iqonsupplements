@@ -83,8 +83,7 @@ Unknown topics return 200 so a mis-subscribed topic does not keep failing. Budge
 | --- | --- | --- |
 | `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` | HMAC key for webhook verification (see registration below for which value) | **No** (required) |
 | `SUPPLEMENTS_RESEND_API_KEY` | Resend API key (shared with the other supplements mailers) | **No** (required) |
-| `SUPPLEMENTS_EMAIL_FROM` | Default From for supplements mail, e.g. `IQON <orders@iqonbody.com>` | **No** (required unless the override is set) |
-| `SUPPLEMENTS_ORDER_EMAIL_FROM` | Optional From override for order emails only; falls back to `SUPPLEMENTS_EMAIL_FROM` | No (optional) |
+| `SUPPLEMENTS_ORDER_EMAIL_FROM` | Optional From override for order emails only. Default in code: `IQON <orders@iqonhealth.com>`. `SUPPLEMENTS_EMAIL_FROM` (contact/affiliate mailers) is not used for order mail | No (optional, leave unset) |
 | `SUPPLEMENTS_DATABASE_URL` | Postgres for the idempotency ledger (Prisma) | **No** (required; route fails closed with 503 without it) |
 | `SUPPLEMENTS_SUPPORT_EMAIL` | Support address shown in emails and used as Reply-To | No (optional, default above) |
 | `SUPPLEMENTS_EMAIL_ASSET_ORIGIN` | https origin for email images and links, default `https://www.iqonbody.com` | No (optional) |
@@ -92,7 +91,7 @@ Unknown topics return 200 so a mis-subscribed topic does not keep failing. Budge
 | `SUPPLEMENTS_SHOPIFY_CLIENT_ID`, `SUPPLEMENTS_SHOPIFY_CLIENT_SECRET`, `SUPPLEMENTS_SHOPIFY_STORE_DOMAIN` | Optional Admin API order read (existing client) | Yes (Production only) |
 | `SUPPLEMENTS_SHOPIFY_ADMIN_TOKEN` | Alternative Admin auth (existing) | No (optional) |
 
-**Sender domain:** production needs a Resend verified domain for the From address (for example `iqonbody.com`). The preview test sends used `IQON <orders@iqonhealth.com>` because that is the only verified domain on the Resend account used for testing; do not use it for production without a decision.
+**Sender (owner decision):** order emails are sent from `IQON <orders@iqonhealth.com>`. `iqonhealth.com` is already verified in Resend, so no new domain verification is needed. The `SUPPLEMENTS_RESEND_API_KEY` set in Vercel must belong to the Resend account where `iqonhealth.com` is verified. Replies go to the support address (`SUPPLEMENTS_SUPPORT_EMAIL`, default `support@iqonsupplements.com`).
 
 The Admin read uses fields covered by protected customer data (email, shipping address). If the app lacks that access, the lookup fails and the email still sends from the webhook payload/snapshot.
 
@@ -113,7 +112,7 @@ Configure everything first, deploy, and only then register the webhooks. A webho
    for m in 20260916000000_supplements_affiliates 20261005000000_supplements_transactional_emails 20261006000000_transactional_emails_send_uncertain; do npx prisma migrate resolve --applied "$m"; done
    ```
    Recording all three keeps any later `migrate deploy` a no-op (same two tables as above). Check with `psql "$SUPPLEMENTS_DATABASE_URL" -c '\dt'`: no `supplements_affiliate_*` table must appear.
-2. **Resend**: verify the sending domain, then set `SUPPLEMENTS_RESEND_API_KEY` and `SUPPLEMENTS_EMAIL_FROM` (or `SUPPLEMENTS_ORDER_EMAIL_FROM`), and optionally `SUPPLEMENTS_SUPPORT_EMAIL`.
+2. **Resend**: set `SUPPLEMENTS_RESEND_API_KEY` (a key from the Resend account where `iqonhealth.com` is verified) and optionally `SUPPLEMENTS_SUPPORT_EMAIL`. The From defaults to `IQON <orders@iqonhealth.com>`; no domain step is needed.
 3. **Webhook secret**: set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`. For Option A (app subscription) the value is known in advance: the app client secret. For Option B (admin webhooks), the signing key is shown on Settings > Notifications > Webhooks. Verify in admin whether it is visible before the first webhook exists. If it is not, create the webhooks, then immediately set the key and redeploy; deliveries in that short window get a 503 and are retried by Shopify.
 4. **Deploy** this branch. It also ships `public/images/email/*`, which the emails reference. Check that `https://www.iqonbody.com/images/email/iqon-wordmark-ink.png` returns 200.
 5. **Register the webhooks** (below).
