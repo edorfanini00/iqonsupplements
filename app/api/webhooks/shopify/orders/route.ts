@@ -19,6 +19,7 @@ export const maxDuration = 10;
 const headers = { "Cache-Control": "no-store" };
 
 export async function POST(request: Request) {
+  const startedAt = Date.now();
   const read = await readLimitedBody(request);
   if (!read.ok) return Response.json({ ok: false, reason: read.reason }, { status: read.status, headers });
   const env = process.env;
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
     imageLookup: storefrontImageLookup(env),
     adminOrderLookup: adminOrderLookup(),
     brand: brandConfig(env),
+    startedAt,
   });
   return Response.json(result.body, { status: result.status, headers });
 }

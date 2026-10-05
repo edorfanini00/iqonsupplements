@@ -2,7 +2,9 @@
  * Real Postgres proof that the ledger claim is atomic under concurrency.
  * Runs only when ORDER_EMAILS_TEST_DATABASE_URL points at a throwaway database
  * (the test drops and recreates supplements_transactional_emails from the
- * committed migration). Skipped automatically otherwise.
+ * committed migration). Skipped automatically otherwise. Refuses to run (fails)
+ * against a non local host or the app's own SUPPLEMENTS_DATABASE_URL unless
+ * ORDER_EMAILS_TEST_ALLOW_REMOTE=1.
  */
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
@@ -15,6 +17,28 @@ import { FakeSender } from "./memory";
 
 const url = process.env.ORDER_EMAILS_TEST_DATABASE_URL;
 const skip = url ? false : "ORDER_EMAILS_TEST_DATABASE_URL not set";
+
+/** The suite drops the ledger table, so only ever point it at a throwaway local database. */
+export function unsafeTestDatabase(testUrl: string, env: Record<string, string | undefined> = process.env): string | null {
+  if (env.ORDER_EMAILS_TEST_ALLOW_REMOTE === "1") return null;
+  if (env.SUPPLEMENTS_DATABASE_URL?.trim() && env.SUPPLEMENTS_DATABASE_URL.trim() === testUrl.trim()) return "equals SUPPLEMENTS_DATABASE_URL";
+  let host: string;
+  try {
+    host = new URL(testUrl).hostname;
+  } catch {
+    return "unparseable URL";
+  }
+  // A socket path (?host=/tmp) leaves the hostname empty: that is local too.
+  return ["localhost", "127.0.0.1", "[::1]", ""].includes(host) ? null : `host ${host} is not local`;
+}
+
+test("the destructive suite only runs against a throwaway local database", () => {
+  assert.equal(unsafeTestDatabase("postgresql://postgres@localhost:55432/t", {}), null);
+  assert.equal(unsafeTestDatabase("postgresql://postgres@127.0.0.1:55432/t", {}), null);
+  assert.match(unsafeTestDatabase("postgresql://u:p@db.prisma.io:5432/prod", {})!, /not local/);
+  assert.match(unsafeTestDatabase("postgresql://postgres@localhost/t", { SUPPLEMENTS_DATABASE_URL: "postgresql://postgres@localhost/t" })!, /SUPPLEMENTS_DATABASE_URL/);
+  assert.equal(unsafeTestDatabase("postgresql://u:p@db.prisma.io:5432/x", { ORDER_EMAILS_TEST_ALLOW_REMOTE: "1" }), null);
+});
 const MIGRATIONS = [
   "20261005000000_supplements_transactional_emails",
   "20261006000000_transactional_emails_send_uncertain",
@@ -24,6 +48,8 @@ let clients: PrismaClient[] = [];
 
 before(async () => {
   if (!url) return;
+  const unsafe = unsafeTestDatabase(url);
+  if (unsafe) throw new Error(`Refusing to drop tables on ORDER_EMAILS_TEST_DATABASE_URL (${unsafe}). Set ORDER_EMAILS_TEST_ALLOW_REMOTE=1 to override.`);
   // Several independent clients = several connection pools, like parallel serverless instances.
   clients = Array.from({ length: 4 }, () => new PrismaClient({ datasourceUrl: url }));
   const admin = clients[0];
@@ -135,4 +161,23 @@ test("Resend window on Postgres: uncertain rows expire to sent_unconfirmed after
   assert.ok((await store.claim(input("w-refused"))).claimed);
   // sent_unconfirmed rows still count as shipped for partial shipment detection.
   assert.deepEqual(await store.shippedQuantities("w-lost", "other"), { "1": 1 });
+});
+
+test("snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported", { skip }, async () => {
+  const store = prismaTransactionalEmailStore(clients[0]);
+  const input = (marker: string) => ({ ...claimInput("snap-1"), snapshot: { lineItems: [], marker } });
+  const first = await store.claim(input("v1"));
+  assert.ok(first.claimed && !first.sendUncertain);
+  await store.markFailed("order_confirmation", "snap-1", first.token, "resend_rate_limit_exceeded", false);
+  const second = await store.claim(input("v2"));
+  assert.ok(second.claimed);
+  assert.equal(second.sendUncertain, false);
+  assert.equal((second.snapshot as { marker: string }).marker, "v2", "nothing was delivered: current data wins");
+  assert.equal(second.previousError, "resend_rate_limit_exceeded");
+  await store.markFailed("order_confirmation", "snap-1", second.token, "resend_timeout", true);
+  const third = await store.claim(input("v3"));
+  assert.ok(third.claimed);
+  assert.equal(third.sendUncertain, true);
+  assert.equal((third.snapshot as { marker: string }).marker, "v2", "uncertain attempt: replay its body");
+  assert.equal(third.previousError, "resend_timeout");
 });

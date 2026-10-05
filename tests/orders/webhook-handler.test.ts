@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { handleShopifyOrderWebhook, readLimitedBody, verifyShopifyHmac, type WebhookDeps } from "../../lib/orders/webhooks/handler";
-import { classifyResendError } from "../../lib/orders/webhooks/sender";
+import { classifyResendError, resendSender } from "../../lib/orders/webhooks/sender";
 import { MORE_TO_FOLLOW_COPY } from "../../lib/orders/emails/shipping-confirmation";
 import { verifyShopifyWebhookSignature } from "../../lib/affiliates/shopify-webhook";
 import { BRAND, ORDER_ID, SECRET, fulfillmentPayload, orderPaidPayload, partialFirst, partialSecond, sign, visibleText, webhookHeaders } from "./fixtures";
@@ -424,6 +424,15 @@ test("Resend errors: setup problems retry, payload problems are permanent, serve
   }
   const payload = classifyResendError({ name: "validation_error", statusCode: 422, message: "Invalid `to` field." });
   assert.deepEqual([payload.retryable, payload.uncertain], [false, false]);
+  // A payload error that merely mentions a domain stays permanent (no 4h Shopify retry loop).
+  const recipient = classifyResendError({ name: "validation_error", statusCode: 422, message: "The recipient domain example.invalid is invalid." });
+  assert.deepEqual([recipient.retryable, recipient.uncertain], [false, false]);
+  for (const message of ["Invalid `from` field. The email address needs to follow the format.", "The iqonbody.com domain is not verified. Please, add and verify your domain."]) {
+    const c = classifyResendError({ name: "validation_error", statusCode: 422, message });
+    assert.deepEqual([c.retryable, c.uncertain], [true, false], message);
+  }
+  const auth = classifyResendError({ name: "validation_error", statusCode: 401, message: "x" });
+  assert.deepEqual([auth.retryable, auth.uncertain], [true, false]);
   for (const name of ["internal_server_error", "application_error", "concurrent_idempotent_requests"]) {
     const c = classifyResendError({ name, statusCode: 500, message: "x" });
     assert.deepEqual([c.retryable, c.uncertain], [true, true], name);
@@ -447,4 +456,115 @@ test("a body that trickles in past the read deadline is refused with 408", async
   const res = await readLimitedBody(new Request("https://x.test", { method: "POST", body: stream, duplex: "half" } as RequestInit), 1000, 200);
   assert.deepEqual(res, { ok: false, status: 408, reason: "body_timeout" });
   assert.ok(Date.now() - started < 1000);
+});
+
+const conflict = { ok: false as const, retryable: true, uncertain: true, error: "resend_invalid_idempotent_request", idempotentConflict: true };
+
+test("Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender", async () => {
+  const client = { emails: { send: async () => ({ data: null, error: { name: "invalid_idempotent_request", message: "Same idempotency key used with a different payload", statusCode: 409 } }) } };
+  const sender = resendSender({ SUPPLEMENTS_RESEND_API_KEY: "re_test", SUPPLEMENTS_EMAIL_FROM: "IQON <orders@example.com>" }, client as never)!;
+  const outcome = await sender.send({ to: "a@example.com", subject: "s", html: "h", text: "t", idempotencyKey: "k", tag: "order_confirmation" }, 1000);
+  assert.equal(outcome.ok, false);
+  assert.equal(!outcome.ok && outcome.idempotentConflict, true);
+});
+
+test("REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent", async () => {
+  const { clock, deps, sender, store, logs } = clocked({ sender: new FakeSender([conflict]) });
+  const first = await deliver(deps, "fulfillments/create", fulfillmentPayload());
+  assert.equal(first.status, 503);
+  const row = store.get("shipping_confirmation", "5550000000001")!;
+  assert.equal(row.status, "failed");
+  assert.equal(row.sendUncertain, true);
+  assert.deepEqual(logs.filter((l) => l.event === "resend_idempotent_conflict").map((l) => l.treatedAs), ["uncertain"]);
+  // A repeated conflict (Resend kept the key of a refused request) is still not proof of delivery...
+  sender.script.push(conflict);
+  clock.now += HOUR;
+  assert.equal((await deliver(deps, "fulfillments/update", fulfillmentPayload())).status, 503);
+  assert.equal(store.get("shipping_confirmation", "5550000000001")!.status, "failed");
+  assert.deepEqual(logs.filter((l) => l.event === "resend_idempotent_conflict").map((l) => l.treatedAs), ["uncertain", "uncertain"]);
+  // ...it keeps being retried inside the window...
+  clock.now += HOUR;
+  assert.equal((await deliver(deps, "fulfillments/update", fulfillmentPayload())).body.sent, true);
+  assert.equal(sender.attempts.length, 3);
+
+  // ...and after it the row ends as sent_unconfirmed without another send.
+  const late = clocked({ sender: new FakeSender([conflict]) });
+  assert.equal((await deliver(late.deps, "orders/paid", orderPaidPayload())).status, 503);
+  late.clock.now += 2 * DAY;
+  assert.equal((await deliver(late.deps, "orders/paid", orderPaidPayload())).body.status, "sent_unconfirmed");
+  assert.equal(late.sender.attempts.length, 1);
+});
+
+test("an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent", async () => {
+  const timeout = { ok: false as const, retryable: true, uncertain: true, error: "resend_timeout" };
+  const { clock, deps, store, logs } = clocked({ sender: new FakeSender([timeout, conflict]) });
+  assert.equal((await deliver(deps, "orders/paid", orderPaidPayload())).status, 503);
+  clock.now += 10 * 60_000;
+  const res = await deliver(deps, "orders/paid", orderPaidPayload());
+  assert.equal(res.status, 200);
+  assert.equal(res.body.sent, true);
+  assert.equal(store.get("order_confirmation", String(ORDER_ID))!.status, "sent");
+  assert.deepEqual(logs.filter((l) => l.event === "resend_idempotent_conflict").map((l) => l.treatedAs), ["sent"]);
+});
+
+test("REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed", async () => {
+  const timeout = { ok: false as const, retryable: true, uncertain: true, error: "resend_timeout" };
+  const order = clocked({ sender: new FakeSender([timeout]) });
+  await deliver(order.deps, "orders/paid", orderPaidPayload());
+  order.clock.now += 10 * 60_000;
+  await deliver(order.deps, "orders/paid", orderPaidPayload({ customer: { id: 7001, first_name: "Changed", last_name: "Morgan", email: "ava.morgan@example.com" } }));
+  assert.equal(order.sender.attempts.length, 2);
+  assert.equal(order.sender.attempts[0].html, order.sender.attempts[1].html);
+  assert.ok(!order.sender.attempts[1].html.includes("Changed"));
+
+  const ship = clocked({ sender: new FakeSender([timeout]) });
+  await deliver(ship.deps, "fulfillments/create", fulfillmentPayload());
+  ship.clock.now += 10 * 60_000;
+  await deliver(ship.deps, "fulfillments/update", fulfillmentPayload({ tracking_number: "1ZNEWNUMBER0000001", tracking_numbers: ["1ZNEWNUMBER0000001"] }));
+  assert.equal(ship.sender.attempts.length, 2);
+  assert.equal(ship.sender.attempts[0].html, ship.sender.attempts[1].html);
+  assert.ok(!ship.sender.attempts[1].html.includes("1ZNEWNUMBER0000001"));
+});
+
+test("REGRESSION r2a N2: after a certain rejection the retry renders the current data", async () => {
+  const refused = { ok: false as const, retryable: true, uncertain: false, error: "resend_rate_limit_exceeded" };
+  const order = clocked({ sender: new FakeSender([refused]) });
+  await deliver(order.deps, "orders/paid", orderPaidPayload());
+  order.clock.now += 10 * 60_000;
+  await deliver(order.deps, "orders/paid", orderPaidPayload({ customer: { id: 7001, first_name: "Changed", last_name: "Morgan", email: "ava.morgan@example.com" } }));
+  assert.equal(order.sender.sent.length, 1);
+  assert.ok(order.sender.sent[0].html.includes("Changed"));
+  assert.ok(!order.sender.attempts[0].html.includes("Changed"));
+
+  const ship = clocked({ sender: new FakeSender([refused]) });
+  await deliver(ship.deps, "fulfillments/create", fulfillmentPayload());
+  ship.clock.now += 2 * DAY;
+  await deliver(ship.deps, "fulfillments/update", fulfillmentPayload({ tracking_number: "1ZNEWNUMBER0000001", tracking_numbers: ["1ZNEWNUMBER0000001"] }));
+  assert.equal(ship.sender.sent.length, 1);
+  assert.ok(ship.sender.sent[0].html.includes("1ZNEWNUMBER0000001"), "corrected tracking number is emailed");
+});
+
+test("REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read", async () => {
+  const { deps, sender } = setup({ startedAt: Date.now() - 3900 });
+  const res = await deliver(deps, "orders/paid", orderPaidPayload());
+  assert.equal(res.status, 503);
+  assert.equal(sender.attempts.length, 0, "no send started after the budget was spent reading the body");
+});
+
+test("the handler itself ignores a stored snapshot when the claim reports no uncertain attempt", async () => {
+  // A store that hands back the first snapshot on every claim: the handler must still render fresh.
+  const store = new MemoryStore();
+  const claim = store.claim.bind(store);
+  let first: unknown;
+  store.claim = async (input) => {
+    const result = await claim(input);
+    if (result.claimed) first ??= result.snapshot;
+    return result.claimed ? { ...result, snapshot: first } : result;
+  };
+  const sender = new FakeSender([{ ok: false, retryable: true, uncertain: false, error: "resend_rate_limit_exceeded" }]);
+  const { deps } = setup({ store, sender });
+  await deliver(deps, "orders/paid", orderPaidPayload());
+  await deliver(deps, "orders/paid", orderPaidPayload({ customer: { id: 7001, first_name: "Changed", last_name: "Morgan", email: "ava.morgan@example.com" } }));
+  assert.equal(sender.sent.length, 1);
+  assert.ok(sender.sent[0].html.includes("Changed"));
 });

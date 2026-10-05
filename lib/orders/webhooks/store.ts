@@ -12,9 +12,15 @@
  * row (the outcome update was lost) or a failure that may still have been
  * delivered (timeout, network error, 5xx) marks the row `send_uncertain`.
  * Such a row is retried only within AMBIGUOUS_SEND_WINDOW_MS of its first
- * claim, while the key still protects the customer. After that it becomes the
- * terminal `sent_unconfirmed`: a later fulfillments/update (shipment_status
+ * claim (created_at), while the key still protects the customer. After that
+ * it becomes the terminal `sent_unconfirmed`: a later fulfillments/update (shipment_status
  * changes arrive days later) must never produce a second email.
+ *
+ * The window deliberately starts at the first claim, not at the first
+ * uncertain attempt: that is when the key was first used, so it is the
+ * conservative choice. An uncertain attempt made more than 23h after the first
+ * claim (a shipment refused for a day, then a retry that timed out) is
+ * therefore never retried either.
  */
 import { randomUUID } from "node:crypto";
 import type { PrismaClient } from "@prisma/client";
@@ -36,8 +42,13 @@ export interface ClaimInput {
 }
 
 export type ClaimResult =
-  /** `snapshot` is the one stored by the first claim (reclaims never overwrite it). */
-  | { claimed: true; token: string; attempts: number; snapshot: unknown }
+  /**
+   * `sendUncertain`: an earlier attempt may have reached the customer. Only then
+   * is `snapshot` the one of that attempt (kept so a retry sends the same body);
+   * a reclaim after certain failures stores the new snapshot instead.
+   * `previousError`: last_error of the attempt before this one (null on a first claim).
+   */
+  | { claimed: true; token: string; attempts: number; snapshot: unknown; sendUncertain: boolean; previousError: string | null }
   | { claimed: false; status: EmailStatus | "unknown" };
 
 export interface TransactionalEmailStore {
@@ -74,19 +85,21 @@ export function prismaTransactionalEmailStore(prisma: PrismaClient, now: () => D
       const json = snapshot === undefined ? undefined : (JSON.parse(JSON.stringify(snapshot)) as object);
       try {
         await table.create({ data: { kind, dedupeKey, orderId, status: "sending", attempts: 1, claimToken: token, claimedAt: at, createdAt: at, snapshot: json } });
-        return { claimed: true, token, attempts: 1, snapshot: json ?? null };
+        return { claimed: true, token, attempts: 1, snapshot: json ?? null, sendUncertain: false, previousError: null };
       } catch (error) {
         if (!isUniqueViolation(error)) throw error;
       }
       const stale = new Date(at.getTime() - staleAfterMs);
       const windowStart = new Date(at.getTime() - AMBIGUOUS_SEND_WINDOW_MS);
-      const take = { status: "sending", claimToken: token, claimedAt: at, attempts: { increment: 1 }, lastError: null };
+      // last_error is kept until this attempt's outcome overwrites it (see previousError).
+      const take = { status: "sending", claimToken: token, claimedAt: at, attempts: { increment: 1 } };
       // Each step is one conditional UPDATE: Postgres re-checks the WHERE clause
       // after acquiring the row lock, so only one concurrent claimer can match.
-      let reclaimed = await table.updateMany({
-        where: { kind, dedupeKey, status: "failed", OR: [{ sendUncertain: false }, { createdAt: { gte: windowStart } }] },
-        data: take,
-      });
+      // Nothing reached the customer yet: retry with the current snapshot.
+      let reclaimed = await table.updateMany({ where: { kind, dedupeKey, status: "failed", sendUncertain: false }, data: { ...take, snapshot: json } });
+      if (reclaimed.count === 0) {
+        reclaimed = await table.updateMany({ where: { kind, dedupeKey, status: "failed", sendUncertain: true, createdAt: { gte: windowStart } }, data: take });
+      }
       if (reclaimed.count === 0) {
         // The previous owner vanished mid send: it may have been delivered.
         reclaimed = await table.updateMany({
@@ -105,8 +118,13 @@ export function prismaTransactionalEmailStore(prisma: PrismaClient, now: () => D
           data: { status: "sent_unconfirmed", claimToken: null, sendUncertain: true, lastError: "ambiguous_send_expired" },
         });
       }
-      const row = await table.findUnique({ where: { kind_dedupeKey: { kind, dedupeKey } }, select: { status: true, attempts: true, claimToken: true, snapshot: true } });
-      if (reclaimed.count === 1 && row?.claimToken === token) return { claimed: true, token, attempts: row.attempts, snapshot: row.snapshot ?? null };
+      const row = await table.findUnique({
+        where: { kind_dedupeKey: { kind, dedupeKey } },
+        select: { status: true, attempts: true, claimToken: true, snapshot: true, sendUncertain: true, lastError: true },
+      });
+      if (reclaimed.count === 1 && row?.claimToken === token) {
+        return { claimed: true, token, attempts: row.attempts, snapshot: row.snapshot ?? null, sendUncertain: row.sendUncertain, previousError: row.lastError };
+      }
       return { claimed: false, status: (row?.status as EmailStatus | undefined) ?? "unknown" };
     },
     async markSent(kind, dedupeKey, token, messageId) {

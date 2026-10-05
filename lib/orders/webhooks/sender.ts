@@ -20,8 +20,12 @@ export interface OutgoingEmail {
 
 export type SendOutcome =
   | { ok: true; id: string | null; duplicate?: boolean }
-  /** `uncertain`: Resend may have accepted the email anyway (timeout, network error, 5xx). */
-  | { ok: false; retryable: boolean; uncertain: boolean; error: string };
+  /**
+   * `uncertain`: Resend may have accepted the email anyway (timeout, network error, 5xx).
+   * `idempotentConflict`: Resend already holds this key with a different body. The handler
+   * decides what that means from the ledger row (see deliver() in handler.ts).
+   */
+  | { ok: false; retryable: boolean; uncertain: boolean; error: string; idempotentConflict?: boolean };
 
 export interface EmailSender {
   send(message: OutgoingEmail, timeoutMs: number): Promise<SendOutcome>;
@@ -47,10 +51,15 @@ const CONFIGURATION = new Set([
 /** Resend answers these before accepting anything; every other error may have been delivered. */
 const REJECTED_UNSENT = new Set([...PERMANENT, ...CONFIGURATION]);
 
-/** Resend reports an unverified From domain as a 403 validation_error. */
+/**
+ * Resend reports an unverified From domain as a 403 validation_error. Only auth
+ * statuses or wording about the sender domain / From address count as setup
+ * problems; anything else about the message (e.g. the recipient) is permanent.
+ */
 function isConfigurationError(error: { name: string; message?: string; statusCode?: number | null }): boolean {
   if (CONFIGURATION.has(error.name)) return true;
-  return error.statusCode === 401 || error.statusCode === 403 || /domain|\bfrom\b|api key|verif/i.test(error.message ?? "");
+  if (error.statusCode === 401 || error.statusCode === 403) return true;
+  return /domain is not verified|verify (?:a|your) domain|`?from`? (?:address|field)/i.test(error.message ?? "");
 }
 
 export function classifyResendError(error: { name: string; message?: string; statusCode?: number | null }): Extract<SendOutcome, { ok: false }> {
@@ -89,8 +98,11 @@ export function resendSender(env: Env = process.env, client?: ResendLike): Email
         // same idempotency key, so Resend will not deliver twice.
         if (result === "timeout") return { ok: false, retryable: true, uncertain: true, error: "resend_timeout" };
         if (result.error) {
-          // Same key was already accepted with a different body: the email went out.
-          if (result.error.name === "invalid_idempotent_request") return { ok: true, id: null, duplicate: true };
+          // Same key already used with a different body. Only proof of delivery if an
+          // earlier attempt was uncertain; the handler checks the ledger for that.
+          if (result.error.name === "invalid_idempotent_request") {
+            return { ok: false, retryable: true, uncertain: true, error: "resend_invalid_idempotent_request", idempotentConflict: true };
+          }
           return classifyResendError(result.error);
         }
         return { ok: true, id: result.data?.id ?? null };

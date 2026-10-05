@@ -36,13 +36,15 @@ export class MemoryStore implements TransactionalEmailStore {
     const copy = snapshot === undefined ? null : JSON.parse(JSON.stringify(snapshot));
     if (!existing) {
       this.rows.set(k, { kind, dedupeKey, orderId, status: "sending", attempts: 1, claimToken: token, claimedAt: now, createdAt: now, sendUncertain: false, snapshot: copy, messageId: null, lastError: null });
-      return { claimed: true, token, attempts: 1, snapshot: copy };
+      return { claimed: true, token, attempts: 1, snapshot: copy, sendUncertain: false, previousError: null };
     }
     const inWindow = existing.createdAt >= now - AMBIGUOUS_SEND_WINDOW_MS;
     const stale = existing.status === "sending" && existing.claimedAt < now - staleAfterMs;
     const take = (uncertain: boolean): ClaimResult => {
-      Object.assign(existing, { status: "sending", attempts: existing.attempts + 1, claimToken: token, claimedAt: now, lastError: null, sendUncertain: existing.sendUncertain || uncertain });
-      return { claimed: true, token, attempts: existing.attempts, snapshot: existing.snapshot };
+      // After certain failures only, the current snapshot replaces the stored one.
+      const replace = !existing.sendUncertain && !uncertain && copy !== null ? { snapshot: copy } : {};
+      Object.assign(existing, { status: "sending", attempts: existing.attempts + 1, claimToken: token, claimedAt: now, sendUncertain: existing.sendUncertain || uncertain, ...replace });
+      return { claimed: true, token, attempts: existing.attempts, snapshot: existing.snapshot, sendUncertain: existing.sendUncertain, previousError: existing.lastError };
     };
     if (existing.status === "failed" && (!existing.sendUncertain || inWindow)) return take(false);
     if (stale && inWindow) return take(true);

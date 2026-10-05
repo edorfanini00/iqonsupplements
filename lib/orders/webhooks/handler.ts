@@ -27,7 +27,7 @@ import { renderOrderConfirmationEmail } from "../emails/order-confirmation";
 import { renderShippingConfirmationEmail } from "../emails/shipping-confirmation";
 import type { EmailBrandConfig, EmailLineItem, OrderSnapshot, RenderedEmail, ShipmentDetails } from "../emails/types";
 import type { AdminOrderInfo, AdminOrderLookup } from "./admin-order";
-import type { EmailSender } from "./sender";
+import type { EmailSender, SendOutcome } from "./sender";
 import { hasMoreToFollow, parseFulfillment, parseOrderPaid, shipmentReadiness, totalsMismatch } from "./shopify-payload";
 import { TERMINAL_STATUSES, type ClaimResult, type EmailKind, type ShipmentLedgerSnapshot, type TransactionalEmailStore } from "./store";
 
@@ -36,7 +36,7 @@ export const MAX_BODY_BYTES = 1_000_000;
 export const DEFAULT_BUDGET_MS = 4000;
 export const DEFAULT_STALE_CLAIM_MS = 5 * 60_000;
 /** Shopify sends the whole body at once; a slow trickle is not a real delivery. */
-export const BODY_READ_DEADLINE_MS = 2000;
+export const BODY_READ_DEADLINE_MS = 1000;
 
 export interface WebhookDeps {
   env: Record<string, string | undefined>;
@@ -48,6 +48,8 @@ export interface WebhookDeps {
   adminOrderLookup: AdminOrderLookup | null;
   brand: EmailBrandConfig;
   now?: () => number;
+  /** When the request arrived (same clock as `now`); the budget includes the body read. */
+  startedAt?: number;
   log?: (event: Record<string, unknown>) => void;
   budgetMs?: number;
   staleClaimMs?: number;
@@ -128,7 +130,7 @@ function errorMessage(error: unknown): string {
 
 export async function handleShopifyOrderWebhook(rawBody: Buffer | string, headers: Headers, deps: WebhookDeps): Promise<WebhookResult> {
   const now = deps.now ?? Date.now;
-  const started = now();
+  const started = deps.startedAt ?? now();
   const budget = deps.budgetMs ?? DEFAULT_BUDGET_MS;
   const remaining = () => budget - (now() - started);
   const topic = headers.get("x-shopify-topic") ?? "";
@@ -182,6 +184,8 @@ type Ctx = {
   log: (event: Record<string, unknown>) => void;
 };
 
+const IDEMPOTENT_CONFLICT = "resend_invalid_idempotent_request";
+
 /** Time reserved after the send to record the outcome (two markSent tries). */
 const FINISH_RESERVE_MS = 1000;
 /** Minimum time given to any ledger write, even when the budget is spent. */
@@ -229,10 +233,11 @@ async function deliver(
   to: string,
   email: RenderedEmail,
   idempotencyKey: string,
+  claim: Extract<ClaimResult, { claimed: true }>,
   ids: Record<string, unknown>,
 ): Promise<WebhookResult> {
   const { store, sender, brand } = ctx.deps;
-  let outcome;
+  let outcome: SendOutcome;
   try {
     outcome = await sender.send(
       { to, subject: email.subject, html: email.html, text: email.text, idempotencyKey, replyTo: brand.supportEmail, tag: kind },
@@ -240,6 +245,16 @@ async function deliver(
     );
   } catch (error) {
     outcome = { ok: false as const, retryable: true, uncertain: true, error: errorMessage(error) };
+  }
+  if (!outcome.ok && outcome.idempotentConflict) {
+    // Resend already holds this key. After an uncertain attempt that means it was
+    // accepted. Otherwise (or when the uncertainty itself came from a conflict)
+    // Resend may have kept the key of a rejected request, so nothing proves
+    // delivery: stay uncertain (retried inside the window, then sent_unconfirmed)
+    // and leave a distinct trail for monitoring.
+    const accepted = claim.sendUncertain && claim.previousError !== IDEMPOTENT_CONFLICT;
+    ctx.log({ event: "resend_idempotent_conflict", treatedAs: accepted ? "sent" : "uncertain", ...ids });
+    if (accepted) outcome = { ok: true, id: null, duplicate: true };
   }
   if (outcome.ok) {
     // One retry: the update is keyed by our claim token, so repeating it is harmless.
@@ -298,9 +313,10 @@ async function orderPaid(payload: unknown, ctx: Ctx): Promise<WebhookResult> {
 
   const claim = await claimOrRetry(ctx, { kind: "order_confirmation", dedupeKey: parsed.orderId, orderId: parsed.orderId, snapshot: fresh, staleAfterMs: ctx.deps.staleClaimMs ?? DEFAULT_STALE_CLAIM_MS });
   if (!claim.claimed) return duplicate(ctx, claim, { orderId: parsed.orderId });
-  // A retry renders exactly what the first attempt rendered, so Resend sees the
-  // same body for the same idempotency key.
-  const order = isOrderSnapshot(claim.snapshot) && claim.snapshot.orderId === parsed.orderId ? claim.snapshot : fresh;
+  // After an uncertain attempt, render exactly what that attempt rendered so Resend
+  // sees the same body for the same idempotency key. Otherwise nothing reached
+  // the customer yet and the current data is used.
+  const order = claim.sendUncertain && isOrderSnapshot(claim.snapshot) && claim.snapshot.orderId === parsed.orderId ? claim.snapshot : fresh;
   try {
     if (!order.email) {
       await write(ctx, ctx.deps.store.markSkipped("order_confirmation", order.orderId, claim.token, "no_recipient"), "mark_skipped");
@@ -309,7 +325,7 @@ async function orderPaid(payload: unknown, ctx: Ctx): Promise<WebhookResult> {
     }
     if (order.test) ctx.log({ event: "test_order", note: "Shopify test order; sending normally", ...ids });
     const email = renderOrderConfirmationEmail(order, ctx.deps.brand);
-    return await deliver(ctx, "order_confirmation", order.orderId, claim.token, order.email, email, `order-confirmation/${order.orderId}`, { ...ids, attempt: claim.attempts });
+    return await deliver(ctx, "order_confirmation", order.orderId, claim.token, order.email, email, `order-confirmation/${order.orderId}`, claim, { ...ids, attempt: claim.attempts });
   } catch (error) {
     await write(ctx, ctx.deps.store.markFailed("order_confirmation", order.orderId, claim.token, errorMessage(error), false), "mark_failed").catch(() => {});
     throw error;
@@ -368,7 +384,7 @@ async function fulfillment(payload: unknown, ctx: Ctx): Promise<WebhookResult> {
   const claim = await claimOrRetry(ctx, { kind: "shipping_confirmation", dedupeKey: f.fulfillmentId, orderId: f.orderId, snapshot: ledger, staleAfterMs: ctx.deps.staleClaimMs ?? DEFAULT_STALE_CLAIM_MS });
   if (!claim.claimed) return duplicate(ctx, claim, { orderId: f.orderId, fulfillmentId: f.fulfillmentId });
   const stored = (claim.snapshot as ShipmentLedgerSnapshot | null)?.shipment;
-  const shipment = isShipment(stored) && stored.fulfillmentId === f.fulfillmentId ? stored : fresh;
+  const shipment = claim.sendUncertain && isShipment(stored) && stored.fulfillmentId === f.fulfillmentId ? stored : fresh;
   try {
     if (!shipment.email) {
       await write(ctx, store.markSkipped("shipping_confirmation", f.fulfillmentId, claim.token, "no_recipient"), "mark_skipped");
@@ -376,7 +392,7 @@ async function fulfillment(payload: unknown, ctx: Ctx): Promise<WebhookResult> {
       return ok({ skipped: true, reason: "no_recipient" });
     }
     const email = renderShippingConfirmationEmail(shipment, ctx.deps.brand);
-    return await deliver(ctx, "shipping_confirmation", f.fulfillmentId, claim.token, shipment.email, email, `shipped/${f.fulfillmentId}`, { ...ids, attempt: claim.attempts });
+    return await deliver(ctx, "shipping_confirmation", f.fulfillmentId, claim.token, shipment.email, email, `shipped/${f.fulfillmentId}`, claim, { ...ids, attempt: claim.attempts });
   } catch (error) {
     await write(ctx, store.markFailed("shipping_confirmation", f.fulfillmentId, claim.token, errorMessage(error), false), "mark_failed").catch(() => {});
     throw error;
