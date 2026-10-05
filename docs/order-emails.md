@@ -14,7 +14,7 @@ Shopify (hosted checkout creates the order; Supliful adds fulfilments + tracking
    │  webhook: orders/paid, fulfillments/create, fulfillments/update
    ▼
 POST /api/webhooks/shopify/orders          app/api/webhooks/shopify/orders/route.ts
-   │  readLimitedBody (raw bytes, 1 MB cap, 2s read deadline) → handleShopifyOrderWebhook (lib/orders/webhooks/handler.ts)
+   │  readLimitedBody (raw bytes, 1 MB cap, 1s read deadline; the 4s budget starts at request arrival) → handleShopifyOrderWebhook (lib/orders/webhooks/handler.ts)
    │   1. x-shopify-shop-domain must be nr9zd0-t5.myshopify.com (SUPPLEMENTS_SHOP)
    │   2. HMAC SHA256 over the raw body with SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET (timing safe)
    │   3. topic allowlist; anything else → 200 {ignored}
@@ -43,9 +43,10 @@ Table `supplements_transactional_emails`, unique on `(kind, dedupe_key)`:
 * A claim is an `INSERT` (wins once thanks to the unique index) or a conditional `UPDATE` that takes over a row that is `failed` or `sending` for longer than 5 minutes (stale). Postgres re-evaluates the `WHERE` under the row lock, so exactly one concurrent delivery wins. Proven against a real Postgres in `tests/orders/store.integration.test.ts`.
 * Each claim gets a random `claim_token`; only the holder can mark the row `sent`/`failed`/`skipped`.
 * `sent`, `skipped` and `sent_unconfirmed` are terminal. A later tracking number change or `shipment_status` update (`in_transit`, `out_for_delivery`, `delivered`) on the same fulfilment therefore never sends a second email.
-* **Uncertain sends and the 24h Resend window.** Resend remembers an idempotency key for 24 hours. If an attempt may have reached Resend without a confirmed outcome (our `sent` update was lost, the call timed out, a network error, a Resend 5xx), the row gets `send_uncertain = true` (sticky, never cleared). Such a row is retried only within **23 hours of its first claim** (`created_at`), where the same key makes the retry a no-op at Resend. After that, the next delivery turns it into the terminal `sent_unconfirmed` (`last_error = ambiguous_send_expired`) and gets a 200 duplicate. The email was probably delivered, and a second "on its way" email days later is worse than a missing one. Failures Resend explicitly refused (4xx such as rate limit or a bad key) are not uncertain and stay retryable.
+* **Uncertain sends and the 24h Resend window.** Resend remembers an idempotency key for 24 hours. If an attempt may have reached Resend without a confirmed outcome (our `sent` update was lost, the call timed out, a network error, a Resend 5xx), the row gets `send_uncertain = true` (sticky, never cleared). Such a row is retried only within **23 hours of its first claim** (`created_at`), where the same key makes the retry a no-op at Resend. The window is measured from the first claim, not from the first uncertain attempt, on purpose: the key was first used then (Resend may keep it even for a refused request), so this is the conservative reading. After the window, the next delivery turns the row into the terminal `sent_unconfirmed` (`last_error = ambiguous_send_expired`) and gets a 200 duplicate. The email was probably delivered, and a second "on its way" email days later is worse than a missing one. Consequence of measuring from the first claim: an uncertain attempt made more than 23h after the first claim (for example a shipment whose first attempts were refused for a day and whose later retry timed out) is never retried either. Failures Resend explicitly refused (4xx such as rate limit or a bad key) are not uncertain and stay retryable.
 * After a successful send, `markSent` gets about 1s of reserved budget and is tried twice.
-* A retry renders from the snapshot stored by the first claim (order snapshot, or the shipment render input), so Resend sees the same body for the same key. If Resend still reports `invalid_idempotent_request` (same key, different body), we treat it as already sent.
+* After an **uncertain** attempt, the retry renders from the stored snapshot (order snapshot, or the shipment render input) of that attempt, so Resend sees the same body for the same key. After **certain** failures only (nothing reached the customer), the reclaim stores and renders the current data instead, so for example a corrected tracking number is the one emailed.
+* Resend `invalid_idempotent_request` (same key, different body) is logged as `resend_idempotent_conflict`. If the row was already `send_uncertain` from a timeout, network error, 5xx or lost update, it proves the earlier attempt was accepted and the row is marked `sent` (no message id). Otherwise, including when the previous attempt itself ended in such a conflict, nothing proves delivery (Resend may have kept the key of a refused request), so it is treated as uncertain: retried inside the 23h window, then `sent_unconfirmed`. Look at any `resend_idempotent_conflict` with `treatedAs: "uncertain"` in the Resend dashboard.
 * Fulfilments that are not ready (no tracking yet, `pending`, `cancelled`, `error`, `failure`) are acknowledged **without** writing a row, so the later `fulfillments/update` that adds tracking can still send.
 
 ### Response contract
@@ -54,8 +55,8 @@ Table `supplements_transactional_emails`, unique on `(kind, dedupe_key)`:
 | --- | --- | --- |
 | 200 | sent; duplicate of a sent/skipped/sent_unconfirmed email; deliberate skip (no recipient, not ready, cancelled); unknown topic; permanent Resend rejection of this message (payload validation errors) | done |
 | 401 | wrong shop domain or bad HMAC | retried, then dropped |
-| 400 / 408 / 413 | unreadable JSON / body not received within 2s / body over 1 MB | retried, then dropped |
-| 503 | not configured (secret, DB or Resend missing); Resend setup problem (invalid or restricted API key, unverified From domain (a 403 `validation_error`), quota, rate limit); transient failure (claim released as `failed`); another delivery currently holds a fresh claim | retried with backoff |
+| 400 / 408 / 413 | unreadable JSON / body not received within 1s / body over 1 MB | retried, then dropped |
+| 503 | not configured (secret, DB or Resend missing); Resend setup problem (invalid or restricted API key, a 401/403, or a `validation_error` about the From address or an unverified domain, quota, rate limit); transient failure (claim released as `failed`); another delivery currently holds a fresh claim | retried with backoff |
 
 Every non 2xx counts toward Shopify's failure limit: Shopify retries a failed delivery 8 times over about 4 hours, and **app subscriptions that keep failing are removed** (Shopify emails the app's contact). So configuration must be in place before the webhooks are registered (go live order below), and a 503 caused by a misconfigured Resend domain must be fixed quickly.
 
@@ -99,9 +100,19 @@ The Admin read uses fields covered by protected customer data (email, shipping a
 
 Configure everything first, deploy, and only then register the webhooks. A webhook that lands on a half configured deployment gets 503s, and repeated failures can get the subscription removed.
 
-1. **Database**: provision Postgres, set `SUPPLEMENTS_DATABASE_URL` in Vercel, then apply the migrations:
-   `SUPPLEMENTS_DATABASE_URL=... npx prisma migrate deploy`
-   (applies `20261005000000_supplements_transactional_emails` (one new table and two indexes) and `20261006000000_transactional_emails_send_uncertain` (one new boolean column); both additive). If the database was created outside Prisma migrations, apply the two `migration.sql` files directly, in order.
+1. **Database**: provision a new Postgres for the supplements site and set `SUPPLEMENTS_DATABASE_URL` in Vercel. Apply **only the two order email migrations**. Do **not** run a plain `prisma migrate deploy` on the empty database: it would also apply `20260916000000_supplements_affiliates` and create 29 `supplements_affiliate_*` tables, and affiliate tables belong only to the Health project (`scripts/disabled-affiliate-migration.mjs`). Mark the affiliate migration as applied without running it, then deploy:
+   ```
+   export SUPPLEMENTS_DATABASE_URL='postgresql://...'   # the new supplements DB
+   npx prisma migrate resolve --applied 20260916000000_supplements_affiliates
+   npx prisma migrate deploy
+   ```
+   `migrate deploy` then runs `20261005000000_supplements_transactional_emails` (one table, two indexes) and `20261006000000_transactional_emails_send_uncertain` (one boolean column). Resulting tables: exactly `_prisma_migrations` and `supplements_transactional_emails` (verified on a throwaway Postgres 2026-10-05; a second `migrate deploy` reports "No pending migrations", `migrate status` "up to date"). Alternative without Prisma running the SQL:
+   ```
+   psql "$SUPPLEMENTS_DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/migrations/20261005000000_supplements_transactional_emails/migration.sql
+   psql "$SUPPLEMENTS_DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/migrations/20261006000000_transactional_emails_send_uncertain/migration.sql
+   for m in 20260916000000_supplements_affiliates 20261005000000_supplements_transactional_emails 20261006000000_transactional_emails_send_uncertain; do npx prisma migrate resolve --applied "$m"; done
+   ```
+   Recording all three keeps any later `migrate deploy` a no-op (same two tables as above). Check with `psql "$SUPPLEMENTS_DATABASE_URL" -c '\dt'`: no `supplements_affiliate_*` table must appear.
 2. **Resend**: verify the sending domain, then set `SUPPLEMENTS_RESEND_API_KEY` and `SUPPLEMENTS_EMAIL_FROM` (or `SUPPLEMENTS_ORDER_EMAIL_FROM`), and optionally `SUPPLEMENTS_SUPPORT_EMAIL`.
 3. **Webhook secret**: set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`. For Option A (app subscription) the value is known in advance: the app client secret. For Option B (admin webhooks), the signing key is shown on Settings > Notifications > Webhooks. Verify in admin whether it is visible before the first webhook exists. If it is not, create the webhooks, then immediately set the key and redeploy; deliveries in that short window get a 503 and are retried by Shopify.
 4. **Deploy** this branch. It also ships `public/images/email/*`, which the emails reference. Check that `https://www.iqonbody.com/images/email/iqon-wordmark-ink.png` returns 200.
@@ -112,7 +123,32 @@ Configure everything first, deploy, and only then register the webhooks. A webho
    * The confirmation totals match the order page in Shopify admin (subtotal, discount, shipping, tax, total), and the logs show no `totals_mismatch`.
    * The ledger is clean. Every row must be `sent`; any `failed` row means a configuration problem (look at `last_error`):
      `select kind, dedupe_key, status, attempts, send_uncertain, resend_message_id, last_error from supplements_transactional_emails order by created_at desc limit 20;`
-   * Afterwards, monitor the logs for `send_failed`, `mark_sent_failed` and `totals_mismatch` (for example a Vercel log alert), and occasionally run `select status, count(*) from supplements_transactional_emails group by 1;`. A `sent_unconfirmed` count above zero means a send could not be confirmed. The customer most likely got the email; check the Resend dashboard.
+   * Afterwards, monitor the logs for `send_failed`, `mark_sent_failed`, `resend_idempotent_conflict` and `totals_mismatch` (for example a Vercel log alert), and run the ledger checks below regularly (for example daily).
+
+### Monitoring queries
+
+Every row returned by these needs a look; a healthy ledger returns nothing.
+
+```sql
+-- 1. Failed: not delivered yet. Shopify retries for about 4h; a row still failed after that will not be retried
+--    (configuration problem: see last_error). send_uncertain = true means it may have been delivered anyway.
+select kind, dedupe_key, order_id, attempts, send_uncertain, last_error, created_at, updated_at
+from supplements_transactional_emails where status = 'failed' order by updated_at desc;
+
+-- 2. Stuck in sending for more than 5 minutes: the outcome update was lost after the send call.
+--    Usually delivered (an orders/paid row gets no later event, so it stays like this forever). Check Resend.
+select kind, dedupe_key, order_id, attempts, claimed_at, created_at
+from supplements_transactional_emails where status = 'sending' and claimed_at < (now() at time zone 'utc') - interval '5 minutes' order by claimed_at;
+
+-- 3. Sent unconfirmed: an uncertain send older than Resend's 24h key window, never resent. Most likely delivered.
+select kind, dedupe_key, order_id, attempts, last_error, created_at, updated_at
+from supplements_transactional_emails where status = 'sent_unconfirmed' order by updated_at desc;
+
+-- Overview
+select status, send_uncertain, count(*) from supplements_transactional_emails group by 1, 2 order by 1, 2;
+```
+
+For rows from 2 and 3, search the Resend dashboard for the recipient (`snapshot->>'email'`) to see whether the email went out; if it did not, send it manually. Timestamps are stored in UTC without time zone, hence `now() at time zone 'utc'`.
 
 ### Registering the webhooks
 
@@ -157,10 +193,12 @@ Go live step 7 is the proof: the test order must produce no Shopify or Supliful 
 
 ```
 npm run test:order-emails                     # unit tests; DB tests skip
-ORDER_EMAILS_TEST_DATABASE_URL=postgresql://... npm run test:order-emails   # + real Postgres concurrency tests (drops/recreates the table!)
+ORDER_EMAILS_TEST_DATABASE_URL=postgresql://postgres@localhost:55432/t npm run test:order-emails   # + real Postgres tests (drops/recreates the table!)
 node --import tsx scripts/render-order-email-previews.ts --out docs/emails [--screenshots --asset-origin http://127.0.0.1:8765]
 RESEND_API_KEY=... node --import tsx scripts/send-order-email-preview.ts [--asset-base https://...]   # owner inbox only
 ```
+
+The Postgres suite refuses to run (fails) unless the test URL's host is `localhost`/`127.0.0.1` (or a socket) and differs from `SUPPLEMENTS_DATABASE_URL`; `ORDER_EMAILS_TEST_ALLOW_REMOTE=1` overrides that for a throwaway remote database.
 
 Screenshots: the script uses Playwright (exact viewport, full page, local Chrome) when `playwright-core` can be imported, either from the project or from `PLAYWRIGHT_CORE_PATH=/path/to/node_modules/playwright-core` (an npx cache copy works). Otherwise, or with `--chrome`, it runs plain headless Chrome with the email inside an iframe of the exact width, kills Chrome as soon as the PNG is written, and crops with `sips` (macOS). Serve `public/` locally (`python3 -m http.server 8765` in `public/`) so images load before deploy.
 
@@ -172,4 +210,4 @@ Screenshots: the script uses Playwright (exact viewport, full page, local Chrome
 * Prices in the confirmation use Shopify's `current_*` totals (after edits/refunds at the time of payment) in the presentment currency. Tips and duties are not itemised (logged as `totals_mismatch`).
 * "The rest will follow" relies on the snapshot taken at `orders/paid`. Items removed after payment, or a fulfilment that never got tracking, can make it wrong. Follow up: when Admin access is configured, read the remaining unfulfilled quantity at shipment time. Also confirm on the first real order that `fulfillable_quantity` in `fulfillments/create` reflects the post fulfilment value.
 * Retention: `snapshot` keeps the email, first name and address indefinitely. Follow up ticket: null `snapshot` after about 90 days.
-* A row whose send was uncertain and that is first retried more than 23h later is marked `sent_unconfirmed` without sending. In the rare case that the first attempt really did not deliver, the customer misses that one email (see monitoring in go live step 7).
+* A row whose send was uncertain and that is retried more than 23h after its **first claim** is marked `sent_unconfirmed` without sending, even if the uncertain attempt itself was recent (see Idempotency). In the rare case that the attempt really did not deliver, the customer misses that one email (see Monitoring queries).
