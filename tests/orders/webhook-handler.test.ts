@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { handleShopifyOrderWebhook, readLimitedBody, verifyShopifyHmac, type WebhookDeps } from "../../lib/orders/webhooks/handler";
+import { BODY_READ_DEADLINE_MS, handleShopifyOrderWebhook, readLimitedBody, verifyShopifyHmac, type WebhookDeps } from "../../lib/orders/webhooks/handler";
 import { DEFAULT_ORDER_EMAIL_FROM, classifyResendError, orderEmailConfigured, orderEmailFrom, resendSender } from "../../lib/orders/webhooks/sender";
 import { isSubscriptionRenewal, orderSource } from "../../lib/orders/webhooks/shopify-payload";
 import { MORE_TO_FOLLOW_COPY } from "../../lib/orders/emails/shipping-confirmation";
@@ -685,4 +685,15 @@ test("every paid order logs its origin (no PII) so the renewal rule can be check
   assert.equal(sources[1].appId, "580111");
   assert.ok(!JSON.stringify(sources).includes("@"), "no email address in the origin log");
   assert.equal(orderSource(orderPaidPayload()).sellingPlanLines, 1);
+});
+
+
+test("REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival", async () => {
+  assert.equal(BODY_READ_DEADLINE_MS, 1000);
+  const { readFileSync } = await import("node:fs");
+  const route = readFileSync(new URL("../../app/api/webhooks/shopify/orders/route.ts", import.meta.url), "utf8");
+  const arrival = route.indexOf("const startedAt = Date.now()");
+  const read = route.indexOf("await readLimitedBody(request)");
+  assert.ok(arrival >= 0 && read > arrival, "startedAt must be taken before the body is read");
+  assert.match(route, /handleShopifyOrderWebhook\([\s\S]*\bstartedAt,?[\s\S]*\}\)/, "route must pass startedAt to the handler");
 });

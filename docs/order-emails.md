@@ -119,19 +119,22 @@ The Admin read uses fields covered by protected customer data (email, shipping a
 
 Configure everything first, deploy, and only then register the webhooks. A webhook that lands on a half configured deployment gets 503s, and repeated failures can get the subscription removed.
 
-1. **Database**: provision a new Postgres for the supplements site and set `SUPPLEMENTS_DATABASE_URL` in Vercel. Apply **only the two order email migrations**. Do **not** run a plain `prisma migrate deploy` on the empty database: it would also apply `20260916000000_supplements_affiliates` and create 29 `supplements_affiliate_*` tables, and affiliate tables belong only to the Health project (`scripts/disabled-affiliate-migration.mjs`). Mark the affiliate migration as applied without running it, then deploy:
+1. **Database**: provision a new Postgres for the supplements site and set `SUPPLEMENTS_DATABASE_URL` in Vercel. Apply **only the two order email migrations**. Do **not** run a plain `prisma migrate deploy` on the empty database: it would also apply `20260916000000_supplements_affiliates` and create 29 affiliate and admin tables, and those tables belong only to the Health project (`scripts/disabled-affiliate-migration.mjs`). Mark the affiliate migration as applied without running it, then deploy:
    ```
-   export SUPPLEMENTS_DATABASE_URL='postgresql://...'   # the new supplements DB
-   npx prisma migrate resolve --applied 20260916000000_supplements_affiliates
-   npx prisma migrate deploy
+   set -e
+   export SUPPLEMENTS_DATABASE_URL='postgresql://...'   # the new supplements DB (must already exist)
+   npx prisma migrate resolve --applied 20260916000000_supplements_affiliates \
+     && npx prisma migrate deploy
    ```
+   The `&&` matters: if `resolve` fails (database missing, typo, connection error), `migrate deploy` must not run, because on its own it would create the database and apply the affiliate migration. Stop if `resolve` does not print `Migration 20260916000000_supplements_affiliates marked as applied.`
    `migrate deploy` then runs `20261005000000_supplements_transactional_emails` (one table, two indexes) and `20261006000000_transactional_emails_send_uncertain` (one boolean column). Resulting tables: exactly `_prisma_migrations` and `supplements_transactional_emails` (verified on a throwaway Postgres 2026-10-05; a second `migrate deploy` reports "No pending migrations", `migrate status` "up to date"). Alternative without Prisma running the SQL:
    ```
-   psql "$SUPPLEMENTS_DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/migrations/20261005000000_supplements_transactional_emails/migration.sql
-   psql "$SUPPLEMENTS_DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/migrations/20261006000000_transactional_emails_send_uncertain/migration.sql
-   for m in 20260916000000_supplements_affiliates 20261005000000_supplements_transactional_emails 20261006000000_transactional_emails_send_uncertain; do npx prisma migrate resolve --applied "$m"; done
+   set -e
+   psql "$SUPPLEMENTS_DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/migrations/20261005000000_supplements_transactional_emails/migration.sql \
+     && psql "$SUPPLEMENTS_DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/migrations/20261006000000_transactional_emails_send_uncertain/migration.sql \
+     && for m in 20260916000000_supplements_affiliates 20261005000000_supplements_transactional_emails 20261006000000_transactional_emails_send_uncertain; do npx prisma migrate resolve --applied "$m" || exit 1; done
    ```
-   Recording all three keeps any later `migrate deploy` a no-op (same two tables as above). Check with `psql "$SUPPLEMENTS_DATABASE_URL" -c '\dt'`: no `supplements_affiliate_*` table must appear.
+   Recording all three keeps any later `migrate deploy` a no-op (same two tables as above). Check with `psql "$SUPPLEMENTS_DATABASE_URL" -c '\dt'`: it must list exactly `_prisma_migrations` and `supplements_transactional_emails`. If anything else appears, drop and recreate the database and start again.
 2. **Resend**: set `SUPPLEMENTS_RESEND_API_KEY` (a key from the Resend account where `iqonhealth.com` is verified). Leave `SUPPLEMENTS_SUPPORT_EMAIL` unset (default `info@iqonhealth.com`). The From defaults to `IQON <info@iqonhealth.com>`; no domain step is needed.
 3. **Webhook secret**: set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`. For Option A (app subscription) the value is known in advance: the app client secret. For Option B (admin webhooks), the signing key is shown on Settings > Notifications > Webhooks. Verify in admin whether it is visible before the first webhook exists. If it is not, create the webhooks, then immediately set the key and redeploy; deliveries in that short window get a 503 and are retried by Shopify.
 4. **Deploy** this branch. It also ships `public/images/email/*`, which the emails reference. Check that `https://www.iqonbody.com/images/email/iqon-wordmark-ink.png` returns 200.
@@ -156,6 +159,7 @@ from supplements_transactional_emails where status = 'failed' order by updated_a
 
 -- 2. Stuck in sending for more than 5 minutes: the outcome update was lost after the send call.
 --    Usually delivered (an orders/paid row gets no later event, so it stays like this forever). Check Resend.
+--    Note: on a sending row, last_error holds the PREVIOUS attempt's error (the handler reads it), not this attempt's.
 select kind, dedupe_key, order_id, attempts, claimed_at, created_at
 from supplements_transactional_emails where status = 'sending' and claimed_at < (now() at time zone 'utc') - interval '5 minutes' order by claimed_at;
 
