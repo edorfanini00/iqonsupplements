@@ -2,7 +2,7 @@
 
 Customer transactional emails for the IQON supplements storefront (www.iqonbody.com), sent through Resend from Shopify webhooks.
 
-* **Order confirmation**: one per paid order (`orders/paid`).
+* **Order confirmation**: one per paid order (`orders/paid`), except subscription renewal orders (owner decision, see Subscription renewals).
 * **Shipping confirmation**: one per fulfilment, once it carries tracking (`fulfillments/create`, `fulfillments/update`).
 
 Previews: [`docs/emails/`](emails/) (HTML, plain text and PNG screenshots at 390px, 1280px and 390px dark mode).
@@ -53,7 +53,7 @@ Table `supplements_transactional_emails`, unique on `(kind, dedupe_key)`:
 
 | Status | When | Shopify behaviour |
 | --- | --- | --- |
-| 200 | sent; duplicate of a sent/skipped/sent_unconfirmed email; deliberate skip (no recipient, not ready, cancelled); unknown topic; permanent Resend rejection of this message (payload validation errors) | done |
+| 200 | sent; duplicate of a sent/skipped/sent_unconfirmed email; deliberate skip (no recipient, subscription renewal order, not ready, cancelled); unknown topic; permanent Resend rejection of this message (payload validation errors) | done |
 | 401 | wrong shop domain or bad HMAC | retried, then dropped |
 | 400 / 408 / 413 | unreadable JSON / body not received within 1s / body over 1 MB | retried, then dropped |
 | 503 | not configured (secret, DB or Resend missing); Resend setup problem (invalid or restricted API key, a 401/403, or a `validation_error` about the From address or an unverified domain, quota, rate limit); transient failure (claim released as `failed`); another delivery currently holds a fresh claim | retried with backoff |
@@ -61,6 +61,26 @@ Table `supplements_transactional_emails`, unique on `(kind, dedupe_key)`:
 Every non 2xx counts toward Shopify's failure limit: Shopify retries a failed delivery 8 times over about 4 hours, and **app subscriptions that keep failing are removed** (Shopify emails the app's contact). So configuration must be in place before the webhooks are registered (go live order below), and a 503 caused by a misconfigured Resend domain must be fixed quickly.
 
 Unknown topics return 200 so a mis-subscribed topic does not keep failing. Budget is about 4s end to end (Shopify waits 5s): enrichment ≤1.3s in parallel, claim ≤1.5s, Resend send gets the rest; a hung Resend call is cut off and released.
+
+### Subscription renewals (owner decision)
+
+Renewal orders get **no order confirmation**; the customer already got one for their first subscription order. Their shipments **still get the shipping email**. The first subscription order (placed through checkout, with selling plan lines) and one time orders get the confirmation as usual.
+
+How a renewal is recognised (`isSubscriptionRenewal` in `lib/orders/webhooks/shopify-payload.ts`). The store bills subscriptions with the **Shopify Subscriptions** app (`docs/commerce/purchase-options.md`), which creates each renewal through a subscription contract billing attempt, not through checkout:
+
+1. `source_name` starts with `subscription_contract`. Renewal orders were `subscription_contract` for years and have been reported as `subscription_contract_checkout_one` since about October 2025 ([Shopify dev community](https://community.shopify.dev/t/order-paid-webhook-sourcename-property-changed-for-subscription/23868)). The first subscription order comes from checkout and has the storefront's `source_name` (`web`, or the headless channel's app id).
+2. Secondary: the tag `Subscription Recurring Order` (Recharge style tagging). Shopify can add tags minutes after the webhook, so this never stands alone in practice.
+
+When a renewal is recognised, the `order_confirmation` row is written as `skipped` with `last_error = subscription_renewal` and the parsed order **snapshot** (same fields as for any order). A repeated `orders/paid` delivery is a 200 duplicate. The renewal's shipping email reads that snapshot like any other (order name, first name, subscription labels, recipient if the fulfilment has none). With no snapshot at all it still sends from the fulfilment payload (and the Admin API when configured). The log line is `{"event":"skipped","reason":"subscription_renewal","signal":"source_name:…"}`.
+
+**Signal uncertainty.** Shopify does not document a field that marks an order as a renewal, and it calls `source_name` a free-form string that can change without notice. Signals deliberately not used: selling plan data (the first order has it too, and REST webhook line items only carry `selling_plan_id` from API version 2026-10), and a missing `checkout_token` on its own (draft and API created orders have none, and it is undocumented whether `checkout_one` renewals carry one). If unsure, the rule says "not a renewal". The cost of a miss is one extra thank you email; a false positive would leave a first order without one. To make checking possible, every paid order logs a non PII `order_source` line with `sourceName`, `appId`, `hasCheckoutToken`, `hasCheckoutId`, `sellingPlanLines` and the `renewal` verdict.
+
+**Go live verification (renewals).** After the plans exist (`docs/commerce/purchase-options.md`):
+1. Place a test subscription order through the site. Expect `order_source` with `renewal:false`, an IQON confirmation and the row `sent`.
+2. Trigger a renewal: in Shopify admin open the subscription contract (Apps > Subscriptions > the contract) and use the app's bill or "process now" action if it offers one. Otherwise wait for the first billing date.
+3. Check the renewal's `order_source` log line: `renewal:true` and `sourceName` starting with `subscription_contract`. Check the row: `select status, last_error from supplements_transactional_emails where kind = 'order_confirmation' and dedupe_key = '<renewal order id>';` should give `skipped | subscription_renewal`. No confirmation email should arrive.
+4. Fulfil the renewal with tracking (or let Supliful): exactly one IQON shipping email arrives.
+5. If step 3 shows `renewal:false` (Shopify changed `source_name` again), note the logged `sourceName`/`appId` and extend `isSubscriptionRenewal`. Until then renewals receive a confirmation, which is the safe failure.
 
 ### Data stored (minimal PII)
 
@@ -75,7 +95,7 @@ Unknown topics return 200 so a mis-subscribed topic does not keep failing. Budge
 * Tracking button reuses `resolveTrackingUrl` from `lib/orders/tracking.ts`, so the email and the storefront agree: the universal tracker keyed on the number (parcelsapp; carrier pages such as USPS stall on anti bot interstitials), otherwise Shopify's `tracking_url` when it is https.
 * Totals: Subtotal is the **pre discount** line sum at current quantities (Shopify's `subtotal_price` is already after discounts, so it is not used), Discount is `current_total_discounts` (line, order and shipping discounts), Shipping is `total_shipping_price_set` (before shipping discounts), Tax is `current_total_tax`, Total is `current_total_price`. Subtotal minus discounts plus shipping plus tax (unless `taxes_included`) equals the total; tested in `tests/orders/templates.test.ts`. If a real order does not add up (for example a tip or duties, which the email does not itemise), the handler logs `totals_mismatch` with the difference and still sends.
 * Product images: Storefront API (variant image, else product featured image, requested as 240×300 JPG), else `public/images/email/products/<handle>.jpg` matched by handle or title, else `placeholder.jpg`. All absolute https URLs built from `SUPPLEMENTS_EMAIL_ASSET_ORIGIN`.
-* Support address: `SUPPLEMENTS_SUPPORT_EMAIL`, default `support@iqonsupplements.com` (the support address documented by the existing contact reply mailer, `lib/contact/reply-mailer.ts`). It is also set as Reply-To. **Open decision:** confirm this inbox exists and is monitored, or set the env var.
+* Support address (owner decision): `info@iqonhealth.com`, shown in both emails and set as Reply-To. `SUPPLEMENTS_SUPPORT_EMAIL` can override it; leave it unset.
 
 ## Environment variables
 
@@ -83,7 +103,7 @@ Unknown topics return 200 so a mis-subscribed topic does not keep failing. Budge
 | --- | --- | --- |
 | `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` | HMAC key for webhook verification (see registration below for which value) | **No** (required) |
 | `SUPPLEMENTS_RESEND_API_KEY` | Resend API key (shared with the other supplements mailers) | **No** (required) |
-| `SUPPLEMENTS_ORDER_EMAIL_FROM` | Optional From override for order emails only. Default in code: `IQON <orders@iqonhealth.com>`. `SUPPLEMENTS_EMAIL_FROM` (contact/affiliate mailers) is not used for order mail | No (optional, leave unset) |
+| `SUPPLEMENTS_ORDER_EMAIL_FROM` | Optional From override for order emails only. Default in code: `IQON <info@iqonhealth.com>`. `SUPPLEMENTS_EMAIL_FROM` (contact/affiliate mailers) is not used for order mail | No (optional, leave unset) |
 | `SUPPLEMENTS_DATABASE_URL` | Postgres for the idempotency ledger (Prisma) | **No** (required; route fails closed with 503 without it) |
 | `SUPPLEMENTS_SUPPORT_EMAIL` | Support address shown in emails and used as Reply-To | No (optional, default above) |
 | `SUPPLEMENTS_EMAIL_ASSET_ORIGIN` | https origin for email images and links, default `https://www.iqonbody.com` | No (optional) |
@@ -91,7 +111,7 @@ Unknown topics return 200 so a mis-subscribed topic does not keep failing. Budge
 | `SUPPLEMENTS_SHOPIFY_CLIENT_ID`, `SUPPLEMENTS_SHOPIFY_CLIENT_SECRET`, `SUPPLEMENTS_SHOPIFY_STORE_DOMAIN` | Optional Admin API order read (existing client) | Yes (Production only) |
 | `SUPPLEMENTS_SHOPIFY_ADMIN_TOKEN` | Alternative Admin auth (existing) | No (optional) |
 
-**Sender (owner decision):** order emails are sent from `IQON <orders@iqonhealth.com>`. `iqonhealth.com` is already verified in Resend, so no new domain verification is needed. The `SUPPLEMENTS_RESEND_API_KEY` set in Vercel must belong to the Resend account where `iqonhealth.com` is verified. Replies go to the support address (`SUPPLEMENTS_SUPPORT_EMAIL`, default `support@iqonsupplements.com`).
+**Sender and support inbox (owner decisions):** order emails are sent from `IQON <info@iqonhealth.com>` (there is no `orders@` mailbox). `iqonhealth.com` is already verified in Resend, so no new domain verification is needed. The `SUPPLEMENTS_RESEND_API_KEY` set in Vercel must belong to the Resend account where `iqonhealth.com` is verified. Replies go to the same inbox: Reply-To is `info@iqonhealth.com` (`SUPPLEMENTS_SUPPORT_EMAIL` default).
 
 The Admin read uses fields covered by protected customer data (email, shipping address). If the app lacks that access, the lookup fails and the email still sends from the webhook payload/snapshot.
 
@@ -112,11 +132,11 @@ Configure everything first, deploy, and only then register the webhooks. A webho
    for m in 20260916000000_supplements_affiliates 20261005000000_supplements_transactional_emails 20261006000000_transactional_emails_send_uncertain; do npx prisma migrate resolve --applied "$m"; done
    ```
    Recording all three keeps any later `migrate deploy` a no-op (same two tables as above). Check with `psql "$SUPPLEMENTS_DATABASE_URL" -c '\dt'`: no `supplements_affiliate_*` table must appear.
-2. **Resend**: set `SUPPLEMENTS_RESEND_API_KEY` (a key from the Resend account where `iqonhealth.com` is verified) and optionally `SUPPLEMENTS_SUPPORT_EMAIL`. The From defaults to `IQON <orders@iqonhealth.com>`; no domain step is needed.
+2. **Resend**: set `SUPPLEMENTS_RESEND_API_KEY` (a key from the Resend account where `iqonhealth.com` is verified). Leave `SUPPLEMENTS_SUPPORT_EMAIL` unset (default `info@iqonhealth.com`). The From defaults to `IQON <info@iqonhealth.com>`; no domain step is needed.
 3. **Webhook secret**: set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`. For Option A (app subscription) the value is known in advance: the app client secret. For Option B (admin webhooks), the signing key is shown on Settings > Notifications > Webhooks. Verify in admin whether it is visible before the first webhook exists. If it is not, create the webhooks, then immediately set the key and redeploy; deliveries in that short window get a 503 and are retried by Shopify.
 4. **Deploy** this branch. It also ships `public/images/email/*`, which the emails reference. Check that `https://www.iqonbody.com/images/email/iqon-wordmark-ink.png` returns 200.
 5. **Register the webhooks** (below).
-6. **Handle Shopify's own customer notifications and Supliful's** (below), so customers do not get two emails.
+6. **Turn off Shopify's customer notifications and Supliful's customer emails** (owner decisions, see Avoid duplicate customer emails below), so customers only get the IQON emails.
 7. **Test order**: place a Shopify test order **with a discount code** (test orders send normally and are flagged `test_order` in logs), then fulfil it with tracking. Check:
    * Exactly one IQON confirmation and one IQON shipping email arrived, and **no Shopify or Supliful confirmation or shipping email** arrived for the same order.
    * The confirmation totals match the order page in Shopify admin (subtotal, discount, shipping, tax, total), and the logs show no `totals_mismatch`.
@@ -171,21 +191,18 @@ with `$topic` = `ORDERS_PAID`, `FULFILLMENTS_CREATE`, `FULFILLMENTS_UPDATE`. (Ne
 
 **Option B: Shopify admin.** Settings > Notifications > Webhooks > Create webhook, format JSON, same URL, events "Order payment", "Fulfillment creation", "Fulfillment update". Admin created webhooks are signed with the **store's webhook signing key** shown on that page ("Your webhooks will be signed with …"), so set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` to that key, not the app secret. Use one option, not both, or customers would still get one email (ledger dedupes) but you would be paying for double deliveries.
 
-### Avoid duplicate customer emails
+### Avoid duplicate customer emails (owner decisions)
 
-Orders come from Shopify hosted checkout, so Shopify's own customer notifications are active. Shopify does **not** offer an on/off toggle for every notification, so verify each of these in admin (**Settings > Notifications > Customer notifications**) instead of assuming:
+Orders come from Shopify hosted checkout, so Shopify's own customer notifications are active until switched off, and Supliful can send its own customer emails. The owner has decided:
 
-* **Order confirmation**: generally cannot be switched off. Options: (a) keep Shopify's and do not use ours (do not subscribe `orders/paid`; the shipping emails still work from the fulfilment payload and the Admin API), or (b) keep ours and edit Shopify's "Order confirmation" template down to a minimal note. Owner decision.
-* **Shipping confirmation**: generally has no global toggle either. Shopify sends it per fulfilment when the fulfilment is created with "notify customer" set, and here Supliful's app creates the fulfilments. Options, in order of preference: (a) configure Supliful not to notify the customer, if their app exposes that setting (ask Supliful support otherwise); (b) edit Shopify's "Shipping confirmation" template down to a minimal note, or decide to keep Shopify's shipping email and not subscribe the fulfilment topics.
-* **Shipping update, Out for delivery, Delivered**: these do have toggles. Ours sends one email per fulfilment only, so switching them off removes later status emails. Owner decision whether to keep them.
+* **Shopify notifications: turned off by the owner.** In **Settings > Notifications > Customer notifications**, the owner turns off Shopify's **Order confirmation** and the shipping notifications (**Shipping confirmation**, **Shipping update**, **Out for delivery**, **Delivered**). IQON sends one confirmation per order and one shipping email per fulfilment; there are no later status emails. If the store's plan offers no off switch for a notification (Order confirmation and Shipping confirmation have historically had none), the owner edits that template down so it does not reach customers as a second confirmation, and records what was done.
+* **Supliful customer emails: disabled by the owner** in the Supliful app (or through Supliful support if the app has no setting). Supliful still fulfils and writes tracking back to Shopify, which is what triggers our shipping email.
 
-**Supliful:** also check whether Supliful sends its own end customer emails (shipping or tracking). If it does, disable them there.
-
-Go live step 7 is the proof: the test order must produce no Shopify or Supliful duplicate. Do not treat any of the above as settled until a test order has confirmed it.
+These are go live step 6. Step 7 is the proof: the test order must produce **only IQON emails** (one confirmation, one shipping email) and nothing from Shopify or Supliful. Do not treat the switch off as done until a test order confirms it.
 
 ### Rollback
 
-* Fast: delete the three webhook subscriptions (`webhookSubscriptionDelete(id:)`, or remove them in Settings > Notifications > Webhooks) **or** unset `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` (route returns 503; Shopify retries then gives up, and app subscriptions may be removed after repeated failures). Re-enable Shopify's customer notifications.
+* Fast: delete the three webhook subscriptions (`webhookSubscriptionDelete(id:)`, or remove them in Settings > Notifications > Webhooks) **or** unset `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` (route returns 503; Shopify retries then gives up, and app subscriptions may be removed after repeated failures). Re-enable Shopify's customer notifications (and Supliful's customer emails if wanted), otherwise customers get no order or shipping email at all.
 * Code: revert the merge commit. The table and column are additive and can stay. To remove them: `DROP TABLE "supplements_transactional_emails";` (or just the column: `ALTER TABLE "supplements_transactional_emails" DROP COLUMN "send_uncertain";`).
 
 ## Tests and tools
@@ -205,7 +222,7 @@ Screenshots: the script uses Playwright (exact viewport, full page, local Chrome
 
 * Partial shipment detection compares the fulfilment with the order snapshot and earlier shipping emails. Two fulfilments of one order that arrive at the same instant may both say "the rest will follow".
 * Subscription labels come from the webhook when present, otherwise from the Admin API. Without Admin access, a subscription line shows without its label.
-* Subscription renewal orders also trigger `orders/paid`, so each renewal gets an order confirmation. Owner decision whether that is wanted.
+* Renewal detection relies on an undocumented `source_name` value (see Subscription renewals). If Shopify changes it again, renewals get a confirmation until the rule is extended.
 * Prices in the confirmation use Shopify's `current_*` totals (after edits/refunds at the time of payment) in the presentment currency. Tips and duties are not itemised (logged as `totals_mismatch`).
 * "The rest will follow" relies on the snapshot taken at `orders/paid`. Items removed after payment, or a fulfilment that never got tracking, can make it wrong. Follow up: when Admin access is configured, read the remaining unfulfilled quantity at shipment time. Also confirm on the first real order that `fulfillable_quantity` in `fulfillments/create` reflects the post fulfilment value.
 * Retention: `snapshot` keeps the email, first name and address indefinitely. Follow up ticket: null `snapshot` after about 90 days.
