@@ -14,6 +14,8 @@ const headers = { "Cache-Control": "no-store" };
 /** Diagnostic: is the token loaded? Never returns any part of it. */
 export function GET() {
   return Response.json({
+    relayEnabled: false,
+    purchaseProductionEnabled: false,
     tokenSet: Boolean(process.env.META_CAPI_ACCESS_TOKEN?.trim()),
     pixelId: resolvePixelId(process.env.NEXT_PUBLIC_META_PIXEL_ID),
   }, { headers });

@@ -1,16 +1,10 @@
-/**
- * Meta Pixel browser helpers for the headless storefront.
- *
- *   PageView          every storefront route (app/meta-pixel.tsx)
- *   ViewContent       product pages (app/meta-view-content.tsx)
- *   AddToCart         after the cart mutation succeeds (app/store-shell.tsx)
- *   InitiateCheckout  just before the buyer leaves for Shopify checkout (app/store-shell.tsx)
- *   Purchase          not here: Shopify webhook + Customer Events pixel (docs/meta-pixel.md)
- *
- * Every event gets a fresh event_id, sent both to fbq and to /api/meta/track
- * (Conversions API), so Meta keeps one copy. Nothing here may throw into app code.
+/** Storefront advertising helpers. Explicit consent and reviewed health eligibility
+ * are both required. No routes/products are approved in this release; the SDK and
+ * event relay stay inactive. Purchase belongs to the isolated Shopify webhook.
  */
-import { resolvePixelId, shopifyNumericId, type RelayEvent } from "./meta-shared";
+import { resolvePixelId, shopifyNumericId, metaPathApproved, metaVariantsApproved, type RelayEvent } from "./meta-shared";
+
+import { advertisingConsent } from "./meta-consent";
 
 type Fbq = ((...args: unknown[]) => void) & { callMethod?: (...args: unknown[]) => void; queue: unknown[]; push: Fbq; loaded: boolean; version: string };
 
@@ -25,7 +19,7 @@ export const META_PIXEL_ID = resolvePixelId(process.env.NEXT_PUBLIC_META_PIXEL_I
 export const META_SCRIPT_SRC = "https://connect.facebook.net/en_US/fbevents.js";
 
 /** Pages that are not storefront (affiliate portal): no pixel events there. */
-export const isTrackedPath = (pathname: string) => !/^\/affiliates(\/|$)/.test(pathname);
+export const isTrackedPath = metaPathApproved;
 
 export function newEventId(): string {
   try {
@@ -59,7 +53,9 @@ let initialised = false;
 
 /** Standard fbq queue stub (same as Meta's base code) plus init, once. The SDK is loaded by next/script. */
 export function ensureFbq(): Fbq | null {
-  if (typeof window === "undefined" || !META_PIXEL_ID) return null;
+  if (typeof window === "undefined" || !META_PIXEL_ID || !advertisingConsent()) return null;
+  const location = new URL(window.location.href);
+  if (!isTrackedPath(location.pathname) || location.search || location.hash) return null;
   try {
     if (!window.fbq) {
       const n = function (...args: unknown[]) {
@@ -87,22 +83,16 @@ function prune(params: Record<string, unknown>) {
   return Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && !v.length)));
 }
 
-/** Same event_id to the Conversions API relay; keepalive so it survives the checkout redirect. */
+/** Reserved transport: no public relay dispatch until abuse controls are verified. */
 function postServerEvent(eventName: RelayEvent, eventId: string, customData: Record<string, unknown>) {
-  try {
-    void fetch("/api/meta/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      keepalive: true,
-      body: JSON.stringify({ eventName, eventId, eventSourceUrl: window.location.href, customData }),
-    }).catch(() => {});
-  } catch {
-    /* never throw into app code */
-  }
+  // Relay remains disabled until independently reviewed provenance/rate/replay control.
+  void eventName; void eventId; void customData;
 }
 
 function track(eventName: RelayEvent, params: Record<string, unknown>): string | null {
+  if (!advertisingConsent()) return null;
+  const ids = params.content_ids;
+  if (eventName !== "PageView" && (!Array.isArray(ids) || !metaVariantsApproved(ids))) return null;
   const fbq = ensureFbq();
   if (!fbq) return null;
   const eventId = newEventId();
@@ -128,7 +118,7 @@ export function trackPageView(routeKey: string) {
 
 export function trackViewContent(p: { routeKey: string; contentId: string; name?: string; value: number; currency: string }) {
   if (!viewContentGuard(`${p.routeKey}|${p.contentId}`)) return null;
-  return track("ViewContent", { content_ids: [p.contentId], content_type: "product", content_name: p.name, value: money(p.value), currency: p.currency });
+  return track("ViewContent", { content_ids: [p.contentId], content_type: "product", value: money(p.value), currency: p.currency });
 }
 
 export function trackAddToCart(p: { contentId: string; name?: string; quantity: number; unitPrice: number; currency: string }) {
@@ -136,7 +126,6 @@ export function trackAddToCart(p: { contentId: string; name?: string; quantity: 
   return track("AddToCart", {
     content_ids: [p.contentId],
     content_type: "product",
-    content_name: p.name,
     contents: [{ id: p.contentId, quantity: p.quantity, item_price: money(p.unitPrice) }],
     num_items: p.quantity,
     value: money(p.unitPrice * p.quantity),

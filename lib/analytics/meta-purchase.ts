@@ -1,33 +1,15 @@
-/**
- * Shopify orders/paid webhook -> Meta Conversions API Purchase.
- *
- * Checkout runs on Shopify's hosted checkout, which the storefront cannot see,
- * so Purchase is sent from here: event_id purchase_<order id>, the same id the
- * Shopify Customer Events pixel uses for the browser copy (docs/meta-pixel.md).
- * _fbp/_fbc and the last storefront URL come from the order's note_attributes,
- * written as cart attributes at checkout handoff (lib/shopify.server.ts).
- *
- * This route only talks to Meta. It sends no email and writes nothing; it is a
- * separate endpoint from /api/webhooks/shopify/orders (order emails), so
- * subscribing it can never trigger a customer email.
- *
- * Responses (Shopify retries anything that is not 2xx):
- *   200  sent, skipped (test order, subscription renewal, no token, pixel off),
- *        unsupported topic, or Meta rejected the event (4xx: a retry cannot fix it)
- *   401  wrong shop or bad signature
- *   400  unreadable JSON
- *   503  webhook secret missing, or Meta unreachable / 5xx / 429 (safe to retry:
- *        Meta deduplicates on event_id)
+/** Dedicated tracking webhook. Production dispatch is fail-closed until health,
+ * checkout consent/withdrawal and durable replay controls are independently reviewed.
+ * Signed explicitly synthetic test orders can be delivered only to Meta Test Events.
+ * No order, email, fulfillment, admin or database runtime dependencies.
  */
-import { SUPPLEMENTS_SHOP } from "../affiliates/shopify-admin";
-import { MAX_BODY_BYTES, verifyShopifyHmac } from "../orders/webhooks/handler";
-import { isSubscriptionRenewal } from "../orders/webhooks/shopify-payload";
+import { SUPPLEMENTS_SHOP, MAX_BODY_BYTES, verifyShopifyHmac, isSubscriptionRenewal } from "./meta-security";
 import { sendMetaEvents, type MetaSendDeps, type MetaSendResult, type MetaServerEvent } from "./meta-capi";
-import { readMetaAttributes, shopifyNumericId } from "./meta-shared";
+import { readMetaAttributes, shopifyNumericId, META_CONSENT_GRANTED, metaVariantsApproved } from "./meta-shared";
 
 export const PURCHASE_TOPICS = ["orders/paid"] as const;
 export const DEFAULT_EVENT_SOURCE_URL = "https://www.iqonbody.com/";
-const MAX_EVENT_AGE_S = 7 * 24 * 3600 - 3600;
+export const MAX_EVENT_AGE_S = 24 * 3600;
 
 type Json = Record<string, unknown>;
 const obj = (v: unknown): Json | null => (v && typeof v === "object" && !Array.isArray(v) ? (v as Json) : null);
@@ -56,11 +38,11 @@ function orderValue(order: Json): number {
   return 0;
 }
 
-function eventTime(order: Json, nowS: number): number {
+function eventTime(order: Json, nowS: number): number | null {
   const parsed = Date.parse(str(order.processed_at) ?? str(order.created_at) ?? "");
-  const t = Number.isFinite(parsed) ? Math.floor(parsed / 1000) : nowS;
-  // Meta rejects future events and events older than 7 days.
-  return t > nowS || nowS - t > MAX_EVENT_AGE_S ? nowS : t;
+  const t = Number.isFinite(parsed) ? Math.floor(parsed / 1000) : null;
+  // Keep original time; a retry cannot refresh a stale conversion.
+  return t === null || t > nowS || nowS - t > MAX_EVENT_AGE_S ? null : t;
 }
 
 /** Maps a Shopify REST order payload to the Meta Purchase event. Null when it is not an order. */
@@ -68,6 +50,8 @@ export function mapOrderToPurchase(payload: unknown, now = Date.now()): MetaServ
   const order = obj(payload);
   const orderId = shopifyNumericId(str(order?.id, 40) ?? str(order?.admin_graphql_api_id, 80));
   if (!order || !orderId || !/^\d+$/.test(orderId)) return null;
+  const timestamp = eventTime(order, Math.floor(now / 1000));
+  if (timestamp === null) return null;
   const lines = (Array.isArray(order.line_items) ? order.line_items : []).flatMap((value) => {
     const line = obj(value);
     const id = shopifyNumericId(str(line?.variant_id, 40)) ?? shopifyNumericId(str(line?.product_id, 40));
@@ -88,8 +72,8 @@ export function mapOrderToPurchase(payload: unknown, now = Date.now()): MetaServ
     // Orders without a browser (draft, admin, POS) cannot be website events: Meta rejects those without a user agent.
     actionSource: userAgent ? "website" : "other",
     eventId: purchaseEventId(orderId),
-    eventTime: eventTime(order, Math.floor(now / 1000)),
-    eventSourceUrl: ids.eventSourceUrl ?? DEFAULT_EVENT_SOURCE_URL,
+    eventTime: timestamp,
+    eventSourceUrl: DEFAULT_EVENT_SOURCE_URL,
     customData: {
       value: orderValue(order),
       currency,
@@ -144,7 +128,7 @@ export async function handleMetaPurchaseWebhook(rawBody: Buffer | string, header
     info({ event: "rejected", reason: "unexpected_shop" });
     return { status: 401, body: { ok: false, reason: "unexpected_shop" } };
   }
-  const secret = deps.env.SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET;
+  const secret = deps.env.META_SHOPIFY_WEBHOOK_SECRET;
   if (!secret?.trim()) {
     info({ event: "not_configured", reason: "missing_webhook_secret" });
     return { status: 503, body: { ok: false, retry: true, reason: "not_configured" } };
@@ -161,9 +145,8 @@ export async function handleMetaPurchaseWebhook(rawBody: Buffer | string, header
     return { status: 400, body: { ok: false, reason: "invalid_json" } };
   }
   const order = obj(payload);
-  const event = mapOrderToPurchase(payload, (deps.now ?? Date.now)());
-  if (!order || !event) return { status: 400, body: { ok: false, reason: "not_an_order" } };
-  const orderId = String(event.customData?.order_id);
+  if (!order || !/^\d{1,20}$/.test(String(order.id ?? ""))) return { status: 400, body: { ok: false, reason: "not_an_order" } };
+  const orderId = String(order.id);
   if (order.test === true && !deps.env.META_CAPI_TEST_EVENT_CODE?.trim()) {
     info({ event: "skipped", reason: "test_order", orderId });
     return { status: 200, body: { ok: true, skipped: "test_order" } };
@@ -171,11 +154,34 @@ export async function handleMetaPurchaseWebhook(rawBody: Buffer | string, header
   const renewal = isSubscriptionRenewal(payload);
   if (renewal.renewal) {
     // Renewals are billed by the Subscriptions app, not a website conversion.
-    info({ event: "skipped", reason: "subscription_renewal", signal: renewal.signal, orderId });
+    info({ event: "skipped", reason: "subscription_renewal", orderId });
     return { status: 200, body: { ok: true, skipped: "subscription_renewal" } };
   }
+  const consent = readMetaAttributes(order.note_attributes);
+  if (consent.consent !== META_CONSENT_GRANTED || headers.get("sec-gpc") === "1") return { status: 200, body: { ok: true, skipped: "advertising_consent_required" } };
+  const event = mapOrderToPurchase(payload, (deps.now ?? Date.now)());
+  if (!event) return { status: 200, body: { ok: true, skipped: "invalid_or_stale_event" } };
+  const variantIds = Array.isArray(order.line_items) ? order.line_items.map(line => shopifyNumericId(obj(line)?.variant_id as string) ?? "") : [];
+  const testFixture = order.test === true && !!deps.env.META_CAPI_TEST_EVENT_CODE?.trim()
+    && Array.isArray(order.note_attributes) && order.note_attributes.some(a => obj(a)?.name === "_meta_test_fixture" && obj(a)?.value === "synthetic-v1")
+    && variantIds.length > 0 && variantIds.every(id => ["8001", "8002", "8003"].includes(id));
+  if (testFixture) {
+    // Test Events only. Never transmit customer matching inputs from fixtures.
+    event.user = { clientUserAgent: "IQON synthetic tracking verification" };
+    event.actionSource = "website";
+    return deliverEligiblePurchase(event, deps);
+  }
+  if (!metaVariantsApproved(variantIds)) return { status: 200, body: { ok: true, skipped: "health_eligibility_unverified" } };
+  // A cart attribute is a snapshot, not current checkout advertising consent.
+  // No dispatch until supported checkout consent + withdrawal and durable replay
+  // controls have been independently verified. No environment bypass.
+  return { status: 200, body: { ok: true, skipped: "purchase_controls_unverified" } };
+}
+
+/** Internal transport retained for a future reviewed activation, never called by the route. */
+async function deliverEligiblePurchase(event: MetaServerEvent, deps: PurchaseWebhookDeps): Promise<PurchaseWebhookResult> {
   const result = await (deps.send ?? sendMetaEvents)([event], deps);
-  info({ event: result.ok ? "sent" : "not_sent", orderId, eventId: event.eventId, status: result.status, skipped: result.skipped, hasFbp: !!event.user.fbp, hasFbc: !!event.user.fbc });
+
   if (result.ok) return { status: 200, body: { ok: true, sent: true, eventId: event.eventId } };
   if (result.skipped) return { status: 200, body: { ok: true, skipped: result.skipped } };
   const transient = result.status === undefined || result.status === 429 || result.status >= 500;

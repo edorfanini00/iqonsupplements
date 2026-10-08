@@ -4,7 +4,7 @@ import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
 import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS, CART_ATTRIBUTES } from "./shopify-operations";
-import { mergeCartAttributes, metaCartAttributes, validEventSourceUrl } from "./analytics/meta-shared";
+import { mergeCartAttributes, metaCartAttributes, validEventSourceUrl, META_CONSENT_COOKIE, META_CONSENT_GRANTED } from "./analytics/meta-shared";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
@@ -50,10 +50,10 @@ async function readCart():Promise<ShopifyCart|null> {
   return result.cart;
 }
 type CartPayload={cart:ShopifyCart|null;userErrors:{message:string}[];warnings?:{message:string}[]};
-async function mutate(query:string,variables:Record<string,unknown>):Promise<CartPayload> {
+async function mutate(query:string,variables:Record<string,unknown>, signal?:AbortSignal):Promise<CartPayload> {
   const settings=config();
   if(!settings) throw new CommerceError("Orders are not open yet.",503);
-  const data=await shopifyRequest<Record<string,CartPayload>>(settings,query,variables,await buyerIP());
+  const data=await shopifyRequest<Record<string,CartPayload>>(settings,query,variables,await buyerIP(),fetch,signal);
   const result=Object.values(data)[0];
   if(result.userErrors.length) throw new CommerceError(result.userErrors.map(e=>e.message).join(" "),422,result.cart?publicCart(result.cart):undefined);
   if(!result.cart) throw new CommerceError("We couldn’t update your bag. Please try again.");
@@ -79,16 +79,22 @@ async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<{cart:Shopi
 async function metaAttributes(request:Request) {
   const jar=await cookies();
   const url=new URL(request.url);
-  return metaCartAttributes({fbp:jar.get("_fbp")?.value??null,fbc:jar.get("_fbc")?.value??null,
+  return metaCartAttributes({consent:request.headers.get("sec-gpc") === "1" ? "denied" : jar.get(META_CONSENT_COOKIE)?.value ?? "denied",fbp:jar.get("_fbp")?.value??null,fbc:jar.get("_fbc")?.value??null,
     eventSourceUrl:validEventSourceUrl(request.headers.get("referer"),["www.iqonbody.com","iqonbody.com",url.hostname])});
 }
-/** Best effort and bounded to 1.5s: a failure here must never block or slow checkout much. */
+/** Await the abortable operation; no mutation survives the checkout response.
+ * Stale advertising grants must be cleared before handoff. If that cannot be
+ * confirmed, fail this handoff so the buyer can retry without leaking consent.
+ */
 async function syncMetaAttributes(cart:ShopifyCart,request:Request) {
-  let timer:ReturnType<typeof setTimeout>|undefined;
-  try {
-    const attributes=mergeCartAttributes(cart.attributes,await metaAttributes(request));
-    if(attributes) await Promise.race([mutate(CART_ATTRIBUTES,{cartId:cart.id,attributes}),new Promise(resolve=>{timer=setTimeout(resolve,1500);})]);
-  } catch {} finally {clearTimeout(timer);}
+  const attributes=mergeCartAttributes(cart.attributes,await metaAttributes(request));
+  if(!attributes) return;
+  try { await mutate(CART_ATTRIBUTES,{cartId:cart.id,attributes},AbortSignal.timeout(1500)); }
+  catch {
+    const staleGrant=cart.attributes?.some(a=>a.key==="_meta_consent"&&a.value===META_CONSENT_GRANTED);
+    if(staleGrant) throw new CommerceError("We couldn’t save your privacy preference. Please try checkout again.",503);
+    // No prior grant: attribution remains absent/denied; checkout can proceed.
+  }
 }
 const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
 export async function getCartResponse() {

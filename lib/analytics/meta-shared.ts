@@ -38,13 +38,20 @@ export function shopifyNumericId(value: string | number | null | undefined): str
 
 /**
  * Cart attributes that carry the Meta browser ids into Shopify's hosted
- * checkout. The leading underscore hides them from the buyer; Shopify copies
- * cart attributes to the order's note_attributes, where the Purchase webhook
- * reads them.
+ * checkout. Shopify copies cart attributes to order note_attributes.
+ * These values are not a current hosted-checkout consent authority.
  */
-export const META_CART_ATTRIBUTE_KEYS = { fbp: "_fbp", fbc: "_fbc", eventSourceUrl: "_event_source_url" } as const;
+export const META_CART_ATTRIBUTE_KEYS = { fbp: "_fbp", fbc: "_fbc", eventSourceUrl: "_event_source_url", consent: "_meta_consent" } as const;
 
-export type MetaBrowserIds = { fbp: string | null; fbc: string | null; eventSourceUrl: string | null };
+export const META_CONSENT_COOKIE = "iqon_ad_consent";
+export const META_CONSENT_GRANTED = "granted-v1";
+// Empty until explicit health-data eligibility review. Never infer eligibility from Meta category None.
+export const APPROVED_META_PATHS: readonly string[] = [];
+export const APPROVED_META_VARIANTS: readonly string[] = [];
+export const metaPathApproved = (path: string) => APPROVED_META_PATHS.includes(path);
+export const metaVariantsApproved = (ids: readonly string[]) => ids.length > 0 && ids.every(id => /^\d{1,20}$/.test(id) && APPROVED_META_VARIANTS.includes(id));
+
+export type MetaBrowserIds = { consent?: string | null; fbp: string | null; fbc: string | null; eventSourceUrl: string | null };
 export type CartAttribute = { key: string; value: string };
 
 const FBP_PATTERN = /^fb\.\d\.\d{10,14}\.\d{1,30}$/;
@@ -55,30 +62,26 @@ export const validFbp = (value: unknown): string | null =>
 export const validFbc = (value: unknown): string | null =>
   typeof value === "string" && FBC_PATTERN.test(value.trim()) ? value.trim() : null;
 
-/** https URL on one of the allowed hosts, without the fragment, at most 1000 chars. */
+/** Only reviewed storefront routes; emitted URL contains no path, query, credentials or fragment. */
 export function validEventSourceUrl(value: unknown, allowedHosts: readonly string[]): string | null {
   if (typeof value !== "string" || value.length > 1000) return null;
   try {
     const url = new URL(value);
-    const local = url.hostname === "localhost" || url.hostname === "127.0.0.1";
-    if (url.protocol !== "https:" && !(local && url.protocol === "http:")) return null;
-    if (!allowedHosts.includes(url.hostname)) return null;
-    url.hash = "";
-    return url.toString();
-  } catch {
-    return null;
-  }
+    if (url.protocol !== "https:" || url.username || url.password || url.port) return null;
+    if (!allowedHosts.includes(url.hostname) || !metaPathApproved(url.pathname)) return null;
+    return `${url.origin}/`;
+  } catch { return null; }
 }
 
-/** Cart attributes to write; invalid or empty values are left out. */
+/** Explicit negative entries clear stale cart attribution after absence/withdrawal. */
 export function metaCartAttributes(ids: MetaBrowserIds): CartAttribute[] {
-  const out: CartAttribute[] = [];
-  const fbp = validFbp(ids.fbp);
-  const fbc = validFbc(ids.fbc);
-  if (fbp) out.push({ key: META_CART_ATTRIBUTE_KEYS.fbp, value: fbp });
-  if (fbc) out.push({ key: META_CART_ATTRIBUTE_KEYS.fbc, value: fbc });
-  if (ids.eventSourceUrl) out.push({ key: META_CART_ATTRIBUTE_KEYS.eventSourceUrl, value: ids.eventSourceUrl.slice(0, 1000) });
-  return out;
+  const granted = ids.consent === META_CONSENT_GRANTED;
+  return [
+    { key: META_CART_ATTRIBUTE_KEYS.consent, value: granted ? META_CONSENT_GRANTED : "denied" },
+    { key: META_CART_ATTRIBUTE_KEYS.fbp, value: granted ? validFbp(ids.fbp) ?? "" : "" },
+    { key: META_CART_ATTRIBUTE_KEYS.fbc, value: granted ? validFbc(ids.fbc) ?? "" : "" },
+    { key: META_CART_ATTRIBUTE_KEYS.eventSourceUrl, value: granted ? validEventSourceUrl(ids.eventSourceUrl, ["www.iqonbody.com", "iqonbody.com"]) ?? "" : "" },
+  ];
 }
 
 /**
@@ -106,11 +109,13 @@ export function readMetaAttributes(attributes: unknown): MetaBrowserIds {
       if (key && typeof e.value === "string") found[key] = e.value;
     }
   }
+  const granted = found[META_CART_ATTRIBUTE_KEYS.consent] === META_CONSENT_GRANTED;
   const url = found[META_CART_ATTRIBUTE_KEYS.eventSourceUrl];
   return {
-    fbp: validFbp(found[META_CART_ATTRIBUTE_KEYS.fbp]),
-    fbc: validFbc(found[META_CART_ATTRIBUTE_KEYS.fbc]),
-    eventSourceUrl: typeof url === "string" && /^https:\/\//.test(url) && url.length <= 1000 ? url : null,
+    consent: granted ? META_CONSENT_GRANTED : "denied",
+    fbp: granted ? validFbp(found[META_CART_ATTRIBUTE_KEYS.fbp]) : null,
+    fbc: granted ? validFbc(found[META_CART_ATTRIBUTE_KEYS.fbc]) : null,
+    eventSourceUrl: granted ? validEventSourceUrl(url, ["www.iqonbody.com", "iqonbody.com"]) : null,
   };
 }
 

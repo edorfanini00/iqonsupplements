@@ -55,7 +55,7 @@ function fixture(t) {
   process.env.SHOPIFY_API_VERSION = "2026-07";
   t.after(() => {
     for (const key of ["SHOPIFY_STORE_DOMAIN", "SHOPIFY_STOREFRONT_PRIVATE_TOKEN", "SHOPIFY_API_VERSION"])
-      previous[key] === undefined ? delete process.env[key] : process.env[key] = previous[key];
+      if (previous[key] === undefined) delete process.env[key]; else process.env[key] = previous[key];
   });
   const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false, attributeWrites: [], failAttributes: false};
   const recalculate = () => {
@@ -254,32 +254,42 @@ const pageRequest = (body, path, referer) => new Request(`${origin}/api/${path}`
   method: "POST", headers: {Origin: origin, "Content-Type": "application/json", Referer: referer}, body: JSON.stringify(body),
 });
 
-test("Meta browser ids are written as cart attributes on create and refreshed only when they change at checkout", async t => {
-  const state = fixture(t);
-  jar.set("_fbp", FBP);
-  const product = fixtureProducts[0];
-  assert.equal((await routes.mutateCartResponse(pageRequest({action: "add", id: product.handle, variantId: product.variantId, quantity: 1}, "cart", `${origin}/products/creatine-monohydrate`))).status, 200);
-  assert.deepEqual(state.cart.attributes, [{key: "_fbp", value: FBP}, {key: "_event_source_url", value: `${origin}/products/creatine-monohydrate`}]);
-  assert.equal((await routes.checkoutResponse(pageRequest({}, "checkout", `${origin}/products/creatine-monohydrate`))).status, 200);
-  assert.equal(state.attributeWrites.length, 0, "unchanged values: no extra Shopify call");
-  // The buyer later arrives from an ad (fbclid -> _fbc) and checks out from the bag on another page.
-  state.cart.attributes = [{key: "gift_note", value: "kept"}, ...state.cart.attributes];
-  jar.set("_fbc", FBC);
-  const checkout = await routes.checkoutResponse(pageRequest({}, "checkout", `${origin}/collections/supplements`));
-  assert.equal(checkout.status, 200);
-  assert.equal((await checkout.json()).checkoutUrl, "https://iqon-test.myshopify.com/checkouts/test-only");
-  assert.deepEqual(state.attributeWrites, [[{key: "gift_note", value: "kept"}, {key: "_fbp", value: FBP}, {key: "_fbc", value: FBC}, {key: "_event_source_url", value: `${origin}/collections/supplements`}]]);
+test("consented browser IDs persist before handoff; unapproved URLs are omitted", async t => {
+  const state = fixture(t); jar.set("iqon_ad_consent", "granted-v1"); jar.set("_fbp", FBP);
+  await add(fixtureProducts[0]);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_fbp").value, FBP);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_event_source_url").value, "");
+  state.cart.attributes.unshift({key:"gift_note",value:"kept"}); jar.set("_fbc", FBC);
+  assert.equal((await routes.checkoutResponse(pageRequest({},"checkout",`${origin}/products/private?email=x`))).status,200);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_fbc").value,FBC);
+  assert.equal(state.cart.attributes.find(a=>a.key==="gift_note").value,"kept");
 });
-
-test("a failing cart attribute update never blocks checkout, and junk cookies or foreign referers are not written", async t => {
-  const state = fixture(t);
-  jar.set("_fbp", "<script>"); jar.set("_fbc", "nope");
-  const product = fixtureProducts[0];
-  await routes.mutateCartResponse(pageRequest({action: "add", id: product.handle, variantId: product.variantId, quantity: 1}, "cart", "https://evil.example/x"));
-  assert.deepEqual(state.cart.attributes, []);
-  jar.set("_fbp", FBP); state.failAttributes = true;
-  const checkout = await routes.checkoutResponse(pageRequest({}, "checkout", `${origin}/`));
-  assert.equal(checkout.status, 200);
-  assert.equal((await checkout.json()).checkoutUrl, "https://iqon-test.myshopify.com/checkouts/test-only");
-  assert.ok(state.operations.includes("IQONCartAttributes"));
+test("missing/withdrawn consent clears previous cart grant and matching IDs", async t => {
+  const state=fixture(t); jar.set("iqon_ad_consent","granted-v1"); jar.set("_fbp",FBP); await add(fixtureProducts[0]);
+  jar.delete("iqon_ad_consent");
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_meta_consent").value,"denied");
+  assert.equal(state.cart.attributes.find(a=>a.key==="_fbp").value,"");
+});
+test("failed clearing of stale consent does not hand off; ordinary unattributed checkout works", async t => {
+  const state=fixture(t); await add(fixtureProducts[0]); state.failAttributes=true;
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+  state.cart.attributes=[{key:"_meta_consent",value:"granted-v1"}];
+  const result=await routes.checkoutResponse(request({},"checkout")); assert.equal(result.status,503); assert.ok(!(await result.json()).checkoutUrl);
+});
+test("slow tracking mutation aborts and settles before checkout response, without orphan work", async t => {
+  const state=fixture(t); await add(fixtureProducts[0]);
+  state.cart.attributes=[]; let started=false; let settled=false;
+  const previousFetch=globalThis.fetch;
+  t.mock.method(globalThis,"fetch",async (url,options)=>{
+    if(String(options.body).includes("IQONCartAttributes")) {
+      started=true;
+      return await new Promise((resolve,reject)=>{
+        const timer=setTimeout(()=>{settled=true;resolve(Response.json({data:{cartAttributesUpdate:{cart:state.cart,userErrors:[]}}}));},1900);
+        options.signal.addEventListener("abort",()=>{clearTimeout(timer);settled=true;reject(options.signal.reason);},{once:true});
+      });
+    }
+    return previousFetch(url,options);
+  });
+  const response=await routes.checkoutResponse(request({},"checkout")); assert.equal(response.status,200); assert.equal(started,true); assert.equal(settled,true);
 });

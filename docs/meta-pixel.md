@@ -1,134 +1,53 @@
-# Meta Pixel and Conversions API (www.iqonbody.com)
+# IQON Body tracking: safe installation, activation blocked
 
-Dataset / pixel: **IQON Body Web**, id `1006368245818889` (IQON portfolio, connected to ad account `act_1600704801853649`).
+Dataset `1006368245818889`, IQON Body Web; ad account `1600704801853649`.
 
-## What fires where
+This release closes unsafe delivery paths. It does **not** claim live conversion tracking. Normal browser events, public relay events and production Purchase are fail-closed. No paid traffic, real charged order, fulfillment, emails, payment-mode changes or normal-production synthetic Purchase are authorized.
 
-| Event | Browser (fbq) | Server (Conversions API) | event_id |
-| --- | --- | --- | --- |
-| PageView | every storefront route change, `app/meta-pixel.tsx` | `/api/meta/track` relay | random UUID per event |
-| ViewContent | product pages, `app/meta-view-content.tsx` | relay | random UUID |
-| AddToCart | after `/api/cart` add succeeds, `app/store-shell.tsx` | relay | random UUID |
-| InitiateCheckout | right before the redirect to Shopify checkout, `app/store-shell.tsx` | relay (fetch `keepalive`, survives the redirect) | random UUID |
-| Purchase | Shopify Customer Events custom pixel (below; installed by the owner in Shopify admin) | Shopify `orders/paid` webhook to `/api/webhooks/shopify/meta-purchase` | `purchase_<Shopify order id>` on both |
+## Current behavior
 
-Browser and server copies carry the same `event_id`, so Meta keeps one. The affiliate portal (`/affiliates/*`) sends no events.
+- Browser SDK and preferences UI stay invisible while the reviewed route allowlist is empty. The preference implementation requires explicit advertising opt-in, offers decline/withdrawal, and honors GPC. Enabling routes later requires independent review. No health-data eligibility is inferred from Meta's displayed category.
+- `/api/meta/track` POST returns `skipped:relay_controls_unverified`. Same-Origin is only a browser CSRF defense, not authentication. No environment variable can turn the relay on. Streaming bodies are capped at 4,096 bytes with a total two-second deadline.
+- GET reports only pixel ID, token-present boolean and false activation booleans. Configuration present is not delivery evidence.
+- `/api/webhooks/shopify/meta-purchase` authenticates exact raw bytes with timing-safe HMAC using **META_SHOPIFY_WEBHOOK_SECRET only**. It never falls back to the order/email secret. One-megabyte streaming cap, two-second read deadline. Tracking's transitive runtime graph excludes all email, fulfillment, admin and order integration modules.
+- Absent/negative consent and GPC fail closed. Health route/variant allowlists are empty. Freeform product names, arbitrary hosts and sensitive URLs cannot be transmitted. Production Purchase remains gated even if a cart grant exists: cart attributes cannot prove current hosted-checkout consent or withdrawal.
+- Valid original `processed_at`/`created_at` timestamps are preserved; missing, invalid, future or older-than-24-hour timestamps are skipped. No stale conversion is rewritten to now. Synthetic retries keep the same `purchase_<numeric order ID>` and time. This bounded retry policy is not a durable exactly-once guarantee.
+- Attribute writes use abortable Shopify transport, awaited through completion/abort before checkout response. Withdrawn/absent preference writes `denied` and empty matching fields, preserving other attributes. Failure to clear an existing grant blocks only that checkout handoff with a retry message. Failure without a previous grant permits unattributed shopping.
+- Errors contain only fixed codes and HTTP status; upstream bodies and exception text never enter results/logs.
 
-* `content_ids`: the numeric Shopify **variant** id (`gid://shopify/ProductVariant/8001` becomes `8001`), `content_type: product`, on every event including Purchase, so reporting and any later catalog match. ViewContent uses the variant the product page opens with (first available). In the unconnected design preview there are no variants, so the product handle is used.
-* `value` / `currency`: ViewContent the variant price; AddToCart unit price (subscription plan price when a plan was chosen) times quantity; InitiateCheckout the bag subtotal; Purchase the order total (`current_total_price`: after discounts, with shipping and tax), shop currency (USD).
-* Dedupe guards (`lib/analytics/meta.ts`): the same PageView/ViewContent key inside 700 ms (React Strict Mode, hydration), AddToCart inside 400 ms, InitiateCheckout inside 1.5 s (double click) is dropped. Purchase is deterministic per order, so webhook retries and the browser copy collapse in Meta.
+## Safe server test boundary
 
-## Code
+Required server variables: `META_CAPI_ACCESS_TOKEN`, a real temporary `META_CAPI_TEST_EVENT_CODE`, and dedicated `META_SHOPIFY_WEBHOOK_SECRET`. Optional `META_GRAPH_VERSION` defaults to `v24.0`; public pixel ID defaults above and supports `off`.
 
-```
-lib/analytics/meta-shared.ts    pixel id, domain verification value, relay allowlist, cart attribute keys and validation (browser + server)
-lib/analytics/meta.ts           browser: fbq stub/init, event_id, dedupe, track helpers, relay POST
-lib/analytics/meta-capi.ts      server only: normalise + SHA-256 PII, POST to Graph API, 3.5 s timeout, never throws, logs once if no token
-lib/analytics/meta-relay.ts     server only: /api/meta/track logic (allowlist, origin check, 4 KB cap, sanitised custom_data, reads _fbp/_fbc/IP/UA)
-lib/analytics/meta-purchase.ts  server only: orders/paid HMAC check, order -> Purchase mapping, skip rules
-app/meta-pixel.tsx              loads fbevents.js (next/script, afterInteractive) and fires PageView
-app/meta-view-content.tsx       ViewContent on product pages
-app/api/meta/track/route.ts     relay (GET = diagnostic: tokenSet, pixelId; never shows the token)
-app/api/webhooks/shopify/meta-purchase/route.ts  Purchase webhook
-app/layout.tsx                  <meta name="facebook-domain-verification" content="0lu4a3qv07rw7jbt484id6y35f7pwf"> in <head> of every page
-lib/shopify.server.ts           writes _fbp, _fbc, _event_source_url as cart attributes (cart create + checkout handoff)
-```
+The manual Shopify webhook signing credential was exposed during operational setup; it is **not usable** for this route. Actual Shopify webhook registration remains blocked until an unexposed app-owned credential is configured. The owner can generate a separate 256-bit dedicated secret for a signed synthetic production-route test; that secret does not establish a Shopify webhook subscription or prove Shopify delivery.
 
-The relay accepts only `PageView`, `ViewContent`, `AddToCart`, `InitiateCheckout` (anything else: 204, nothing sent). It requires a same origin `Origin` header (browsers always send it on POST) and takes no PII from the browser; match signals come from the request (cookies `_fbp`/`_fbc`, `x-forwarded-for`, `user-agent`). The token is sent in the POST body, never in a URL or log.
+The only active webhook delivery path requires all of:
 
-## Purchase: why a webhook
+1. Valid brand shop/topic/HMAC, `test:true`, actual Test Events code.
+2. `_meta_consent=granted-v1` and `_meta_test_fixture=synthetic-v1` note attributes.
+3. Fresh original timestamp, numeric order ID, and only synthetic variants `8001`, `8002`, `8003`.
+4. No renewal signal.
 
-Checkout and the thank you page run on Shopify's hosted checkout (`nr9zd0-t5.myshopify.com`), which this site cannot see. Two copies, same `event_id`:
+The transmitted test user data is replaced with the fixed `IQON synthetic tracking verification` user agent; no email, phone, address, customer ID, IP or advertising cookie is transmitted. Source is the canonical homepage; custom data uses only numeric synthetic IDs and purchase totals. See `docs/tracking/synthetic-order.mjs` for the fixture factory. Do not invoke this with real customer/order data. Remove the Test Events code after verification.
 
-1. **Server (this repo):** Shopify `orders/paid` webhook to `https://www.iqonbody.com/api/webhooks/shopify/meta-purchase`. It verifies the shop domain and the HMAC (`SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`, same key and helper as the order email webhook), maps the order and sends Purchase with hashed email, phone, name, city, state, zip, country and customer id, plus raw `browser_ip`, `client_details.user_agent` and the `_fbp`/`_fbc` that the storefront put on the cart.
-2. **Browser (Shopify admin):** a Customer Events custom pixel on `checkout_completed` (snippet below).
+An accepted Meta response proves acceptance only. Events Manager visibility must be independently observed. Local matching event IDs do not prove Browser+Server deduplication; real checkout consent transfer, browser Purchase and purchase end-to-end remain NOT VERIFIED. No recommendation to create charged orders or change live payment modes.
 
-**fbp/fbc across domains.** `_fbp`/`_fbc` live on `iqonbody.com` and cannot be read on `*.myshopify.com`. The storefront therefore writes them, plus the page the buyer checked out from, as hidden cart attributes (`_fbp`, `_fbc`, `_event_source_url`; the leading underscore hides them in checkout). They are set in `cartCreate` and refreshed right before the checkout redirect (`cartAttributesUpdate`, only when something changed, bounded to 1.5 s, failures ignored so checkout is never blocked). Other attributes on the cart are preserved. Shopify copies cart attributes to the order's `note_attributes`, which the webhook reads.
+## Shopify custom pixel
 
-**Orders without a browser** (draft, admin or POS orders, no `client_details.user_agent`) are sent with `action_source: other`, because Meta rejects website events without a user agent.
+Standalone reviewable source: `docs/tracking/shopify-meta-purchase.js`. Configure permission **Required: Marketing** and data-sale classification **qualifies as data sale**. It reads `init.customerPrivacy`, subscribes via `api.customerPrivacy` to `visitorConsentCollected`, and requires marketing/data-sale permission at each checkout event. GPC revokes permission. With no approved variants, it sends nothing and loads no SDK. Keep it disconnected until activation review; do not paste the earlier permissive snippet.
 
-**Skip rules.** Test orders are skipped unless `META_CAPI_TEST_EVENT_CODE` is set (then they go to Events Manager > Test events). Subscription renewals (Shopify Subscriptions billing, `source_name` `subscription_contract*`, same rule as the order emails) are skipped: they are not a website conversion.
+Official API reference: https://shopify.dev/docs/api/web-pixels-api/pixel-privacy . Sandbox URL minimization and current-consent transfer remain separate gates, because fbq can collect URL context independently of explicit custom data.
 
-**No email.** This is a separate route from `/api/webhooks/shopify/orders` (which sends the Resend order emails and whose `orders/paid` subscription was deleted when Shopify became the single email sender). The Meta route imports no sender, ledger or database code (enforced by a test). Do **not** point the Meta webhook at `/api/webhooks/shopify/orders`, and do not recreate the old email webhook.
+## Concrete activation work (requires fresh review)
 
-**Responses.** 200 sent / skipped / unsupported topic / Meta 4xx (retry cannot fix it); 401 wrong shop or bad signature; 400 bad JSON; 503 secret missing or Meta unreachable/5xx/429 (Shopify retries; Meta dedupes on `event_id`).
+Production relay requires signed, short-lived first-party provenance bound to a server-controlled anonymous session, plus durable atomic rate limits and event replay claims. Origin headers or process-local Maps are insufficient. Rate/replay reads and writes must fail closed. A future dedicated tracking schema in the existing Postgres can store hashed session IDs, consent version/status, revocation time, unique event ID, original timestamp, send status and expiry. It must be separately migrated/reviewed, with no reuse or changes to order/email tables. No DB mutation is part of this release.
 
-## Environment variables
+Purchase requires a supported Shopify current-advertising-consent integration including withdrawal while/after hosted checkout, linked to the dedicated consent record; expired/unknown consent cannot send. Claims must use unique `purchase_<orderid>`, preserve original time, allow retry after transient or ambiguous send without duplicating downstream identity, and expire outside the bounded retry window. Claim success must follow awaited delivery. Independently test concurrent/replayed requests and revoked sessions.
 
-| Name | Where | Required | Notes |
-| --- | --- | --- | --- |
-| `NEXT_PUBLIC_META_PIXEL_ID` | Vercel, all environments | No | Default `1006368245818889`. Set to `off` on Preview to keep preview traffic out of the dataset. Build time value (redeploy after changing). |
-| `META_CAPI_ACCESS_TOKEN` | Vercel Production, **server only** (never `NEXT_PUBLIC_`) | For server events | Without it every server send is a no-op and one warning is logged. |
-| `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` | Vercel Production | For the Purchase webhook | Existing variable used by the order email webhook. Admin created webhooks: the signing key shown in Settings > Notifications > Webhooks. App created: the app client secret. |
-| `META_CAPI_TEST_EVENT_CODE` | Vercel | No | Only while testing in Events Manager > Test events; remove afterwards. |
-| `META_GRAPH_VERSION` | Vercel | No | Default `v24.0`. |
+An authorized privacy/health eligibility review must approve specific routes/variants/event uses before adding allowlist entries. An unapproved item makes the whole cart/order ineligible. Do not strip the name and then send a restricted purchase, rename it to another event, or use CAPI to bypass Meta restrictions. Current dataset classification is not such approval.
 
-**Token:** Events Manager > Data sources > **IQON Body Web** > **Settings** > **Conversions API** > **Generate access token**. Paste it only into Vercel (Production, server side, `META_CAPI_ACCESS_TOKEN`), then redeploy. Check: `curl -s https://www.iqonbody.com/api/meta/track` returns `"tokenSet":true` (the diagnostic shows only that flag and the public pixel id).
+## Verification and rollback
 
-## Go live (owner, in this order)
+Commands: `npm run test:meta`; `node --test tests/cart-routes.test.mjs`; `npm run typecheck:next`; changed-file ESLint; `npm run build:vercel`. Tests use synthetic fixtures and mocked transports. Independent exact-SHA review and live deployment evidence are separate release gates.
 
-1. Merge and deploy. The pixel and the domain tag go live with the deploy; server events stay off until the token exists.
-2. Meta Business Settings > Brand safety > Domains > `iqonbody.com` > meta tag method > **Verify**.
-3. Generate the CAPI token (above), set `META_CAPI_ACCESS_TOKEN` in Vercel Production, redeploy, check `tokenSet:true`.
-4. Make sure `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` is set (see table), then create the webhook: Shopify admin > Settings > Notifications > Webhooks > **Create webhook**: Event **Order payment**, Format **JSON**, URL `https://www.iqonbody.com/api/webhooks/shopify/meta-purchase`, the newest stable API version. Only this one event. No other webhook changes.
-5. Shopify admin > Settings > Customer events > **Add custom pixel** named `Meta Pixel Purchase (IQON Body)`, paste the snippet below, Customer privacy: Permission **Required** (Marketing), Data sale **Data collected qualifies as data sale**, Save, **Connect**.
-6. Test: set `META_CAPI_TEST_EVENT_CODE` from Events Manager > Test events, redeploy, browse home > product > add to bag > checkout and place a real low value order (or a Shopify test order; with the test code set it is sent too). Expect PageView, ViewContent, AddToCart, InitiateCheckout as Browser and Server, deduplicated, and Purchase (`purchase_<order id>`) from Server and Browser, deduplicated. Then remove `META_CAPI_TEST_EVENT_CODE` and redeploy.
-7. Check Events Manager > IQON Body Web > Settings for a Health and Wellness data restriction (see research/TRACKING_GAP.md).
-
-### Customer Events custom pixel (browser Purchase)
-
-```js
-// IQON Body: Meta Pixel browser Purchase on Shopify checkout.
-// eventID purchase_<order id> matches the server Purchase from
-// www.iqonbody.com/api/webhooks/shopify/meta-purchase, so Meta keeps one.
-const PIXEL_ID = "1006368245818889";
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-
-const tail = (id) => String(id ?? "").split("/").pop();
-
-analytics.subscribe("checkout_completed", (event) => {
-  const checkout = event.data.checkout;
-  const orderId = tail(checkout.order && checkout.order.id);
-  if (!orderId) return;
-  const lines = (checkout.lineItems || []).filter((l) => l.variant && l.variant.id);
-  const match = {};
-  if (checkout.email) match.em = checkout.email.trim().toLowerCase();
-  if (checkout.phone) match.ph = checkout.phone.replace(/\D/g, "");
-  fbq("init", PIXEL_ID, match);
-  fbq("track", "Purchase", {
-    value: Number((checkout.totalPrice && checkout.totalPrice.amount) || 0),
-    currency: checkout.currencyCode || "USD",
-    content_type: "product",
-    content_ids: [...new Set(lines.map((l) => tail(l.variant.id)))],
-    contents: lines.map((l) => ({ id: tail(l.variant.id), quantity: l.quantity, item_price: Number((l.variant.price && l.variant.price.amount) || 0) })),
-    num_items: lines.reduce((sum, l) => sum + l.quantity, 0),
-    order_id: orderId,
-  }, { eventID: "purchase_" + orderId });
-});
-```
-
-It subscribes to `checkout_completed` only (the storefront already sends InitiateCheckout). fbevents.js hashes `em`/`ph` itself.
-
-## Consent
-
-The storefront has no cookie or consent banner today, so the pixel loads for everyone (same as before for Shopify's own pixels). If a banner is added, gate `MetaPixel` on it and call `fbq("consent", "revoke" | "grant")`. The Customer Events pixel follows Shopify's customer privacy settings.
-
-## Rollback
-
-* Pixel off without a code change: set `NEXT_PUBLIC_META_PIXEL_ID=off` and redeploy (browser events and relay stop; the domain tag stays).
-* Server events off: remove `META_CAPI_ACCESS_TOKEN` and redeploy (relay and webhook return skipped).
-* Purchase: delete the "Order payment" webhook to `/meta-purchase` in Settings > Notifications > Webhooks, and disconnect the custom pixel in Settings > Customer events.
-* Code: revert the merge commit. Nothing stored, no migrations. Cart attributes already on carts are harmless.
-
-## Tests
-
-```
-npm run test:meta            # tests/meta/meta.test.ts
-npm run typecheck:next
-npx eslint lib/analytics app/meta-pixel.tsx app/meta-view-content.tsx app/api/meta app/api/webhooks/shopify/meta-purchase tests/meta
-npm run build:vercel
-```
+Disable server test delivery by removing `META_CAPI_TEST_EVENT_CODE` or the CAPI token. Disable the public pixel with `NEXT_PUBLIC_META_PIXEL_ID=off` and redeploy. Disconnect the dedicated custom pixel; remove only the dedicated tracking webhook if one is later registered. Revert the focused code commit if necessary. No migrations or order/email configuration rollback is required.

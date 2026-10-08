@@ -176,15 +176,16 @@ export async function sendMetaEvents(events: MetaServerEvent[], deps: MetaSendDe
       signal: AbortSignal.timeout(deps.timeoutMs ?? CAPI_TIMEOUT_MS),
     });
     if (!response.ok) {
-      const text = (await response.text().catch(() => "")).replaceAll(token, "[token]").slice(0, 300);
-      log("send failed", { events: events.map((e) => e.eventName), status: response.status, error: text });
+      const text = "meta_http_error";
+      void response.body?.cancel().catch(() => {});
+      log("send failed", { status: response.status, error: text });
       return { ok: false, status: response.status, error: text };
     }
     return { ok: true, status: response.status };
-  } catch (error) {
-    const message = error instanceof Error ? `${error.name}: ${error.message}`.slice(0, 200) : "unknown_error";
+  } catch {
+    const message = "meta_transport_error";
     try {
-      log("send error", { events: events.map((e) => e?.eventName), error: message });
+      log("send error", { error: message });
     } catch {
       /* logging must not throw either */
     }

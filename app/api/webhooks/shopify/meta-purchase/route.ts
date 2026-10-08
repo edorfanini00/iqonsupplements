@@ -5,7 +5,7 @@
  * See lib/analytics/meta-purchase.ts and docs/meta-pixel.md.
  */
 import { handleMetaPurchaseWebhook } from "@/lib/analytics/meta-purchase";
-import { readLimitedBody } from "@/lib/orders/webhooks/handler";
+import { readLimitedBody } from "@/lib/analytics/meta-security";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
