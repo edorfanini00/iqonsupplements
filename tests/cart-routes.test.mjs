@@ -29,6 +29,7 @@ const imports = {
   "./merchandise": withPolicy("../lib/merchandise.ts"),
   "./shopify-operations": dataUrl(compile("../lib/shopify-operations.ts")),
   "./shopify": withPolicy("../lib/shopify.ts"),
+  "./analytics/meta-shared": dataUrl(compile("../lib/analytics/meta-shared.ts")),
 };
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);
@@ -56,7 +57,7 @@ function fixture(t) {
     for (const key of ["SHOPIFY_STORE_DOMAIN", "SHOPIFY_STOREFRONT_PRIVATE_TOKEN", "SHOPIFY_API_VERSION"])
       previous[key] === undefined ? delete process.env[key] : process.env[key] = previous[key];
   });
-  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false};
+  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false, attributeWrites: [], failAttributes: false};
   const recalculate = () => {
     const discount = state.cart.discountCodes.some(code => code.code === "SAVE10");
     let total = 0;
@@ -83,7 +84,7 @@ function fixture(t) {
     if (operation === "IQONCartRead") return Response.json({data: {cart: state.cart?.id === variables.id ? state.cart : null}});
     let mutation;
     if (operation === "IQONCartCreate") {
-      state.cart = {id: `gid://shopify/Cart/test-${++state.serial}?key=test-only-secret`, checkoutUrl: "https://iqon-test.myshopify.com/checkouts/test-only", discountCodes: [], lines: {pageInfo: {hasNextPage: false}, nodes: []}};
+      state.cart = {id: `gid://shopify/Cart/test-${++state.serial}?key=test-only-secret`, checkoutUrl: "https://iqon-test.myshopify.com/checkouts/test-only", attributes: variables.input.attributes || [], discountCodes: [], lines: {pageInfo: {hasNextPage: false}, nodes: []}};
       mutation = "cartCreate";
     }
     if (operation === "IQONCartCreate" || operation === "IQONCartAdd") {
@@ -102,6 +103,11 @@ function fixture(t) {
     } else if (operation === "IQONCartRemove") {
       mutation = "cartLinesRemove";
       state.cart.lines.nodes = state.cart.lines.nodes.filter(line => !variables.lineIds.includes(line.id));
+    } else if (operation === "IQONCartAttributes") {
+      if (state.failAttributes) return new Response("", {status: 502});
+      mutation = "cartAttributesUpdate";
+      state.attributeWrites.push(variables.attributes);
+      state.cart.attributes = variables.attributes;
     } else if (operation === "IQONCartDiscounts") {
       mutation = "cartDiscountCodesUpdate";
       state.cart.discountCodes = variables.discountCodes.map(code => ({code, applicable: code === "SAVE10"}));
@@ -239,4 +245,41 @@ test("checkout removes old skincare and requires review before handing off to Sh
   assert.equal(response.status,422);
   const data=await response.json();assert.equal(data.cart.items.length,1);assert.ok(!data.checkoutUrl);
   assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+});
+
+// Meta _fbp/_fbc travel to the hosted checkout as hidden cart attributes (docs/meta-pixel.md).
+const FBP = "fb.1.1759876543210.1234567890";
+const FBC = "fb.1.1759876543210.IwAR0synthetic";
+const pageRequest = (body, path, referer) => new Request(`${origin}/api/${path}`, {
+  method: "POST", headers: {Origin: origin, "Content-Type": "application/json", Referer: referer}, body: JSON.stringify(body),
+});
+
+test("Meta browser ids are written as cart attributes on create and refreshed only when they change at checkout", async t => {
+  const state = fixture(t);
+  jar.set("_fbp", FBP);
+  const product = fixtureProducts[0];
+  assert.equal((await routes.mutateCartResponse(pageRequest({action: "add", id: product.handle, variantId: product.variantId, quantity: 1}, "cart", `${origin}/products/creatine-monohydrate`))).status, 200);
+  assert.deepEqual(state.cart.attributes, [{key: "_fbp", value: FBP}, {key: "_event_source_url", value: `${origin}/products/creatine-monohydrate`}]);
+  assert.equal((await routes.checkoutResponse(pageRequest({}, "checkout", `${origin}/products/creatine-monohydrate`))).status, 200);
+  assert.equal(state.attributeWrites.length, 0, "unchanged values: no extra Shopify call");
+  // The buyer later arrives from an ad (fbclid -> _fbc) and checks out from the bag on another page.
+  state.cart.attributes = [{key: "gift_note", value: "kept"}, ...state.cart.attributes];
+  jar.set("_fbc", FBC);
+  const checkout = await routes.checkoutResponse(pageRequest({}, "checkout", `${origin}/collections/supplements`));
+  assert.equal(checkout.status, 200);
+  assert.equal((await checkout.json()).checkoutUrl, "https://iqon-test.myshopify.com/checkouts/test-only");
+  assert.deepEqual(state.attributeWrites, [[{key: "gift_note", value: "kept"}, {key: "_fbp", value: FBP}, {key: "_fbc", value: FBC}, {key: "_event_source_url", value: `${origin}/collections/supplements`}]]);
+});
+
+test("a failing cart attribute update never blocks checkout, and junk cookies or foreign referers are not written", async t => {
+  const state = fixture(t);
+  jar.set("_fbp", "<script>"); jar.set("_fbc", "nope");
+  const product = fixtureProducts[0];
+  await routes.mutateCartResponse(pageRequest({action: "add", id: product.handle, variantId: product.variantId, quantity: 1}, "cart", "https://evil.example/x"));
+  assert.deepEqual(state.cart.attributes, []);
+  jar.set("_fbp", FBP); state.failAttributes = true;
+  const checkout = await routes.checkoutResponse(pageRequest({}, "checkout", `${origin}/`));
+  assert.equal(checkout.status, 200);
+  assert.equal((await checkout.json()).checkoutUrl, "https://iqon-test.myshopify.com/checkouts/test-only");
+  assert.ok(state.operations.includes("IQONCartAttributes"));
 });

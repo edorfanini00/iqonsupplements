@@ -3,7 +3,8 @@ import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
-import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS, CART_ATTRIBUTES } from "./shopify-operations";
+import { mergeCartAttributes, metaCartAttributes, validEventSourceUrl } from "./analytics/meta-shared";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
@@ -73,6 +74,22 @@ async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<{cart:Shopi
   const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
   return {cart:result.cart,removed:true};
 }
+// Meta browser ids travel to the hosted checkout as hidden cart attributes, so the
+// orders/paid webhook can send Purchase with the same _fbp/_fbc (lib/analytics/meta-purchase.ts).
+async function metaAttributes(request:Request) {
+  const jar=await cookies();
+  const url=new URL(request.url);
+  return metaCartAttributes({fbp:jar.get("_fbp")?.value??null,fbc:jar.get("_fbc")?.value??null,
+    eventSourceUrl:validEventSourceUrl(request.headers.get("referer"),["www.iqonbody.com","iqonbody.com",url.hostname])});
+}
+/** Best effort and bounded to 2.5s: a failure here must never block or slow checkout much. */
+async function syncMetaAttributes(cart:ShopifyCart,request:Request) {
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  try {
+    const attributes=mergeCartAttributes(cart.attributes,await metaAttributes(request));
+    if(attributes) await Promise.race([mutate(CART_ATTRIBUTES,{cartId:cart.id,attributes}),new Promise(resolve=>{timer=setTimeout(resolve,2500);})]);
+  } catch {} finally {clearTimeout(timer);}
+}
 const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
 export async function getCartResponse() {
   try {const {cart,removed}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:skincareNotice}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
@@ -104,7 +121,7 @@ export async function mutateCartResponse(request:Request) {
       if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);
       if(!existing && current && current.lines.nodes.length>=99) throw new CommerceError("Your bag is full. Please complete this order first.",422);
       const lines=[{merchandiseId:variant.id,quantity,...(plan?{sellingPlanId:plan.id}:{})}];
-      result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
+      result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines,attributes:await metaAttributes(request)}});
     } else if(input.action==="update") {
       const quantity=validQuantity(input.quantity,true);
       if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));
@@ -133,6 +150,7 @@ export async function checkoutResponse(request:Request) {
     if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
+    await syncMetaAttributes(cart,request);
     return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
   }catch(error){return fail(error);}
 }
