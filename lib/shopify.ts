@@ -15,13 +15,13 @@ export function shopifyConfig(values:Record<string,unknown>): ShopifyConfig | nu
   if(!/^20\d{2}-(01|04|07|10)$/.test(version)) throw new CommerceError("The store is temporarily unavailable.",503);
   return {domain,token,version};
 }
-export async function shopifyRequest<T>(config:ShopifyConfig, query:string, variables:Record<string,unknown>={}, buyerIP?:string, fetcher:typeof fetch=fetch):Promise<T> {
+export async function shopifyRequest<T>(config:ShopifyConfig, query:string, variables:Record<string,unknown>={}, buyerIP?:string, fetcher:typeof fetch=fetch, signal?:AbortSignal):Promise<T> {
   const headers:Record<string,string>={"Content-Type":"application/json","Shopify-Storefront-Private-Token":config.token};
   if(buyerIP) headers["Shopify-Storefront-Buyer-IP"]=buyerIP;
   let response:Response;
   try {
     response=await fetcher(`https://${config.domain}/api/${config.version}/graphql.json`, {
-      method:"POST",headers,body:JSON.stringify({query,variables}),cache:"no-store",signal:AbortSignal.timeout(12000),
+      method:"POST",headers,body:JSON.stringify({query,variables}),cache:"no-store",signal:signal ?? AbortSignal.timeout(12000),
     });
   } catch { throw new CommerceError("We couldn’t reach the store. Please try again."); }
   if(!response.ok) throw new CommerceError("The store is temporarily unavailable. Please try again.",response.status===429?429:502);
@@ -72,6 +72,7 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
 }
 export type ShopifyCart = {
   id:string; checkoutUrl:string; totalQuantity:number;
+  attributes?:{key:string;value:string|null}[];
   discountCodes?:{code:string;applicable:boolean}[];
   cost:{subtotalAmount:{amount:string;currencyCode:string};totalAmount:{amount:string;currencyCode:string}};
   lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{totalAmount:ShopifyMoney};sellingPlanAllocation?:{sellingPlan:{id:string;name:string;options:{name:string;value:string}[]}}|null;merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string;tags?:string[]}}}[]};

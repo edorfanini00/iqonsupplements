@@ -11,6 +11,7 @@ import type { Category } from "@/lib/catalog";
 import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Purchase, type Product, type StoreCatalog } from "@/lib/catalog";
 import { isComingSoon } from "@/lib/commerce-policy";
 import type { CartSnapshot } from "@/lib/shopify";
+import { contentId, trackAddToCart, trackInitiateCheckout } from "@/lib/analytics/meta";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -78,7 +79,9 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       const variant=p.variants?.find(v=>v.id===variantId)||p.variants?.find(v=>v.available);
       if(!variant||!p.available)return;
       if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
-      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})});return;
+      setBag(true);
+      const itemPrice=variant.sellingPlans?.find(plan=>plan.id===sellingPlanId)?.price??variant.price;
+      void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(added=>{if(added)trackAddToCart({contentId:contentId(variant.id,id),name:p.name,quantity,unitPrice:itemPrice,currency:variant.currency});});return;
     }
     if(purchase!=="once")return;
     const item={id,quantity:Math.max(1,Math.min(20,Math.floor(quantity))),purchase,frequency:purchase==="once"?"once":frequency};
@@ -94,6 +97,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     try{
       const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}",signal:AbortSignal.timeout(15000)});
       const data=await response.json();if(data.cart)applySnapshot(data.cart);if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
+      trackInitiateCheckout({items:cart.map(item=>({contentId:contentId(item.variantId,item.id),quantity:item.quantity})),value:subtotal,currency});
       window.location.assign(data.checkoutUrl);
     }catch(e){setError(e instanceof Error?e.message:"Checkout is temporarily unavailable.");lock.current=false;setBusy(false);}
   };

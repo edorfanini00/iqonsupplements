@@ -29,6 +29,7 @@ const imports = {
   "./merchandise": withPolicy("../lib/merchandise.ts"),
   "./shopify-operations": dataUrl(compile("../lib/shopify-operations.ts")),
   "./shopify": withPolicy("../lib/shopify.ts"),
+  "./analytics/meta-shared": dataUrl(compile("../lib/analytics/meta-shared.ts")),
 };
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);
@@ -54,9 +55,9 @@ function fixture(t) {
   process.env.SHOPIFY_API_VERSION = "2026-07";
   t.after(() => {
     for (const key of ["SHOPIFY_STORE_DOMAIN", "SHOPIFY_STOREFRONT_PRIVATE_TOKEN", "SHOPIFY_API_VERSION"])
-      previous[key] === undefined ? delete process.env[key] : process.env[key] = previous[key];
+      if (previous[key] === undefined) delete process.env[key]; else process.env[key] = previous[key];
   });
-  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false};
+  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false, attributeWrites: [], failAttributes: false};
   const recalculate = () => {
     const discount = state.cart.discountCodes.some(code => code.code === "SAVE10");
     let total = 0;
@@ -83,7 +84,7 @@ function fixture(t) {
     if (operation === "IQONCartRead") return Response.json({data: {cart: state.cart?.id === variables.id ? state.cart : null}});
     let mutation;
     if (operation === "IQONCartCreate") {
-      state.cart = {id: `gid://shopify/Cart/test-${++state.serial}?key=test-only-secret`, checkoutUrl: "https://iqon-test.myshopify.com/checkouts/test-only", discountCodes: [], lines: {pageInfo: {hasNextPage: false}, nodes: []}};
+      state.cart = {id: `gid://shopify/Cart/test-${++state.serial}?key=test-only-secret`, checkoutUrl: "https://iqon-test.myshopify.com/checkouts/test-only", attributes: variables.input.attributes || [], discountCodes: [], lines: {pageInfo: {hasNextPage: false}, nodes: []}};
       mutation = "cartCreate";
     }
     if (operation === "IQONCartCreate" || operation === "IQONCartAdd") {
@@ -102,6 +103,11 @@ function fixture(t) {
     } else if (operation === "IQONCartRemove") {
       mutation = "cartLinesRemove";
       state.cart.lines.nodes = state.cart.lines.nodes.filter(line => !variables.lineIds.includes(line.id));
+    } else if (operation === "IQONCartAttributes") {
+      if (state.failAttributes) return new Response("", {status: 502});
+      mutation = "cartAttributesUpdate";
+      state.attributeWrites.push(variables.attributes);
+      state.cart.attributes = variables.attributes;
     } else if (operation === "IQONCartDiscounts") {
       mutation = "cartDiscountCodesUpdate";
       state.cart.discountCodes = variables.discountCodes.map(code => ({code, applicable: code === "SAVE10"}));
@@ -239,4 +245,51 @@ test("checkout removes old skincare and requires review before handing off to Sh
   assert.equal(response.status,422);
   const data=await response.json();assert.equal(data.cart.items.length,1);assert.ok(!data.checkoutUrl);
   assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+});
+
+// Meta _fbp/_fbc travel to the hosted checkout as hidden cart attributes (docs/meta-pixel.md).
+const FBP = "fb.1.1759876543210.1234567890";
+const FBC = "fb.1.1759876543210.IwAR0synthetic";
+const pageRequest = (body, path, referer) => new Request(`${origin}/api/${path}`, {
+  method: "POST", headers: {Origin: origin, "Content-Type": "application/json", Referer: referer}, body: JSON.stringify(body),
+});
+
+test("consented browser IDs persist before handoff; unapproved URLs are omitted", async t => {
+  const state = fixture(t); jar.set("iqon_ad_consent", "granted-v1"); jar.set("_fbp", FBP);
+  await add(fixtureProducts[0]);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_fbp").value, FBP);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_event_source_url").value, "");
+  state.cart.attributes.unshift({key:"gift_note",value:"kept"}); jar.set("_fbc", FBC);
+  assert.equal((await routes.checkoutResponse(pageRequest({},"checkout",`${origin}/products/private?email=x`))).status,200);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_fbc").value,FBC);
+  assert.equal(state.cart.attributes.find(a=>a.key==="gift_note").value,"kept");
+});
+test("missing/withdrawn consent clears previous cart grant and matching IDs", async t => {
+  const state=fixture(t); jar.set("iqon_ad_consent","granted-v1"); jar.set("_fbp",FBP); await add(fixtureProducts[0]);
+  jar.delete("iqon_ad_consent");
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+  assert.equal(state.cart.attributes.find(a=>a.key==="_meta_consent").value,"denied");
+  assert.equal(state.cart.attributes.find(a=>a.key==="_fbp").value,"");
+});
+test("failed clearing of stale consent does not hand off; ordinary unattributed checkout works", async t => {
+  const state=fixture(t); await add(fixtureProducts[0]); state.failAttributes=true;
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+  state.cart.attributes=[{key:"_meta_consent",value:"granted-v1"}];
+  const result=await routes.checkoutResponse(request({},"checkout")); assert.equal(result.status,503); assert.ok(!(await result.json()).checkoutUrl);
+});
+test("slow tracking mutation aborts and settles before checkout response, without orphan work", async t => {
+  const state=fixture(t); await add(fixtureProducts[0]);
+  state.cart.attributes=[]; let started=false; let settled=false;
+  const previousFetch=globalThis.fetch;
+  t.mock.method(globalThis,"fetch",async (url,options)=>{
+    if(String(options.body).includes("IQONCartAttributes")) {
+      started=true;
+      return await new Promise((resolve,reject)=>{
+        const timer=setTimeout(()=>{settled=true;resolve(Response.json({data:{cartAttributesUpdate:{cart:state.cart,userErrors:[]}}}));},1900);
+        options.signal.addEventListener("abort",()=>{clearTimeout(timer);settled=true;reject(options.signal.reason);},{once:true});
+      });
+    }
+    return previousFetch(url,options);
+  });
+  const response=await routes.checkoutResponse(request({},"checkout")); assert.equal(response.status,200); assert.equal(started,true); assert.equal(settled,true);
 });
