@@ -44,6 +44,8 @@ export interface MetaServerEvent {
   /** Unix seconds; defaults to now. */
   eventTime?: number;
   eventSourceUrl?: string | null;
+  /** Default "website". Meta requires client_user_agent for website events. */
+  actionSource?: "website" | "other";
   customData?: Record<string, unknown>;
   user: MetaUserInput;
 }
@@ -131,7 +133,7 @@ export function buildPayload(events: MetaServerEvent[], env: Env, now = Date.now
       event_name: e.eventName,
       event_time: e.eventTime ?? Math.floor(now / 1000),
       event_id: e.eventId,
-      action_source: "website",
+      action_source: e.actionSource ?? "website",
       ...(e.eventSourceUrl ? { event_source_url: e.eventSourceUrl } : {}),
       user_data: buildUserData(e.user),
       ...(e.customData ? { custom_data: e.customData } : {}),

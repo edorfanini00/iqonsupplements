@@ -85,9 +85,10 @@ export function metaCartAttributes(ids: MetaBrowserIds): CartAttribute[] {
  * Replaces our keys in an existing attribute list and keeps everyone else's.
  * Returns null when nothing would change, so callers can skip the write.
  */
-export function mergeCartAttributes(existing: readonly CartAttribute[] | null | undefined, ours: readonly CartAttribute[]): CartAttribute[] | null {
+export function mergeCartAttributes(existing: readonly { key: string; value: string | null }[] | null | undefined, ours: readonly CartAttribute[]): CartAttribute[] | null {
   if (!ours.length) return null;
-  const current = (existing ?? []).filter((a) => a && typeof a.key === "string" && typeof a.value === "string");
+  // cartAttributesUpdate replaces the whole list: keep other apps' entries, null values as "".
+  const current = (existing ?? []).filter((a) => a && typeof a.key === "string").map((a) => ({ key: a.key, value: typeof a.value === "string" ? a.value : "" }));
   const keys = new Set(ours.map((a) => a.key));
   const merged = [...current.filter((a) => !keys.has(a.key)), ...ours];
   const same = ours.every((a) => current.some((c) => c.key === a.key && c.value === a.value));

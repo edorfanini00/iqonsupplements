@@ -47,9 +47,9 @@ export function sanitizeCustomData(value: unknown): Record<string, unknown> | un
 export async function handleRelay(request: Request, deps: MetaSendDeps = {}): Promise<RelayResult> {
   try {
     const host = new URL(request.url).hostname;
-    // Only our own pages post here; a different Origin is a cross site call.
-    const origin = request.headers.get("origin");
-    if (origin && origin !== new URL(request.url).origin) return { status: 403, body: { ok: false } };
+    // Only our own pages post here: browsers always send Origin on a POST, so a
+    // missing or different Origin is a script or a cross site call.
+    if (request.headers.get("origin") !== new URL(request.url).origin) return { status: 403, body: { ok: false } };
     if (Number(request.headers.get("content-length") ?? 0) > RELAY_MAX_BODY) return { status: 413, body: { ok: false } };
     const text = await request.text();
     if (text.length > RELAY_MAX_BODY) return { status: 413, body: { ok: false } };

@@ -72,7 +72,7 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
 }
 export type ShopifyCart = {
   id:string; checkoutUrl:string; totalQuantity:number;
-  attributes?:{key:string;value:string}[];
+  attributes?:{key:string;value:string|null}[];
   discountCodes?:{code:string;applicable:boolean}[];
   cost:{subtotalAmount:{amount:string;currencyCode:string};totalAmount:{amount:string;currencyCode:string}};
   lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{totalAmount:ShopifyMoney};sellingPlanAllocation?:{sellingPlan:{id:string;name:string;options:{name:string;value:string}[]}}|null;merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string;tags?:string[]}}}[]};

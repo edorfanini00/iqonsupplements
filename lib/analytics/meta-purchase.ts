@@ -82,8 +82,11 @@ export function mapOrderToPurchase(payload: unknown, now = Date.now()): MetaServ
   const address = billing ?? shipping;
   const ids = readMetaAttributes(order.note_attributes);
   const currency = (str(order.currency, 3) ?? "USD").toUpperCase();
+  const userAgent = str(obj(order.client_details)?.user_agent, 500);
   return {
     eventName: "Purchase",
+    // Orders without a browser (draft, admin, POS) cannot be website events: Meta rejects those without a user agent.
+    actionSource: userAgent ? "website" : "other",
     eventId: purchaseEventId(orderId),
     eventTime: eventTime(order, Math.floor(now / 1000)),
     eventSourceUrl: ids.eventSourceUrl ?? DEFAULT_EVENT_SOURCE_URL,
@@ -109,7 +112,7 @@ export function mapOrderToPurchase(payload: unknown, now = Date.now()): MetaServ
       fbp: ids.fbp,
       fbc: ids.fbc,
       clientIpAddress: str(order.browser_ip, 64),
-      clientUserAgent: str(obj(order.client_details)?.user_agent, 500),
+      clientUserAgent: userAgent,
     },
   };
 }

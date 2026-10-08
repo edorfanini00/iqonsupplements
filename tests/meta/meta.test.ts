@@ -204,6 +204,9 @@ test("relay rejects Purchase, unknown events, bad ids, bad JSON, oversize bodies
     assert.equal(result.status, 204, JSON.stringify(body));
   }
   assert.equal((await handleRelay(relayRequest({ eventName: "PageView", eventId: id }, { origin: "https://evil.example" }), deps)).status, 403);
+  const scripted = relayRequest({ eventName: "PageView", eventId: id });
+  scripted.headers.delete("origin");
+  assert.equal((await handleRelay(scripted, deps)).status, 403, "no Origin: not a browser on our pages");
   assert.equal((await handleRelay(relayRequest({ eventName: "PageView", eventId: id, pad: "x".repeat(5000) }), deps)).status, 413);
   assert.equal(calls.length, 0);
   assert.equal(isRelayEvent("Purchase"), false);
@@ -254,11 +257,15 @@ test("sendMetaEvents never throws: network error, Meta 400 and a hung request al
   assert.equal(rejected.status, 400);
   assert.ok(!JSON.stringify(logs).includes(TOKEN), "token never logged");
   const started = Date.now();
+  // AbortSignal.timeout's timer is unref'd; a live server keeps the loop running, the test has to.
+  const keepAlive = setInterval(() => {}, 1000);
   const hung = await sendMetaEvents([event], {
     env: ENV, log, timeoutMs: 50,
     fetch: ((_u: string, init: RequestInit) => new Promise((_, reject) => init.signal?.addEventListener("abort", () => reject(init.signal?.reason)))) as unknown as typeof fetch,
   });
+  clearInterval(keepAlive);
   assert.equal(hung.ok, false);
+  assert.match(hung.error ?? "", /TimeoutError/);
   assert.ok(Date.now() - started < 1000);
   assert.equal(CAPI_TIMEOUT_MS, 3500);
   const throwingLog = await sendMetaEvents([event], { env: ENV, log: () => { throw new Error("log down"); }, fetch: (async () => { throw new Error("x"); }) as typeof fetch });
@@ -297,6 +304,7 @@ test("invalid cookie values are not written, and other apps' attributes are kept
   const merged = mergeCartAttributes([{ key: "ref", value: "creator1" }, { key: META_CART_ATTRIBUTE_KEYS.fbp, value: "fb.1.1700000000000.1" }], ours);
   assert.deepEqual(merged, [{ key: "ref", value: "creator1" }, ...ours]);
   assert.equal(mergeCartAttributes(merged, ours), null, "unchanged: no extra Shopify write");
+  assert.deepEqual(mergeCartAttributes([{ key: "other_app", value: null }], ours), [{ key: "other_app", value: "" }, ...ours], "null valued attributes are kept, not wiped");
   assert.equal(mergeCartAttributes([], []), null);
   assert.equal(readCookie("a=1; _fbp=" + FBP + "; b=2", "_fbp"), FBP);
   assert.equal(readCookie("x_fbp=1", "_fbp"), null);
@@ -342,6 +350,8 @@ test("Purchase mapping: refunded quantities, gid ids, stale timestamps and junk 
   assert.equal(edited.eventId, `purchase_${ORDER_ID}`);
   assert.deepEqual(edited.customData?.contents, [{ id: "8002", quantity: 1, item_price: 34 }]);
   assert.equal(edited.eventTime, Math.floor(now / 1000), "older than 7 days: sent as now so Meta accepts it");
+  assert.equal(edited.actionSource, "other", "no client_details: not a website event (Meta needs a user agent)");
+  assert.equal(mapOrderToPurchase(orderPaidPayload({ client_details: { user_agent: "UA" } }))?.actionSource, "website");
   assert.equal(mapOrderToPurchase(null), null);
   assert.equal(mapOrderToPurchase({ id: "abc" }), null);
   assert.equal(mapOrderToPurchase([1, 2]), null);

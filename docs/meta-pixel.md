@@ -34,7 +34,7 @@ app/layout.tsx                  <meta name="facebook-domain-verification" conten
 lib/shopify.server.ts           writes _fbp, _fbc, _event_source_url as cart attributes (cart create + checkout handoff)
 ```
 
-The relay accepts only `PageView`, `ViewContent`, `AddToCart`, `InitiateCheckout` (anything else: 204, nothing sent). It takes no PII from the browser; match signals come from the request (cookies `_fbp`/`_fbc`, `x-forwarded-for`, `user-agent`). The token is sent in the POST body, never in a URL or log.
+The relay accepts only `PageView`, `ViewContent`, `AddToCart`, `InitiateCheckout` (anything else: 204, nothing sent). It requires a same origin `Origin` header (browsers always send it on POST) and takes no PII from the browser; match signals come from the request (cookies `_fbp`/`_fbc`, `x-forwarded-for`, `user-agent`). The token is sent in the POST body, never in a URL or log.
 
 ## Purchase: why a webhook
 
@@ -43,7 +43,9 @@ Checkout and the thank you page run on Shopify's hosted checkout (`nr9zd0-t5.mys
 1. **Server (this repo):** Shopify `orders/paid` webhook to `https://www.iqonbody.com/api/webhooks/shopify/meta-purchase`. It verifies the shop domain and the HMAC (`SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`, same key and helper as the order email webhook), maps the order and sends Purchase with hashed email, phone, name, city, state, zip, country and customer id, plus raw `browser_ip`, `client_details.user_agent` and the `_fbp`/`_fbc` that the storefront put on the cart.
 2. **Browser (Shopify admin):** a Customer Events custom pixel on `checkout_completed` (snippet below).
 
-**fbp/fbc across domains.** `_fbp`/`_fbc` live on `iqonbody.com` and cannot be read on `*.myshopify.com`. The storefront therefore writes them, plus the page the buyer checked out from, as hidden cart attributes (`_fbp`, `_fbc`, `_event_source_url`; the leading underscore hides them in checkout). They are set in `cartCreate` and refreshed right before the checkout redirect (`cartAttributesUpdate`, only when something changed, bounded to 2.5 s, failures ignored so checkout is never blocked). Other attributes on the cart are preserved. Shopify copies cart attributes to the order's `note_attributes`, which the webhook reads.
+**fbp/fbc across domains.** `_fbp`/`_fbc` live on `iqonbody.com` and cannot be read on `*.myshopify.com`. The storefront therefore writes them, plus the page the buyer checked out from, as hidden cart attributes (`_fbp`, `_fbc`, `_event_source_url`; the leading underscore hides them in checkout). They are set in `cartCreate` and refreshed right before the checkout redirect (`cartAttributesUpdate`, only when something changed, bounded to 1.5 s, failures ignored so checkout is never blocked). Other attributes on the cart are preserved. Shopify copies cart attributes to the order's `note_attributes`, which the webhook reads.
+
+**Orders without a browser** (draft, admin or POS orders, no `client_details.user_agent`) are sent with `action_source: other`, because Meta rejects website events without a user agent.
 
 **Skip rules.** Test orders are skipped unless `META_CAPI_TEST_EVENT_CODE` is set (then they go to Events Manager > Test events). Subscription renewals (Shopify Subscriptions billing, `source_name` `subscription_contract*`, same rule as the order emails) are skipped: they are not a website conversion.
 
@@ -61,7 +63,7 @@ Checkout and the thank you page run on Shopify's hosted checkout (`nr9zd0-t5.mys
 | `META_CAPI_TEST_EVENT_CODE` | Vercel | No | Only while testing in Events Manager > Test events; remove afterwards. |
 | `META_GRAPH_VERSION` | Vercel | No | Default `v24.0`. |
 
-**Token:** Events Manager > Data sources > **IQON Body Web** > **Settings** > **Conversions API** > **Generate access token**. Paste it only into Vercel (Production, server side, `META_CAPI_ACCESS_TOKEN`), then redeploy. Check: `curl -s https://www.iqonbody.com/api/meta/track` returns `"tokenSet":true`.
+**Token:** Events Manager > Data sources > **IQON Body Web** > **Settings** > **Conversions API** > **Generate access token**. Paste it only into Vercel (Production, server side, `META_CAPI_ACCESS_TOKEN`), then redeploy. Check: `curl -s https://www.iqonbody.com/api/meta/track` returns `"tokenSet":true` (the diagnostic shows only that flag and the public pixel id).
 
 ## Go live (owner, in this order)
 

@@ -82,12 +82,12 @@ async function metaAttributes(request:Request) {
   return metaCartAttributes({fbp:jar.get("_fbp")?.value??null,fbc:jar.get("_fbc")?.value??null,
     eventSourceUrl:validEventSourceUrl(request.headers.get("referer"),["www.iqonbody.com","iqonbody.com",url.hostname])});
 }
-/** Best effort and bounded to 2.5s: a failure here must never block or slow checkout much. */
+/** Best effort and bounded to 1.5s: a failure here must never block or slow checkout much. */
 async function syncMetaAttributes(cart:ShopifyCart,request:Request) {
   let timer:ReturnType<typeof setTimeout>|undefined;
   try {
     const attributes=mergeCartAttributes(cart.attributes,await metaAttributes(request));
-    if(attributes) await Promise.race([mutate(CART_ATTRIBUTES,{cartId:cart.id,attributes}),new Promise(resolve=>{timer=setTimeout(resolve,2500);})]);
+    if(attributes) await Promise.race([mutate(CART_ATTRIBUTES,{cartId:cart.id,attributes}),new Promise(resolve=>{timer=setTimeout(resolve,1500);})]);
   } catch {} finally {clearTimeout(timer);}
 }
 const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";

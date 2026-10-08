@@ -16,7 +16,6 @@ export function GET() {
   return Response.json({
     tokenSet: Boolean(process.env.META_CAPI_ACCESS_TOKEN?.trim()),
     pixelId: resolvePixelId(process.env.NEXT_PUBLIC_META_PIXEL_ID),
-    testEventCode: Boolean(process.env.META_CAPI_TEST_EVENT_CODE?.trim()),
   }, { headers });
 }
 
