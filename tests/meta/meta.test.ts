@@ -20,7 +20,7 @@ const fixture = (overrides: Record<string, unknown> = {}) => ({ id: 612345678901
 function headers(raw: string) { return new Headers({ "x-shopify-topic": "orders/paid", "x-shopify-shop-domain": SUPPLEMENTS_SHOP, "x-shopify-hmac-sha256": createHmac("sha256", SECRET).update(raw).digest("base64") }); }
 async function deliver(payload: unknown, env = ENV, status = 200) {
   const raw = JSON.stringify(payload); const calls: Record<string, unknown>[] = [];
-  const result = await handleMetaPurchaseWebhook(raw, headers(raw), { env, now: () => NOW, info: () => {}, log: () => {}, fetch: (async (_url, init) => { calls.push(JSON.parse(String(init?.body))); return new Response("", { status }); }) as typeof fetch });
+  const result = await handleMetaPurchaseWebhook(raw, headers(raw), { env, now: () => NOW, info: () => {}, log: () => {}, fetch: (async (_url, init) => { calls.push(JSON.parse(String(init?.body))); return Response.json({ events_received: status === 200 ? 1 : 0 }, { status }); }) as typeof fetch });
   return { result, calls };
 }
 test("signed synthetic fixture is test mode only, fixed ID/time and minimized", async () => {
@@ -29,7 +29,8 @@ test("signed synthetic fixture is test mode only, fixed ID/time and minimized", 
   assert.equal(calls[0].test_event_code, "TEST-SYNTHETIC");
   const event = (calls[0].data as Record<string, unknown>[])[0];
   assert.equal(event.event_id, "purchase_6123456789012"); assert.equal(event.event_time, NOW / 1000 - 3600);
-  assert.deepEqual(event.user_data, { client_user_agent: "IQON synthetic tracking verification" });
+  assert.deepEqual(event.user_data, { client_user_agent: "IQON synthetic tracking verification", em: [sha("tracking-verification@example.invalid")], external_id: [sha("iqon-tracking-synthetic-v1")] });
+  assert.ok(!JSON.stringify(calls).includes("tracking-verification@example.invalid"), "synthetic email is hashed");
   assert.ok(!JSON.stringify(calls).includes("must-not-leak"));
 });
 test("production orders and unapproved variants cannot use test bypass", async () => {
@@ -253,4 +254,25 @@ test("actual preferences component produces no shopper UI with no approved paths
   };
   runInNewContext(output,{exports,require:(id:string)=>{assert.ok(id in mocks,id);return mocks[id];}});
   assert.equal(exports.MetaPixel(),null);
+});
+
+test("CAPI success requires valid JSON and the exact accepted event count", async () => {
+  const events=[{eventName:"Purchase",eventId:"purchase_12345678",eventTime:NOW/1000,user:{}}];
+  for(const body of ["", "not JSON", "null", "[]", "{}", '{"events_received":0}', '{"events_received":"1"}', '{"events_received":2}', '{"events_received":1,"error":{"message":"secret private@example.invalid"}}']) {
+    const result=await sendMetaEvents(events,{env:ENV,log:()=>{},fetch:(async()=>new Response(body,{status:200})) as typeof fetch});
+    assert.equal(result.ok,false,body); assert.equal(result.retryable,true,body); assert.equal(result.status,200);
+    assert.ok(["meta_invalid_response","meta_event_count_mismatch"].includes(result.error??""));
+    assert.ok(!JSON.stringify(result).includes("private@example.invalid"));
+  }
+  const accepted=await sendMetaEvents(events,{env:ENV,fetch:(async()=>Response.json({events_received:1})) as typeof fetch});
+  assert.deepEqual(accepted,{ok:true,status:200});
+  const partial=await sendMetaEvents([...events,{...events[0],eventId:"purchase_12345679"}],{env:ENV,fetch:(async()=>Response.json({events_received:1})) as typeof fetch});
+  assert.equal(partial.ok,false); assert.equal(partial.retryable,true);
+});
+test("ambiguous 200 upstream receipt triggers webhook retry without success claim", async () => {
+  const raw=JSON.stringify(fixture());
+  for(const body of ["not JSON",'{"events_received":0}']) {
+    const result=await handleMetaPurchaseWebhook(raw,headers(raw),{env:ENV,now:()=>NOW,info:()=>{},log:()=>{},fetch:(async()=>new Response(body,{status:200})) as typeof fetch});
+    assert.equal(result.status,503); assert.equal(result.body.retry,true); assert.equal(result.body.sent,undefined);
+  }
 });

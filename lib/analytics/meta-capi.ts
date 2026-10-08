@@ -55,6 +55,8 @@ export interface MetaSendResult {
   skipped?: "missing_token" | "disabled" | "no_events";
   status?: number;
   error?: string;
+  /** Ambiguous successful HTTP response: retry with the original event ID/time. */
+  retryable?: boolean;
 }
 
 export interface MetaSendDeps {
@@ -180,6 +182,18 @@ export async function sendMetaEvents(events: MetaServerEvent[], deps: MetaSendDe
       void response.body?.cancel().catch(() => {});
       log("send failed", { status: response.status, error: text });
       return { ok: false, status: response.status, error: text };
+    }
+    let receipt: unknown;
+    try { receipt = await response.json(); }
+    catch {
+      return { ok: false, status: response.status, error: "meta_invalid_response", retryable: true };
+    }
+    if (!receipt || typeof receipt !== "object" || Array.isArray(receipt) || "error" in receipt) {
+      return { ok: false, status: response.status, error: "meta_invalid_response", retryable: true };
+    }
+    const accepted = (receipt as Record<string, unknown>).events_received;
+    if (!Number.isInteger(accepted) || accepted !== events.length) {
+      return { ok: false, status: response.status, error: "meta_event_count_mismatch", retryable: true };
     }
     return { ok: true, status: response.status };
   } catch {

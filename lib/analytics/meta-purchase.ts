@@ -167,7 +167,11 @@ export async function handleMetaPurchaseWebhook(rawBody: Buffer | string, header
     && variantIds.length > 0 && variantIds.every(id => ["8001", "8002", "8003"].includes(id));
   if (testFixture) {
     // Test Events only. Never transmit customer matching inputs from fixtures.
-    event.user = { clientUserAgent: "IQON synthetic tracking verification" };
+    event.user = {
+      clientUserAgent: "IQON synthetic tracking verification",
+      email: "tracking-verification@example.invalid",
+      externalId: "iqon-tracking-synthetic-v1",
+    };
     event.actionSource = "website";
     return deliverEligiblePurchase(event, deps);
   }
@@ -184,7 +188,7 @@ async function deliverEligiblePurchase(event: MetaServerEvent, deps: PurchaseWeb
 
   if (result.ok) return { status: 200, body: { ok: true, sent: true, eventId: event.eventId } };
   if (result.skipped) return { status: 200, body: { ok: true, skipped: result.skipped } };
-  const transient = result.status === undefined || result.status === 429 || result.status >= 500;
+  const transient = result.retryable === true || result.status === undefined || result.status === 429 || result.status >= 500;
   return transient
     ? { status: 503, body: { ok: false, retry: true, reason: "meta_unavailable" } }
     : { status: 200, body: { ok: false, reason: "meta_rejected" } };

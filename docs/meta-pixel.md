@@ -28,9 +28,9 @@ The only active webhook delivery path requires all of:
 3. Fresh original timestamp, numeric order ID, and only synthetic variants `8001`, `8002`, `8003`.
 4. No renewal signal.
 
-The transmitted test user data is replaced with the fixed `IQON synthetic tracking verification` user agent; no email, phone, address, customer ID, IP or advertising cookie is transmitted. Source is the canonical homepage; custom data uses only numeric synthetic IDs and purchase totals. See `docs/tracking/synthetic-order.mjs` for the fixture factory. Do not invoke this with real customer/order data. Remove the Test Events code after verification.
+The transmitted test user data is replaced with the fixed `IQON synthetic tracking verification` user agent plus SHA-256 matching inputs for reserved synthetic email `tracking-verification@example.invalid` and fixed external ID `iqon-tracking-synthetic-v1`; no customer email, phone, address, customer ID, IP or advertising cookie is transmitted. Source is the canonical homepage; custom data uses only numeric synthetic IDs and purchase totals. See `docs/tracking/synthetic-order.mjs` for the fixture factory. Do not invoke this with real customer/order data. Remove the Test Events code after verification.
 
-An accepted Meta response proves acceptance only. Events Manager visibility must be independently observed. Local matching event IDs do not prove Browser+Server deduplication; real checkout consent transfer, browser Purchase and purchase end-to-end remain NOT VERIFIED. No recommendation to create charged orders or change live payment modes.
+Success requires a valid Meta JSON receipt with `events_received` equal to the intended event count. Invalid, missing, zero or mismatched receipts cause a retryable failure using the original event ID/time. An accepted Meta response proves acceptance only. Events Manager visibility must be independently observed. Local matching event IDs do not prove Browser+Server deduplication; real checkout consent transfer, browser Purchase and purchase end-to-end remain NOT VERIFIED. No recommendation to create charged orders or change live payment modes.
 
 ## Shopify custom pixel
 
