@@ -3,7 +3,9 @@ import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
-import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+import { CATALOG_QUERY, CART_QUERY, CART_CHECKOUT, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+import { readPrivacyState } from "./privacy.server";
+import { PrivacyInputError, gpcHeader, restrictChoices, validateRestriction, visitorConsent } from "./privacy";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
@@ -122,17 +124,45 @@ export async function mutateCartResponse(request:Request) {
     return Response.json(snapshot,{headers:responseHeaders});
   } catch(error) {return fail(error);}
 }
+// The visitor's saved choice is authoritative. The page may only add withdrawals that
+// have not reached the server yet, and either GPC signal removes advertising and sharing.
+async function checkoutPrivacy(request:Request) {
+  if(Number(request.headers.get("content-length")||0)>1024) throw new CommerceError("Invalid request.",413);
+  const text=await request.text();
+  if(text.length>1024) throw new CommerceError("Invalid request.",413);
+  let input:unknown;
+  try {input=text?JSON.parse(text):{};}catch {throw new CommerceError("Invalid request.",400);}
+  if(!input||typeof input!=="object"||Array.isArray(input)||Object.keys(input).some(key=>key!=="privacy")) throw new CommerceError("Invalid request.",400);
+  const privacy=(input as {privacy?:unknown}).privacy;
+  if(privacy!==undefined&&(!privacy||typeof privacy!=="object"||Array.isArray(privacy)||Object.keys(privacy).some(key=>key!=="restrict"&&key!=="gpc")))
+    throw new CommerceError("Invalid request.",400);
+  const {restrict,gpc}=(privacy||{}) as {restrict?:unknown;gpc?:unknown};
+  if(gpc!==undefined&&typeof gpc!=="boolean") throw new CommerceError("Invalid request.",400);
+  let restriction;
+  try {restriction=validateRestriction(restrict);}catch(error){if(error instanceof PrivacyInputError)throw new CommerceError("Invalid request.",400);throw error;}
+  const state=await readPrivacyState();
+  return {revision:state.revision,consent:visitorConsent(restrictChoices(state.choices,restriction),gpc===true||gpcHeader(request.headers))};
+}
+// visitorConsent on @inContext needs Storefront API 2025-10 or later.
+const consentVersion=(version:string)=>version<"2025-10"?"2025-10":version;
 export async function checkoutResponse(request:Request) {
   try {
     sameOrigin(request);
-    // Refresh immediately before handing the buyer to Shopify's hosted checkout.
-    const refreshed=await removeUpcomingProducts(await readCart());
+    const privacy=await checkoutPrivacy(request);
+    const settings=config();
+    if(!settings) throw new CommerceError("Orders are not open yet.",503);
+    const id=await cartId();
+    // Refresh immediately before handing the buyer to Shopify's hosted checkout. Every
+    // handoff is a new contextualized read; a checkout URL is never cached or reused.
+    const current=id?(await shopifyRequest<{cart:ShopifyCart|null}>({...settings,version:consentVersion(settings.version)},CART_CHECKOUT,{id,visitorConsent:privacy.consent},await buyerIP())).cart:null;
+    const refreshed=await removeUpcomingProducts(current);
     const cart=refreshed.cart;
     if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
     if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
-    return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
+    // Returned exactly as Shopify issued it: the signed _cs consent parameter must not be altered.
+    return Response.json({checkoutUrl:cart.checkoutUrl,privacyRevision:privacy.revision},{headers:responseHeaders});
   }catch(error){return fail(error);}
 }
