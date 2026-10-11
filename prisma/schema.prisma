@@ -522,3 +522,20 @@ model TransactionalEmail {
   @@index([orderId])
   @@map("supplements_transactional_emails")
 }
+
+/// Anonymous storefront privacy decisions. visitorKey is the SHA-256 of a random token
+/// held only by the visitor's browser; no customer, order, IP or device data is stored.
+/// Every change increments revision inside a single conditional UPDATE.
+model StorefrontPrivacyConsent {
+  visitorKey  String   @id @map("visitor_key") @db.Char(64)
+  analytics   Boolean?
+  marketing   Boolean?
+  preferences Boolean?
+  saleOfData  Boolean? @map("sale_of_data")
+  revision    Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  @@index([updatedAt])
+  @@map("storefront_privacy_consents")
+}

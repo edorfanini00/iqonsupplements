@@ -11,21 +11,26 @@ import type { Category } from "@/lib/catalog";
 import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Purchase, type Product, type StoreCatalog } from "@/lib/catalog";
 import { isComingSoon } from "@/lib/commerce-policy";
 import type { CartSnapshot } from "@/lib/shopify";
+import type { PrivacySnapshot } from "@/lib/privacy";
+import { PrivacyChoicesSheet, usePrivacy, type PrivacyLinks } from "./privacy-choices";
 
-type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
+type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number; openPrivacy:()=>void; privacyLinks:PrivacyLinks};
 const StoreContext = createContext<StoreContextType | null>(null);
 export function useStore() {const value=useContext(StoreContext); if(!value) throw new Error("Store context missing"); return value;}
 // Use the supplied label artwork verbatim for the black header wordmark.
 // The viewBox trims transparent padding; the white footer retains its existing artwork.
 export function Wordmark({large=false}:{large?:boolean}) {return <svg className={`wordmark wordmark-artwork ${large?"wordmark-large":""}`} viewBox={large?"172 64 265 97":"44 46 363 132"} role="img" aria-label="IQON" focusable="false"><image href={large?"/images/brand/iqon-logo.png":"/images/brand/iqon-logo-label-original.png"} width={large?600:450} height="225"/></svg>;}
 
-export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreCatalog}) {
+export function StoreShell({children,catalog,privacy:initialPrivacy,privacyLinks}:{children:ReactNode;catalog:StoreCatalog;privacy:PrivacySnapshot;privacyLinks:PrivacyLinks}) {
   const {products,mode}=catalog; const router=useRouter(); const findProduct=(id:string)=>products.find(p=>p.id===id);
   const pathname=usePathname();
   const [cart,setCart]=useState<CartItem[]>([]);
   const [hydrated,setHydrated]=useState(false);
   const [bag,setBag]=useState(false);
   const [search,setSearch]=useState(false);
+  const [privacyOpen,setPrivacyOpen]=useState(false);
+  const privacyOpener=useRef<HTMLElement|null>(null);
+  const privacy=usePrivacy(initialPrivacy);
   const [preferredDepartment,setPreferredDepartment]=useState<Category>("supplements");
   const routeDepartment:Category|undefined=pathname==="/"?"supplements":pathname.startsWith("/skincare")||pathname.startsWith("/collections/skincare")?"skincare":pathname.startsWith("/collections/supplements")?"supplements":products.find(p=>pathname===`/products/${p.id}`)?.category;
   const department=routeDepartment||preferredDepartment;
@@ -61,7 +66,9 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     setHydrated(true);
   },[mode]);
   useEffect(()=>{if(hydrated&&mode==="preview")try{localStorage.setItem("iqon-store-bag-v2",JSON.stringify(cart));}catch{}},[cart,hydrated,mode]);
-  useEffect(()=>{setBag(false);setSearch(false);},[pathname]);
+  useEffect(()=>{setBag(false);setSearch(false);setPrivacyOpen(false);},[pathname]);
+  // Returning from hosted checkout through the back cache must not leave checkout locked.
+  useEffect(()=>{const onShow=(event:PageTransitionEvent)=>{if(event.persisted){lock.current=false;setBusy(false);}};window.addEventListener("pageshow",onShow);return ()=>window.removeEventListener("pageshow",onShow);},[]);
   const subtotal=useMemo(()=>live?shopSubtotal:cart.reduce((sum,item)=>{const p=findProduct(item.id);return sum+(p?unitPrice(p,item.purchase)*item.quantity:0);},0),[cart,products,live,shopSubtotal]);
   const count=cart.reduce((sum,item)=>sum+item.quantity,0);
   const transact=async(input:Record<string,unknown>)=>{
@@ -92,12 +99,22 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     if(!live||lock.current||!hydrated)return;
     lock.current=true;setBusy(true);setError("");
     try{
-      const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}",signal:AbortSignal.timeout(15000)});
-      const data=await response.json();if(data.cart)applySnapshot(data.cart);if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
-      window.location.assign(data.checkoutUrl);
+      // Each attempt reads a fresh, consent contextualized checkout link. If privacy
+      // choices change while it is in flight, that link is discarded and never used.
+      for(let attempt=0;attempt<3;attempt++){
+        const epoch=privacy.epoch();
+        const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({privacy:privacy.checkoutContext()}),signal:AbortSignal.timeout(15000)});
+        const data=await response.json();if(data.cart)applySnapshot(data.cart);
+        // The server refuses a link when its saved decision differs from the one shown here.
+        if(response.status===409&&data.privacyChanged){await privacy.refresh();continue;}
+        if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
+        if(epoch===privacy.epoch()&&data.privacyVersion===privacy.version()){window.location.assign(data.checkoutUrl);return;}
+        await privacy.refresh();
+      }
+      throw new Error("Your privacy choices changed. Please select checkout again.");
     }catch(e){setError(e instanceof Error?e.message:"Checkout is temporarily unavailable.");lock.current=false;setBusy(false);}
   };
-  const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count};
+  const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count,openPrivacy:()=>{privacyOpener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setPrivacyOpen(true);},privacyLinks};
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
   if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
   return <StoreContext.Provider value={value}>
@@ -107,6 +124,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     {children}
     <Footer/>
     <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<button className="button button-dark full-width" disabled={busy||!hydrated} onClick={()=>void checkout()}>Secure checkout <ArrowRight size={18}/></button>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
+    <PrivacyChoicesSheet open={privacyOpen} onOpenChange={setPrivacyOpen} privacy={privacy} links={privacyLinks} returnFocus={privacyOpener}/>
     <Sheet open={search} onOpenChange={setSearch}><SheetContent side="top" className="search-sheet"><SheetTitle>Find your essential.</SheetTitle><SheetDescription>Search the IQON collection</SheetDescription><div className="search-field"><Search size={22}/><input aria-label="Search the collection" placeholder="Search products, formats, collections…" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={18}/></button>}</div><div className="search-results">{results.map(p=><Link href={`/products/${p.id}`} key={p.id} onClick={()=>setSearch(false)}><img src={p.image} alt={p.name}/><span>{p.name}<small>{p.type} · {productPrice(p)}</small></span><ArrowRight size={18}/></Link>)}{!results.length&&<p className="no-results">No products match “{query}”. Try “collagen”, “creatine” or “skincare”.</p>}</div></SheetContent></Sheet>
 
   </StoreContext.Provider>;
@@ -146,4 +164,4 @@ export function ProductCard({product:p,compact=false}:{product:Product;compact?:
   {isComingSoon(p)||p.pricePending||p.available===false||p.requiresSellingPlan?<Link className="button button-dark product-card-action" aria-label={`View ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add ${p.name} to bag`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
  </article>;
 }
-function Footer(){const {mode,currency,department}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
+function Footer(){const {mode,currency,department,openPrivacy,privacyLinks}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span><nav className="footer-privacy" aria-label="Privacy"><a href={privacyLinks.policy}>Privacy policy</a><button type="button" onClick={openPrivacy}>Your Privacy Choices</button></nav>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
