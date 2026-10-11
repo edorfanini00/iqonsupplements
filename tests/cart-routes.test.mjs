@@ -127,7 +127,14 @@ function fixture(t) {
 const consentUrl = (base, consent) => consent ? `${base}?_cs=${Buffer.from(JSON.stringify(consent)).toString("base64url")}.sig%2Fx` : base;
 const readConsent = url => {const value = new URL(url).searchParams.get("_cs"); return value ? JSON.parse(Buffer.from(value.split(".")[0], "base64url")) : null;};
 const COOKIE = "__Host-iqon_privacy";
-const decide = (choices, revision = 1) => jar.set(COOKIE, `v1.${["analytics", "marketing", "preferences", "saleOfData"].map(p => choices[p] === true ? "1" : choices[p] === false ? "0" : "n").join("")}.${revision}.${Math.floor(Date.now() / 1000)}`);
+// Writes a saved decision the way the privacy route does; returns its version string.
+let clock = Date.now() - 60_000;
+const decide = (choices, revision = 1) => {
+  const at = ++clock;
+  jar.set(COOKIE, `v2.${["analytics", "marketing", "preferences", "saleOfData"].map(p => choices[p] === true ? "1" : choices[p] === false ? "0" : "n").join("")}.${revision}.${at}.${at - 1}`);
+  for (const p of ["analytics", "marketing", "preferences", "saleOfData"]) choices[p] === false ? jar.set(`${COOKIE}_w_${p}`, `v1.${at}`) : jar.delete(`${COOKIE}_w_${p}`);
+  return `${revision}.${at}.${["analytics", "marketing", "preferences", "saleOfData"].some(p => choices[p] === false) ? at : 0}`;
+};
 const all = value => ({analytics: value, marketing: value, preferences: value, saleOfData: value});
 const checkout = (body = {}, extra = {}) => routes.checkoutResponse(new Request(`${origin}/api/checkout`, {
   method: "POST", headers: {Origin: origin, "Content-Type": "application/json", ...extra}, body: typeof body === "string" ? body : JSON.stringify(body),
@@ -268,11 +275,11 @@ test("checkout sends the visitor's saved decision with a fresh contextual read: 
   let data = await response.json();
   // No choice: nothing is invented, so Shopify receives no expressed preference.
   assert.equal(state.consents.at(-1), null); assert.equal(readConsent(data.checkoutUrl), null);
-  assert.equal(data.privacyRevision, 0);
-  decide(all(true), 3);
+  assert.equal(data.privacyVersion, "0.0.0");
+  const granted = decide(all(true), 3);
   data = await (await checkout()).json();
   assert.deepEqual(state.consents.at(-1), all(true)); assert.deepEqual(readConsent(data.checkoutUrl), all(true));
-  assert.equal(data.privacyRevision, 3);
+  assert.equal(data.privacyVersion, granted);
   decide({...all(true), marketing: false, saleOfData: false}, 4);
   const withdrawn = await (await checkout()).json();
   assert.deepEqual(readConsent(withdrawn.checkoutUrl), {analytics: true, preferences: true, marketing: false, saleOfData: false});
@@ -318,7 +325,7 @@ test("an unsaved withdrawal from the page applies at checkout, and the page can 
   }
   assert.equal(state.consents.length, before);
   // A forged unprefixed cookie cannot stand in for the host only decision cookie.
-  jar.set("iqon_privacy", `v1.1111.9.${Math.floor(Date.now() / 1000)}`);
+  jar.set("iqon_privacy", `v2.1111.9.${Date.now()}.0`);
   await checkout();
   assert.equal(state.consents.at(-1), null);
 });
@@ -355,17 +362,39 @@ test("the consent read uses Storefront API 2025-10 or later even if an older ver
 });
 
 test("checkout after returning from Shopify uses the withdrawn decision, not the earlier grant", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); decide(all(true), 1);
+  const state = fixture(t); await add(fixtureProducts[0]); const first_ = decide(all(true), 1);
   const first = await (await checkout()).json();
   // Visitor returns from hosted checkout and withdraws on the storefront.
-  decide({...all(true), marketing: false}, 2);
+  const withdrawn = decide({...all(true), marketing: false}, 2);
   const second = await (await checkout()).json();
   assert.notEqual(second.checkoutUrl, first.checkoutUrl);
   assert.equal(readConsent(second.checkoutUrl).marketing, false);
-  assert.equal(second.privacyRevision, 2);
+  assert.equal(second.privacyVersion, withdrawn); assert.notEqual(second.privacyVersion, first_);
   // Concurrent handoffs each read the decision current at their own request.
   const [a, b] = await Promise.all([checkout(), checkout({privacy: {restrict: {analytics: false}}})]);
   assert.equal(readConsent((await a.json()).checkoutUrl).analytics, true);
   assert.equal(readConsent((await b.json()).checkoutUrl).analytics, false);
   assert.equal(state.consents.length, 4);
+});
+
+test("checkout refuses a link when the page shows a different decision than the one saved", async t => {
+  const state = fixture(t); await add(fixtureProducts[0]);
+  const shown = decide(all(true), 1);
+  decide(all(false), 2); // saved in another tab after this page last read it
+  const before = state.consents.length;
+  const response = await checkout({privacy: {version: shown}});
+  assert.equal(response.status, 409);
+  const body = await response.json();
+  assert.equal(body.privacyChanged, true); assert.ok(!("checkoutUrl" in body));
+  assert.equal(state.consents.length, before, "no contextual read happens for a stale page");
+  for (const version of [5, "x".repeat(65), null]) assert.equal((await checkout({privacy: {version}})).status, 400);
+});
+
+test("a withdrawal cookie outranks a grant that had not seen it at checkout", async t => {
+  const state = fixture(t); await add(fixtureProducts[0]);
+  const at = Date.now() - 1000;
+  jar.set(COOKIE, `v2.1111.3.${at}.${at - 500}`);
+  jar.set(`${COOKIE}_w_marketing`, `v1.${at - 100}`);
+  await checkout();
+  assert.deepEqual(state.consents.at(-1), {...all(true), marketing: false});
 });

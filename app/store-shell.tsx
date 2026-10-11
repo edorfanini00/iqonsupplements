@@ -104,9 +104,12 @@ export function StoreShell({children,catalog,privacy:initialPrivacy,privacyLinks
       for(let attempt=0;attempt<3;attempt++){
         const epoch=privacy.epoch();
         const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({privacy:privacy.checkoutContext()}),signal:AbortSignal.timeout(15000)});
-        const data=await response.json();if(data.cart)applySnapshot(data.cart);if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
-        if(data.privacyRevision!==privacy.revision())await privacy.refresh();
-        if(epoch===privacy.epoch()&&data.privacyRevision===privacy.revision()){window.location.assign(data.checkoutUrl);return;}
+        const data=await response.json();if(data.cart)applySnapshot(data.cart);
+        // The server refuses a link when its saved decision differs from the one shown here.
+        if(response.status===409&&data.privacyChanged){await privacy.refresh();continue;}
+        if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
+        if(epoch===privacy.epoch()&&data.privacyVersion===privacy.version()){window.location.assign(data.checkoutUrl);return;}
+        await privacy.refresh();
       }
       throw new Error("Your privacy choices changed. Please select checkout again.");
     }catch(e){setError(e instanceof Error?e.message:"Checkout is temporarily unavailable.");lock.current=false;setBusy(false);}

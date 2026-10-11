@@ -125,7 +125,8 @@ export async function mutateCartResponse(request:Request) {
   } catch(error) {return fail(error);}
 }
 // The visitor's saved choice is authoritative. The page may only add withdrawals that
-// have not reached the server yet, and either GPC signal removes advertising and sharing.
+// have not been saved yet, and either GPC signal removes advertising and sharing. When the
+// page names the decision version it is showing, a different saved version gets no link.
 async function checkoutPrivacy(request:Request) {
   if(Number(request.headers.get("content-length")||0)>1024) throw new CommerceError("Invalid request.",413);
   const text=await request.text();
@@ -134,14 +135,15 @@ async function checkoutPrivacy(request:Request) {
   try {input=text?JSON.parse(text):{};}catch {throw new CommerceError("Invalid request.",400);}
   if(!input||typeof input!=="object"||Array.isArray(input)||Object.keys(input).some(key=>key!=="privacy")) throw new CommerceError("Invalid request.",400);
   const privacy=(input as {privacy?:unknown}).privacy;
-  if(privacy!==undefined&&(!privacy||typeof privacy!=="object"||Array.isArray(privacy)||Object.keys(privacy).some(key=>key!=="restrict"&&key!=="gpc")))
+  if(privacy!==undefined&&(!privacy||typeof privacy!=="object"||Array.isArray(privacy)||Object.keys(privacy).some(key=>key!=="restrict"&&key!=="gpc"&&key!=="version")))
     throw new CommerceError("Invalid request.",400);
-  const {restrict,gpc}=(privacy||{}) as {restrict?:unknown;gpc?:unknown};
+  const {restrict,gpc,version}=(privacy||{}) as {restrict?:unknown;gpc?:unknown;version?:unknown};
   if(gpc!==undefined&&typeof gpc!=="boolean") throw new CommerceError("Invalid request.",400);
+  if(version!==undefined&&(typeof version!=="string"||version.length>64)) throw new CommerceError("Invalid request.",400);
   let restriction;
   try {restriction=validateRestriction(restrict);}catch(error){if(error instanceof PrivacyInputError)throw new CommerceError("Invalid request.",400);throw error;}
   const state=await readPrivacyState();
-  return {revision:state.revision,consent:visitorConsent(restrictChoices(state.choices,restriction),gpc===true||gpcHeader(request.headers))};
+  return {version:state.version,stale:version!==undefined&&version!==state.version,consent:visitorConsent(restrictChoices(state.choices,restriction),gpc===true||gpcHeader(request.headers))};
 }
 // visitorConsent on @inContext needs Storefront API 2025-10 or later.
 const consentVersion=(version:string)=>version<"2025-10"?"2025-10":version;
@@ -149,6 +151,7 @@ export async function checkoutResponse(request:Request) {
   try {
     sameOrigin(request);
     const privacy=await checkoutPrivacy(request);
+    if(privacy.stale) return Response.json({error:"Your privacy choices changed. Please try again.",privacyChanged:true},{status:409,headers:responseHeaders});
     const settings=config();
     if(!settings) throw new CommerceError("Orders are not open yet.",503);
     const id=await cartId();
@@ -163,6 +166,6 @@ export async function checkoutResponse(request:Request) {
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
     // Returned exactly as Shopify issued it: the signed _cs consent parameter must not be altered.
-    return Response.json({checkoutUrl:cart.checkoutUrl,privacyRevision:privacy.revision},{headers:responseHeaders});
+    return Response.json({checkoutUrl:cart.checkoutUrl,privacyVersion:privacy.version},{headers:responseHeaders});
   }catch(error){return fail(error);}
 }

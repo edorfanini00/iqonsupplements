@@ -3,23 +3,25 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import ts from "typescript";
 
-// Exercises the real consent model and privacy route handlers with an in memory cookie jar.
+// Exercises the real consent model and privacy route handlers. Each request runs with its
+// own copy of the browser's cookies taken when it was sent, and its Set-Cookie headers are
+// applied to the browser only when its response "arrives", so overlapping and delayed
+// requests behave as they do over a real network.
 const dataUrl = source => "data:text/javascript;base64," + Buffer.from(source).toString("base64");
 const compile = file => ts.transpile(fs.readFileSync(new URL(file, import.meta.url), "utf8"), {
   module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022,
 });
 const privacyUrl = dataUrl(compile("../lib/privacy.ts"));
 const bindingsUrl = dataUrl(`
-  export const jar = new Map();
-  export const cookieOptions = new Map();
-  export const requestHeaders = new Headers();
+  import {AsyncLocalStorage} from "node:async_hooks";
+  export const scope = new AsyncLocalStorage();
   export const cookies = async () => ({
-    get: key => jar.has(key) ? {value: jar.get(key)} : undefined,
-    set: (key, value, options) => {jar.set(key, value); cookieOptions.set(key, options);}
+    get: key => scope.getStore().sent.has(key) ? {value: scope.getStore().sent.get(key)} : undefined,
+    set: (key, value, options) => scope.getStore().received.set(key, {value, options}),
   });
-  export const headers = async () => requestHeaders;
+  export const headers = async () => scope.getStore().headers;
 `);
-const { jar, cookieOptions, requestHeaders } = await import(bindingsUrl);
+const { scope } = await import(bindingsUrl);
 const privacy = await import(privacyUrl);
 const routes = await import(dataUrl(compile("../lib/privacy.server.ts")
   .replace('"next/headers"', JSON.stringify(bindingsUrl)).replace('"./privacy"', JSON.stringify(privacyUrl))));
@@ -27,164 +29,208 @@ const routes = await import(dataUrl(compile("../lib/privacy.server.ts")
 const origin = "https://www.iqon.example";
 const COOKIE = "__Host-iqon_privacy";
 const all = value => ({analytics: value, marketing: value, preferences: value, saleOfData: value});
-function reset(host = "www.iqon.example") {
-  jar.clear(); cookieOptions.clear();
-  for (const key of [...requestHeaders.keys()]) requestHeaders.delete(key);
-  requestHeaders.set("host", host);
-}
-const post = (body, extra = {}) => new Request(`${origin}/api/privacy`, {
-  method: "POST", headers: {Origin: origin, "Content-Type": "application/json", ...extra}, body: typeof body === "string" ? body : JSON.stringify(body),
-});
-async function save(choices, expectedRevision, extra) {
-  const response = await routes.savePrivacyResponse(post({choices, expectedRevision}, extra));
-  return {status: response.status, body: await response.json()};
-}
-const current = async () => (await (await routes.getPrivacyResponse()).json()).privacy;
+const tick = () => new Promise(resolve => setTimeout(resolve, 3));
 
-test("unknown is never treated as granted, and malformed or expired cookies read as unknown", () => {
-  const now = Date.parse("2026-10-11T12:00:00Z"); const seconds = now / 1000;
-  for (const value of [undefined, "", "granted", "v1.1111", "v1.1111.1", "v1.11x1.1.1760000000", "v2.1111.1.1760000000", "v1.1111.1.0"]) {
-    const state = privacy.parsePrivacyCookie(value, now);
-    assert.deepEqual(state.choices, privacy.UNKNOWN_CHOICES);
-    assert.equal(privacy.advertisingAllowed(state.choices, false), false);
-    assert.equal(privacy.visitorConsent(state.choices, false), null);
-  }
-  assert.deepEqual(privacy.parsePrivacyCookie(`v1.1111.4.${seconds - privacy.PRIVACY_MAX_AGE - 1}`, now).choices, privacy.UNKNOWN_CHOICES);
-  assert.deepEqual(privacy.parsePrivacyCookie(`v1.1111.4.${seconds + 3600}`, now).choices, privacy.UNKNOWN_CHOICES);
-  const state = {choices: {analytics: true, marketing: false, preferences: null, saleOfData: true}, revision: 7, decidedAt: seconds - 10};
-  assert.deepEqual(privacy.parsePrivacyCookie(privacy.encodePrivacyCookie(state), now), state);
+// A browser cookie jar. send() snapshots the jar; arrive() applies that response's cookies.
+function browser(host = "www.iqon.example", extraHeaders = {}) {
+  const jar = new Map();
+  const run = async (handler, request) => {
+    const store = {sent: new Map(jar), received: new Map(), headers: new Headers({host, ...extraHeaders})};
+    const response = await scope.run(store, () => handler(request));
+    return {status: response.status, body: await response.json(), cookies: store.received, arrive() {for (const [key, {value}] of store.received) jar.set(key, value);}};
+  };
+  const post = body => new Request(`${origin}/api/privacy`, {method: "POST", headers: {Origin: origin, "Content-Type": "application/json", ...extraHeaders}, body: typeof body === "string" ? body : JSON.stringify(body)});
+  return {
+    jar,
+    send: body => run(routes.savePrivacyResponse, post(body)),
+    async save(body) {const result = await this.send(body); result.arrive(); await tick(); return result;},
+    async current() {return (await run(routes.getPrivacyResponse, new Request(`${origin}/api/privacy`))).body.privacy;},
+    raw: request => run(routes.savePrivacyResponse, request),
+  };
+}
+const grantAll = async b => b.save({choices: all(true), expectedVersion: (await b.current()).version});
+
+test("unknown is never treated as granted, and malformed or expired decisions read as unknown", () => {
+  const now = Date.parse("2026-10-11T12:00:00Z");
+  for (const value of [undefined, "", "granted", "v1.1111.1.1760000000", "v2.1111", "v2.11x1.1.1.1", "v2.1111.1.0.0", "v3.1111.1.5.5"])
+    assert.equal(privacy.parseDecision(value, now), null);
+  assert.equal(privacy.parseDecision(`v2.1111.4.${now - privacy.PRIVACY_MAX_AGE * 1000 - 1}.0`, now), null);
+  assert.equal(privacy.parseDecision(`v2.1111.4.${now + 3600_000}.0`, now), null);
+  assert.equal(privacy.parseDecision(`v2.1111.4.${now - 10}.${now}`, now), null, "basis cannot be later than the decision");
+  const unknown = privacy.combinePrivacy(null, {});
+  assert.deepEqual(unknown.choices, privacy.UNKNOWN_CHOICES);
+  assert.equal(privacy.visitorConsent(unknown.choices, false), null);
+  const decision = {choices: {analytics: true, marketing: false, preferences: null, saleOfData: true}, revision: 7, decidedAt: now - 10, basis: now - 20};
+  assert.deepEqual(privacy.parseDecision(privacy.encodeDecision(decision), now), decision);
+  assert.equal(privacy.parseWithdrawal("v1.0", now), null);
+  assert.equal(privacy.parseWithdrawal(`v1.${now - 5}`, now), now - 5);
+});
+
+test("a withdrawal outranks any grant whose saving request had not seen it", () => {
+  const grant = {choices: all(true), revision: 3, decidedAt: 2000, basis: 1000};
+  assert.deepEqual(privacy.combinePrivacy(grant, {marketing: 1500}).choices, {...all(true), marketing: false});
+  assert.deepEqual(privacy.combinePrivacy(grant, {marketing: 1000}).choices, all(true), "a grant made after seeing the withdrawal stands");
+  assert.deepEqual(privacy.combinePrivacy(null, {saleOfData: 5}).choices, {...privacy.UNKNOWN_CHOICES, saleOfData: false});
+  const state = privacy.combinePrivacy(grant, {marketing: 1500, analytics: 900});
+  assert.equal(state.horizon, 2000);
+  assert.equal(state.version, "3.2000.1500");
 });
 
 test("granted, denied, partial and GPC decisions map faithfully to Shopify VisitorConsent", () => {
   assert.deepEqual(privacy.visitorConsent(all(true), false), all(true));
-  assert.equal(privacy.advertisingAllowed(all(true), false), true);
   assert.deepEqual(privacy.visitorConsent(all(false), false), all(false));
-  assert.equal(privacy.advertisingAllowed(all(false), false), false);
   // Only expressed choices are sent; no preference is omitted rather than invented.
   assert.deepEqual(privacy.visitorConsent({analytics: true, marketing: null, preferences: null, saleOfData: false}, false), {analytics: true, saleOfData: false});
-  assert.equal(privacy.advertisingAllowed({...all(true), saleOfData: null}, false), false);
   // GPC is an expressed opt out of advertising and sale or sharing, and overrides a stored grant.
   assert.deepEqual(privacy.visitorConsent(all(true), true), {analytics: true, preferences: true, marketing: false, saleOfData: false});
   assert.deepEqual(privacy.visitorConsent(privacy.UNKNOWN_CHOICES, true), {marketing: false, saleOfData: false});
-  assert.equal(privacy.advertisingAllowed(all(true), true), false);
   assert.equal(privacy.gpcHeader(new Headers({"Sec-GPC": "1"})), true);
   assert.equal(privacy.gpcHeader(new Headers({"Sec-GPC": "0"})), false);
   assert.equal(privacy.gpcHeader(new Headers()), false);
 });
 
-test("restrictions can only withdraw and reject any attempt to grant", () => {
+test("restrictions and withdrawal lists can only withdraw", () => {
   assert.deepEqual(privacy.restrictChoices(all(true), {marketing: false}), {...all(true), marketing: false});
-  assert.deepEqual(privacy.restrictChoices(all(null), {marketing: false}), {...all(null), marketing: false});
   for (const value of [{marketing: true}, {marketing: null}, {marketing: "false"}, {ads: false}, [], "x", null])
     assert.throws(() => privacy.validateRestriction(value), privacy.PrivacyInputError);
   assert.deepEqual(privacy.validateRestriction(undefined), {});
+  for (const value of [[], ["ads"], ["marketing", "marketing"], "marketing", null, {marketing: false}, ["analytics", "marketing", "preferences", "saleOfData", "x"]])
+    assert.throws(() => privacy.validateWithdrawals(value), privacy.PrivacyInputError);
   for (const value of [undefined, null, [], {}, {...all(true), extra: true}, {...all(true), marketing: "true"}, {...all(true), marketing: 1}, {analytics: true}])
     assert.throws(() => privacy.validateChoices(value), privacy.PrivacyInputError);
-  assert.deepEqual(privacy.grantsAdded(all(false), {...all(false), marketing: true}), ["marketing"]);
-  assert.deepEqual(privacy.grantsAdded(all(true), all(false)), []);
 });
 
-test("privacy choices persist in a host only, httpOnly, secure cookie and survive a new request", async () => {
-  reset();
-  assert.deepEqual((await current()).choices, privacy.UNKNOWN_CHOICES);
-  const saved = await save(all(true), 0);
+test("choices persist in host only, httpOnly, secure cookies and survive a new request", async () => {
+  const b = browser();
+  assert.deepEqual((await b.current()).choices, privacy.UNKNOWN_CHOICES);
+  const saved = await grantAll(b);
   assert.equal(saved.status, 200);
-  assert.equal(saved.body.privacy.revision, 1); assert.equal(saved.body.privacy.advertisingAllowed, true);
-  const options = cookieOptions.get(COOKIE);
-  assert.equal(options.httpOnly, true); assert.equal(options.secure, true); assert.equal(options.path, "/");
-  assert.equal(options.sameSite, "lax"); assert.equal(options.domain, undefined);
-  assert.equal(options.maxAge, privacy.PRIVACY_MAX_AGE);
-  assert.ok(!jar.has("iqon_privacy"));
-  const reread = await current();
-  assert.deepEqual(reread.choices, all(true)); assert.equal(reread.revision, 1);
+  for (const [name, {options}] of saved.cookies) {
+    assert.ok(name.startsWith(COOKIE));
+    assert.equal(options.httpOnly, true); assert.equal(options.secure, true); assert.equal(options.path, "/");
+    assert.equal(options.sameSite, "lax"); assert.equal(options.domain, undefined); assert.equal(options.maxAge, privacy.PRIVACY_MAX_AGE);
+  }
+  assert.ok(!b.jar.has("iqon_privacy"));
+  assert.deepEqual((await b.current()).choices, all(true));
+  await b.save({withdraw: ["marketing"]});
+  assert.ok(b.jar.has(`${COOKIE}_w_marketing`));
+  assert.deepEqual((await b.current()).choices, {...all(true), marketing: false});
 });
 
-test("an unprefixed cookie planted on the production host is ignored", async () => {
-  reset();
-  jar.set("iqon_privacy", `v1.1111.9.${Math.floor(Date.now() / 1000)}`);
-  assert.deepEqual((await current()).choices, privacy.UNKNOWN_CHOICES);
-  reset("localhost:3000");
-  jar.set("iqon_privacy", `v1.1111.9.${Math.floor(Date.now() / 1000)}`);
-  assert.deepEqual((await current()).choices, all(true));
+test("unprefixed cookies planted on the production host are ignored", async () => {
+  const b = browser();
+  b.jar.set("iqon_privacy", `v2.1111.9.${Date.now()}.0`);
+  assert.deepEqual((await b.current()).choices, privacy.UNKNOWN_CHOICES);
+  const local = browser("localhost:3000");
+  local.jar.set("iqon_privacy", `v2.1111.9.${Date.now()}.0`);
+  assert.deepEqual((await local.current()).choices, all(true));
 });
 
-test("granted to withdrawn always applies, even from an outdated window", async () => {
-  reset();
-  await save(all(true), 0);
-  await save({...all(true), analytics: false}, 1);
-  // This window still shows analytics on. That stale grant is refused; the withdrawal applies.
-  const withdrawn = await save({...all(true), marketing: false, saleOfData: false}, 0);
-  assert.equal(withdrawn.status, 409);
-  assert.deepEqual(withdrawn.body.privacy.choices, {analytics: false, marketing: false, preferences: true, saleOfData: false});
-  assert.equal(withdrawn.body.privacy.advertisingAllowed, false);
-  assert.deepEqual((await current()).choices, withdrawn.body.privacy.choices);
-  const plain = await save(all(false), 0);
-  assert.equal(plain.status, 200);
-  assert.deepEqual((await current()).choices, all(false));
+// Review finding F3 / S1: two requests sent from the same cookies, answered in either order.
+for (const order of ["grant arrives last", "grant arrives first"]) {
+  test(`overlapping grant and withdrawal: ${order}, the withdrawal stands`, async () => {
+    const b = browser();
+    await b.save({choices: {...all(true), marketing: false, saleOfData: false}, expectedVersion: (await b.current()).version});
+    const version = (await b.current()).version;
+    await tick();
+    const [grant, withdraw] = await Promise.all([
+      b.send({choices: all(true), expectedVersion: version}),
+      (async () => {await tick(); return b.send({choices: all(false), expectedVersion: version});})(),
+    ]);
+    assert.equal(grant.status, 200); assert.equal(withdraw.status, 200);
+    if (order === "grant arrives first") {grant.arrive(); withdraw.arrive();} else {withdraw.arrive(); grant.arrive();}
+    const final = await b.current();
+    assert.equal(final.choices.marketing, false); assert.equal(final.choices.saleOfData, false);
+    assert.deepEqual(privacy.visitorConsent(final.choices, false), all(false));
+  });
+}
+
+test("a delayed request carrying pre withdrawal cookies cannot restore the grant (review repro)", async () => {
+  const b = browser();
+  await grantAll(b);
+  const captured = new Map(b.jar);
+  const capturedVersion = (await b.current()).version;
+  await tick();
+  await b.save({choices: all(false), expectedVersion: capturedVersion});
+  assert.deepEqual((await b.current()).choices, all(false));
+  // Replay the earlier legitimate request with its original cookies.
+  const replay = browser();
+  for (const [key, value] of captured) replay.jar.set(key, value);
+  const late = await replay.send({choices: all(true), expectedVersion: capturedVersion});
+  // The server cannot see cookies the request did not carry, so it answers. Its response,
+  // delivered to the browser after the withdrawal, must still not grant anything.
+  assert.equal(late.status, 200);
+  for (const [key, {value}] of late.cookies) b.jar.set(key, value);
+  assert.deepEqual((await b.current()).choices, all(false));
+  // A grant made later by a visitor who has seen the withdrawal does take effect.
+  await tick();
+  await grantAll(b);
+  assert.deepEqual((await b.current()).choices, all(true));
 });
 
-test("a stale window cannot promote a grant over a newer withdrawal", async () => {
-  reset();
-  await save(all(true), 0);                 // revision 1, both windows see it
-  await save(all(false), 1);                // window B withdraws: revision 2
-  const stale = await save(all(true), 1);   // window A still believes revision 1
+test("a stale window cannot promote a grant, but its withdrawals still apply", async () => {
+  const b = browser();
+  await grantAll(b);
+  const shown = (await b.current()).version;
+  await tick();
+  await b.save({withdraw: ["marketing", "saleOfData"]});
+  const stale = await b.save({choices: {...all(true), analytics: false}, expectedVersion: shown});
   assert.equal(stale.status, 409);
-  assert.deepEqual(stale.body.privacy.choices, all(false));
-  assert.deepEqual((await current()).choices, all(false));
-  const fresh = await save(all(true), 2);
+  assert.deepEqual((await b.current()).choices, {analytics: false, marketing: false, preferences: true, saleOfData: false});
+  const fresh = await b.save({choices: all(true), expectedVersion: (await b.current()).version});
   assert.equal(fresh.status, 200);
+  assert.deepEqual((await b.current()).choices, all(true));
 });
 
-test("GPC requests cannot save advertising or sharing grants", async () => {
-  reset();
-  const blocked = await save(all(true), 0, {"Sec-GPC": "1"});
+test("withdraw only requests apply to the current decision without a version", async () => {
+  const b = browser();
+  await grantAll(b);
+  assert.equal((await b.save({withdraw: ["analytics"]})).status, 200);
+  assert.deepEqual((await b.current()).choices, {...all(true), analytics: false});
+  assert.equal((await b.save({withdraw: ["analytics"]})).status, 200, "repeating a withdrawal is harmless");
+  assert.equal((await b.save({withdraw: ["analytics"], choices: all(true)})).status, 400);
+});
+
+test("GPC requests cannot save advertising or sharing grants, and GPC overrides stored grants", async () => {
+  const gpc = browser("www.iqon.example", {"Sec-GPC": "1"});
+  const blocked = await gpc.save({choices: all(true), expectedVersion: (await gpc.current()).version});
   assert.equal(blocked.status, 422);
-  assert.deepEqual((await current()).choices, privacy.UNKNOWN_CHOICES);
-  await save(all(true), 0);
-  const withdrawal = await save({...all(true), analytics: false, marketing: true}, 1, {"Sec-GPC": "1"});
-  assert.equal(withdrawal.status, 200);
-  reset();
-  await save({...all(true), marketing: false}, 0);
-  const mixed = await save({...all(true), analytics: false}, 1, {"Sec-GPC": "1"});
-  assert.equal(mixed.status, 422);
-  assert.deepEqual((await current()).choices, {...all(true), marketing: false, analytics: false});
-  reset();
-  const allowed = await save({...all(true), marketing: false, saleOfData: false}, 0, {"Sec-GPC": "1"});
-  assert.equal(allowed.status, 200);
-  assert.equal(allowed.body.privacy.gpc, true);
-  // A grant saved without GPC is overridden while the signal is present.
-  reset(); await save(all(true), 0);
-  requestHeaders.set("sec-gpc", "1");
-  const overridden = await current();
-  assert.deepEqual(overridden.choices, all(true));
-  assert.equal(overridden.effective.marketing, false); assert.equal(overridden.effective.saleOfData, false);
-  assert.equal(overridden.advertisingAllowed, false);
+  assert.deepEqual((await gpc.current()).choices, privacy.UNKNOWN_CHOICES);
+  assert.equal((await gpc.save({choices: {...all(true), marketing: false, saleOfData: false}, expectedVersion: (await gpc.current()).version})).status, 200);
+  const b = browser(); await grantAll(b);
+  const overridden = browser("www.iqon.example", {"Sec-GPC": "1"});
+  for (const [key, value] of b.jar) overridden.jar.set(key, value);
+  const snapshot = await overridden.current();
+  assert.deepEqual(snapshot.choices, all(true));
+  assert.equal(snapshot.effective.marketing, false); assert.equal(snapshot.effective.saleOfData, false); assert.equal(snapshot.gpc, true);
 });
 
 test("forged, cross origin and malformed saves are rejected without changing the decision", async () => {
-  reset();
-  await save(all(false), 0);
-  const before = jar.get(COOKIE);
+  const b = browser();
+  await b.save({choices: all(false), expectedVersion: (await b.current()).version});
+  const before = new Map(b.jar);
+  const version = (await b.current()).version;
+  const post = (body, headers = {}) => new Request(`${origin}/api/privacy`, {method: "POST", headers: {Origin: origin, "Content-Type": "application/json", ...headers}, body: typeof body === "string" ? body : JSON.stringify(body)});
   const cases = [
-    post({choices: all("true"), expectedRevision: 1}),
-    post({choices: {...all(true), extra: true}, expectedRevision: 1}),
-    post({choices: all(true), expectedRevision: "1"}),
-    post({choices: all(true), expectedRevision: 1.5}),
-    post({choices: all(true), expectedRevision: -1}),
+    post({choices: all("true"), expectedVersion: version}),
+    post({choices: {...all(true), extra: true}, expectedVersion: version}),
+    post({choices: all(true), expectedVersion: 1}),
+    post({choices: all(true), expectedVersion: "latest"}),
     post({choices: all(true)}),
-    post({choices: all(true), expectedRevision: 1, revision: 99}),
+    post({choices: all(true), expectedVersion: version, revision: 99}),
+    post({withdraw: ["ads"]}),
     post([all(true)]),
     post("not json"),
     post("x".repeat(2000)),
-    new Request(`${origin}/api/privacy`, {method: "POST", headers: {Origin: "https://evil.example", "Content-Type": "application/json"}, body: JSON.stringify({choices: all(true), expectedRevision: 1})}),
-    new Request(`${origin}/api/privacy`, {method: "POST", headers: {Origin: origin, "Content-Type": "text/plain"}, body: JSON.stringify({choices: all(true), expectedRevision: 1})}),
+    post({choices: all(true), expectedVersion: version}, {Origin: "https://evil.example"}),
+    post({choices: all(true), expectedVersion: version}, {"Content-Type": "text/plain"}),
   ];
   for (const request of cases) {
-    const response = await routes.savePrivacyResponse(request);
+    const response = await b.raw(request);
     assert.ok([400, 403, 413, 415].includes(response.status), `unexpected ${response.status}`);
-    assert.equal(response.headers.get("cache-control"), "private, no-store");
+    assert.equal(response.cookies.size, 0);
   }
-  assert.equal(jar.get(COOKIE), before);
+  assert.deepEqual(b.jar, before);
 });
 
 test("privacy links point at Shopify's published policy and opt out pages", () => {
