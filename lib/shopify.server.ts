@@ -127,8 +127,8 @@ export async function mutateCartResponse(request:Request) {
 // The ledger's saved decision is authoritative. Pending withdrawal cookies and the page
 // may only remove permissions, and either GPC signal removes advertising and sharing. When
 // the page names the decision version it is showing, a different saved version gets no
-// link. If the ledger cannot be read for a visitor who saved choices, advertising and sale
-// or sharing are declined for this handoff and checkout continues.
+// link. If the ledger cannot be read for a visitor who made a choice, every optional purpose
+// is declined for this handoff and checkout continues.
 async function checkoutPrivacy(request:Request) {
   if(Number(request.headers.get("content-length")||0)>1024) throw new CommerceError("Invalid request.",413);
   const text=await request.text();

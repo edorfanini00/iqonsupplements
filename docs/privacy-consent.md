@@ -54,11 +54,12 @@ The token is readable by page scripts because the page creates it. It only ident
 Unavailable means the database is down, the variable is unset, the migration was not applied, or the role lacks permission.
 
 - **Visitors who never saved a choice** have no identity cookie and need no database read. Their checkout is unchanged.
-- **Visitors with saved choices:**
+- **Visitors who made a choice** (they have the identity cookie, which is only created when the visitor saves in the panel):
   - The panel says their choices could not be loaded and keeps the last choices it had read, marked unavailable.
   - Saving fails visibly, and withdrawals stay pending and are retried.
-  - At checkout, advertising and sale or sharing are sent as declined, analytics and preferences as not expressed, plus any pending withdrawals and GPC.
+  - At checkout, **all four purposes** are sent as declined, so no saved decline can fall back to regional defaults.
   - Checkout continues. Nothing is ever reported as granted because of an outage.
+- **Identity without a stored row:** if a visitor's very first save never reached the ledger, the identity exists without a row, and an outage cannot tell the two cases apart. Such a visitor did make a choice in the panel, so they are treated the same way.
 
 ## Retention, migration and rollback
 

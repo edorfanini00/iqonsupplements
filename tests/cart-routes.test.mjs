@@ -409,16 +409,21 @@ test("pending withdrawal cookies restrict checkout even when the page sends noth
   assert.deepEqual(state.consents.at(-1), {...all(true), marketing: false});
 });
 
-test("ledger outage: saved visitors are handed off with advertising and sharing declined, nothing invented", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); const shown = decide(all(true));
+test("ledger outage: a visitor who made choices gets every optional purpose declined, never a grant or a default", async t => {
+  const state = fixture(t); await add(fixtureProducts[0]);
+  // Saved: advertising and sharing granted, analytics and preferences explicitly declined.
+  const shown = decide({analytics: false, marketing: true, preferences: false, saleOfData: true});
+  await checkout({privacy: {version: shown}});
+  assert.deepEqual(state.consents.at(-1), {analytics: false, marketing: true, preferences: false, saleOfData: true});
   ledger.down = true;
   const response = await checkout({privacy: {version: shown}});
   assert.equal(response.status, 200, "shopping continues during an outage");
-  assert.deepEqual(state.consents.at(-1), {marketing: false, saleOfData: false});
-  await checkout({privacy: {restrict: {analytics: false}}});
-  assert.deepEqual(state.consents.at(-1), {analytics: false, marketing: false, saleOfData: false});
-  // Visitors who never saved a choice do not depend on the ledger at all.
+  assert.deepEqual(state.consents.at(-1), all(false), "no saved decline falls back to regional defaults");
+  await checkout({}, {"Sec-GPC": "1"});
+  assert.deepEqual(state.consents.at(-1), all(false));
+  // A visitor who never made a choice has no identity, needs no ledger, and stays unexpressed.
   jar.delete(ID);
   await checkout();
   assert.equal(state.consents.at(-1), null);
+  ledger.down = false;
 });

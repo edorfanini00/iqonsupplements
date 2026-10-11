@@ -14,8 +14,10 @@ export type VisitorConsent=Partial<Record<PrivacyPurpose,boolean>>;
 export const UNKNOWN_CHOICES:PrivacyChoices=Object.freeze({analytics:null,marketing:null,preferences:null,saleOfData:null});
 // Global Privacy Control is an expressed opt out of sale, sharing and targeted advertising.
 export const GPC_PURPOSES:PrivacyPurpose[]=["marketing","saleOfData"];
-// Purposes withheld from checkout when a visitor's saved decision cannot be read.
-export const OUTAGE_DECLINED:PrivacyPurpose[]=["marketing","saleOfData"];
+// Purposes withheld from checkout when a visitor who made a choice cannot have it read:
+// all of them, so no declined purpose can fall back to regional defaults. Visitors who never
+// made a choice have no identity, are never in this state, and stay unexpressed.
+export const OUTAGE_DECLINED:PrivacyPurpose[]=[...PRIVACY_PURPOSES];
 
 // Cookies. Production names carry __Host- (Secure, Path=/, no Domain); localhost uses plain names.
 // The identity cookie holds a random token created by the visitor's own browser; the server

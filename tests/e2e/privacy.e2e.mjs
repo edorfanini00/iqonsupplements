@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -489,6 +489,35 @@ test("an unavailable ledger is shown honestly and never as a grant", async () =>
   const dialog = await openChoices(page);
   await dialog.getByText(/couldn’t load your saved privacy choices right now/).waitFor();
   assert.equal(await dialog.getByRole("switch", {name: "Advertising"}).getAttribute("aria-checked"), "false");
+  await ctx.close();
+});
+
+test("real ledger outage: saved declines are kept for all purposes, fresh visitors stay unexpressed", async () => {
+  // Takes the owned test cluster's table offline, as an unapplied migration or lost permission would.
+  const psql = sql => execSync(`${process.env.PRIVACY_TEST_PSQL} -q -c "${sql}"`, {stdio: "ignore"});
+  const {ctx, visits} = await context(); const page = await ctx.newPage();
+  await page.goto(base);
+  const dialog = await openChoices(page);
+  for (const name of ["Advertising", "Sale or sharing of data"]) await dialog.getByRole("switch", {name}).click();
+  await dialog.getByRole("button", {name: "Save choices"}).click();
+  await dialog.locator(".privacy-notice").filter({hasText: "Your privacy choices are saved."}).waitFor();
+  await page.keyboard.press("Escape");
+  assert.deepEqual((await savedChoices(page)).choices, {analytics: false, marketing: true, preferences: false, saleOfData: true});
+  await addToBag(page);
+  assert.deepEqual(consentOf(await checkout(page, visits)), {analytics: false, marketing: true, preferences: false, saleOfData: true});
+  psql("ALTER TABLE storefront_privacy_consents RENAME TO storefront_privacy_consents_offline");
+  try {
+    await page.goto(base);
+    const offline = await openChoices(page);
+    await offline.getByText(/couldn’t load your saved privacy choices right now/).waitFor();
+    assert.equal(await offline.getByText("Loading your privacy choices…").count(), 0, "the panel does not stay on loading");
+    await page.keyboard.press("Escape");
+    assert.deepEqual(consentOf(await checkout(page, visits)), all(false), "no saved decline falls back to regional defaults");
+    const fresh = await context(); const visitor = await fresh.ctx.newPage();
+    await addToBag(visitor);
+    assert.equal(consentOf(await checkout(visitor, fresh.visits)), null, "a visitor who never chose needs no ledger");
+    await fresh.ctx.close();
+  } finally {psql("ALTER TABLE storefront_privacy_consents_offline RENAME TO storefront_privacy_consents");}
   await ctx.close();
 });
 
