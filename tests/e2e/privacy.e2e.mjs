@@ -3,7 +3,9 @@
 // in process Shopify fixture (fake-shopify.mjs). Hosted checkout and the Shopify opt out
 // page are local stubs: these tests prove storefront behavior, not Shopify checkout behavior.
 //
-//   PLAYWRIGHT_CORE=/path/to/node_modules/playwright-core node --test tests/e2e/privacy.e2e.mjs
+// The privacy ledger runs on a fresh owned PostgreSQL cluster:
+//   PLAYWRIGHT_CORE=/path/to/node_modules/playwright-core scripts/privacy-test-db.sh \
+//     node --test --test-concurrency=1 tests/e2e/privacy.e2e.mjs
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -32,11 +34,13 @@ const all = value => ({analytics: value, marketing: value, preferences: value, s
 const consentOf = url => {const cs = new URL(url).searchParams.get("_cs"); return cs ? JSON.parse(Buffer.from(cs, "base64url")) : null;};
 const ADVERTISING = /facebook|fbcdn|doubleclick|google-analytics|googletagmanager|tiktok|analytics\.js|trekkie|monorail|meta\.com/i;
 
+const databaseUrl = process.env.PRIVACY_TEST_DATABASE_URL;
+if (!databaseUrl || new URL(databaseUrl).hostname !== "127.0.0.1") throw new Error("Run through scripts/privacy-test-db.sh: PRIVACY_TEST_DATABASE_URL must be a loopback test database.");
 try {await fetch(`${base}/`); throw new Error(`port ${port} is already in use; stop the other server first`);} catch (error) {if (error.message.includes("already in use")) throw error;}
 const out = fs.openSync(serverLog, "a");
 const server = spawn(path.join(root, "node_modules/.bin/next"), ["start", "-p", String(port)], {cwd: root, stdio: ["ignore", out, out], env: {
   ...process.env, NODE_ENV: "production", SHOPIFY_STORE_DOMAIN: domain, SHOPIFY_STOREFRONT_PRIVATE_TOKEN: "e2e-fixture-token", SHOPIFY_API_VERSION: "2026-07",
-  FAKE_SHOPIFY_LEDGER: ledgerFile, FAKE_SHOPIFY_CONTROL: controlFile, NODE_OPTIONS: `--import ${pathToFileURL(path.join(root, "tests/e2e/fake-shopify.mjs")).href}`,
+  SUPPLEMENTS_DATABASE_URL: databaseUrl, FAKE_SHOPIFY_LEDGER: ledgerFile, FAKE_SHOPIFY_CONTROL: controlFile, NODE_OPTIONS: `--import ${pathToFileURL(path.join(root, "tests/e2e/fake-shopify.mjs")).href}`,
 }});
 process.on("exit", () => server.kill("SIGTERM"));
 for (let i = 0; ; i++) {
@@ -144,9 +148,10 @@ test("unknown sends no preference; granted persists across refresh and reaches c
   for (const name of ["Preferences", "Analytics", "Advertising", "Sale or sharing of data"]) assert.equal(await dialog.getByRole("switch", {name}).getAttribute("aria-checked"), "true");
   await page.screenshot({path: path.join(shots, "phone-privacy-granted.png")});
   await page.keyboard.press("Escape");
-  const cookie = (await ctx.cookies()).find(c => c.name === "iqon_privacy");
-  assert.ok(cookie.httpOnly); assert.equal(cookie.sameSite, "Lax");
-  assert.equal(await page.evaluate(() => document.cookie.includes("iqon_privacy")), false);
+  // The browser holds only a random identity token; the decision itself lives in the ledger.
+  const privacyCookies = (await ctx.cookies()).filter(c => c.name.startsWith("iqon_privacy"));
+  assert.deepEqual(privacyCookies.map(c => c.name), ["iqon_privacy_id"]);
+  assert.match(privacyCookies[0].value, /^[A-Za-z0-9_-]{43}$/); assert.equal(privacyCookies[0].sameSite, "Lax");
   const granted = await checkout(page, visits);
   assert.deepEqual(consentOf(granted), all(true));
   await ctx.close();
@@ -189,9 +194,10 @@ test("GPC from the browser or the header overrides a stored grant and locks the 
     await page.keyboard.press("Escape");
     const saved = await savedChoices(page);
     assert.equal(saved.choices.marketing, false); assert.equal(saved.choices.saleOfData, false);
-    // A grant stored before GPC was switched on is still overridden at checkout.
-    const now = Date.now();
-    await ctx.addCookies([{name: "iqon_privacy", value: `v2.1111.99.${now}.${now}`, url: base, httpOnly: true, sameSite: "Lax"}]);
+    // A grant saved from a browser without GPC is still overridden while GPC is on.
+    const id = (await ctx.cookies()).find(c => c.name === "iqon_privacy_id");
+    const plain = await context(); await plain.ctx.addCookies([{name: id.name, value: id.value, url: base, sameSite: "Lax"}]);
+    const plainPage = await plain.ctx.newPage(); await plainPage.goto(base); await choose(plainPage, "Allow all"); await plain.ctx.close();
     assert.deepEqual((await savedChoices(page)).choices, all(true));
     await addToBag(page);
     const url = await checkout(page, visits);
@@ -252,7 +258,7 @@ test("a withdrawal that cannot be saved still applies at checkout and is saved a
   await page.goBack(); await page.waitForURL(`${base}/**`);
   await page.unroute(`${base}/api/privacy`);
   await page.reload();
-  await page.waitForFunction(() => !Object.keys(localStorage).some(key => key.startsWith("iqon-privacy-pending:")));
+  await page.waitForFunction(() => !document.cookie.includes("iqon_privacy_pending_"));
   assert.deepEqual((await savedChoices(page)).choices, all(false));
   await ctx.close();
 });
@@ -297,14 +303,14 @@ test("leaving for Shopify's opt out page and returning does not pretend to sync"
 });
 
 // Regressions from the independent reviews of e47245b (functional F1 to F3, security S1 to S3).
-const pendingKeys = page => page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith("iqon-privacy-pending:")).sort());
+const pendingKeys = page => page.evaluate(() => document.cookie.split("; ").map(part => part.split("=")[0]).filter(name => name.startsWith("iqon_privacy_pending_")).sort());
 test("review F1/S2: a failed withdrawal in one tab restricts checkout in an already open tab", async () => {
   const {ctx, visits} = await context(); const a = await ctx.newPage();
   await a.goto(base); await choose(a, "Allow all");
   const b = await ctx.newPage(); await addToBag(b);
   await a.route(`${base}/api/privacy`, route => route.request().method() === "POST" ? route.abort("internetdisconnected") : route.continue());
   assert.match(await choose(a, "Decline all"), /couldn’t save/);
-  assert.deepEqual(await pendingKeys(b), ["iqon-privacy-pending:analytics", "iqon-privacy-pending:marketing", "iqon-privacy-pending:preferences", "iqon-privacy-pending:saleOfData"]);
+  assert.deepEqual(await pendingKeys(b), ["iqon_privacy_pending_analytics", "iqon_privacy_pending_marketing", "iqon_privacy_pending_preferences", "iqon_privacy_pending_saleOfData"]);
   assert.deepEqual((await savedChoices(b)).choices, all(true), "the server still holds the grant");
   const url = await checkout(b, visits);
   assert.deepEqual(consentOf(url), all(false), "the other tab must not hand off the old grant");
@@ -354,9 +360,11 @@ test("review S3: a stale form that never saw the change cannot restore a withdra
   const {ctx} = await context(); const a = await ctx.newPage();
   await a.goto(base); await choose(a, "Allow all");
   const b = await ctx.newPage(); await b.goto(base);
-  // Tab B misses every refresh, so its open form keeps the old switches and version.
-  await b.route(`${base}/api/privacy`, route => route.request().method() === "GET" ? route.abort("internetdisconnected") : route.continue());
+  // Tab B has shown the grant; from now on it misses every refresh, so its open form keeps
+  // the old switches and version.
   const stale = await openChoices(b);
+  assert.equal(await stale.getByRole("switch", {name: "Advertising"}).getAttribute("aria-checked"), "true");
+  await b.route(`${base}/api/privacy`, route => route.request().method() === "GET" ? route.abort("internetdisconnected") : route.continue());
   await choose(a, "Decline all");
   assert.equal(await stale.getByRole("switch", {name: "Advertising"}).getAttribute("aria-checked"), "true");
   const posted = b.waitForRequest(r => r.url() === `${base}/api/privacy` && r.method() === "POST");
@@ -368,27 +376,119 @@ test("review S3: a stale form that never saw the change cannot restore a withdra
   await ctx.close();
 });
 
-test("review F3/S1: a late response to an earlier grant cannot restore consent after withdrawal", async () => {
+test("review F3/S1: replaying an earlier grant request after a withdrawal is refused by the ledger", async () => {
   const {ctx, visits} = await context(); const page = await ctx.newPage();
+  const responses = [];
+  page.on("response", response => {if (response.url() === `${base}/api/privacy`) responses.push(response);});
   await page.goto(base); await choose(page, "Allow all");
   const shown = await savedChoices(page);
   const captured = (await ctx.cookies()).filter(c => c.name.startsWith("iqon_privacy")).map(c => `${c.name}=${c.value}`).join("; ");
   await choose(page, "Decline all");
   assert.deepEqual((await savedChoices(page)).choices, all(false));
-  // The earlier grant request, carrying its original cookies, is answered now...
   const late = await fetch(`${base}/api/privacy`, {method: "POST", headers: {Origin: base, "Content-Type": "application/json", Cookie: captured}, body: JSON.stringify({choices: all(true), expectedVersion: shown.version})});
-  assert.equal(late.status, 200, "the server cannot see cookies the request did not carry");
-  // ...and its Set-Cookie reaches the browser last, as a delayed response would.
-  const issued = late.headers.getSetCookie().map(line => line.split(";")[0].split("="));
-  assert.ok(issued.length >= 1);
-  await ctx.addCookies(issued.map(([name, value]) => ({name, value, url: base, httpOnly: true, sameSite: "Lax"})));
+  assert.equal(late.status, 409);
+  assert.equal(late.headers.getSetCookie().length, 0);
+  assert.ok(responses.length > 0 && (await Promise.all(responses.map(r => r.headerValue("set-cookie")))).every(value => value === null), "privacy responses never set cookies");
   await page.reload();
   assert.deepEqual((await savedChoices(page)).choices, all(false));
-  const dialog = await openChoices(page);
-  assert.equal(await dialog.getByRole("switch", {name: "Advertising"}).getAttribute("aria-checked"), "false");
-  await page.keyboard.press("Escape");
   await addToBag(page);
   assert.deepEqual(consentOf(await checkout(page, visits)), all(false));
+  await ctx.close();
+});
+
+// Holds authentic server responses: each request reaches the real server at once, and its
+// unmodified response is delivered later. Adapted from the round 1 functional review.
+async function holdPost(page) {
+  let release, readyResolve;
+  const gate = new Promise(resolve => {release = resolve;}), ready = new Promise(resolve => {readyResolve = resolve;});
+  await page.route(`${base}/api/privacy`, async route => {
+    const request = route.request();
+    if (request.method() !== "POST") return route.continue();
+    const upstream = await fetch(request.url(), {method: "POST", headers: await request.allHeaders(), body: request.postData()});
+    const body = await upstream.text(); const headers = Object.fromEntries(upstream.headers.entries());
+    for (const name of ["content-length", "content-encoding", "transfer-encoding", "connection"]) delete headers[name];
+    readyResolve(); await gate;
+    await route.fulfill({status: upstream.status, headers, body});
+  });
+  return {ready, release};
+}
+test("review R1-A (functional F3a): real UI saves with reordered responses cannot restore a newer withdrawal", async () => {
+  const {ctx, visits} = await context(); let oldHold, grantHold;
+  try {
+    const main = await ctx.newPage(); await main.goto(base); await choose(main, "Allow all");
+    const oldTab = await ctx.newPage(); await oldTab.goto(base);
+    const grantTab = await ctx.newPage(); await grantTab.goto(base);
+    oldHold = await holdPost(oldTab);
+    const oldPanel = await openChoices(oldTab);
+    await oldPanel.getByRole("button", {name: "Decline all"}).click(); await oldHold.ready;
+    await choose(main, "Decline all"); assert.deepEqual((await savedChoices(main)).choices, all(false));
+    await choose(main, "Allow all"); assert.deepEqual((await savedChoices(main)).choices, all(true));
+    await grantTab.reload(); grantHold = await holdPost(grantTab);
+    const grantPanel = await openChoices(grantTab);
+    await grantPanel.getByRole("button", {name: "Allow all"}).click(); await grantHold.ready;
+    await choose(main, "Decline all"); assert.deepEqual((await savedChoices(main)).choices, all(false));
+    oldHold.release(); await oldPanel.locator(".privacy-notice").filter({hasText: /saved|changed/}).waitFor();
+    assert.deepEqual((await savedChoices(main)).choices, all(false));
+    grantHold.release(); await grantPanel.locator(".privacy-notice").filter({hasText: /saved|changed/}).waitFor();
+    // The tab whose grant was overtaken shows the newer decision and says so.
+    await grantPanel.getByText("Your privacy choices were changed in another window. Review them before saving.").waitFor();
+    assert.equal(await grantPanel.getByRole("switch", {name: "Advertising"}).getAttribute("aria-checked"), "false");
+    await main.reload();
+    assert.deepEqual((await savedChoices(main)).choices, all(false), "the latest Decline all survives");
+    await addToBag(main);
+    assert.deepEqual(consentOf(await checkout(main, visits)), all(false));
+  } finally {oldHold?.release(); grantHold?.release(); await ctx.close();}
+});
+
+test("review R1-C: actual storage quota plus a failed save still restricts another tab's checkout", async () => {
+  const {ctx, visits} = await context(); const a = await ctx.newPage(); await a.goto(base); await choose(a, "Allow all");
+  const b = await ctx.newPage(); await addToBag(b);
+  const quota = await a.evaluate(() => {
+    let size = 1024 * 1024, i = 0;
+    while (size > 0) {try {localStorage.setItem(`quota-${i++}`, "x".repeat(size));} catch (error) {if (error.name !== "QuotaExceededError") throw error; size = Math.floor(size / 2);}}
+    try {localStorage.setItem("probe", "x"); return false;} catch (error) {return error.name === "QuotaExceededError";}
+  });
+  assert.equal(quota, true, "Chromium's own storage quota is exhausted");
+  await a.route(`${base}/api/privacy`, route => route.request().method() === "POST" ? route.abort("internetdisconnected") : route.continue());
+  assert.match(await choose(a, "Decline all"), /couldn’t save.*stays off in this browser/);
+  assert.deepEqual((await savedChoices(b)).choices, all(true), "the ledger still holds the grant");
+  assert.deepEqual(consentOf(await checkout(b, visits)), all(false));
+  await a.evaluate(() => localStorage.clear());
+  await ctx.close();
+});
+
+test("identity bootstrap: two first tabs with held responses keep one identity and the withdrawal", async () => {
+  const {ctx, visits} = await context();
+  const a = await ctx.newPage(); await a.goto(base);
+  const b = await ctx.newPage(); await b.goto(base);
+  assert.equal((await ctx.cookies()).some(c => c.name === "iqon_privacy_id"), false);
+  const holdA = await holdPost(a); const holdB = await holdPost(b);
+  const panelA = await openChoices(a); const panelB = await openChoices(b);
+  await panelA.getByRole("button", {name: "Decline all"}).click();
+  await panelB.getByRole("button", {name: "Allow all"}).click();
+  await Promise.all([holdA.ready, holdB.ready]);
+  const identity = (await ctx.cookies()).filter(c => c.name === "iqon_privacy_id");
+  assert.equal(identity.length, 1);
+  holdB.release(); holdA.release();
+  await panelA.locator(".privacy-notice").filter({hasText: /saved|changed/}).waitFor();
+  await panelB.locator(".privacy-notice").filter({hasText: /saved|changed/}).waitFor();
+  assert.deepEqual((await ctx.cookies()).filter(c => c.name === "iqon_privacy_id").map(c => c.value), [identity[0].value], "no response replaced the identity");
+  assert.deepEqual((await savedChoices(a)).choices, all(false));
+  await a.keyboard.press("Escape"); await addToBag(a);
+  assert.deepEqual(consentOf(await checkout(a, visits)), all(false));
+  await ctx.close();
+});
+
+test("an unavailable ledger is shown honestly and never as a grant", async () => {
+  const {ctx} = await context(); const page = await ctx.newPage();
+  await page.goto(base); await choose(page, "Allow all");
+  await page.route(`${base}/api/privacy`, route => route.request().method() === "GET"
+    ? route.fulfill({status: 503, contentType: "application/json", body: JSON.stringify({error: "down", privacy: {choices: all(null), effective: all(null), gpc: false, version: "000000000000.0", status: "unavailable"}})})
+    : route.continue());
+  await page.reload();
+  const dialog = await openChoices(page);
+  await dialog.getByText(/couldn’t load your saved privacy choices right now/).waitFor();
+  assert.equal(await dialog.getByRole("switch", {name: "Advertising"}).getAttribute("aria-checked"), "false");
   await ctx.close();
 });
 

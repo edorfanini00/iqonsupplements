@@ -5,7 +5,7 @@ import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
 import { CATALOG_QUERY, CART_QUERY, CART_CHECKOUT, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { readPrivacyState } from "./privacy.server";
-import { PrivacyInputError, gpcHeader, restrictChoices, validateRestriction, visitorConsent } from "./privacy";
+import { OUTAGE_DECLINED, PrivacyInputError, gpcHeader, restrictChoices, validateRestriction, visitorConsent } from "./privacy";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
@@ -124,9 +124,11 @@ export async function mutateCartResponse(request:Request) {
     return Response.json(snapshot,{headers:responseHeaders});
   } catch(error) {return fail(error);}
 }
-// The visitor's saved choice is authoritative. The page may only add withdrawals that
-// have not been saved yet, and either GPC signal removes advertising and sharing. When the
-// page names the decision version it is showing, a different saved version gets no link.
+// The ledger's saved decision is authoritative. Pending withdrawal cookies and the page
+// may only remove permissions, and either GPC signal removes advertising and sharing. When
+// the page names the decision version it is showing, a different saved version gets no
+// link. If the ledger cannot be read for a visitor who saved choices, advertising and sale
+// or sharing are declined for this handoff and checkout continues.
 async function checkoutPrivacy(request:Request) {
   if(Number(request.headers.get("content-length")||0)>1024) throw new CommerceError("Invalid request.",413);
   const text=await request.text();
@@ -143,7 +145,10 @@ async function checkoutPrivacy(request:Request) {
   let restriction;
   try {restriction=validateRestriction(restrict);}catch(error){if(error instanceof PrivacyInputError)throw new CommerceError("Invalid request.",400);throw error;}
   const state=await readPrivacyState();
-  return {version:state.version,stale:version!==undefined&&version!==state.version,consent:visitorConsent(restrictChoices(state.choices,restriction),gpc===true||gpcHeader(request.headers))};
+  const restricted=restrictChoices(restrictChoices(state.choices,state.pending),restriction);
+  if(state.status==="unavailable") return {version:state.version,stale:false,
+    consent:visitorConsent(restrictChoices(restricted,Object.fromEntries(OUTAGE_DECLINED.map(p=>[p,false]))),gpc===true||gpcHeader(request.headers))};
+  return {version:state.version,stale:version!==undefined&&version!==state.version,consent:visitorConsent(restricted,gpc===true||gpcHeader(request.headers))};
 }
 // visitorConsent on @inContext needs Storefront API 2025-10 or later.
 const consentVersion=(version:string)=>version<"2025-10"?"2025-10":version;

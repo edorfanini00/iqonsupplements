@@ -23,10 +23,20 @@ const { jar, cookieOptions, requestHeaders } = await import(bindingsUrl);
 const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
 const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)));
 const privacyUrl = dataUrl(compile("../lib/privacy.ts"));
+// Checkout only reads the ledger. Its ordering is proven against PostgreSQL in
+// tests/privacy-ledger.test.mjs; here a plain read stub holds the saved decision.
+const ledgerUrl = dataUrl(`
+  export const saved = {records: new Map(), down: false};
+  export const privacyLedger = {
+    read: async key => {if (saved.down) throw new Error("connection refused"); return saved.records.get(key) ?? null;},
+    save: async () => {throw new Error("checkout never saves");},
+  };
+`);
+const { saved: ledger } = await import(ledgerUrl);
 const imports = {
   "./commerce-policy": policyUrl,
   "./privacy": privacyUrl,
-  "./privacy.server": dataUrl(compile("../lib/privacy.server.ts").replace('"next/headers"', JSON.stringify(bindingsUrl)).replace('"./privacy"', JSON.stringify(privacyUrl))),
+  "./privacy.server": dataUrl(compile("../lib/privacy.server.ts").replace('"next/headers"', JSON.stringify(bindingsUrl)).replace('"./privacy-ledger"', JSON.stringify(ledgerUrl)).replace('"./privacy"', JSON.stringify(privacyUrl))),
   react: dataUrl("export const cache = fn => fn;"),
   "next/headers": bindingsUrl,
   "./catalog": dataUrl("export const products = [];"),
@@ -51,7 +61,7 @@ const fixtureProducts = [
 const plans = [{id:"gid://shopify/SellingPlan/10",name:"Deliver every month",price:26.10}, {id:"gid://shopify/SellingPlan/20",name:"Deliver every 2 months",price:27.55}];
 const planAllocation = plan => ({sellingPlan:{id:plan.id,name:plan.name,recurringDeliveries:true,options:[{name:"Delivery",value:plan.name}],priceAdjustments:[{orderCount:null}]},priceAdjustments:[{price:money(plan.price),compareAtPrice:money(29),perDeliveryPrice:money(plan.price)}]});
 function fixture(t) {
-  jar.clear(); cookieOptions.clear(); requestHeaders.delete("sec-gpc");
+  jar.clear(); cookieOptions.clear(); requestHeaders.delete("sec-gpc"); ledger.records.clear(); ledger.down = false;
   const previous = {...process.env};
   process.env.SHOPIFY_STORE_DOMAIN = "iqon-test.myshopify.com";
   process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN = "test-only-token";
@@ -126,14 +136,14 @@ function fixture(t) {
 }
 const consentUrl = (base, consent) => consent ? `${base}?_cs=${Buffer.from(JSON.stringify(consent)).toString("base64url")}.sig%2Fx` : base;
 const readConsent = url => {const value = new URL(url).searchParams.get("_cs"); return value ? JSON.parse(Buffer.from(value.split(".")[0], "base64url")) : null;};
-const COOKIE = "__Host-iqon_privacy";
-// Writes a saved decision the way the privacy route does; returns its version string.
-let clock = Date.now() - 60_000;
+const ID = "__Host-iqon_privacy_id";
+const TOKEN = "t".repeat(43);
+const KEY = (await import("node:crypto")).createHash("sha256").update(TOKEN).digest("hex");
+// Records a saved decision in the ledger for this browser's identity; returns its version.
 const decide = (choices, revision = 1) => {
-  const at = ++clock;
-  jar.set(COOKIE, `v2.${["analytics", "marketing", "preferences", "saleOfData"].map(p => choices[p] === true ? "1" : choices[p] === false ? "0" : "n").join("")}.${revision}.${at}.${at - 1}`);
-  for (const p of ["analytics", "marketing", "preferences", "saleOfData"]) choices[p] === false ? jar.set(`${COOKIE}_w_${p}`, `v1.${at}`) : jar.delete(`${COOKIE}_w_${p}`);
-  return `${revision}.${at}.${["analytics", "marketing", "preferences", "saleOfData"].some(p => choices[p] === false) ? at : 0}`;
+  jar.set(ID, TOKEN);
+  ledger.records.set(KEY, {choices: {...choices}, revision});
+  return `${KEY.slice(0, 12)}.${revision}`;
 };
 const all = value => ({analytics: value, marketing: value, preferences: value, saleOfData: value});
 const checkout = (body = {}, extra = {}) => routes.checkoutResponse(new Request(`${origin}/api/checkout`, {
@@ -275,7 +285,7 @@ test("checkout sends the visitor's saved decision with a fresh contextual read: 
   let data = await response.json();
   // No choice: nothing is invented, so Shopify receives no expressed preference.
   assert.equal(state.consents.at(-1), null); assert.equal(readConsent(data.checkoutUrl), null);
-  assert.equal(data.privacyVersion, "0.0.0");
+  assert.equal(data.privacyVersion, "none.0");
   const granted = decide(all(true), 3);
   data = await (await checkout()).json();
   assert.deepEqual(state.consents.at(-1), all(true)); assert.deepEqual(readConsent(data.checkoutUrl), all(true));
@@ -325,7 +335,8 @@ test("an unsaved withdrawal from the page applies at checkout, and the page can 
   }
   assert.equal(state.consents.length, before);
   // A forged unprefixed cookie cannot stand in for the host only decision cookie.
-  jar.set("iqon_privacy", `v2.1111.9.${Date.now()}.0`);
+  // A plain identity cookie planted for the production host is not the __Host- cookie.
+  jar.delete(ID); jar.set("iqon_privacy_id", TOKEN);
   await checkout();
   assert.equal(state.consents.at(-1), null);
 });
@@ -390,11 +401,24 @@ test("checkout refuses a link when the page shows a different decision than the 
   for (const version of [5, "x".repeat(65), null]) assert.equal((await checkout({privacy: {version}})).status, 400);
 });
 
-test("a withdrawal cookie outranks a grant that had not seen it at checkout", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]);
-  const at = Date.now() - 1000;
-  jar.set(COOKIE, `v2.1111.3.${at}.${at - 500}`);
-  jar.set(`${COOKIE}_w_marketing`, `v1.${at - 100}`);
+test("pending withdrawal cookies restrict checkout even when the page sends nothing", async t => {
+  const state = fixture(t); await add(fixtureProducts[0]); decide(all(true));
+  jar.set("__Host-iqon_privacy_pending_marketing", "1791757000000-peer");
+  jar.set("__Host-iqon_privacy_pending_saleOfData", "not a token"); // malformed values are ignored
   await checkout();
   assert.deepEqual(state.consents.at(-1), {...all(true), marketing: false});
+});
+
+test("ledger outage: saved visitors are handed off with advertising and sharing declined, nothing invented", async t => {
+  const state = fixture(t); await add(fixtureProducts[0]); const shown = decide(all(true));
+  ledger.down = true;
+  const response = await checkout({privacy: {version: shown}});
+  assert.equal(response.status, 200, "shopping continues during an outage");
+  assert.deepEqual(state.consents.at(-1), {marketing: false, saleOfData: false});
+  await checkout({privacy: {restrict: {analytics: false}}});
+  assert.deepEqual(state.consents.at(-1), {analytics: false, marketing: false, saleOfData: false});
+  // Visitors who never saved a choice do not depend on the ledger at all.
+  jar.delete(ID);
+  await checkout();
+  assert.equal(state.consents.at(-1), null);
 });

@@ -5,62 +5,37 @@ export const PRIVACY_PURPOSES=["analytics","marketing","preferences","saleOfData
 export type PrivacyPurpose=typeof PRIVACY_PURPOSES[number];
 export type PrivacyChoices=Record<PrivacyPurpose,boolean|null>;
 export type PrivacyRestriction=Partial<Record<PrivacyPurpose,false>>;
-// One saved decision: choices, a counter, when it was saved, and the newest decision time
-// the saving request had seen (its basis). All times are server milliseconds.
-export type SavedDecision={choices:PrivacyChoices;revision:number;decidedAt:number;basis:number};
-export type Withdrawals=Partial<Record<PrivacyPurpose,number>>;
-// The visitor's current decision after withdrawals are applied. `horizon` is the newest
-// time this request knows about; `version` identifies the decision for freshness checks.
-export type PrivacyState={choices:PrivacyChoices;revision:number;horizon:number;version:string};
-export type PrivacySnapshot={choices:PrivacyChoices;effective:PrivacyChoices;gpc:boolean;version:string};
+// "ready": choices come from the ledger (or the visitor never saved any).
+// "loading": the page has not read the ledger yet. "unavailable": the ledger could not be read.
+export type PrivacyStatus="ready"|"loading"|"unavailable";
+export type PrivacySnapshot={choices:PrivacyChoices;effective:PrivacyChoices;gpc:boolean;version:string;status:PrivacyStatus};
 export type VisitorConsent=Partial<Record<PrivacyPurpose,boolean>>;
 
-export const PRIVACY_COOKIE="iqon_privacy";
-// __Host- cookies cannot be set by sibling subdomains or scoped to another path.
-export const SECURE_PRIVACY_COOKIE="__Host-iqon_privacy";
-export const withdrawalCookie=(base:string, purpose:PrivacyPurpose)=>`${base}_w_${purpose}`;
-export const PRIVACY_MAX_AGE=60*60*24*365;
-export const MAX_REVISION=999_999_999;
 export const UNKNOWN_CHOICES:PrivacyChoices=Object.freeze({analytics:null,marketing:null,preferences:null,saleOfData:null});
 // Global Privacy Control is an expressed opt out of sale, sharing and targeted advertising.
-const GPC_PURPOSES:PrivacyPurpose[]=["marketing","saleOfData"];
-const SKEW=5*60*1000;
+export const GPC_PURPOSES:PrivacyPurpose[]=["marketing","saleOfData"];
+// Purposes withheld from checkout when a visitor's saved decision cannot be read.
+export const OUTAGE_DECLINED:PrivacyPurpose[]=["marketing","saleOfData"];
+
+// Cookies. Production names carry __Host- (Secure, Path=/, no Domain); localhost uses plain names.
+// The identity cookie holds a random token created by the visitor's own browser; the server
+// stores only its SHA-256 and never sets this cookie, so no response can replace it.
+export const IDENTITY_COOKIE="iqon_privacy_id";
+// Withdrawals not yet confirmed by the ledger, one cookie per purpose, written by the page.
+export const PENDING_COOKIE_PREFIX="iqon_privacy_pending_";
+export const IDENTITY_MAX_AGE=60*60*24*400;
+export const cookieName=(name:string, secure:boolean)=>secure?`__Host-${name}`:name;
+export const validIdentity=(value:string|undefined):value is string=>/^[A-Za-z0-9_-]{43}$/.test(value||"");
+export const validPendingToken=(value:string|undefined):value is string=>/^\d{1,15}-[a-z0-9]{1,16}$/.test(value||"");
 
 export class PrivacyInputError extends Error {}
 
-const code=(value:boolean|null)=>value===true?"1":value===false?"0":"n";
-const decode=(value:string)=>value==="1"?true:value==="0"?false:null;
-
-export function encodeDecision(decision:SavedDecision):string {
-  return `v2.${PRIVACY_PURPOSES.map(p=>code(decision.choices[p])).join("")}.${decision.revision}.${decision.decidedAt}.${decision.basis}`;
-}
-// Unreadable, future dated or expired decisions are ignored, so they never yield a grant.
-export function parseDecision(value:string|undefined, now=Date.now()):SavedDecision|null {
-  const match=/^v2\.([10n]{4})\.(\d{1,9})\.(\d{1,15})\.(\d{1,15})$/.exec(value||"");
-  if(!match) return null;
-  const decidedAt=Number(match[3]);const basis=Number(match[4]);
-  if(!decidedAt||decidedAt>now+SKEW||now-decidedAt>PRIVACY_MAX_AGE*1000||basis>decidedAt) return null;
-  const choices=Object.fromEntries(PRIVACY_PURPOSES.map((p,i)=>[p,decode(match[1][i])])) as PrivacyChoices;
-  return {choices,revision:Number(match[2]),decidedAt,basis};
-}
-export const encodeWithdrawal=(at:number)=>`v1.${at}`;
-// A withdrawal record is kept even if it looks future dated: it can only restrict.
-export function parseWithdrawal(value:string|undefined, now=Date.now()):number|null {
-  const match=/^v1\.(\d{1,15})$/.exec(value||"");
-  if(!match) return null;
-  const at=Number(match[1]);
-  return at&&now-at<=PRIVACY_MAX_AGE*1000?at:null;
-}
-// Withdrawals take precedence over any grant whose saving request had not seen them. A
-// grant sent before a withdrawal, but answered after it, therefore never takes effect.
-export function combinePrivacy(decision:SavedDecision|null, withdrawals:Withdrawals):PrivacyState {
-  const choices=Object.fromEntries(PRIVACY_PURPOSES.map(p=>{
-    const withdrawn=withdrawals[p];
-    return [p,withdrawn!==undefined&&(!decision||withdrawn>decision.basis)?false:decision?decision.choices[p]:null];
-  })) as PrivacyChoices;
-  const latestWithdrawal=Math.max(0,...Object.values(withdrawals));
-  return {choices,revision:decision?.revision||0,horizon:Math.max(decision?.decidedAt||0,latestWithdrawal),
-    version:`${decision?.revision||0}.${decision?.decidedAt||0}.${latestWithdrawal}`};
+// Versions identify a decision: the first 12 characters of the visitor key and the revision.
+export const UNSAVED_VERSION="none.0";
+export const versionOf=(visitorKey:string|null, revision:number)=>visitorKey?`${visitorKey.slice(0,12)}.${revision}`:UNSAVED_VERSION;
+export function parseVersion(value:unknown):{prefix:string;revision:number}|null {
+  const match=typeof value==="string"?/^([0-9a-f]{12}|none)\.(\d{1,9})$/.exec(value):null;
+  return match?{prefix:match[1],revision:Number(match[2])}:null;
 }
 
 export function validateChoices(value:unknown):PrivacyChoices {
@@ -86,9 +61,6 @@ export function validateRestriction(value:unknown):PrivacyRestriction {
 export function restrictChoices(choices:PrivacyChoices, restriction:PrivacyRestriction={}):PrivacyChoices {
   return Object.fromEntries(PRIVACY_PURPOSES.map(p=>[p,restriction[p]===false?false:choices[p]])) as PrivacyChoices;
 }
-export function grantsAdded(current:PrivacyChoices, next:PrivacyChoices):PrivacyPurpose[] {
-  return PRIVACY_PURPOSES.filter(p=>next[p]===true&&current[p]!==true);
-}
 export function effectiveChoices(choices:PrivacyChoices, gpc:boolean):PrivacyChoices {
   return gpc?{...choices,...Object.fromEntries(GPC_PURPOSES.map(p=>[p,false]))}:{...choices};
 }
@@ -98,7 +70,7 @@ export function visitorConsent(choices:PrivacyChoices, gpc:boolean):VisitorConse
   const consent=Object.fromEntries(PRIVACY_PURPOSES.filter(p=>effective[p]!==null).map(p=>[p,effective[p]]));
   return Object.keys(consent).length?consent as VisitorConsent:null;
 }
-export function privacySnapshot(state:PrivacyState, gpc:boolean):PrivacySnapshot {
-  return {choices:{...state.choices},effective:effectiveChoices(state.choices,gpc),gpc,version:state.version};
+export function privacySnapshot(choices:PrivacyChoices, version:string, status:PrivacyStatus, gpc:boolean):PrivacySnapshot {
+  return {choices:{...choices},effective:effectiveChoices(choices,gpc),gpc,version,status};
 }
 export function gpcHeader(headers:Headers):boolean {return headers.get("sec-gpc")?.trim()==="1";}
