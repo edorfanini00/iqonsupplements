@@ -7,8 +7,10 @@ import "./product-experience.css";
 import "./product-story-v4.css";
 import "./skincare-product-story.css";
 import "./supplement-product-story.css";
+import "./privacy.css";
 import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
+import { initialPrivacySnapshot, privacyLinks } from "@/lib/privacy.server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "IQON — Supplements & Skincare",
@@ -17,6 +19,6 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
 };
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const catalog=await getStoreCatalog();
-  return <html lang="en"><head>{catalog.mode!=="live"&&<meta name="codex-preview" content="development"/>}</head><body><StoreShell catalog={catalog}>{children}</StoreShell></body></html>;
+  const [catalog,privacy]=await Promise.all([getStoreCatalog(),initialPrivacySnapshot()]);
+  return <html lang="en"><head>{catalog.mode!=="live"&&<meta name="codex-preview" content="development"/>}</head><body><StoreShell catalog={catalog} privacy={privacy} privacyLinks={privacyLinks()}>{children}</StoreShell></body></html>;
 }
