@@ -516,3 +516,6 @@ body { background:#fafbfb; }
 .skincare-launch-note .button:disabled { opacity:1; background:#dfe3e5; color:#656e74; border-color:#dfe3e5; cursor:default; }
 .skincare-launch-note .under-link { margin-top:16px; font-size:12px; }
 @media(max-width:600px) { .subscription-saving { margin-left:0; margin-top:4px; display:table; } }
+
+/* Customer account entry points (header + mobile menu); the account area styles live in app/account/account.css. */
+.mobile-account-link{display:flex;justify-content:space-between;align-items:center;padding:18px 0;margin-top:6px;border-bottom:1px solid var(--line);font-size:18px}
