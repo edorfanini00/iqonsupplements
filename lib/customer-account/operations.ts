@@ -12,7 +12,7 @@ const ADDRESS = `fragment IQONAddress on CustomerAddress { id firstName lastName
 const ORDER_SUMMARY = `fragment IQONOrderSummary on Order {
   id name processedAt financialStatus fulfillmentStatus cancelledAt
   totalPrice { ${MONEY} }
-  lineItems(first: 4) { nodes { id title quantity image { url(transform: {maxWidth: 160, maxHeight: 160}) altText } } }
+  lineItems(first: 4) { pageInfo { hasNextPage } nodes { id title quantity image { url(transform: {maxWidth: 160, maxHeight: 160}) altText } } }
 }`;
 const SUBSCRIPTION_SUMMARY = `fragment IQONSubscriptionSummary on SubscriptionContract {
   id status createdAt nextBillingDate currencyCode lastPaymentStatus

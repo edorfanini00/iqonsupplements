@@ -74,11 +74,17 @@ export function AccountShell({children}: {children: ReactNode}) {
             </nav>
             <form method="post" action="/account/logout" className="account-signout account-signout-side"><button type="submit"><LogOut size={15} strokeWidth={1.5}/>Sign out</button></form>
           </aside>
-          <div className="account-content">{children}<form method="post" action="/account/logout" className="account-signout account-signout-end"><button type="submit"><LogOut size={15} strokeWidth={1.5}/>Sign out</button></form></div>
+          <div className="account-content"><SignOutNotice/>{children}<form method="post" action="/account/logout" className="account-signout account-signout-end"><button type="submit"><LogOut size={15} strokeWidth={1.5}/>Sign out</button></form></div>
         </div>
         : <SignedOutState state={session} returnTo={pathname}/>}
     </main>
   </AccountContext.Provider>;
+}
+
+function SignOutNotice() {
+  // Set by /account/logout when the session store could not revoke the session.
+  const [failed] = useState(() => new URL(window.location.href).searchParams.get("signout") === "unavailable");
+  return failed ? <p className="account-error-inline" role="alert">We couldn’t sign you out just now. Please try again in a moment.</p> : null;
 }
 
 function SignedOutState({state, returnTo}: {state: SessionState; returnTo: string}) {

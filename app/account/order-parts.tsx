@@ -15,10 +15,15 @@ export function orderStatus(order: Pick<OrderSummary, "cancelled" | "financialSt
   return FULFILLMENT[order.fulfillmentStatus] || "Processing";
 }
 
+export function itemLabel(order: Pick<OrderSummary, "itemCount" | "itemCountComplete">) {
+  if (!order.itemCountComplete) return `${order.itemCount}+ items`;
+  return `${order.itemCount} ${order.itemCount === 1 ? "item" : "items"}`;
+}
+
 export function OrderRow({order}: {order: OrderSummary}) {
   return <Link className="order-row" href={`/account/orders/${order.id}`}>
     <span className="order-thumbs" aria-hidden="true">{order.items.slice(0, 3).map((item, i) => item.image ? <img key={i} src={item.image} alt=""/> : <span key={i} className="order-thumb-blank">{item.title.slice(0, 1)}</span>)}</span>
-    <span className="order-main"><strong>Order {order.name}</strong><small>{formatDate(order.processedAt)} · {order.itemCount} {order.itemCount === 1 ? "item" : "items"}</small></span>
+    <span className="order-main"><strong>Order {order.name}</strong><small>{formatDate(order.processedAt)} · {itemLabel(order)}</small></span>
     <span className="order-state">{orderStatus(order)}</span>
     <span className="order-total">{formatMoney(order.totalPrice)}</span>
     <ArrowRight className="order-go" size={16} strokeWidth={1.5}/>

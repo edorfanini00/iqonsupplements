@@ -2,6 +2,18 @@
 import { CLIENT_ID, SHOP_ID, createFakeProvider } from "./fake-provider.mjs";
 import * as handlers from "@/lib/customer-account/handlers";
 import { resetJwksCache } from "@/lib/customer-account/oauth";
+import { prismaSessionStore } from "@/lib/customer-account/store";
+import { PrismaClient } from "@prisma/client";
+import { after } from "node:test";
+
+// Real PostgreSQL only: run through scripts/account-test-db.sh, which provides an owned,
+// loopback-only cluster with the migrations applied. There is no in-memory fallback.
+const databaseUrl = process.env.ACCOUNT_TEST_DATABASE_URL;
+if (!databaseUrl) throw new Error("ACCOUNT_TEST_DATABASE_URL is not set: run through scripts/account-test-db.sh");
+export const prisma = new PrismaClient({datasourceUrl: databaseUrl});
+export const store = prismaSessionStore(prisma);
+after(() => prisma.$disconnect());
+export const SESSION_COOKIE = "__Host-iqb_ca";
 
 export const ORIGIN = "https://www.iqonbody.example";
 export const SECRET = Buffer.from("0123456789abcdef0123456789abcdef-test-only-secret").toString("base64");
@@ -22,7 +34,7 @@ export function setup(options: {env?: Record<string, string | undefined>; clock?
     if (!response) throw new Error(`unexpected external request ${String(input)}`);
     return response;
   }) as typeof fetch;
-  const deps = {env: options.env ?? env, fetcher, now: () => clock.now};
+  const deps = {env: options.env ?? env, fetcher, now: () => clock.now, store, pollMs: 20, waitMs: 3000};
   return {provider, clock, deps, fetcher};
 }
 

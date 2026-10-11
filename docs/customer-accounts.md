@@ -13,42 +13,43 @@ shares nothing with this code.
 |---|---|
 | `GET /account/login?return=` | Starts sign-in: encrypted transaction cookie, 303 to Shopify authorize. Prefetches get 204. |
 | `GET /account/callback` | Checks state (constant time) against the transaction, exchanges the code with the PKCE verifier, verifies the id_token (RS256 via shop JWKS, issuer, audience, expiry, nonce), creates the session, 303 to an allowlisted path. |
-| `POST /account/logout` | Same-origin only. Clears every session chunk, then 303 to Shopify end-session. |
+| `POST /account/logout` | Same-origin only. Revokes the session row (no cookie change), then 303 to Shopify end-session. |
 | `/account`, `/account/orders[/id]`, `/account/subscriptions[/id]`, `/account/addresses`, `/account/profile` | Signed-in pages (client components reading `/api/account/*`). |
-| `/account/privacy`, `/account/signed-out` | **Public**: no session needed (guest footer access to privacy). |
+| `/account/privacy`, `/account/signed-out` | **Public**: no session needed. `/account/privacy` renders the canonical privacy panel (`PrivacyPanel` from `app/privacy-choices.tsx`) inline, bound to the store shell's single `usePrivacy` state; the footer's "Your Privacy Choices" links here. |
 | `/api/account/*` | JSON BFF. Customer-scoped Customer Account API queries only; no Admin API. |
 
-## Sessions
+## Sessions (round 1 design: durable, server-side)
 
-- Cookies: `__Host-iqb_ca.0..3` (session) and `__Host-iqb_ca_tx` (10 minute login transaction);
-  HttpOnly, Secure, SameSite=Lax, Path=/, no Domain. Plain-http `localhost` development drops the
-  prefix and Secure.
-- Contents are AES-256-GCM sealed with purpose-bound keys (HKDF from
-  `CUSTOMER_ACCOUNT_SESSION_SECRET`, purpose also bound as AAD), so a transaction can't be used
-  as a session and vice versa. The envelope is split into at most 4 chunks of 3800 bytes; more
-  chunks or bytes are rejected before decryption, and a missing, reordered or foreign chunk fails
-  GCM authentication. Any invalid envelope clears all chunks. A realistic Shopify session uses
-  1–2 chunks. No database, no migration.
-- Absolute lifetime 30 days; access tokens refresh 60 s before expiry.
-- CSRF: mutations need exact `Origin`, `Sec-Fetch-Site: same-origin` when sent, JSON content type,
-  ≤ 8 KB body and `x-iqb-csrf` = HMAC(secret, session id), delivered by `/api/account/session`.
-- Responses: `Cache-Control: private, no-store, max-age=0`, `Vary: Cookie`, `X-Robots-Tag: noindex`.
-
-### Refresh concurrency: what is and isn't guaranteed
-
-- Within one server instance, concurrent requests share one refresh (in-memory single-flight,
-  retained 30 s so a request carrying the just-rotated cookie reuses the result).
-- This is **not** a cross-instance lock. On Vercel two instances can refresh the same session at
-  once. If Shopify invalidates a used refresh token, the losing request gets `invalid_grant`.
-  Data endpoints then answer 401 **without** touching cookies, so they never overwrite the
-  winner's rotated cookie, whatever order the responses arrive in. The client re-checks
-  `/api/account/session` with its newest cookie; only that endpoint clears a session that is
-  truly dead. Tests: `tests/customer-account/auth.test.ts` ("cross-instance refresh race …").
-- Shopify's exact rotation/reuse policy for refresh tokens is not documented and has not been
-  observed live yet. Both behaviors (strict rotation, reuse tolerated) are covered by tests
-  against the MOCK provider.
-- The account client loads the session first and each page makes one data request, so in normal
-  use refreshes happen once per tab.
+- **Cookie**: `__Host-iqb_ca` = `id.secret` (24 + 32 random bytes, base64url). HttpOnly, Secure,
+  SameSite=Lax, Path=/, 30 days. It is an opaque pointer: no tokens, no customer data.
+- **Session of record**: one row in `customer_account_sessions` (existing PostgreSQL,
+  `SUPPLEMENTS_DATABASE_URL`; migration `20261011010000_customer_account_sessions`, additive).
+  `tokens` is AES-256-GCM sealed with a purpose-bound key and the row id as additional data
+  (a sealed value only opens on its own row). `secret_hash` is an HMAC of the cookie secret,
+  compared in constant time. No plaintext provider credential is stored or logged.
+- **Who writes the cookie**: only a successful `/account/callback`. Data endpoints,
+  `/api/account/session` and `/account/logout` never set or clear it. Consequences, each covered by
+  `tests/customer-account/races.test.ts` and the two-tab browser test:
+  - a late successful refresh can't restore a signed-out session, and the refreshed tokens are
+    discarded if the row was revoked meanwhile;
+  - a late response for A can't replace B's newer sign-in;
+  - a stale authentication failure or malformed cookie can't erase a newer session;
+  - a delayed logout response can't sign a newer session out.
+- **Logout** revokes the row (`revoked_at`), then redirects to Shopify end-session. The browser
+  keeps a dead pointer until the next sign-in overwrites it.
+- **Refresh, across instances**:
+  - Coordinated through the row. A request needing a refresh takes a lease with one conditional
+    `UPDATE` (live row, same `generation`, no unexpired lease), then calls Shopify with a 10 s timeout.
+  - It installs the new tokens with a compare-and-set on `(generation, lease owner, not revoked)`,
+    incrementing `generation`.
+  - Other requests poll the row (bounded, 12 s) and use the new generation.
+  - A crashed holder's lease lapses after 20 s. A rejected grant revokes exactly that generation.
+  - Proven with two separate Node processes against one PostgreSQL and a strictly rotating mock
+    (`tests/customer-account/two-process.test.ts`): one refresh, both requests signed in.
+- **Outages**: database unavailable → 503 "unavailable", never "signed out"; the cookie is untouched.
+- **Retention**: each sign-in purges up to 25 rows that expired or were revoked over 7 days ago.
+- CSRF: mutations need exact `Origin`, `Sec-Fetch-Site: same-origin` when sent, JSON, ≤ 8 KB and
+  `x-iqb-csrf` = HMAC(secret, session id) from `/api/account/session`.
 
 ### Logout and the id_token_hint
 
@@ -73,6 +74,8 @@ queries. If Shopify refuses them, the account still works:
 
 - Native: pause, resume, skip/unskip an upcoming order, cancel (with confirmation). Every action
   re-reads the contract from Shopify and checks the allowed transition before mutating.
+- Order summaries fetch the first four lines for thumbnails; when an order has more lines the count
+  is shown as "N+ items" (`pageInfo.hasNextPage`), never as an exact total. Detail pages show all lines.
 - Not native: changing frequency (no documented customer mutation) and changing the card or
   subscription delivery address. These go to Shopify's hosted subscription page when
   `SHOPIFY_SUBSCRIPTION_MANAGEMENT_PUBLISHED=true`, otherwise "contact us".
@@ -83,9 +86,9 @@ queries. If Shopify refuses them, the account still works:
 ## Tests
 
 ```
-node --import tsx --test tests/customer-account/*.test.ts      # unit/integration, MOCK provider
+scripts/account-test-db.sh node --import tsx --test tests/customer-account/*.test.ts   # owned loopback PostgreSQL + MOCK provider
 npm run build:vercel
-PLAYWRIGHT_CORE=<path>/playwright-core node --test --test-concurrency=1 tests/e2e/customer-account.e2e.mjs
+E2E_PORT=3919 PLAYWRIGHT_CORE=<path>/playwright-core scripts/account-test-db.sh node --test --test-concurrency=1 tests/e2e/customer-account.e2e.mjs
 ```
 
 The browser suite runs the production build. Server-side calls to `https://shopify.com/*` go to
@@ -96,6 +99,11 @@ routes, reached as fresh navigations after the real `/account/login` 303 has bee
 
 ## Rollback
 
-Code-only and additive. To disable: unset the four required env vars (the area shows "opening
-soon" and the API returns 503 `not_configured`), or revert the PR. Rotating
-`CUSTOMER_ACCOUNT_SESSION_SECRET` revokes every session. No migrations.
+Additive. Requires migration `prisma/migrations/20261011010000_customer_account_sessions` (and the
+privacy ledger migration `20261011000000_storefront_privacy_consents` from the integrated privacy
+work) applied to the existing database **before** the code is deployed; without the table, sign-in
+returns "unavailable" and nothing else on the storefront changes.
+- Disable: unset the four required env vars ("opening soon", API 503 `not_configured`) or revert.
+- Revoke every session: `UPDATE customer_account_sessions SET revoked_at = now() WHERE revoked_at IS NULL;`
+  (rotating `CUSTOMER_ACCOUNT_SESSION_SECRET` also makes every row unreadable).
+- Remove: `DROP TABLE "customer_account_sessions";` after reverting the code.

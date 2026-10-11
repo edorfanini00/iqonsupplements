@@ -9,7 +9,9 @@ export type AccountAddress = {
 };
 export type OrderSummary = {
   id: string; name: string; processedAt: string; financialStatus: string | null; fulfillmentStatus: string; cancelled: boolean;
-  totalPrice: Money; items: {title: string; quantity: number; image: string | null; alt: string}[]; itemCount: number;
+  totalPrice: Money; items: {title: string; quantity: number; image: string | null; alt: string}[];
+  /** Units across the returned lines; a lower bound when `itemCountComplete` is false (summary fetches the first lines only). */
+  itemCount: number; itemCountComplete: boolean;
 };
 export type OrderDetail = OrderSummary & {
   confirmationNumber: string | null; statusPageUrl: string | null; cancelReason: string | null;

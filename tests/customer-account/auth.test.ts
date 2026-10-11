@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CLIENT_ID, SHOP_ID } from "./fake-provider.mjs";
-import { CUSTOMER_A, CUSTOMER_B, env, handlers, Jar, ORIGIN, request, setup, signIn } from "./harness";
+import { CUSTOMER_A, CUSTOMER_B, env, handlers, Jar, ORIGIN, request, SESSION_COOKIE, setup, signIn, store } from "./harness";
 import { customerAccountConfig, AccountUnavailable } from "@/lib/customer-account/config";
 import { safeReturnPath } from "@/lib/customer-account/return-path";
 import { seal } from "@/lib/customer-account/crypto";
-import { resetRefreshSingleFlight } from "@/lib/customer-account/session";
 
 const location = (response: Response) => response.headers.get("location") || "";
 
@@ -70,10 +69,18 @@ test("successful callback creates an encrypted HttpOnly session and returns to t
   assert.equal(location(done), "/account/orders");
   assert.ok(!location(done).includes("code="));
   assert.equal(jar.cookies.has("__Host-iqb_ca_tx"), false, "transaction cookie cleared");
-  const attrs = jar.attributes.get("__Host-iqb_ca.0")!;
+  const attrs = jar.attributes.get(SESSION_COOKIE)!;
   for (const flag of ["HttpOnly", "Secure", "SameSite=Lax", "Path=/"]) assert.ok(attrs.includes(flag), flag);
-  const envelope = [...jar.cookies].filter(([k]) => k.startsWith("__Host-iqb_ca.")).map(([, v]) => v).join("");
-  assert.ok(!/mockat_|mockrt_|eyJ/.test(envelope), "tokens are not readable from the session cookie");
+  // The cookie is an opaque pointer; the session of record is an encrypted database row.
+  const value = jar.cookies.get(SESSION_COOKIE)!;
+  assert.match(value, /^[A-Za-z0-9_-]{32}\.[A-Za-z0-9_-]{43}$/);
+  const row = await store.get(value.split(".")[0]);
+  assert.ok(row && row.customerSub === CUSTOMER_A && row.generation === 0 && row.revokedAt === null);
+  const state = t.provider.load();
+  for (const secret of [...Object.keys(state.access), ...Object.keys(state.refresh)]) {
+    assert.ok(!value.includes(secret) && !row!.tokens.includes(secret), "no plaintext provider token in cookie or database");
+  }
+  assert.ok(!row!.secretHash.includes(value.split(".")[1]), "the cookie secret is stored only as an HMAC");
   assert.equal(session.status, "signed_in");
   assert.equal(session.email, "avery.synthetic@example.test");
   const exchange = t.provider.ledger().find((e: {op: string; grant?: string}) => e.op === "token" && e.grant === "authorization_code");
@@ -90,7 +97,7 @@ test("callback rejects tampered state, missing transaction, provider errors and 
   callback.searchParams.set("state", "forged-state-value-forged-state-value-forg");
   let response = jar.take(await handlers.callbackRoute(request(callback.pathname + callback.search, jar), t.deps));
   assert.equal(location(response), "/account?signin=failed");
-  assert.equal([...jar.cookies.keys()].some(k => k.startsWith("__Host-iqb_ca.")), false);
+  assert.equal([...jar.cookies.keys()].some(k => k === SESSION_COOKIE), false);
 
   // Callback without the browser's transaction cookie (login CSRF / injected code)
   jar = new Jar();
@@ -115,7 +122,7 @@ test("callback rejects tampered state, missing transaction, provider errors and 
   assert.equal(location(response), "/account");
   const replay = captured.take(await handlers.callbackRoute(request(callback.pathname + callback.search, captured), t.deps));
   assert.equal(location(replay), "/account?signin=failed");
-  assert.equal([...captured.cookies.keys()].some(k => k.startsWith("__Host-iqb_ca.")), false);
+  assert.equal([...captured.cookies.keys()].some(k => k === SESSION_COOKIE), false);
 
   // Expired transaction (older than 10 minutes)
   jar = new Jar();
@@ -150,7 +157,7 @@ test("id_token must carry the transaction nonce, the shop issuer, this client an
     const callback = new URL(t.provider.authorize(url.href, CUSTOMER_A));
     const response = jar.take(await handlers.callbackRoute(request(callback.pathname + callback.search, jar), t.deps));
     assert.equal(location(response), "/account?signin=failed", name);
-    assert.equal([...jar.cookies.keys()].some(k => k.startsWith("__Host-iqb_ca.")), false, name);
+    assert.equal([...jar.cookies.keys()].some(k => k === SESSION_COOKIE), false, name);
   }
 });
 
@@ -164,32 +171,36 @@ test("provider outage during sign-in is reported as unavailable, not as a failed
   assert.equal(location(response), "/account?signin=unavailable");
 });
 
-test("tampered, foreign-secret and swapped cookies are treated as signed out and cleared", async () => {
+test("forged, sibling, foreign-secret and malformed cookies are signed out, and nothing is ever cleared", async () => {
   const t = setup();
   const {jar} = await signIn(t);
-  const tampered = jar.clone();
-  const value = tampered.cookies.get("__Host-iqb_ca.0")!;
-  tampered.cookies.set("__Host-iqb_ca.0", value.slice(0, -4) + (value.endsWith("AAAA") ? "BBBB" : "AAAA"));
-  let response = await handlers.overviewApi(request("/api/account/overview", tampered), t.deps);
-  assert.equal(response.status, 401);
-  assert.ok(response.headers.getSetCookie().some(c => c.startsWith("__Host-iqb_ca.0=;") && c.includes("Max-Age=0")));
-
+  const {jar: other} = await signIn(t, CUSTOMER_B);
+  const [id, secret] = jar.cookies.get(SESSION_COOKIE)!.split(".");
+  const [otherId, otherSecret] = other.cookies.get(SESSION_COOKIE)!.split(".");
+  const variants: [string, string][] = [
+    ["wrong secret for a real id", `${id}.${secret.slice(0, -2)}${secret.endsWith("AA") ? "BB" : "AA"}`],
+    ["sibling id with this secret", `${otherId}.${secret}`],
+    ["this id with the sibling's secret", `${id}.${otherSecret}`],
+    ["unknown id", `${"x".repeat(32)}.${secret}`],
+    ["malformed", "not-a-session"],
+    ["old chunked envelope name only", ""],
+  ];
+  for (const [name, value] of variants) {
+    const forged = new Jar();
+    if (value) forged.cookies.set(SESSION_COOKIE, value); else forged.cookies.set(`${SESSION_COOKIE}.0`, secret);
+    const response = await handlers.overviewApi(request("/api/account/overview", forged), t.deps);
+    assert.equal(response.status, 401, name);
+    assert.equal(response.headers.getSetCookie().length, 0, `${name}: no cookie is set or cleared`);
+    const check = await handlers.sessionApi(request("/api/account/session", forged), t.deps);
+    assert.deepEqual(await check.json(), {status: "signed_out"}, name);
+    assert.equal(check.headers.getSetCookie().length, 0, name);
+  }
+  // A different session secret (another deployment's key) can't open these rows.
   const foreign = setup({env: {...env, CUSTOMER_ACCOUNT_SESSION_SECRET: Buffer.from("another-secret-another-secret-another-secret").toString("base64")}});
-  response = await handlers.overviewApi(request("/api/account/overview", jar), foreign.deps);
-  assert.equal(response.status, 401);
-
-  // A sealed login transaction placed in the session cookie fails authentication (purpose-bound keys).
-  const config = (await import("@/lib/customer-account/config")).customerAccountConfig(env)!;
-  const swapped = new Jar();
-  swapped.cookies.set("__Host-iqb_ca.0", await seal(config.secret, "transaction", {v: 1, sid: "x", sub: CUSTOMER_B, tokens: {}, expiresAt: Date.now() + 1e9}));
-  response = await handlers.overviewApi(request("/api/account/overview", swapped), t.deps);
-  assert.equal(response.status, 401);
-
-  // No cookie at all is signed_out without a Set-Cookie.
-  response = await handlers.overviewApi(request("/api/account/overview", null), t.deps);
-  assert.equal(response.status, 401);
-  assert.equal((await response.json()).error, "signed_out");
-  assert.equal(response.headers.getSetCookie().length, 0);
+  assert.equal((await handlers.overviewApi(request("/api/account/overview", jar), foreign.deps)).status, 401);
+  // The genuine cookies still work: rejecting forgeries had no side effect on them.
+  assert.equal((await handlers.overviewApi(request("/api/account/overview", jar), t.deps)).status, 200);
+  assert.equal((await handlers.overviewApi(request("/api/account/overview", other), t.deps)).status, 200);
 });
 
 test("session absolute lifetime ends the session even with a valid refresh token", async () => {
@@ -200,7 +211,7 @@ test("session absolute lifetime ends the session even with a valid refresh token
   assert.equal(response.status, 401);
 });
 
-test("expired access tokens refresh once for concurrent requests and rotate the cookie", async () => {
+test("expired access tokens refresh once for concurrent requests; the cookie is untouched", async () => {
   const t = setup();
   t.provider.configure({expiresIn: 120});
   const {jar} = await signIn(t);
@@ -211,14 +222,13 @@ test("expired access tokens refresh once for concurrent requests and rotate the 
   for (const response of responses) assert.equal(response.status, 200);
   const refreshes = t.provider.ledger().filter((e: {op: string}) => e.op === "refresh");
   assert.equal(refreshes.length, 1, "single-flight refresh");
-  assert.ok(responses.every(r => r.headers.getSetCookie().some(c => c.startsWith("__Host-iqb_ca.0=") && !c.includes("Max-Age=0"))));
-  jar.take(responses[0]);
+  assert.ok(responses.every(r => r.headers.getSetCookie().length === 0), "refresh changes the database row, never the cookie");
   const after = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
   assert.equal(after.status, 200);
-  assert.equal(t.provider.ledger().filter((e: {op: string}) => e.op === "refresh").length, 1, "rotated cookie is reused without another refresh");
+  assert.equal(t.provider.ledger().filter((e: {op: string}) => e.op === "refresh").length, 1, "the refreshed row is reused without another refresh");
 });
 
-test("a revoked refresh token signs the customer out; a refresh outage does not", async () => {
+test("a revoked refresh token ends the session; a refresh outage does not", async () => {
   const t = setup();
   t.provider.configure({expiresIn: 120});
   const {jar} = await signIn(t);
@@ -227,15 +237,16 @@ test("a revoked refresh token signs the customer out; a refresh outage does not"
   let response = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
   assert.equal(response.status, 503);
   assert.equal((await response.json()).error, "unavailable");
-  assert.equal(response.headers.getSetCookie().length, 0, "session kept during an outage");
+  const id = jar.cookies.get(SESSION_COOKIE)!.split(".")[0];
+  assert.equal((await store.get(id))!.leaseOwner, null, "a failed refresh releases its lease at once");
   t.provider.mutate((state: {refresh: Record<string, {used: boolean}>}) => { for (const r of Object.values(state.refresh)) r.used = true; });
   response = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
   assert.equal(response.status, 401);
-  assert.equal(response.headers.getSetCookie().length, 0, "a data request never clears a cookie a concurrent request may have rotated");
-  // The client then re-checks the session, which clears the dead session.
+  assert.equal(response.headers.getSetCookie().length, 0);
+  assert.equal((await store.get(id))!.revokedAt !== null, true, "the dead grant revokes the row");
   response = await handlers.sessionApi(request("/api/account/session", jar), t.deps);
   assert.deepEqual(await response.json(), {status: "signed_out"});
-  assert.ok(response.headers.getSetCookie().some(c => c.startsWith("__Host-iqb_ca.0=;") && c.includes("Max-Age=0")));
+  assert.equal(response.headers.getSetCookie().length, 0);
 });
 
 test("an access token revoked before expiry gets exactly one refresh and retry", async () => {
@@ -247,7 +258,7 @@ test("an access token revoked before expiry gets exactly one refresh and retry",
   assert.equal(t.provider.ledger().filter((e: {op: string}) => e.op === "refresh").length, 1);
 });
 
-test("logout is POST + same-origin only, clears the session and ends the Shopify session", async () => {
+test("logout is POST + same-origin only, revokes the session and ends the Shopify session", async () => {
   const t = setup();
   const {jar} = await signIn(t);
   let response = await handlers.logoutRoute(request("/account/logout", jar, {method: "POST", headers: {origin: "https://evil.example"}}), t.deps);
@@ -261,7 +272,7 @@ test("logout is POST + same-origin only, clears the session and ends the Shopify
   assert.equal(url.searchParams.get("post_logout_redirect_uri"), `${ORIGIN}/account/signed-out`);
   assert.ok(url.searchParams.get("id_token_hint"));
   assert.equal(response.headers.get("referrer-policy"), "no-referrer");
-  assert.equal([...jar.cookies.keys()].some(k => k.startsWith("__Host-iqb_ca.")), false);
+  assert.equal(response.headers.getSetCookie().length, 0, "logout never touches the cookie; it revokes the session of record");
   const after = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
   assert.equal(after.status, 401);
 });
@@ -287,81 +298,6 @@ test("not configured and misconfigured states are distinct from signed out", asy
   assert.deepEqual(await response.json(), {status: "signed_out"});
 });
 
-test("cross-instance refresh race with strict rotation: the stale request is 401 but does not clobber the rotated cookie", async () => {
-  const t = setup();
-  t.provider.configure({expiresIn: 120, rotateRefresh: true});
-  const {jar} = await signIn(t);
-  t.clock.now += 5 * 60 * 1000;
-  const stale = jar.clone();
-  // Instance 1 refreshes and rotates.
-  const first = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
-  assert.equal(first.status, 200);
-  // Instance 2 (no shared memory) receives the same old cookie and tries the used refresh token.
-  resetRefreshSingleFlight();
-  const second = await handlers.overviewApi(request("/api/account/overview", stale), t.deps);
-  assert.equal(second.status, 401);
-  assert.equal(second.headers.getSetCookie().length, 0);
-  // Out-of-order arrival: second response lands after the first; the browser keeps the rotated cookie.
-  jar.take(second); jar.take(first);
-  const order2 = jar.clone(); order2.take(first); order2.take(second);
-  for (const browser of [jar, order2]) {
-    const check = await handlers.sessionApi(request("/api/account/session", browser), t.deps);
-    assert.equal((await check.json()).status, "signed_in");
-  }
-});
-
-test("cross-instance refresh race where the provider tolerates reuse: both orders of Set-Cookie arrival stay signed in", async () => {
-  const t = setup();
-  t.provider.configure({expiresIn: 120, rotateRefresh: false});
-  const {jar} = await signIn(t);
-  t.clock.now += 5 * 60 * 1000;
-  const a = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
-  resetRefreshSingleFlight();
-  const b = await handlers.overviewApi(request("/api/account/overview", jar), t.deps);
-  assert.equal(a.status, 200); assert.equal(b.status, 200);
-  for (const [x, y] of [[a, b], [b, a]]) {
-    const browser = jar.clone(); browser.take(x); browser.take(y);
-    const check = await handlers.sessionApi(request("/api/account/session", browser), t.deps);
-    assert.equal((await check.json()).status, "signed_in");
-  }
-  assert.equal(t.provider.ledger().filter((e: {op: string}) => e.op === "refresh").length, 2, "two instances each refreshed: not serialized server-wide");
-});
-
-test("chunked session cookies fail closed when incomplete, reordered, mixed or oversized", async () => {
-  const t = setup();
-  const {seal: sealValue} = await import("@/lib/customer-account/crypto");
-  const {customerAccountConfig} = await import("@/lib/customer-account/config");
-  const {writeChunked} = await import("@/lib/customer-account/cookies");
-  const config = customerAccountConfig(env)!;
-  const {jar} = await signIn(t);
-  const {jar: other} = await signIn(t, CUSTOMER_B);
-  // Re-seal A's real session padded to three chunks to exercise multi-chunk assembly.
-  const {readSession} = await import("@/lib/customer-account/session");
-  const sessionA = (await readSession(config, request("/", jar))).session!;
-  const sealed = await sealValue(config.secret, "session", {...sessionA, pad: "p".repeat(7000)});
-  const chunks = new Jar();
-  for (const header of writeChunked(config, "__Host-iqb_ca", sealed, 3600)) chunks.take(new Response(null, {headers: {"set-cookie": header}}));
-  assert.equal(chunks.cookies.size, 3);
-  assert.equal((await handlers.overviewApi(request("/api/account/overview", chunks), t.deps)).status, 200, "complete chunks assemble");
-  const variants: [string, (j: Jar) => void][] = [
-    ["missing middle chunk", j => j.cookies.delete("__Host-iqb_ca.1")],
-    ["missing last chunk", j => j.cookies.delete("__Host-iqb_ca.2")],
-    ["reordered chunks", j => { const a = j.cookies.get("__Host-iqb_ca.0")!, b = j.cookies.get("__Host-iqb_ca.1")!; j.cookies.set("__Host-iqb_ca.0", b); j.cookies.set("__Host-iqb_ca.1", a); }],
-    ["chunk from another session", j => j.cookies.set("__Host-iqb_ca.0", other.cookies.get("__Host-iqb_ca.0")!)],
-    ["extra chunk beyond budget", j => { for (let i = 3; i <= 4; i++) j.cookies.set(`__Host-iqb_ca.${i}`, "x".repeat(3800)); }],
-  ];
-  for (const [name, mutate] of variants) {
-    const broken = chunks.clone(); mutate(broken);
-    const response = await handlers.overviewApi(request("/api/account/overview", broken), t.deps);
-    assert.equal(response.status, 401, name);
-    const cleared = response.headers.getSetCookie().filter(c => c.includes("Max-Age=0")).map(c => c.split("=")[0]);
-    assert.deepEqual(cleared.sort(), ["__Host-iqb_ca.0", "__Host-iqb_ca.1", "__Host-iqb_ca.2", "__Host-iqb_ca.3"], `${name}: every chunk deleted`);
-  }
-  // Logout deletes every chunk too.
-  const out = await handlers.logoutRoute(request("/account/logout", chunks, {method: "POST", headers: {origin: ORIGIN, "sec-fetch-site": "same-origin"}}), t.deps);
-  assert.equal(out.headers.getSetCookie().filter(c => c.includes("Max-Age=0")).length, 4);
-});
-
 test("an attacker's authorization code injected into a victim's callback fails PKCE at the provider", async () => {
   const t = setup();
   // Attacker starts their own flow and obtains a code bound to the attacker's PKCE challenge.
@@ -374,7 +310,7 @@ test("an attacker's authorization code injected into a victim's callback fails P
   const state = new URL(location(victimLogin)).searchParams.get("state")!;
   const response = victim.take(await handlers.callbackRoute(request(`/account/callback?code=${attackerCode}&state=${state}`, victim), t.deps));
   assert.equal(location(response), "/account?signin=failed");
-  assert.equal([...victim.cookies.keys()].some(k => k.startsWith("__Host-iqb_ca.")), false);
+  assert.equal([...victim.cookies.keys()].some(k => k === SESSION_COOKIE), false);
   const exchange = t.provider.ledger().filter((e: {op: string; grant?: string}) => e.op === "token" && e.grant === "authorization_code");
   assert.equal(exchange.length, 1, "the injected code reached the provider once and was refused (PKCE), not accepted");
 });

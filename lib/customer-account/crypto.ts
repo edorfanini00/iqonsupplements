@@ -47,23 +47,24 @@ function derivedKey(secret: Uint8Array, purpose: string, usage: "aes" | "hmac") 
   return key;
 }
 
-export async function seal(secret: Uint8Array, purpose: string, value: unknown): Promise<string> {
+/** `context` (for example a row id) is bound as additional data: a sealed value only opens in its own context. */
+export async function seal(secret: Uint8Array, purpose: string, value: unknown, context = ""): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await derivedKey(secret, purpose, "aes");
-  const cipher = new Uint8Array(await crypto.subtle.encrypt({name: "AES-GCM", iv, additionalData: encoder.encode(purpose)}, key, encoder.encode(JSON.stringify(value))));
+  const cipher = new Uint8Array(await crypto.subtle.encrypt({name: "AES-GCM", iv, additionalData: encoder.encode(`${purpose}\u0000${context}`)}, key, encoder.encode(JSON.stringify(value))));
   const out = new Uint8Array(iv.length + cipher.length);
   out.set(iv); out.set(cipher, iv.length);
   return base64url(out);
 }
 
 /** Returns null for anything that was not produced by seal() with the same secret and purpose. */
-export async function unseal<T>(secret: Uint8Array, purpose: string, value: string | undefined): Promise<T | null> {
+export async function unseal<T>(secret: Uint8Array, purpose: string, value: string | undefined, context = ""): Promise<T | null> {
   if (!value) return null;
   try {
     const bytes = fromBase64url(value);
     if (bytes.length < 12 + 16) return null;
     const key = await derivedKey(secret, purpose, "aes");
-    const plain = await crypto.subtle.decrypt({name: "AES-GCM", iv: bytes.slice(0, 12), additionalData: encoder.encode(purpose)}, key, bytes.slice(12));
+    const plain = await crypto.subtle.decrypt({name: "AES-GCM", iv: bytes.slice(0, 12), additionalData: encoder.encode(`${purpose}\u0000${context}`)}, key, bytes.slice(12));
     return JSON.parse(decoder.decode(plain)) as T;
   } catch { return null; }
 }

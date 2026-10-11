@@ -3,6 +3,7 @@
 ## What the visitor gets
 
 - The footer shows **Privacy policy** (Shopify hosted policy) and **Your Privacy Choices** on every storefront page.
+- **Your Privacy Choices** links to the public page `/account/privacy` (no sign-in needed), which shows these controls inline (`PrivacyPanel`). The same panel also backs `PrivacyChoicesSheet`. Both use the store shell's single `usePrivacy` state, and choices remain per browser, not per account.
 - Your Privacy Choices records four purposes that match Shopify's `VisitorConsent`: `analytics`, `marketing` (shown as Advertising), `preferences` and `saleOfData`. Each one is granted (`true`), declined (`false`) or not expressed (`null`).
 - **Not expressed stays not expressed.** It is never reported as a grant or a denial, and Shopify applies the merchant's regional settings to it (owner direction, October 2026).
 - **Global Privacy Control** (`navigator.globalPrivacyControl` or `Sec-GPC: 1`) overrides advertising and sale or sharing to declined, and those controls are locked off.

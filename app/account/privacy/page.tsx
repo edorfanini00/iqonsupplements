@@ -1,32 +1,22 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
-import { PageHeading, useAccount } from "../account-client";
+import { PrivacyPanel } from "../../privacy-choices";
 import { useStore } from "../../store-shell";
+import { PageHeading, useAccount } from "../account-client";
 
-// Integration seam with the storefront privacy module (Your Privacy Choices). That module
-// owns the only consent state (a browser cookie) and its UI sheet; this page opens the same
-// sheet rather than keeping a second copy of the choices. Until the privacy release is in
-// the store shell, openPrivacy is absent and this page says so plainly.
-type PrivacyStore = {openPrivacy?: () => void; privacyLinks?: {policy: string; optOut: string}};
-
+// Public: guests reach this from the footer; signed-in customers see it in the account menu.
+// The controls are the canonical privacy panel bound to the store shell's single privacy state;
+// choices belong to this browser, not to the account.
 export default function AccountPrivacyPage() {
-  const store = useStore() as ReturnType<typeof useStore> & PrivacyStore;
+  const {privacy, privacyLinks} = useStore();
   const {session} = useAccount();
-  const ready = typeof store.openPrivacy === "function" && !!store.privacyLinks;
   return <>
     <PageHeading title="Privacy"/>
-    {session?.status !== "signed_in" && <p className="account-meta">No sign-in needed. These choices apply to this browser whether or not you have an account.</p>}
-    <section className="account-section privacy-panel">
-      <h2>Your privacy choices</h2>
-      {ready ? <>
-        <p>Choose whether IQON can use analytics, advertising and personalization on this browser. Your choices are saved in this browser, not in your account, so set them again on other devices. A Global Privacy Control signal from your browser is always honored.</p>
-        <button className="button button-dark" type="button" onClick={() => store.openPrivacy!()}>Review privacy choices</button>
-        <div className="privacy-links">
-          <a className="under-link" href={store.privacyLinks!.policy}>Privacy policy<ArrowUpRight size={14}/></a>
-          <a className="under-link" href={store.privacyLinks!.optOut}>Shopify data sharing opt-out<ArrowUpRight size={14}/></a>
-        </div>
-      </> : <p role="status">Privacy choices are not available on the store yet.</p>}
+    <p className="account-meta">{session?.status === "signed_in" ? "These choices are saved for this browser, not for your account, so set them on each device you use." : "No sign-in needed. These choices are saved for this browser."}</p>
+    <section className="account-section privacy-inline" aria-label="Your Privacy Choices">
+      <h2>Your Privacy Choices</h2>
+      <p className="privacy-inline-lead">Choose how IQON may use your data on this site and when you check out.</p>
+      <PrivacyPanel privacy={privacy} links={privacyLinks}/>
     </section>
   </>;
 }

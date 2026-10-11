@@ -152,9 +152,12 @@ export function createFakeProvider({origin, file} = {}) {
         emailAddress: {emailAddress: c.email}, phoneNumber: c.phone ? {phoneNumber: c.phone} : null,
         defaultAddress: addresses().find(a => a.id === c.defaultAddressId) || null,
         addresses: {nodes: addresses()},
-        orders: {pageInfo: {hasNextPage: false, endCursor: null}, nodes: c.orders.map(o => ({...o, lineItems: {nodes: o.lineItems}, fulfillments: {nodes: o.fulfillments}}))},
+        orders: {pageInfo: {hasNextPage: false, endCursor: null}, nodes: c.orders.map(o => ({...o, lineItems: lines(o.lineItems), fulfillments: {nodes: o.fulfillments}}))},
         subscriptionContracts: {nodes: c.subscriptions.map(contractView)},
       });
+      // Honors the document's lineItems(first: N) like Shopify does.
+      const lineLimit = Number(/lineItems\(first: (\d+)\)/.exec(body.query)?.[1] || 250);
+      const lines = all => ({pageInfo: {hasNextPage: all.length > lineLimit}, nodes: all.slice(0, lineLimit)});
       const contractView = s => ({...s, lines: {nodes: s.lines}, upcomingBillingCycles: {nodes: s.upcomingBillingCycles}, orders: {nodes: s.orders}});
       const userError = message => ({userErrors: [{code: "INVALID", field: null, message}]});
       const own = (list, id) => list.find(item => item.id === id);
@@ -164,7 +167,7 @@ export function createFakeProvider({origin, file} = {}) {
           return json({data: {customer: customer()}});
         case "IQONAccountOrder": {
           const o = own(c.orders, v.id);
-          return json({data: {order: o ? {...o, lineItems: {nodes: o.lineItems}, fulfillments: {nodes: o.fulfillments}} : null}});
+          return json({data: {order: o ? {...o, lineItems: lines(o.lineItems), fulfillments: {nodes: o.fulfillments}} : null}});
         }
         case "IQONAccountSubscription": case "IQONSubscriptionExtras": {
           const s = own(c.subscriptions, v.id);
@@ -224,7 +227,13 @@ export function createFakeProvider({origin, file} = {}) {
     const headers = new Headers(init.headers);
     if (url.href === `${base}/oauth/token` && init.method === "POST") return tokenEndpoint(headers, new URLSearchParams(String(init.body)));
     if (url.href === `${base}/.well-known/jwks.json`) return json({keys: [load().jwk]});
-    if (url.href.startsWith(graphqlPrefix) && init.method === "POST") return graphql(headers, JSON.parse(String(init.body)));
+    if (url.href.startsWith(graphqlPrefix) && init.method === "POST") {
+      // Optional delay: Shopify has answered, but the response reaches the app late.
+      const response = graphql(headers, JSON.parse(String(init.body)));
+      const delay = load().config.graphqlDelayMs || 0;
+      if (delay) await new Promise(resolve => setTimeout(resolve, delay));
+      return response;
+    }
     return null;
   }
 

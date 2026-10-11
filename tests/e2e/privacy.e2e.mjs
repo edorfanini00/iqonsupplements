@@ -75,13 +75,14 @@ async function addToBag(page) {
 async function closeOverlays(page) {
   for (let i = 0; i < 3 && await page.getByRole("dialog").count(); i++) {await page.keyboard.press("Escape"); await page.waitForTimeout(250);}
 }
+// The footer link opens the canonical controls inline on the public /account/privacy page.
 async function openChoices(page) {
   await closeOverlays(page);
-  await page.getByRole("button", {name: "Your Privacy Choices"}).click();
-  const dialog = page.getByRole("dialog", {name: "Your Privacy Choices"});
-  await dialog.waitFor();
-  await page.waitForFunction(() => document.querySelector(".privacy-sheet")?.getAnimations().every(a => a.playState !== "running") ?? false);
-  return dialog;
+  await page.getByRole("contentinfo").getByRole("link", {name: "Your Privacy Choices"}).click();
+  await page.waitForURL(url => url.pathname === "/account/privacy");
+  const region = page.getByRole("region", {name: "Your Privacy Choices"});
+  await region.waitFor();
+  return region;
 }
 async function choose(page, action) {
   const dialog = await openChoices(page);
@@ -109,16 +110,17 @@ test("footer controls are visible, labelled and keyboard operable on desktop and
     await page.goto(base);
     const footer = page.locator("footer.store-footer");
     const policy = footer.getByRole("link", {name: "Privacy policy"});
-    const choices = footer.getByRole("button", {name: "Your Privacy Choices"});
+    const choices = footer.getByRole("link", {name: "Your Privacy Choices"});
     await choices.scrollIntoViewIfNeeded();
     assert.ok(await policy.isVisible()); assert.ok(await choices.isVisible());
     assert.equal(await policy.getAttribute("href"), `https://${domain}/policies/privacy-policy`);
     for (const control of [policy, choices]) {const box = await control.boundingBox(); assert.ok(box.height >= 24 && box.width >= 24, "target size");}
     await footer.screenshot({path: path.join(shots, `${mobile ? "phone" : "desktop"}-footer.png`)});
+    assert.equal(await choices.getAttribute("href"), "/account/privacy", "the guest footer link opens the public privacy page");
     await choices.focus(); await page.keyboard.press("Enter");
-    const dialog = page.getByRole("dialog", {name: "Your Privacy Choices"});
+    await page.waitForURL(url => url.pathname === "/account/privacy");
+    const dialog = page.getByRole("region", {name: "Your Privacy Choices"});
     await dialog.waitFor();
-    await page.waitForFunction(() => document.querySelector(".privacy-sheet")?.getAnimations().every(a => a.playState !== "running") ?? false);
     for (const name of ["Preferences", "Analytics", "Advertising", "Sale or sharing of data"]) {
       const toggle = dialog.getByRole("switch", {name});
       assert.equal(await toggle.getAttribute("aria-checked"), "false", `${name} starts off`);
@@ -128,9 +130,7 @@ test("footer controls are visible, labelled and keyboard operable on desktop and
     await page.screenshot({path: path.join(shots, `${mobile ? "phone" : "desktop"}-privacy-choices.png`)});
     const copy = await dialog.innerText() + await footer.innerText();
     assert.doesNotMatch(copy, /[‒-―]|(?<=\s)-(?=\s)/, "no dashes in customer copy");
-    await page.keyboard.press("Escape");
-    await dialog.waitFor({state: "detached"});
-    assert.equal(await page.evaluate(() => document.activeElement?.textContent), "Your Privacy Choices", "focus returns to the trigger");
+    assert.equal(await page.getByRole("link", {name: "Continue with email"}).count(), 0, "no sign-in needed");
     await ctx.close();
   }
 });

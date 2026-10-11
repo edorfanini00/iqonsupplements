@@ -3,13 +3,23 @@ import { safeEqual } from "./crypto";
 import { exchangeCode, logoutUrl, ProviderError, providerHeaders, startLogin, verifyIdToken, type Fetcher } from "./oauth";
 import * as ops from "./operations";
 import { safeReturnPath } from "./return-path";
-import { clearSessionCookies, clearTransactionCookie, csrfToken, freshSession, newSession, readSession, readTransaction, sessionCookies, transactionCookie, validCsrf, type CustomerSession } from "./session";
+import { clearTransactionCookie, createSession, csrfToken, freshSession, readSession, readTransaction, revokeSession, SessionEnded, StoreUnavailable, transactionCookie, validCsrf, type CustomerSession } from "./session";
+import { prismaSessionStore, type SessionStore } from "./store";
+import { prisma } from "../db/prisma";
+import { isDatabaseConfigured } from "../db/database";
 import type { ApiError, SessionState, SubscriptionAction } from "./types";
 import { parseAddress, profileSchema, fieldErrors, subscriptionActionSchema } from "./validation";
 import { gid, mapAddress, mapOrderDetail, mapOrderSummary, mapOverview, mapProfile, mapSubscriptionDetail, mapSubscriptionSummary, numericId } from "./view";
 
-export type Deps = {env?: Record<string, string | undefined>; fetcher?: Fetcher; now?: () => number};
-type Ctx = {config: CustomerAccountConfig; fetcher: Fetcher; now: () => number};
+export type Deps = {env?: Record<string, string | undefined>; fetcher?: Fetcher; now?: () => number; store?: SessionStore; waitMs?: number; pollMs?: number; refreshTimeoutMs?: number};
+type Ctx = {config: CustomerAccountConfig; fetcher: Fetcher; now: () => number; store: SessionStore; waitMs?: number; pollMs?: number; refreshTimeoutMs?: number};
+
+let defaultStore: SessionStore | null = null;
+function sessionStore(env: Record<string, string | undefined>) {
+  // Sessions of record need the existing PostgreSQL; without it accounts are unavailable, never cookie-only.
+  if (env === process.env ? !isDatabaseConfigured() : !env.SUPPLEMENTS_DATABASE_URL?.trim()) throw new AccountUnavailable("SUPPLEMENTS_DATABASE_URL is not configured");
+  return defaultStore ??= prismaSessionStore(prisma);
+}
 
 // Customer responses are per-session: never shared, stored or indexed.
 const NO_STORE = {"Cache-Control": "private, no-store, max-age=0", "Vary": "Cookie", "X-Content-Type-Options": "nosniff", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "same-origin"};
@@ -31,7 +41,9 @@ const fail = (error: ApiError["error"], message: string, status: number, cookies
 function context(deps: Deps): Ctx | null | "invalid" {
   try {
     const config = customerAccountConfig(deps.env ?? process.env);
-    return config ? {config, fetcher: deps.fetcher ?? fetch, now: deps.now ?? Date.now} : null;
+    if (!config) return null;
+    const env = deps.env ?? process.env;
+    return {config, fetcher: deps.fetcher ?? fetch, now: deps.now ?? Date.now, store: deps.store ?? sessionStore(env), waitMs: deps.waitMs, pollMs: deps.pollMs, refreshTimeoutMs: deps.refreshTimeoutMs};
   } catch (error) {
     if (error instanceof AccountUnavailable) {
       // Configuration problems are operator-visible but never echo secret values.
@@ -50,7 +62,8 @@ export async function loginRoute(request: Request, deps: Deps = {}) {
   if (isPrefetch(request)) return new Response(null, {status: 204, headers: NO_STORE});
   const url = new URL(request.url);
   const returnTo = safeReturnPath(url.searchParams.get("return"));
-  const {session} = await readSession(ctx.config, request, ctx.now());
+  let session: CustomerSession | null = null;
+  try { session = await readSession(ctx.config, ctx.store, request, ctx.now()); } catch { /* store outage: start a fresh sign-in */ }
   if (session) return redirect(returnTo);
   const {url: authorize, transaction} = await startLogin(ctx.config, returnTo, ctx.now());
   return redirect(authorize, [await transactionCookie(ctx.config, transaction)], "no-referrer");
@@ -59,7 +72,7 @@ export async function loginRoute(request: Request, deps: Deps = {}) {
 export async function callbackRoute(request: Request, deps: Deps = {}) {
   const ctx = context(deps);
   if (!ctx || ctx === "invalid") return redirect("/account");
-  const {config, fetcher, now} = ctx;
+  const {config, fetcher, now, store} = ctx;
   // The transaction is single use: it is cleared on every outcome, so a replayed callback fails.
   const cleared = [clearTransactionCookie(config)];
   const back = (reason: string) => redirect(`/account?signin=${reason}`, cleared, "no-referrer");
@@ -74,10 +87,13 @@ export async function callbackRoute(request: Request, deps: Deps = {}) {
   try {
     const tokens = await exchangeCode(config, code, tx.verifier, fetcher, now());
     const claims = await verifyIdToken(config, tokens.idToken, tx.nonce, fetcher, now());
-    // A fresh session id on every sign-in: no fixation from any earlier cookie.
-    const session = newSession(claims.sub, tokens, now());
-    return redirect(safeReturnPath(tx.returnTo), [...cleared, ...await sessionCookies(config, session, now())], "no-referrer");
+    // A fresh session row and cookie on every sign-in: no fixation from any earlier cookie. This is
+    // the only response that ever sets the session cookie.
+    const {cookie} = await createSession(config, store, claims.sub, tokens, now());
+    void store.purge(now(), 7 * 24 * 60 * 60 * 1000, 25).catch(() => {});
+    return redirect(safeReturnPath(tx.returnTo), [...cleared, cookie], "no-referrer");
   } catch (error) {
+    if (error instanceof StoreUnavailable) { console.warn("[customer-account] sign-in: session store unavailable"); return back("unavailable"); }
     if (error instanceof ProviderError) {
       console.warn(`[customer-account] sign-in ${error.kind}: ${error.message}`);
       return back(error.kind === "unavailable" ? "unavailable" : "failed");
@@ -90,10 +106,19 @@ export async function logoutRoute(request: Request, deps: Deps = {}) {
   const ctx = context(deps);
   if (!ctx || ctx === "invalid") return redirect("/account/signed-out");
   if (request.method !== "POST" || !sameOriginRequest(request, ctx.config)) return fail("forbidden", "Sign out from your account page.", 403);
-  const {session} = await readSession(ctx.config, request, ctx.now());
-  // Local session ends first. Shopify's end-session endpoint only accepts GET with
-  // id_token_hint (POST is rejected), so the hint is sent to Shopify with no referrer.
-  return redirect(session ? logoutUrl(ctx.config, session.tokens.idToken) : "/account/signed-out", clearSessionCookies(ctx.config), "no-referrer");
+  // Logout revokes the session of record. It sets no cookie, so a delayed logout response can
+  // never erase a newer sign-in in another tab; the old cookie simply points at a revoked row.
+  let session: CustomerSession | null;
+  try {
+    session = await readSession(ctx.config, ctx.store, request, ctx.now());
+    if (session) await revokeSession(ctx.store, session, "logout", ctx.now());
+  } catch (error) {
+    if (error instanceof StoreUnavailable) return redirect("/account?signout=unavailable");
+    throw error;
+  }
+  // Shopify's end-session endpoint only accepts GET with id_token_hint (POST is rejected), so
+  // the hint is sent to Shopify with no referrer.
+  return redirect(session ? logoutUrl(ctx.config, session.tokens.idToken) : "/account/signed-out", [], "no-referrer");
 }
 
 function isPrefetch(request: Request) {
@@ -138,7 +163,8 @@ async function customerGraphql<T>(ctx: Ctx, session: CustomerSession, query: str
   return result.data;
 }
 
-async function withCustomer(request: Request, deps: Deps, handler: Handler, options: {mutation?: boolean; clearOnReject?: boolean} = {}) {
+// Responses from here never set or clear the session cookie: identity changes only at sign-in.
+async function withCustomer(request: Request, deps: Deps, handler: Handler, options: {mutation?: boolean} = {}) {
   const ctx = context(deps);
   if (ctx === null) return fail("not_configured", "Accounts are not available yet.", 503);
   if (ctx === "invalid") return fail("unavailable", "Your account is temporarily unavailable. Please try again shortly.", 503);
@@ -151,38 +177,33 @@ async function withCustomer(request: Request, deps: Deps, handler: Handler, opti
     if (text.length > 8192) return fail("invalid", "Invalid request.", 413);
     try { body = text ? JSON.parse(text) : {}; } catch { return fail("invalid", "Invalid request.", 400); }
   }
-  const {session: stored, present} = await readSession(config, request, ctx.now());
-  if (!stored) return fail("signed_out", "Please sign in to continue.", 401, present ? clearSessionCookies(config) : []);
-  if (options.mutation && !await validCsrf(config, stored, request.headers.get("x-iqb-csrf"))) return fail("forbidden", "Your session changed. Refresh the page and try again.", 403);
-  let session = stored, rotated = false;
-  const refresh = async (force: boolean) => {
-    const next = await freshSession(config, force ? {...session, tokens: {...session.tokens, accessTokenExpiresAt: 0}} : session, ctx.fetcher, ctx.now());
-    if (next.rotated) { session = next.session; rotated = true; }
-  };
+  const coordination = {store: ctx.store, fetcher: ctx.fetcher, now: ctx.now, waitMs: ctx.waitMs, pollMs: ctx.pollMs, refreshTimeoutMs: ctx.refreshTimeoutMs};
   try {
-    await refresh(false);
+    const stored = await readSession(config, ctx.store, request, ctx.now());
+    if (!stored) return fail("signed_out", "Please sign in to continue.", 401);
+    if (options.mutation && !await validCsrf(config, stored, request.headers.get("x-iqb-csrf"))) return fail("forbidden", "Your session changed. Refresh the page and try again.", 403);
+    let session = await freshSession(config, stored, coordination);
     let retried = false;
     const query: Upstream = async <T,>(document: string, variables: Record<string, unknown> = {}) => {
       try { return await customerGraphql<T>(ctx, session, document, variables); }
       catch (error) {
-        // An access token revoked before its expiry gets exactly one refresh attempt.
+        // An access token rejected before its expiry gets exactly one coordinated refresh.
         if (!(error instanceof Upstream401) || retried) throw error;
         retried = true;
-        await refresh(true);
+        session = await freshSession(config, session, coordination, true);
         return customerGraphql<T>(ctx, session, document, variables);
       }
     };
-    const response = await handler({ctx, session, query, body, request});
-    if (rotated) for (const cookie of await sessionCookies(config, session, ctx.now())) response.headers.append("Set-Cookie", cookie);
-    return response;
+    return await handler({ctx, session, query, body, request});
   } catch (error) {
-    // The grant was rejected. This request may carry a cookie that a concurrent request (possibly
-    // on another serverless instance) has already rotated, so it must not clear the browser's
-    // newer cookie. The client re-checks /api/account/session, which clears a truly dead session.
-    if (error instanceof Upstream401 || (error instanceof ProviderError && error.kind === "rejected")) return fail("signed_out", "Your session has ended. Please sign in again.", 401, options.clearOnReject ? clearSessionCookies(config) : []);
+    if (error instanceof SessionEnded || error instanceof Upstream401 || (error instanceof ProviderError && error.kind === "rejected")) return fail("signed_out", "Your session has ended. Please sign in again.", 401);
+    if (error instanceof StoreUnavailable) {
+      console.warn("[customer-account] session store unavailable");
+      return fail("unavailable", "We couldn’t reach your account right now. Please try again.", 503);
+    }
     if (error instanceof ProviderError) {
       console.warn(`[customer-account] upstream unavailable: ${error.message}`);
-      return fail("unavailable", "We couldn’t reach your account right now. Please try again.", 503, rotated ? await sessionCookies(config, session, ctx.now()) : []);
+      return fail("unavailable", "We couldn’t reach your account right now. Please try again.", 503);
     }
     console.error("[customer-account] unexpected failure", error instanceof Error ? error.name : "unknown");
     return fail("unavailable", "Something went wrong. Please try again.", 500);
@@ -200,15 +221,13 @@ export async function sessionApi(request: Request, deps: Deps = {}) {
   const ctx = context(deps);
   if (ctx === null) return json({status: "not_configured"} satisfies SessionState);
   if (ctx === "invalid") return json({status: "unavailable"} satisfies SessionState, 503);
-  const {session, present} = await readSession(ctx.config, request, ctx.now());
-  if (!session) return json({status: "signed_out"} satisfies SessionState, 200, present ? clearSessionCookies(ctx.config) : []);
   const response = await withCustomer(request, deps, async ({ctx, session, query}) => {
     const data = await query<{customer: Record<string, unknown>}>(ops.ACCOUNT_PROFILE);
     const profile = mapProfile(data.customer);
     return json({status: "signed_in", csrf: await csrfToken(ctx.config, session), firstName: profile.firstName, email: profile.email, hostedAccountUrl: hostedAccountUrl(ctx.config), subscriptionManagementUrl: ctx.config.subscriptionManagementUrl} satisfies SessionState);
-   }, {clearOnReject: true});
-  if (response.status === 401) return json({status: "signed_out"} satisfies SessionState, 200, response.headers.getSetCookie());
-  if (response.status >= 500) return json({status: "unavailable"} satisfies SessionState, 503, response.headers.getSetCookie());
+  });
+  if (response.status === 401) return json({status: "signed_out"} satisfies SessionState);
+  if (response.status >= 500) return json({status: "unavailable"} satisfies SessionState, 503);
   return response;
 }
 

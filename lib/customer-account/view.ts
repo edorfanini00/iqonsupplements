@@ -48,6 +48,8 @@ export function mapOrderSummary(raw: Raw): OrderSummary {
     fulfillmentStatus: text(raw.fulfillmentStatus), cancelled: !!raw.cancelledAt, totalPrice: money(raw.totalPrice) || {amount: "0", currencyCode: "USD"},
     items: nodes.slice(0, 4).map(n => ({title: text(n.title), quantity: Number(n.quantity) || 0, image: image(n.image), alt: text(n.image?.altText) || text(n.title)})),
     itemCount: nodes.reduce((sum, n) => sum + (Number(n.quantity) || 0), 0),
+    // Never present a partial sum as the total: more lines than were fetched means "at least".
+    itemCountComplete: raw.lineItems?.pageInfo ? raw.lineItems.pageInfo.hasNextPage === false : true,
   };
 }
 

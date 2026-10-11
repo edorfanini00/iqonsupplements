@@ -33,11 +33,11 @@ export async function startLogin(config: CustomerAccountConfig, returnTo: string
 
 type TokenResponse = {access_token?: unknown; expires_in?: unknown; refresh_token?: unknown; id_token?: unknown};
 
-async function tokenRequest(config: CustomerAccountConfig, body: URLSearchParams, fetcher: Fetcher): Promise<TokenResponse> {
+async function tokenRequest(config: CustomerAccountConfig, body: URLSearchParams, fetcher: Fetcher, timeoutMs = 10000): Promise<TokenResponse> {
   let response: Response;
   try {
     response = await fetcher(config.tokenEndpoint, {
-      method: "POST", body, redirect: "error", cache: "no-store", signal: AbortSignal.timeout(10000),
+      method: "POST", body, redirect: "error", cache: "no-store", signal: AbortSignal.timeout(timeoutMs),
       headers: providerHeaders(config, {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}),
     });
   } catch { throw new ProviderError("unavailable", "token endpoint unreachable"); }
@@ -64,9 +64,9 @@ export async function exchangeCode(config: CustomerAccountConfig, code: string, 
   return tokenSet(await tokenRequest(config, body, fetcher), now);
 }
 
-export async function refreshTokens(config: CustomerAccountConfig, previous: TokenSet, fetcher: Fetcher = fetch, now = Date.now()) {
+export async function refreshTokens(config: CustomerAccountConfig, previous: TokenSet, fetcher: Fetcher = fetch, now = Date.now(), timeoutMs = 10000) {
   const body = new URLSearchParams({grant_type: "refresh_token", client_id: config.clientId, refresh_token: previous.refreshToken});
-  return tokenSet(await tokenRequest(config, body, fetcher), now, previous);
+  return tokenSet(await tokenRequest(config, body, fetcher, timeoutMs), now, previous);
 }
 
 export function logoutUrl(config: CustomerAccountConfig, idToken: string | undefined) {

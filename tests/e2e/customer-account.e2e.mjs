@@ -17,7 +17,7 @@ import { CLIENT_ID, SHOP_ID, createFakeProvider } from "../customer-account/fake
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const playwright = await import(process.env.PLAYWRIGHT_CORE ? pathToFileURL(path.join(process.env.PLAYWRIGHT_CORE, "index.js")).href : "playwright-core");
 const chromium = playwright.chromium || playwright.default.chromium;
-const port = Number(process.env.E2E_PORT || 3918);
+const port = Number(process.env.E2E_PORT || 3919);
 const base = `http://localhost:${port}`;
 const work = fs.mkdtempSync(path.join(os.tmpdir(), "iqb-customer-account-e2e-"));
 const stateFile = path.join(work, "provider.json");
@@ -25,6 +25,11 @@ const serverLog = path.join(work, "server.log");
 const shots = process.env.E2E_SCREENSHOTS || path.join(work, "screenshots");
 fs.mkdirSync(shots, {recursive: true});
 const provider = createFakeProvider({origin: base, file: stateFile});
+// Sessions of record need PostgreSQL: run through scripts/account-test-db.sh (owned, loopback-only cluster).
+function requiredDatabase() {
+  if (!process.env.ACCOUNT_TEST_DATABASE_URL) throw new Error("run through scripts/account-test-db.sh (ACCOUNT_TEST_DATABASE_URL missing)");
+  return process.env.ACCOUNT_TEST_DATABASE_URL;
+}
 const A = "gid://shopify/Customer/7001", NEW = "gid://shopify/Customer/7003";
 
 try {await fetch(`${base}/`); throw new Error(`port ${port} is already in use; stop the other server first`);} catch (error) {if (error.message.includes("already in use")) throw error;}
@@ -33,7 +38,7 @@ const server = spawn(path.join(root, "node_modules/.bin/next"), ["start", "-p", 
   ...process.env, NODE_ENV: "production", SHOPIFY_STORE_DOMAIN: "", SHOPIFY_STOREFRONT_PRIVATE_TOKEN: "",
   SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID: CLIENT_ID, SHOPIFY_CUSTOMER_ACCOUNT_SHOP_ID: SHOP_ID, CUSTOMER_ACCOUNT_PUBLIC_ORIGIN: base,
   CUSTOMER_ACCOUNT_SESSION_SECRET: Buffer.from("e2e-only-secret-e2e-only-secret-e2e-only-secret").toString("base64"),
-  FAKE_CUSTOMER_ACCOUNT_STATE: stateFile, NODE_OPTIONS: `--import ${pathToFileURL(path.join(root, "tests/e2e/customer-account-server-hook.mjs")).href}`,
+  FAKE_CUSTOMER_ACCOUNT_STATE: stateFile, SUPPLEMENTS_DATABASE_URL: requiredDatabase(), NODE_OPTIONS: `--import ${pathToFileURL(path.join(root, "tests/e2e/customer-account-server-hook.mjs")).href}`,
 }});
 process.on("exit", () => server.kill("SIGTERM"));
 for (let i = 0; ; i++) {
@@ -74,8 +79,9 @@ function assertLoginRedirect(status, headers, label) {
 // is fetched and checked here, then replaced by a tiny same-origin interstitial (keeping the real
 // Set-Cookie) that navigates to the exact provider URL as a fresh, routable request. Only the
 // MOCK Shopify hop is simulated; callback, cookies, session and GraphQL run on the real server.
-async function context({mobile = false, customer = A} = {}) {
-  provider.configure({failGraphql: 0, failToken: 0, restrictHidden: false});
+async function context({mobile = false, customer: initialCustomer = A} = {}) {
+  let customer = initialCustomer;
+  provider.configure({failGraphql: 0, failToken: 0, restrictHidden: false, graphqlDelayMs: 0});
   const ctx = await browser.newContext({viewport: mobile ? {width: 390, height: 844} : {width: 1440, height: 900}, deviceScaleFactor: mobile ? 2 : 1, isMobile: mobile, hasTouch: mobile});
   const hosted = [];
   const hop = location => `<!doctype html><meta name="robots" content="noindex"><title>MOCK hop</title><script>location.replace(${JSON.stringify(location)})</script>`;
@@ -101,7 +107,7 @@ async function context({mobile = false, customer = A} = {}) {
     if (!location.startsWith("https://shopify.com/")) return route.fulfill({response});
     return route.fulfill({status: 200, headers: {"content-type": "text/html", "cache-control": "no-store", ...(headers["set-cookie"] ? {"set-cookie": headers["set-cookie"]} : {})}, body: hop(location)});
   });
-  return {ctx, hosted};
+  return {ctx, hosted, signInAs: next => { customer = next; }};
 }
 const shot = (page, name) => page.screenshot({path: path.join(shots, `${name}.png`), fullPage: true});
 /** Fail in seconds with the actual URL, instead of a 30 s timeout, if the flow leaves the app. */
@@ -192,7 +198,7 @@ test("MOCK sign-in returns to the account; tokens stay out of the page, storage 
   await page.getByRole("link", {name: /Order #1101/}).waitFor();
   assert.deepEqual(hosted, ["authorize"]);
   const cookies = await ctx.cookies(base);
-  const session = cookies.find(c => c.name === "iqb_ca.0");
+  const session = cookies.find(c => c.name === "iqb_ca");
   assert.ok(session?.httpOnly, "session cookie is HttpOnly");
   assert.equal(session.sameSite, "Lax");
   assert.equal(await page.evaluate(() => document.cookie.includes("iqb_ca")), false);
@@ -340,6 +346,47 @@ test("guests can open /account/privacy without signing in (footer access), at de
   }
 });
 
+test("integrated privacy: guest footer link opens the canonical inline controls; a saved choice persists (PostgreSQL ledger)", async () => {
+  for (const mobile of [false, true]) {
+    const {ctx} = await context({mobile});
+    const page = await newPage(ctx);
+    await page.goto(`${base}/`);
+    const link = page.getByRole("contentinfo").getByRole("link", {name: "Your Privacy Choices"});
+    assert.equal(await link.getAttribute("href"), "/account/privacy");
+    await link.click();
+    await page.waitForURL(`${base}/account/privacy`);
+    const region = page.getByRole("region", {name: "Your Privacy Choices"});
+    await region.getByRole("switch", {name: "Analytics"}).click();
+    await region.getByRole("button", {name: "Save choices"}).click();
+    await region.getByText("Your privacy choices are saved.").waitFor();
+    await page.reload();
+    const after = page.getByRole("region", {name: "Your Privacy Choices"});
+    await after.getByRole("switch", {name: "Analytics"}).waitFor();
+    assert.equal(await after.getByRole("switch", {name: "Analytics"}).getAttribute("aria-checked"), "true", "persisted across reload");
+    assert.equal(await page.getByRole("dialog").count(), 0, "inline, not a second sheet");
+    await shot(page, `privacy-integrated-guest-${mobile ? "phone" : "desktop"}`);
+    await ctx.close();
+  }
+});
+
+test("phone: every account destination, including Privacy, is visible without scrolling the menu", async () => {
+  const {ctx} = await context({mobile: true});
+  const page = await newPage(ctx);
+  await signIn(page);
+  const nav = page.getByRole("navigation", {name: "Account"});
+  for (const name of ["Overview", "Orders", "Subscriptions", "Addresses", "Profile", "Privacy"]) {
+    const box = await nav.getByRole("link", {name, exact: true}).boundingBox();
+    assert.ok(box && box.x >= 0 && box.x + box.width <= 390, `${name} fully on screen`);
+  }
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "no horizontal overflow");
+  await page.screenshot({path: path.join(shots, "account-nav-phone.png")});
+  await nav.getByRole("link", {name: "Privacy", exact: true}).click();
+  await page.waitForURL(`${base}/account/privacy`);
+  await page.getByRole("region", {name: "Your Privacy Choices"}).waitFor();
+  await shot(page, "privacy-integrated-signed-in-phone");
+  await ctx.close();
+});
+
 test("profile edit, privacy seam, empty and error states", async () => {
   const {ctx} = await context();
   const page = await newPage(ctx);
@@ -349,7 +396,10 @@ test("profile edit, privacy seam, empty and error states", async () => {
   await page.getByText("Your name is updated.").waitFor();
   assert.equal(provider.load().customers[A].firstName, "Avery Ann");
   await page.goto(`${base}/account/privacy`);
-  await page.getByRole("heading", {name: "Your privacy choices"}).waitFor();
+  // Signed in: the canonical privacy panel inline, inside the account menu.
+  const region = page.getByRole("region", {name: "Your Privacy Choices"});
+  await region.getByRole("switch", {name: "Analytics"}).waitFor();
+  await page.getByRole("navigation", {name: "Account"}).waitFor();
   await shot(page, "privacy-seam-desktop");
   // Data outage after sign-in: the section says so and recovers on retry, without signing out.
   provider.configure({failGraphql: 1});
@@ -381,7 +431,35 @@ test("profile edit, privacy seam, empty and error states", async () => {
   }
 });
 
-test("sign out clears the session locally and at the (MOCK) provider", async () => {
+test("two tabs: A's slow request finishing after sign-out and B's sign-in cannot bring A back", async () => {
+  const {ctx, signInAs} = await context();
+  const tab1 = await newPage(ctx), tab2 = await newPage(ctx);
+  await signIn(tab1);
+  await tab2.goto(`${base}/account`);
+  await tab2.getByText(/Hello, Avery/).waitFor();
+  provider.configure({graphqlDelayMs: 2500});
+  // Tab 1 starts a slow account read with A's cookie.
+  const late = tab1.evaluate(async () => { const r = await fetch("/api/account/overview", {cache: "no-store"}); return {status: r.status, setCookie: r.headers.has("set-cookie")}; });
+  await new Promise(resolve => setTimeout(resolve, 300));
+  provider.configure({graphqlDelayMs: 0});
+  // Tab 2 signs out, then signs in as B, while tab 1's response is still in flight.
+  await tab2.getByRole("button", {name: "Sign out"}).click();
+  await tab2.waitForURL(`${base}/account/signed-out`);
+  signInAs("gid://shopify/Customer/7002");
+  await signIn(tab2);
+  await tab2.getByText("Hello, Blake.").waitFor();
+  const result = await late;
+  assert.equal(result.setCookie, false);
+  // Whatever tab 1 got, the browser's identity is still B everywhere.
+  await tab1.goto(`${base}/account`);
+  await tab1.getByText("Hello, Blake.").waitFor();
+  const session = await tab2.evaluate(async () => (await (await fetch("/api/account/session")).json()).email);
+  assert.equal(session, "blake.synthetic@example.test");
+  await shot(tab1, "two-tab-after-race-desktop");
+  await ctx.close();
+});
+
+test("sign out revokes the session locally and at the (MOCK) provider", async () => {
   const {ctx, hosted} = await context();
   const page = await newPage(ctx);
   await signIn(page);
@@ -389,7 +467,8 @@ test("sign out clears the session locally and at the (MOCK) provider", async () 
   await page.waitForURL(`${base}/account/signed-out`);
   await page.getByRole("heading", {name: "You’re signed out."}).waitFor();
   assert.deepEqual(hosted, ["authorize", "logout:true"]);
-  assert.equal((await ctx.cookies(base)).some(c => c.name.startsWith("iqb_ca")), false);
+  // Logout revokes the session of record; the cookie is left as a dead pointer, never cleared by a response.
+  assert.ok((await ctx.cookies(base)).some(c => c.name === "iqb_ca"));
   const api = await page.evaluate(async () => (await fetch("/api/account/overview")).status);
   assert.equal(api, 401);
   await page.goto(`${base}/account`);

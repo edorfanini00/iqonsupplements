@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CUSTOMER_A, CUSTOMER_B, CUSTOMER_NEW, handlers, mutation, ORIGIN, request, setup, signIn } from "./harness";
-import { writeChunked, readChunked, parseCookies, MAX_CHUNKS } from "@/lib/customer-account/cookies";
 
 type Ledger = {op: string; name?: string; id?: string; customer?: string}[];
 const mutations = (ledger: Ledger) => ledger.filter(e => e.op === "subscription" || (e.op === "graphql" && /Create|Update|Delete|Pause|Resume|Cancel|Skip/.test(e.name || "")));
@@ -200,42 +199,6 @@ test("upstream failures are 'unavailable' and keep the session; nothing leaks to
   assert.ok(!logs.some(l => l.includes("synthetic@example.test")), "logs carry no customer email");
 });
 
-test("encrypted envelopes are chunked under the browser cookie limit and capped", () => {
-  const config = {secureCookies: true};
-  const big = "x".repeat(9000);
-  const headers = writeChunked(config, "__Host-iqb_ca", big, 3600);
-  const live = headers.filter(h => !h.includes("Max-Age=0"));
-  assert.equal(live.length, 3);
-  for (const h of live) assert.ok(h.split(";")[0].length < 4096);
-  const jar = parseCookies(live.map(h => h.split(";")[0]).join("; "));
-  assert.equal(readChunked(jar, "__Host-iqb_ca").value, big);
-  assert.throws(() => writeChunked(config, "__Host-iqb_ca", "x".repeat(3800 * MAX_CHUNKS + 1), 3600));
-  // Shrinking a session expires the now-unused higher chunks.
-  assert.ok(writeChunked(config, "__Host-iqb_ca", "small", 3600).some(h => h.startsWith("__Host-iqb_ca.2=;") && h.includes("Max-Age=0")));
-});
-
-test("a realistic Shopify-sized session fits in at most two cookies", async () => {
-  const {seal} = await import("@/lib/customer-account/crypto");
-  const {customerAccountConfig} = await import("@/lib/customer-account/config");
-  const {env} = await import("./harness");
-  const config = customerAccountConfig(env)!;
-  // Generous sizes: shcat_ access token, refresh token and a ~1.2 KB RS256 id_token.
-  const session = {v: 1, sid: "s".repeat(32), sub: "gid://shopify/Customer/12345678901234", createdAt: Date.now(), expiresAt: Date.now() + 1e9,
-    tokens: {accessToken: `shcat_${"a".repeat(600)}`, refreshToken: `shcrt_${"r".repeat(600)}`, idToken: "i".repeat(1200), accessTokenExpiresAt: Date.now()}};
-  const sealed = await seal(config.secret, "session", session);
-  const cookies = writeChunked(config, "__Host-iqb_ca", sealed, 3600).filter(h => !h.includes("Max-Age=0"));
-  assert.ok(cookies.length <= 2, `${sealed.length} bytes in ${cookies.length} cookies`);
-});
-
-test("chunk reader enforces the count and byte budget before decryption", () => {
-  const five = parseCookies(Array.from({length: 5}, (_, i) => `__Host-iqb_ca.${i}=${"a".repeat(100)}`).join("; "));
-  assert.equal(readChunked(five, "__Host-iqb_ca").value, undefined, "more chunks than the budget");
-  const fat = parseCookies(Array.from({length: 4}, (_, i) => `__Host-iqb_ca.${i}=${"a".repeat(3801)}`).join("; "));
-  assert.equal(readChunked(fat, "__Host-iqb_ca").value, undefined, "more bytes than the budget");
-  const gap = parseCookies(`__Host-iqb_ca.0=${"a".repeat(10)}; __Host-iqb_ca.2=${"b".repeat(10)}`);
-  assert.equal(readChunked(gap, "__Host-iqb_ca").value, "a".repeat(10), "assembly stops at the first gap; AES-GCM then rejects the partial envelope");
-});
-
 test("if Shopify denies the undocumented subscription fields, pages still work and nothing signs out", async () => {
   const t = setup();
   const a = await signIn(t, CUSTOMER_A);
@@ -282,4 +245,30 @@ test("address ids in another GID form still work, and writes use Shopify's exact
   const detail = await order.json();
   assert.deepEqual(detail.shippingAddress.formatted, ["Avery Synthetic", "100 Mock Street", "Austin TX 73301"]);
   assert.equal(detail.shippingAddress.id, "", "order address snapshots expose no id");
+});
+
+test("order summaries never present a truncated sum as the total (5 distinct lines, mixed quantities)", async () => {
+  const t = setup();
+  const a = await signIn(t, CUSTOMER_A);
+  type Line = {id: string; title: string; quantity: number; variantTitle: null; sellingPlan: null; totalPrice: {amount: string; currencyCode: string}; image: null};
+  const line = (n: number, quantity: number): Line => ({id: `gid://shopify/LineItem/77${n}`, title: `Product ${n}`, quantity, variantTitle: null, sellingPlan: null, totalPrice: {amount: "10.00", currencyCode: "USD"}, image: null});
+  t.provider.mutate((state: {customers: Record<string, {orders: {lineItems: Line[]}[]}>}) => {
+    const orders = state.customers[CUSTOMER_A].orders;
+    orders[0].lineItems = [line(1, 1), line(2, 2), line(3, 1), line(4, 3), line(5, 1)];   // 5 lines, 8 units
+    orders[1].lineItems = [line(6, 2), line(7, 1), line(8, 4)];                           // 3 lines, 7 units
+  });
+  const list = await (await handlers.ordersApi(request("/api/account/orders", a.jar), t.deps)).json();
+  const [big, small] = list.orders;
+  assert.equal(big.itemCountComplete, false, "more lines than the summary fetched");
+  assert.equal(big.itemCount, 7, "a lower bound from the first four lines, labelled as such");
+  assert.equal(small.itemCountComplete, true);
+  assert.equal(small.itemCount, 7);
+  const {itemLabel} = await import("@/app/account/order-parts");
+  assert.equal(itemLabel(big), "7+ items");
+  assert.equal(itemLabel(small), "7 items");
+  const detail = await (await handlers.orderApi(request("/api/account/orders/9101", a.jar), "9101", t.deps)).json();
+  assert.equal(detail.lines.length, 5);
+  assert.equal(detail.lines.reduce((sum: number, l: {quantity: number}) => sum + l.quantity, 0), 8);
+  const overview = await (await handlers.overviewApi(request("/api/account/overview", a.jar), t.deps)).json();
+  assert.equal(overview.recentOrders[0].itemCountComplete, false);
 });

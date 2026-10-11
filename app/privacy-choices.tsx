@@ -204,11 +204,17 @@ export function usePrivacy(initial:PrivacySnapshot) {
 export type PrivacyControls=ReturnType<typeof usePrivacy>;
 
 export function PrivacyChoicesSheet({open,onOpenChange,privacy,links,returnFocus}:{open:boolean;onOpenChange:(open:boolean)=>void;privacy:PrivacyControls;links:PrivacyLinks;returnFocus:RefObject<HTMLElement|null>}) {
-  const {gpc,saving,notice,snapshot}=privacy;
-  const undecided=PRIVACY_PURPOSES.every(p=>snapshot.choices[p]===null&&privacy.pending[p]!==false);
   return <Sheet open={open} onOpenChange={onOpenChange}><SheetContent className="bag-sheet privacy-sheet" onCloseAutoFocus={event=>{if(returnFocus.current?.isConnected){event.preventDefault();returnFocus.current.focus();}}}>
     <div className="sheet-heading"><SheetTitle>Your Privacy Choices</SheetTitle><SheetDescription>Choose how IQON may use your data on this site and when you check out.</SheetDescription></div>
-    <div className="privacy-body">
+    <PrivacyPanel privacy={privacy} links={links}/>
+  </SheetContent></Sheet>;
+}
+/** The canonical privacy controls, shown in the sheet and inline on /account/privacy. Both use the
+ *  store shell's single usePrivacy instance, so there is one decision state per page. */
+export function PrivacyPanel({privacy,links}:{privacy:PrivacyControls;links:PrivacyLinks}) {
+  const {gpc,saving,notice,snapshot}=privacy;
+  const undecided=PRIVACY_PURPOSES.every(p=>snapshot.choices[p]===null&&privacy.pending[p]!==false);
+  return <div className="privacy-body">
       {gpc&&<p className="privacy-gpc" role="note">Global Privacy Control is on in this browser. We treat it as your choice to turn off advertising and the sale or sharing of your data.</p>}
       {snapshot.status==="loading"?<p className="privacy-state" role="status">Loading your privacy choices…</p>:<>
         <p className="privacy-state">{snapshot.status==="unavailable"?"We couldn’t load your saved privacy choices right now. Anything you turn off still stays off and is saved when the connection returns."
@@ -221,8 +227,7 @@ export function PrivacyChoicesSheet({open,onOpenChange,privacy,links,returnFocus
         <a className="under-link" href={links.policy}>Privacy policy</a>
         <a className="under-link" href={links.optOut}>Shopify opt out form</a>
       </div>
-    </div>
-  </SheetContent></Sheet>;
+    </div>;
 }
 const switchesFrom=(choices:PrivacyChoices)=>Object.fromEntries(PRIVACY_PURPOSES.map(p=>[p,choices[p]===true])) as Record<PrivacyPurpose,boolean>;
 const pendingKey=(pending:PrivacyRestriction)=>PRIVACY_PURPOSES.map(p=>pending[p]===false?"0":"n").join("");

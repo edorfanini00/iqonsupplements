@@ -157,9 +157,10 @@
 .profile-facts dd{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;overflow-wrap:anywhere}
 .profile-facts small{font-size:13px;color:#808182}
 
-.privacy-panel{display:flex;flex-direction:column;align-items:flex-start;gap:18px;max-width:640px}
-.privacy-panel p{font-size:15px;color:#5b5c5d;line-height:1.65}
-.privacy-links{display:flex;flex-wrap:wrap;gap:24px}
+.privacy-inline{max-width:640px}
+.privacy-inline h2{margin-bottom:6px}
+.privacy-inline-lead{font-size:15px;color:#5b5c5d;margin-bottom:18px}
+.privacy-inline .privacy-body{padding:0}
 
 .account-dialog h2{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-.4px}
 .account-dialog .button{min-height:44px}
@@ -174,8 +175,8 @@
   .account-frame{grid-template-columns:minmax(0,1fr);gap:26px}
   .account-sidebar{position:static;gap:2px}
   .account-hello{font-size:22px;margin:0 0 12px}
-  .account-nav{flex-direction:row;overflow-x:auto;gap:6px;border:0;padding-bottom:4px;margin:0 -4%;padding-left:4%;padding-right:4%;scrollbar-width:none}
-  .account-nav::-webkit-scrollbar{display:none}
+  /* Every destination visible at once on phones (wraps to two rows), nothing hidden off-screen. */
+  .account-nav{flex-direction:row;flex-wrap:wrap;gap:8px;border:0}
   .account-nav a{flex:none;padding:8px 14px;border:1px solid var(--line);border-radius:99px;font-size:13px;white-space:nowrap}
   .account-nav a.is-active{background:#28292a;border-color:#28292a;color:#fff}
   .account-signout-side{display:none}
