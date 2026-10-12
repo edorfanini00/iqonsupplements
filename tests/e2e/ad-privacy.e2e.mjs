@@ -14,7 +14,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { STORE, VARIANTS, readState, writeState } from "./fake-shopify-storefront.mjs";
+import { STORE, readState, writeState } from "./fake-shopify-storefront.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const playwright = await import(process.env.PLAYWRIGHT_CORE ? pathToFileURL(path.join(process.env.PLAYWRIGHT_CORE, "index.js")).href : "playwright-core");
