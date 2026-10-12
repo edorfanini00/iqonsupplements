@@ -3,7 +3,8 @@ import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
-import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS, CART_CHECKOUT, CART_ATTRIBUTES } from "./shopify-operations";
+import { AD_RESTRICTION_ATTRIBUTE, adChoiceFromCookies, adRestriction, checkoutVisitorConsent, choiceKey, type AdRestriction } from "./ad-privacy";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
@@ -122,17 +123,80 @@ export async function mutateCartResponse(request:Request) {
     return Response.json(snapshot,{headers:responseHeaders});
   } catch(error) {return fail(error);}
 }
+// Advertising privacy controls (docs/ad-tracking.md). Off: checkout behaves exactly as before,
+// except that an opt-out already stored in this browser is still honoured.
+const adControls=()=>process.env.AD_PRIVACY_CONTROLS==="on";
+type AdSignals={gpc:boolean;restrict:boolean};
+async function adSignals(request:Request):Promise<AdSignals> {
+  // Signals can only restrict: GPC from the header or the page, or an opt-out held only in memory
+  // because this browser refused to store the cookie. Nothing in a request body can grant.
+  if(Number(request.headers.get("content-length")||0)>1024) throw new CommerceError("Invalid request.",413);
+  const text=await request.text();
+  if(text.length>1024) throw new CommerceError("Invalid request.",413);
+  let input:unknown={};
+  if(text){try{input=JSON.parse(text);}catch{throw new CommerceError("Invalid request.",400);}}
+  const body=input&&typeof input==="object"&&!Array.isArray(input)?input as Record<string,unknown>:{};
+  if(!adControls())return {gpc:false,restrict:false};
+  return {gpc:request.headers.get("sec-gpc")==="1"||body.gpc===true,restrict:body.restrict===true};
+}
+/** Adds the restriction to the cart unless it is already there; never removes one. */
+async function restrictCart(cart:ShopifyCart,restriction:Exclude<AdRestriction,null>):Promise<ShopifyCart> {
+  const existing=(cart.attributes||[]).filter(a=>a&&typeof a.key==="string").map(a=>({key:a.key,value:typeof a.value==="string"?a.value:""}));
+  if(existing.some(a=>a.key===AD_RESTRICTION_ATTRIBUTE&&a.value))return cart;
+  const result=await mutate(CART_ATTRIBUTES,{cartId:cart.id,attributes:[...existing.filter(a=>a.key!==AD_RESTRICTION_ATTRIBUTE),{key:AD_RESTRICTION_ATTRIBUTE,value:restriction}]});
+  return result.cart!;
+}
+async function contextualCheckoutUrl(cart:ShopifyCart,consent:Record<string,boolean>):Promise<string> {
+  const settings=config();
+  if(!settings) throw new CommerceError("Orders are not open yet.",503);
+  let lastError:unknown;
+  for(let attempt=0;attempt<2;attempt++) {
+    try {
+      const result=await shopifyRequest<{cart:ShopifyCart|null}>(settings,CART_CHECKOUT,{id:cart.id,consent},await buyerIP());
+      if(result.cart?.id===cart.id&&result.cart.checkoutUrl)return result.cart.checkoutUrl;
+      lastError=new CommerceError("Checkout is temporarily unavailable.");
+    } catch(error) {lastError=error;}
+  }
+  throw lastError;
+}
 export async function checkoutResponse(request:Request) {
   try {
     sameOrigin(request);
+    const signals=await adSignals(request);
+    const choice=adChoiceFromCookies(request.headers.get("cookie"));
+    const restriction=signals.restrict?"denied":adRestriction(choice,signals.gpc);
+    const consent=signals.restrict?{marketing:false,saleOfData:false}:checkoutVisitorConsent(choice,signals.gpc);
     // Refresh immediately before handing the buyer to Shopify's hosted checkout.
     const refreshed=await removeUpcomingProducts(await readCart());
-    const cart=refreshed.cart;
+    let cart=refreshed.cart;
     if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
     if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
-    const url=new URL(cart.checkoutUrl);
+    let restricted=false;
+    if(restriction) {try {cart=await restrictCart(cart,restriction);restricted=true;} catch {}}
+    let checkoutUrl=cart.checkoutUrl;
+    let consentHandoff:"sent"|"unavailable"|undefined;
+    if(consent) {
+      try {checkoutUrl=await contextualCheckoutUrl(cart,consent);consentHandoff="sent";}
+      catch {
+        // Without either restriction channel an opted-out buyer could be measured: do not hand off.
+        if(restriction&&!restricted) throw new CommerceError("Checkout is temporarily unavailable. Please try again.",503);
+        consentHandoff="unavailable";
+      }
+    }
+    const url=new URL(checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
-    return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
+    return Response.json({checkoutUrl,choice:choiceKey(choice),...(consentHandoff?{consentHandoff}:{})},{headers:responseHeaders});
+  }catch(error){return fail(error);}
+}
+/** Opt-out on the storefront: restrict the current cart now, so an already open checkout is covered too. */
+export async function restrictCartResponse(request:Request) {
+  try {
+    if(!adControls()) return Response.json({error:"Not found."},{status:404,headers:responseHeaders});
+    sameOrigin(request);
+    await adSignals(request);
+    const cart=await readCart();
+    if(cart?.totalQuantity) await restrictCart(cart,"denied");
+    return Response.json({restricted:Boolean(cart?.totalQuantity)},{headers:responseHeaders});
   }catch(error){return fail(error);}
 }

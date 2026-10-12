@@ -85,7 +85,10 @@ function payloadFor(checkout) {
 
 function loadMeta() {
   if (typeof window.fbq === "function") return window.fbq;
-  const fbq = function () { fbq.callMethod ? fbq.callMethod.apply(fbq, arguments) : fbq.queue.push(arguments); };
+  const fbq = function () {
+    if (fbq.callMethod) fbq.callMethod.apply(fbq, arguments);
+    else fbq.queue.push(arguments);
+  };
   fbq.push = fbq; fbq.loaded = true; fbq.version = "2.0"; fbq.queue = [];
   // No automatic PageView on history changes and no automatic button/metadata collection.
   fbq.disablePushState = true;

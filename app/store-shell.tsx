@@ -11,6 +11,8 @@ import type { Category } from "@/lib/catalog";
 import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Purchase, type Product, type StoreCatalog } from "@/lib/catalog";
 import { isComingSoon } from "@/lib/commerce-policy";
 import type { CartSnapshot } from "@/lib/shopify";
+import { choiceKey } from "@/lib/ad-privacy";
+import { browserGpc, hasMemoryOptOut, readAdChoice, useAdPrivacy } from "./ad-privacy-client";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -22,6 +24,7 @@ export function Wordmark({large=false}:{large?:boolean}) {return <svg className=
 export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreCatalog}) {
   const {products,mode}=catalog; const router=useRouter(); const findProduct=(id:string)=>products.find(p=>p.id===id);
   const pathname=usePathname();
+  const ads=useAdPrivacy();
   const [cart,setCart]=useState<CartItem[]>([]);
   const [hydrated,setHydrated]=useState(false);
   const [bag,setBag]=useState(false);
@@ -92,9 +95,15 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     if(!live||lock.current||!hydrated)return;
     lock.current=true;setBusy(true);setError("");
     try{
-      const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}",signal:AbortSignal.timeout(15000)});
-      const data=await response.json();if(data.cart)applySnapshot(data.cart);if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
-      window.location.assign(data.checkoutUrl);
+      // Navigate only with a handoff built from the advertising choice this browser holds right now;
+      // if another tab changed it while checkout was being prepared, prepare it again.
+      for(let attempt=0;attempt<3;attempt++){
+        const signals=ads.controls?{...(browserGpc()?{gpc:true}:{}),...(hasMemoryOptOut()?{restrict:true}:{})}:{};
+        const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(signals),signal:AbortSignal.timeout(15000)});
+        const data=await response.json();if(data.cart)applySnapshot(data.cart);if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
+        if(data.choice===choiceKey(readAdChoice())){window.location.assign(data.checkoutUrl);return;}
+      }
+      throw new Error("Your privacy choice changed while checkout was opening. Please select checkout again.");
     }catch(e){setError(e instanceof Error?e.message:"Checkout is temporarily unavailable.");lock.current=false;setBusy(false);}
   };
   const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count};
@@ -146,4 +155,4 @@ export function ProductCard({product:p,compact=false}:{product:Product;compact?:
   {isComingSoon(p)||p.pricePending||p.available===false||p.requiresSellingPlan?<Link className="button button-dark product-card-action" aria-label={`View ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add ${p.name} to bag`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
  </article>;
 }
-function Footer(){const {mode,currency,department}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><Link href="/account/privacy" prefetch={false}>Privacy</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
+function Footer(){const {mode,currency,department}=useStore();const {controls}=useAdPrivacy();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><Link href={controls?"/account/privacy#advertising":"/account/privacy"} prefetch={false}>{controls?"Your Privacy Choices":"Privacy"}</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
