@@ -65,9 +65,10 @@ it("opens the clicked affiliate's contact details in place without any payout mu
   // Same payout table remains in place.
   expect(screen.getByText("Pending balances")).toBeTruthy();
   expect(screen.getByRole("button", { name: "Bravo Synthetic" })).toBeTruthy();
-  expect(calls.every((c) => c.method === "GET")).toBe(true);
-  expect(calls.filter((c) => c.url.startsWith("/api/affiliates/admin/affiliates/")).map((c) => c.url)).toEqual([
-    "/api/affiliates/admin/affiliates/aff-alpha",
+  // Exact request list: no session/command/payout calls, only the two reads.
+  expect(calls).toEqual([
+    { url: "/api/affiliates/admin/payouts", method: "GET" },
+    { url: "/api/affiliates/admin/affiliates/aff-alpha", method: "GET" },
   ]);
 });
 
@@ -92,6 +93,7 @@ it("shows an error with retry, then loads on retry", async () => {
   await within(dialog).findByText("Couldn't load contact details.");
   expect(within(dialog).queryByText("alpha@example.invalid")).toBeNull();
   fireEvent.click(within(dialog).getByRole("button", { name: "Retry" }));
+  expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Close contact details" }));
   await within(dialog).findByText("alpha@example.invalid");
   expect(within(dialog).queryByText("Couldn't load contact details.")).toBeNull();
 });
@@ -138,4 +140,20 @@ it("keeps keyboard focus inside the dialog", async () => {
   expect(document.activeElement).toBe(close);
   fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
   expect(document.activeElement).toBe(back);
+});
+
+it("explains a permission failure without showing any details", async () => {
+  setup(async () => Response.json({ ok: false, error: "Forbidden" }, { status: 403 }));
+  render(React.createElement(Page));
+  const { dialog } = await openContact("Alpha Synthetic");
+  await within(dialog).findByText("You don't have access to this affiliate's contact details.");
+  expect(dialog.textContent).not.toContain("alpha@example.invalid");
+});
+
+it("shows a phone with an extension as saved but does not build a misleading tel link", async () => {
+  setup(async (id) => Response.json({ ok: true, affiliate: { ...profiles[id], phone: "+1 555 0100 ext 12" } }));
+  render(React.createElement(Page));
+  const { dialog } = await openContact("Alpha Synthetic");
+  const phone = await within(dialog).findByText("+1 555 0100 ext 12");
+  expect(phone.closest("a")).toBeNull();
 });

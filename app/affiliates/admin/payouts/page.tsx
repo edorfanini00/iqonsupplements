@@ -875,7 +875,6 @@ interface ContactProfile {
   lastName?: string;
   email?: string;
   phone?: string;
-  promoCode?: string;
   bankInfo?: { paypalEmail?: string; zelle?: string } | null;
 }
 
@@ -925,7 +924,17 @@ function PendingContactModal({
           setError("Couldn't load contact details.");
           return;
         }
-        setProfile(affiliate);
+        // Keep only what is displayed; never hold bank account numbers here.
+        setProfile({
+          id: affiliate.id,
+          firstName: affiliate.firstName,
+          lastName: affiliate.lastName,
+          email: affiliate.email,
+          phone: affiliate.phone,
+          bankInfo: affiliate.bankInfo
+            ? { paypalEmail: affiliate.bankInfo.paypalEmail, zelle: affiliate.bankInfo.zelle }
+            : null,
+        });
       } catch {
         if (!controller.signal.aborted) setError("Couldn't load contact details.");
       }
@@ -948,7 +957,10 @@ function PendingContactModal({
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
+      if (!dialogRef.current.contains(document.activeElement)) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      } else if (e.shiftKey && document.activeElement === first) {
         e.preventDefault();
         last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
@@ -1016,6 +1028,8 @@ function PendingContactModal({
                 onClick={() => {
                   setError(null);
                   setAttempt((n) => n + 1);
+                  // The Retry button unmounts; keep focus inside the dialog.
+                  closeRef.current?.focus();
                 }}
                 className="self-start inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-sans border border-[#242526]/15 text-[#20282c] hover:bg-[#242526]/5 transition-colors"
               >
@@ -1029,7 +1043,7 @@ function PendingContactModal({
           ) : (
             <dl className="space-y-2 text-sm">
               <ContactDetail label="Email" value={profile.email} href={profile.email ? `mailto:${profile.email}` : undefined} />
-              <ContactDetail label="Phone" value={profile.phone} href={profile.phone ? `tel:${profile.phone.replace(/[^+\d]/g, "")}` : undefined} />
+              <ContactDetail label="Phone" value={profile.phone} href={telHref(profile.phone)} />
               <ContactDetail label="Bank details" value={bank ? "On file" : "Not on file"} />
               {bank?.paypalEmail && <ContactDetail label="PayPal" value={bank.paypalEmail} />}
               {bank?.zelle && <ContactDetail label="Zelle" value={bank.zelle} />}
@@ -1047,6 +1061,13 @@ function PendingContactModal({
       </div>
     </div>
   );
+}
+
+/** Only link plain phone numbers; extensions or free text stay unlinked. */
+function telHref(phone?: string): string | undefined {
+  const value = phone?.trim();
+  if (!value || !/^\+?[\d\s().-]+$/.test(value) || !/\d/.test(value)) return undefined;
+  return `tel:${value.replace(/[^+\d]/g, "")}`;
 }
 
 function ContactDetail({
