@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { AD_CHOICE_COOKIE, adChoiceFromCookies, choiceKey, formatAdChoice, type AdChoice, type AdDecision } from "@/lib/ad-privacy";
+import { storefrontEventUrl, type StorefrontEvent, type StorefrontPayload } from "@/lib/meta-storefront";
 
 // Browser side of the storefront advertising choice (docs/ad-tracking.md). The cookie written here
 // is the only record; it is read fresh at every decision point, so every tab sees the latest click.
@@ -60,11 +61,31 @@ export function saveAdChoice(decision: AdDecision, basedOn: string): SaveResult 
   return stored ? "saved" : tab ? "blocked" : "blocked-page";
 }
 
-type AdPrivacy = {controls: boolean; choice: AdChoice | null; gpc: boolean; refresh: () => void};
-const AdPrivacyContext = createContext<AdPrivacy>({controls: false, choice: null, gpc: false, refresh: () => {}});
+// Storefront Meta events: only with an explicit Allow stored in this browser, never under GPC or
+// a tab-only opt-out. Re-read at the moment of every send, so a withdrawal in any tab stops the
+// next event; nothing is queued.
+export function storefrontEventsAllowed() {
+  return readAdChoice()?.decision === "granted" && !browserGpc() && !hasMemoryOptOut();
+}
+function newEventId() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+}
+/** `enabled` is the server flag from useAdPrivacy().storefrontEvents. */
+export function sendStorefrontEvent(enabled: boolean, event: StorefrontEvent, payload?: StorefrontPayload) {
+  if (!enabled || !storefrontEventsAllowed()) return false;
+  const url = storefrontEventUrl(event, newEventId(), location.href, payload);
+  if (!url) return false;
+  void fetch(url, {method: "GET", mode: "no-cors", credentials: "include", referrerPolicy: "no-referrer", keepalive: true}).catch(() => {});
+  return true;
+}
+
+type AdPrivacy = {controls: boolean; storefrontEvents: boolean; choice: AdChoice | null; gpc: boolean; refresh: () => void};
+const AdPrivacyContext = createContext<AdPrivacy>({controls: false, storefrontEvents: false, choice: null, gpc: false, refresh: () => {}});
 export const useAdPrivacy = () => useContext(AdPrivacyContext);
 
-export function AdPrivacyProvider({controls, children}: {controls: boolean; children: ReactNode}) {
+export function AdPrivacyProvider({controls, events, children}: {controls: boolean; events: boolean; children: ReactNode}) {
   const [state, setState] = useState<{choice: AdChoice | null; gpc: boolean}>({choice: null, gpc: false});
   const refresh = useCallback(() => setState({choice: readAdChoice(), gpc: browserGpc()}), []);
   useEffect(() => {
@@ -82,5 +103,6 @@ export function AdPrivacyProvider({controls, children}: {controls: boolean; chil
     document.addEventListener("visibilitychange", onVisible);
     return () => { clearTimeout(initial); channel?.close(); window.removeEventListener("focus", refresh); window.removeEventListener("pageshow", refresh); document.removeEventListener("visibilitychange", onVisible); };
   }, [controls, refresh]);
-  return <AdPrivacyContext.Provider value={{controls, ...state, refresh}}>{children}</AdPrivacyContext.Provider>;
+  // Storefront events require the privacy controls: without them nobody could allow them.
+  return <AdPrivacyContext.Provider value={{controls, storefrontEvents: controls && events, ...state, refresh}}>{children}</AdPrivacyContext.Provider>;
 }

@@ -29,10 +29,12 @@ test("the rejected custom privacy runtime, its migration and route are absent fr
   assert.equal(grep("privacy-ledger|privacy-choices|lib/privacy|/api/privacy|usePrivacy|iqon_privacy", ["app", "lib", "components", "proxy.ts"]), "", "no source references the removed privacy runtime");
 });
 
-test("the storefront has no Meta code, no server-side Meta sender and no Meta credentials", () => {
-  assert.equal(grep("connect\\.facebook\\.net|fbevents|fbq\\(|graph\\.facebook\\.com|META_CAPI|META_SHOPIFY_WEBHOOK|_meta_consent|_fbp|_fbc", ["app", "lib", "components", "proxy.ts", "next.config.ts"]), "");
+test("no Meta SDK, no server-side Meta sender, no Meta credentials; one browser-side event builder", () => {
+  assert.equal(grep("connect\\.facebook\\.net|fbevents|fbq\\(|graph\\.facebook\\.com|META_CAPI|META_SHOPIFY_WEBHOOK|_meta_consent|_fbp|_fbc", ["app", "lib", "components", "proxy.ts", "next.config.ts", "shopify"]), "");
+  assert.equal(grep("facebook\\.com", ["app", "lib", "components", "proxy.ts"]), "lib/meta-storefront.ts", "storefront events are built in exactly one module");
   for (const file of ["app/api/meta/track/route.ts", "app/api/webhooks/shopify/meta-purchase/route.ts", "lib/analytics"]) assert.equal(exists(file), false, file);
-  assert.match(read("shopify/custom-pixels/iqon-meta-checkout.live.js"), /connect\.facebook\.net\/en_US\/fbevents\.js/, "Meta lives only in the checkout pixel artifact");
+  assert.match(read("shopify/custom-pixels/iqon-meta-checkout.live.js"), /https:\/\/www\.facebook\.com\/tr\?/);
+  assert.doesNotMatch(read("lib/shopify.server.ts") + read("app/api/ad-choice/route.ts"), /facebook/, "nothing server-side talks to Meta");
 });
 
 test("checkout handoff stays on the original path unless the visitor expressed something", () => {

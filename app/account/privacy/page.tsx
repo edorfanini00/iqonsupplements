@@ -10,7 +10,7 @@ import { AdvertisingChoices } from "./advertising";
 // Privacy choices are handled on Shopify's own pages for the IQON store.
 export default function AccountPrivacyPage() {
   const {session} = useAccount();
-  const {controls} = useAdPrivacy();
+  const {controls, storefrontEvents} = useAdPrivacy();
   return <>
     <PageHeading title="Privacy"/>
     {session?.status !== "signed_in" && <p className="account-meta">No sign-in needed.</p>}
@@ -24,7 +24,7 @@ export default function AccountPrivacyPage() {
         <span><strong>Privacy policy</strong><small>How IQON collects, uses and shares personal information.</small></span>
         <ArrowUpRight size={18}/>
       </a>
-      <p className="account-note">These pages are hosted by Shopify. Choices you make there are recorded by Shopify for the IQON store and its checkout. {controls ? "This site itself loads no advertising or analytics scripts; measurement happens only at Shopify checkout, as described above." : "This site doesn’t run advertising or analytics tracking of its own."}</p>
+      <p className="account-note">These pages are hosted by Shopify. Choices you make there are recorded by Shopify for the IQON store and its checkout. {storefrontEvents ? "This site loads no advertising or analytics scripts; it sends advertising measurement only if you allow it above." : controls ? "This site itself loads no advertising or analytics scripts; measurement happens only at Shopify checkout, as described above." : "This site doesn’t run advertising or analytics tracking of its own."}</p>
     </section>
   </>;
 }

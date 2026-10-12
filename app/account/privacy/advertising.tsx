@@ -14,7 +14,7 @@ const MESSAGES: Record<SaveResult, string> = {
 };
 
 export function AdvertisingChoices() {
-  const {choice, gpc, refresh} = useAdPrivacy();
+  const {choice, gpc, refresh, storefrontEvents} = useAdPrivacy();
   const [message, setMessage] = useState("");
   const shown = choiceKey(choice);
   const choose = (decision: "granted" | "denied") => {
@@ -25,10 +25,11 @@ export function AdvertisingChoices() {
   const status = gpc ? "Off. Your browser’s Global Privacy Control signal is on, and it applies here and at checkout."
     : choice?.decision === "denied" ? "Off. You opted out in this browser."
     : choice?.decision === "granted" ? "Allowed. You allowed advertising measurement in this browser."
+    : storefrontEvents ? "Off on this site until you allow it. At checkout, Shopify’s privacy settings for your region apply."
     : "You haven’t chosen here. Shopify’s privacy settings for your region apply at checkout.";
   return <section className="account-section ad-choices" id="advertising" aria-labelledby="advertising-title">
     <h2 id="advertising-title">Advertising measurement</h2>
-    <p className="ad-choices-intro">When Shopify’s privacy settings and your choices allow it, IQON tells Meta (Facebook and Instagram) when checkout is started and when an order is completed, only for orders made up entirely of certain products, to measure its ads. We don’t send your name, email, address or product names. Shopping works the same either way.</p>
+    <p className="ad-choices-intro">When Shopify’s privacy settings and your choices allow it, IQON tells Meta (Facebook and Instagram) when checkout is started and when an order is completed, only for orders made up entirely of certain products, to measure its ads. {storefrontEvents ? " Only if you allow it, this site also tells Meta when you view those products or add them to your bag." : ""} We don’t send your name, email, address or product names. Shopping works the same either way.</p>
     <p className="ad-choices-status" role="status"><strong>Current setting:</strong> {status}</p>
     <div className="ad-choices-actions">
       <button type="button" className="button ad-choice-button" aria-pressed={choice?.decision === "denied"} onClick={() => choose("denied")}>Opt out</button>

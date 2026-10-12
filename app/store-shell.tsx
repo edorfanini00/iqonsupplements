@@ -12,7 +12,8 @@ import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, t
 import { isComingSoon } from "@/lib/commerce-policy";
 import type { CartSnapshot } from "@/lib/shopify";
 import { choiceKey } from "@/lib/ad-privacy";
-import { browserGpc, hasMemoryOptOut, readAdChoice, useAdPrivacy } from "./ad-privacy-client";
+import { browserGpc, hasMemoryOptOut, readAdChoice, sendStorefrontEvent, useAdPrivacy } from "./ad-privacy-client";
+import { cartEligible, productHandle, trackablePath, variantEligible } from "@/lib/meta-storefront";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -42,8 +43,9 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const [discountCodes,setDiscountCodes]=useState<CartSnapshot["discountCodes"]>([]);
   const live=mode==="live";
   const currency=live?shopCurrency:catalog.currency;
+  const latestCart=useRef<CartItem[]>([]);
   const applySnapshot=(data:CartSnapshot)=>{
-    setCart(data.items);setShopSubtotal(data.subtotal);setShopCurrency(data.currency);setDiscountCodes(data.discountCodes||[]);setError(data.notice||"");
+    latestCart.current=data.items;setCart(data.items);setShopSubtotal(data.subtotal);setShopCurrency(data.currency);setDiscountCodes(data.discountCodes||[]);setError(data.notice||"");
   };
   async function requestCart(input?:Record<string,unknown>) {
     const response=await fetch("/api/cart",input?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(input),signal:AbortSignal.timeout(25000)}:{cache:"no-store",signal:AbortSignal.timeout(15000)});
@@ -81,7 +83,12 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       const variant=p.variants?.find(v=>v.id===variantId)||p.variants?.find(v=>v.available);
       if(!variant||!p.available)return;
       if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
-      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})});return;
+      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(added=>{
+        // Only when the whole bag is made up of reviewed products; otherwise nothing is sent.
+        if(!added||!ads.storefrontEvents||!variantEligible(variant.id)||!cartEligible(latestCart.current.map(item=>item.variantId)))return;
+        const unit=variant.sellingPlans?.find(plan=>plan.id===sellingPlanId)?.price??variant.price;
+        sendStorefrontEvent(ads.storefrontEvents,"AddToCart",{value:unit*quantity,currency:variant.currency,contents:[{id:variant.id,quantity}]});
+      });return;
     }
     if(purchase!=="once")return;
     const item={id,quantity:Math.max(1,Math.min(20,Math.floor(quantity))),purchase,frequency:purchase==="once"?"once":frequency};
@@ -114,6 +121,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span className="preview-review-notice">Illustrative ratings &amp; review counts</span><span>Orders are not enabled yet</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
     {children}
+    {ads.storefrontEvents&&<StorefrontPageEvents pathname={pathname} products={products} cart={cart} ready={hydrated}/>}
     <Footer/>
     <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<button className="button button-dark full-width" disabled={busy||!hydrated} onClick={()=>void checkout()}>Secure checkout <ArrowRight size={18}/></button>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
     <Sheet open={search} onOpenChange={setSearch}><SheetContent side="top" className="search-sheet"><SheetTitle>Find your essential.</SheetTitle><SheetDescription>Search the IQON collection</SheetDescription><div className="search-field"><Search size={22}/><input aria-label="Search the collection" placeholder="Search products, formats, collections…" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={18}/></button>}</div><div className="search-results">{results.map(p=><Link href={`/products/${p.id}`} key={p.id} onClick={()=>setSearch(false)}><img src={p.image} alt={p.name}/><span>{p.name}<small>{p.type} · {productPrice(p)}</small></span><ArrowRight size={18}/></Link>)}{!results.length&&<p className="no-results">No products match “{query}”. Try “collagen”, “creatine” or “skincare”.</p>}</div></SheetContent></Sheet>
@@ -156,3 +164,20 @@ export function ProductCard({product:p,compact=false}:{product:Product;compact?:
  </article>;
 }
 function Footer(){const {mode,currency,department}=useStore();const {controls}=useAdPrivacy();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><Link href={controls?"/account/privacy#advertising":"/account/privacy"} prefetch={false}>{controls?"Your Privacy Choices":"Privacy"}</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
+
+// PageView on allowlisted routes and ViewContent on reviewed product pages, once per route visit.
+// Nothing is sent while the bag holds any other product, since the page would then be measured
+// alongside a cart that is not eligible.
+function StorefrontPageEvents({pathname,products,cart,ready}:{pathname:string;products:Product[];cart:CartItem[];ready:boolean}) {
+  const sentFor=useRef("");
+  useEffect(()=>{
+    if(!ready||sentFor.current===pathname||!trackablePath(pathname))return;
+    if(cart.length&&!cartEligible(cart.map(item=>item.variantId)))return;
+    sentFor.current=pathname;
+    sendStorefrontEvent(true,"PageView");
+    const handle=productHandle(pathname);
+    const variant=handle?products.find(p=>p.id===handle)?.variants?.find(v=>v.available&&variantEligible(v.id)):undefined;
+    if(variant)sendStorefrontEvent(true,"ViewContent",{value:variant.price,currency:variant.currency,contents:[{id:variant.id,quantity:1}]});
+  },[pathname,products,cart,ready]);
+  return null;
+}
