@@ -4,7 +4,7 @@ import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fe
 import { canonicalActionFetch as fetch } from "@/lib/affiliates/canonical-action-fetch";
 import { usePayoutOutstanding, payoutMoney } from "@/lib/affiliates/use-payout-outstanding";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   Wallet,
   Download,
@@ -121,6 +121,11 @@ export default function AdminPayoutsPage() {
   const [preset, setPreset] = useState<Preset>("30d");
   const [loading, setLoading] = useState(true);
   const [target, setTarget] = useState<PendingRow | null>(null);
+  const [contactTarget, setContactTarget] = useState<{
+    row: PendingRow;
+    opener: HTMLElement;
+  } | null>(null);
+  const closeContact = useCallback(() => setContactTarget(null), []);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedPayoutId, setExpandedPayoutId] = useState<string | null>(null);
 
@@ -269,6 +274,7 @@ export default function AdminPayoutsPage() {
                           setExpandedId((cur) => (cur === p.id ? null : p.id))
                         }
                         onRecord={() => setTarget(p)}
+                        onContact={(opener) => setContactTarget({ row: p, opener })}
                         onRemoved={load}
                       />
                     ))}
@@ -341,6 +347,15 @@ export default function AdminPayoutsPage() {
         )}
       </section>
 
+      {contactTarget && (
+        <PendingContactModal
+          key={contactTarget.row.id}
+          target={contactTarget.row}
+          opener={contactTarget.opener}
+          onClose={closeContact}
+        />
+      )}
+
       {target && (
         <RecordPayoutModal
           target={target}
@@ -360,12 +375,14 @@ function PendingBalanceRow({
   expanded,
   onToggle,
   onRecord,
+  onContact,
   onRemoved,
 }: {
   row: PendingRow;
   expanded: boolean;
   onToggle: () => void;
   onRecord: () => void;
+  onContact: (opener: HTMLElement) => void;
   onRemoved: () => void;
 }) {
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -399,7 +416,17 @@ function PendingBalanceRow({
   return (
     <>
       <tr className="border-b border-[#242526]/5 last:border-0 hover:bg-white/40 transition-colors">
-        <td className="py-4 px-5 font-medium">{row.name}</td>
+        <td className="py-4 px-5 font-medium">
+          <button
+            type="button"
+            onClick={(e) => onContact(e.currentTarget)}
+            aria-haspopup="dialog"
+            title={`View ${row.name}'s contact details`}
+            className="text-left font-medium underline decoration-[#242526]/20 underline-offset-4 hover:decoration-[#242526] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#242526]/40 rounded-sm transition-colors"
+          >
+            {row.name}
+          </button>
+        </td>
         <td className="py-4 px-5">
           <span className="inline-flex items-center font-sans text-xs px-2.5 py-1 rounded-full bg-[#242526]/5 border border-[#242526]/10">
             {row.promoCode}
@@ -838,6 +865,216 @@ function RecordPayoutModal({
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+interface ContactProfile {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  promoCode?: string;
+  bankInfo?: { paypalEmail?: string; zelle?: string } | null;
+}
+
+/**
+ * Read-only contact card for a pending-balance affiliate. Reuses the
+ * admin-only profile GET; renders only contact + payout preference handles
+ * (never account/routing numbers) and never issues a payout request.
+ */
+function PendingContactModal({
+  target,
+  opener,
+  onClose,
+}: {
+  target: PendingRow;
+  opener: HTMLElement;
+  onClose: () => void;
+}) {
+  const [profile, setProfile] = useState<ContactProfile | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/affiliates/admin/affiliates/${encodeURIComponent(target.id)}`,
+          { credentials: "include", cache: "no-store", signal: controller.signal }
+        );
+        const data = await res.json().catch(() => null);
+        if (controller.signal.aborted) return;
+        if (!res.ok) {
+          setError(
+            res.status === 404
+              ? "This affiliate's profile could not be found."
+              : res.status === 401 || res.status === 403
+                ? "You don't have access to this affiliate's contact details."
+                : "Couldn't load contact details."
+          );
+          return;
+        }
+        const affiliate = data?.affiliate as ContactProfile | undefined;
+        // Never show another affiliate's details if the response doesn't match.
+        if (!affiliate || affiliate.id !== target.id) {
+          setError("Couldn't load contact details.");
+          return;
+        }
+        setProfile(affiliate);
+      } catch {
+        if (!controller.signal.aborted) setError("Couldn't load contact details.");
+      }
+    })();
+    return () => controller.abort();
+  }, [target.id, attempt]);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      if (opener.isConnected) opener.focus();
+    };
+  }, [opener, onClose]);
+
+  const fullName = profile
+    ? [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim()
+    : "";
+  const bank = profile?.bankInfo ?? null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pending-contact-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        className="absolute inset-0 bg-[#20282c]/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div
+        ref={dialogRef}
+        className="relative glass-surface-strong rounded-lg p-7 md:p-9 max-w-md w-full max-h-[90vh] overflow-y-auto"
+      >
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Close contact details"
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-[#242526]/5"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mb-1">
+          Contact details
+        </p>
+        <h3
+          id="pending-contact-title"
+          className="text-2xl font-medium tracking-tight mb-1 pr-8 break-words"
+        >
+          {fullName || target.name}
+        </h3>
+        <p className="text-sm text-[#64717a] font-sans">{target.promoCode}</p>
+
+        <div aria-live="polite" className="mt-6">
+          {error ? (
+            <div className="flex flex-col gap-3 p-3 bg-amber-50/80 border border-amber-200 rounded-xl">
+              <p className="flex items-start gap-2 text-sm text-amber-800">
+                <AlertCircle className="h-4 w-4 text-amber-700 mt-0.5 shrink-0" />
+                {error}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  setAttempt((n) => n + 1);
+                }}
+                className="self-start inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] uppercase tracking-[0.18em] font-sans border border-[#242526]/15 text-[#20282c] hover:bg-[#242526]/5 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : !profile ? (
+            <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a]">
+              Loading contact details…
+            </p>
+          ) : (
+            <dl className="space-y-2 text-sm">
+              <ContactDetail label="Email" value={profile.email} href={profile.email ? `mailto:${profile.email}` : undefined} />
+              <ContactDetail label="Phone" value={profile.phone} href={profile.phone ? `tel:${profile.phone.replace(/[^+\d]/g, "")}` : undefined} />
+              <ContactDetail label="Bank details" value={bank ? "On file" : "Not on file"} />
+              {bank?.paypalEmail && <ContactDetail label="PayPal" value={bank.paypalEmail} />}
+              {bank?.zelle && <ContactDetail label="Zelle" value={bank.zelle} />}
+            </dl>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-8 w-full inline-flex items-center justify-center glass-surface rounded-full py-3 text-[10px] uppercase tracking-[0.18em] font-sans text-[#20282c] hover:bg-white/80 transition-colors"
+        >
+          Back to payouts
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ContactDetail({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value?: string;
+  href?: string;
+}) {
+  const text = value?.trim();
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-[#242526]/5 last:border-0 pb-2">
+      <dt className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] pt-1 shrink-0">
+        {label}
+      </dt>
+      <dd className="text-right min-w-0 break-all">
+        {!text ? (
+          <span className="text-[#64717a] italic">Not provided</span>
+        ) : href ? (
+          <a href={href} className="hover:underline">
+            {text}
+          </a>
+        ) : (
+          text
+        )}
+      </dd>
     </div>
   );
 }
