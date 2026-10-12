@@ -92,7 +92,10 @@ it("shows an error with retry, then loads on retry", async () => {
   const { dialog } = await openContact("Alpha Synthetic");
   await within(dialog).findByText("Couldn't load contact details.");
   expect(within(dialog).queryByText("alpha@example.invalid")).toBeNull();
-  fireEvent.click(within(dialog).getByRole("button", { name: "Retry" }));
+  // Real clicks focus the button; the dialog must keep focus once it unmounts.
+  const retry = within(dialog).getByRole("button", { name: "Retry" });
+  retry.focus();
+  fireEvent.click(retry);
   expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Close contact details" }));
   await within(dialog).findByText("alpha@example.invalid");
   expect(within(dialog).queryByText("Couldn't load contact details.")).toBeNull();
