@@ -12,7 +12,7 @@ shares nothing with this code.
 | Route | Purpose |
 |---|---|
 | `GET /account/login?return=` | Starts sign-in: encrypted transaction cookie, 303 to Shopify authorize. Prefetches get 204. |
-| `GET /account/callback` | Checks state (constant time) against the transaction, exchanges the code with the PKCE verifier, verifies the id_token (RS256 via shop JWKS, issuer, audience, expiry, nonce), creates the session, 303 to an allowlisted path. |
+| `GET /account/callback` | Checks state (constant time) against the transaction, exchanges the code with the PKCE verifier, verifies the id_token (RS256 via shop JWKS, issuer, audience, expiry, nonce), then reads the signed-in customer's id from the Customer Account API with the new access token and creates the session for that customer; 303 to an allowlisted path. The id_token `sub` claim is not used for identity (Shopify's own Hydrogen client never reads it; a real preview token carried no usable `sub`); only its shape is logged. |
 | `POST /account/logout` | Same-origin only. Revokes the session row (no cookie change), then 303 to Shopify end-session. |
 | `/account`, `/account/orders[/id]`, `/account/subscriptions[/id]`, `/account/addresses`, `/account/profile` | Signed-in pages (client components reading `/api/account/*`). |
 | `/account/privacy`, `/account/signed-out` | **Public**: no session needed. `/account/privacy` links to Shopify's hosted **Your Privacy Choices** (data sharing opt-out) and **Privacy policy** pages for the IQON store (`lib/hosted-privacy.ts`). It is in the account menu and the storefront footer ("Privacy"). This site keeps no consent state and loads no advertising or analytics scripts. |

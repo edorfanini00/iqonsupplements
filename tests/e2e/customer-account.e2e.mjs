@@ -83,7 +83,7 @@ function assertLoginRedirect(status, headers, label) {
 // MOCK Shopify hop is simulated; callback, cookies, session and GraphQL run on the real server.
 async function context({mobile = false, customer: initialCustomer = A} = {}) {
   let customer = initialCustomer;
-  provider.configure({failGraphql: 0, failToken: 0, restrictHidden: false, graphqlDelayMs: 0});
+  provider.configure({failGraphql: 0, failToken: 0, restrictHidden: false, graphqlDelayMs: 0, idTokenSub: null});
   const ctx = await browser.newContext({viewport: mobile ? {width: 390, height: 844} : {width: 1440, height: 900}, deviceScaleFactor: mobile ? 2 : 1, isMobile: mobile, hasTouch: mobile});
   const hosted = [], hostedPrivacy = [];
   const hop = location => `<!doctype html><meta name="robots" content="noindex"><title>MOCK hop</title><script>location.replace(${JSON.stringify(location)})</script>`;
@@ -217,6 +217,17 @@ test("MOCK sign-in returns to the account; tokens stay out of the page, storage 
     assert.ok(!urls.some(u => u.includes(token)), "token not in any visited URL");
   }
   assert.equal(page.url(), `${base}/account/orders`);
+  await ctx.close();
+});
+
+test("real-preview regression in the browser: an id_token without sub still signs in through the real callback", async () => {
+  const {ctx} = await context();
+  provider.configure({idTokenSub: "absent"});
+  const page = await newPage(ctx);
+  await signIn(page);
+  await page.getByText(/Hello, Avery/).waitFor();
+  assert.equal(await page.evaluate(async () => (await (await fetch("/api/account/session")).json()).email), "avery.synthetic@example.test");
+  provider.configure({idTokenSub: null});
   await ctx.close();
 });
 

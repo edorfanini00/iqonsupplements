@@ -35,6 +35,9 @@ export const ACCOUNT_OVERVIEW = `query IQONAccountOverview {
 ${ADDRESS}
 ${ORDER_SUMMARY}`;
 
+/** The signed-in customer's id, read at sign-in with the freshly issued access token. */
+export const SESSION_CUSTOMER = `query IQONSessionCustomer { customer { id } }`;
+
 export const ACCOUNT_PROFILE = `query IQONAccountProfile {
   customer { id firstName lastName displayName emailAddress { emailAddress } phoneNumber { phoneNumber } }
 }`;
@@ -133,7 +136,7 @@ export const SUBSCRIPTION_UNSKIP = `mutation IQONSubscriptionUnskip($input: Subs
 }`;
 
 export const ALL_OPERATIONS = {
-  ACCOUNT_OVERVIEW, ACCOUNT_PROFILE, ACCOUNT_ORDERS, ACCOUNT_ORDER, ACCOUNT_ADDRESSES, ADDRESS_CREATE, ADDRESS_UPDATE, ADDRESS_DELETE,
+  SESSION_CUSTOMER, ACCOUNT_OVERVIEW, ACCOUNT_PROFILE, ACCOUNT_ORDERS, ACCOUNT_ORDER, ACCOUNT_ADDRESSES, ADDRESS_CREATE, ADDRESS_UPDATE, ADDRESS_DELETE,
   PROFILE_UPDATE, ACCOUNT_SUBSCRIPTIONS, ACCOUNT_SUBSCRIPTION, SUBSCRIPTION_EXTRAS_LIST, SUBSCRIPTION_EXTRAS, SUBSCRIPTION_PAUSE, SUBSCRIPTION_RESUME, SUBSCRIPTION_CANCEL, SUBSCRIPTION_SKIP, SUBSCRIPTION_UNSKIP,
 };
 

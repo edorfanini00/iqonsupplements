@@ -354,3 +354,65 @@ test("an id_token with perfect claims but signed by a foreign key (same kid) is 
   const response = jar.take(await handlers.callbackRoute(request(callback.pathname + callback.search, jar), t.deps));
   assert.equal(location(response), "/account?signin=failed");
 });
+
+test("real-preview regression: an id_token without a usable sub signs in as the customer the Customer Account API reports", async () => {
+  for (const shape of ["absent", "empty", "number"] as const) {
+    const t = setup();
+    t.provider.configure({idTokenSub: shape});
+    const logs: string[] = [];
+    const original = {info: console.info, warn: console.warn};
+    console.info = (...args: unknown[]) => { logs.push(args.join(" ")); };
+    console.warn = (...args: unknown[]) => { logs.push(args.join(" ")); };
+    let a, b;
+    try { a = await signIn(t, CUSTOMER_A); b = await signIn(t, CUSTOMER_B); }
+    finally { Object.assign(console, original); }
+    assert.equal(location(a.done), "/account", `${shape}: signed in`);
+    assert.equal(a.session.email, "avery.synthetic@example.test", shape);
+    assert.equal(b.session.email, "blake.synthetic@example.test", `${shape}: no cross-account mix-up`);
+    const row = (await store.get(a.jar.cookies.get(SESSION_COOKIE)!.split(".")[0]))!;
+    assert.equal(row.customerSub, CUSTOMER_A, `${shape}: identity from customer.id`);
+    assert.ok(logs.some(line => line.includes(`id_token sub claim is ${shape}`)), `${shape}: shape logged`);
+    const secrets = [...Object.keys(t.provider.load().access), ...Object.keys(t.provider.load().refresh)];
+    assert.ok(!logs.some(line => secrets.some(secret => line.includes(secret)) || /eyJ/.test(line)), "no token in logs");
+  }
+});
+
+test("an id_token without sub is still fully verified: nonce, audience, issuer and signature failures still fail", async () => {
+  const t = setup();
+  t.provider.configure({idTokenSub: "absent"});
+  const jar = new Jar();
+  const login = jar.take(await handlers.loginRoute(request("/account/login", jar), t.deps));
+  t.provider.configure({tokenOverride: () => ({id_token: t.provider.signIdToken(CUSTOMER_A, "wrong-nonce", {sub: undefined})})});
+  const callback = new URL(t.provider.authorize(location(login), CUSTOMER_A));
+  const response = jar.take(await handlers.callbackRoute(request(callback.pathname + callback.search, jar), t.deps));
+  assert.equal(location(response), "/account?signin=failed");
+  assert.equal(jar.cookies.has(SESSION_COOKIE), false);
+});
+
+test("sign-in creates no session when the Customer Account API can't confirm the customer", async () => {
+  for (const [name, configure, expected] of [
+    ["API outage", {failGraphql: 1}, "/account?signin=unavailable"],
+  ] as const) {
+    const t = setup();
+    t.provider.configure({idTokenSub: "absent", ...configure});
+    const jar = new Jar();
+    const login = jar.take(await handlers.loginRoute(request("/account/login", jar), t.deps));
+    const callback = new URL(t.provider.authorize(location(login), CUSTOMER_A));
+    const response = jar.take(await handlers.callbackRoute(request(callback.pathname + callback.search, jar), t.deps));
+    assert.equal(location(response), expected, name);
+    assert.equal(jar.cookies.has(SESSION_COOKIE), false, `${name}: no session cookie`);
+  }
+  // A token the API rejects (revoked between exchange and first use) is a failed sign-in.
+  const t = setup();
+  const jar = new Jar();
+  const login = jar.take(await handlers.loginRoute(request("/account/login", jar), t.deps));
+  const callback = new URL(t.provider.authorize(location(login), CUSTOMER_A));
+  const revoking = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const response = await t.fetcher(input, init);
+    if (String(input).endsWith("/oauth/token")) t.provider.mutate((state: {access: Record<string, {exp: number}>}) => { for (const a of Object.values(state.access)) a.exp = 0; });
+    return response;
+  }) as typeof fetch;
+  const response = jar.take(await handlers.callbackRoute(request(callback.pathname + callback.search, jar), {...t.deps, fetcher: revoking}));
+  assert.equal(location(response), "/account?signin=failed");
+  assert.equal(jar.cookies.has(SESSION_COOKIE), false);
+});

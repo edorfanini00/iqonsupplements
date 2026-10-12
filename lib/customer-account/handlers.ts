@@ -87,9 +87,12 @@ export async function callbackRoute(request: Request, deps: Deps = {}) {
   try {
     const tokens = await exchangeCode(config, code, tx.verifier, fetcher, now());
     const claims = await verifyIdToken(config, tokens.idToken, tx.nonce, fetcher, now());
+    if (claims.subShape !== "string") console.info(`[customer-account] sign-in: id_token sub claim is ${claims.subShape}; customer identity comes from the Customer Account API`);
+    // The session's customer is whoever the new access token reads as, per Shopify itself.
+    const customerId = await signedInCustomerId({config, fetcher, now, store}, tokens);
     // A fresh session row and cookie on every sign-in: no fixation from any earlier cookie. This is
     // the only response that ever sets the session cookie.
-    const {cookie} = await createSession(config, store, claims.sub, tokens, now());
+    const {cookie} = await createSession(config, store, customerId, tokens, now());
     void store.purge(now(), 7 * 24 * 60 * 60 * 1000, 25).catch(() => {});
     return redirect(safeReturnPath(tx.returnTo), [...cleared, cookie], "no-referrer");
   } catch (error) {
@@ -119,6 +122,18 @@ export async function logoutRoute(request: Request, deps: Deps = {}) {
   // Shopify's end-session endpoint only accepts GET with id_token_hint (POST is rejected), so
   // the hint is sent to Shopify with no referrer.
   return redirect(session ? logoutUrl(ctx.config, session.tokens.idToken) : "/account/signed-out", [], "no-referrer");
+}
+
+async function signedInCustomerId(ctx: Ctx, tokens: CustomerSession["tokens"]) {
+  let data: {customer?: {id?: unknown} | null};
+  try { data = await customerGraphql(ctx, {tokens} as CustomerSession, ops.SESSION_CUSTOMER, {}); }
+  catch (error) {
+    if (error instanceof Upstream401) throw new ProviderError("rejected", "new access token rejected by the Customer Account API");
+    throw error;
+  }
+  const id = data.customer?.id;
+  if (typeof id !== "string" || !/^gid:\/\/shopify\/Customer\/\d{1,20}$/.test(id)) throw new ProviderError("unavailable", "customer id missing from the Customer Account API");
+  return id;
 }
 
 function isPrefetch(request: Request) {

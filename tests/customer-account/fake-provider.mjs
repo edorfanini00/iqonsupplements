@@ -62,7 +62,7 @@ function initialState() {
     privateKey: privateKey.export({format: "pem", type: "pkcs8"}),
     jwk: {...publicKey.export({format: "jwk"}), kid: "mock-key-1", use: "sig", alg: "RS256"},
     codes: {}, access: {}, refresh: {}, customers: seedCustomers(), nextId: 9900,
-    config: {expiresIn: 3600, rotateRefresh: true, failGraphql: 0, failToken: 0, tokenOverride: null, restrictHidden: false},
+    config: {expiresIn: 3600, rotateRefresh: true, failGraphql: 0, failToken: 0, tokenOverride: null, restrictHidden: false, idTokenSub: null},
     ledger: [],
   };
 }
@@ -79,7 +79,11 @@ export function createFakeProvider({origin, file} = {}) {
   function idToken(state, sub, nonce) {
     const now = Math.floor(Date.now() / 1000);
     const header = b64u(JSON.stringify({alg: "RS256", kid: state.jwk.kid, typ: "JWT"}));
-    const payload = b64u(JSON.stringify({iss: base, aud: CLIENT_ID, sub, nonce, iat: now, exp: now + 3600, email: state.customers[sub].email, sid: token("sid")}));
+    // idTokenSub reproduces id_tokens whose `sub` is unusable, as seen on the real preview callback:
+    // "absent" omits it, "empty" sends "", "number" sends a numeric id. Default: the customer gid.
+    const shape = state.config.idTokenSub;
+    const subject = shape === "absent" ? {} : {sub: shape === "empty" ? "" : shape === "number" ? Number(sub.split("/").pop()) : sub};
+    const payload = b64u(JSON.stringify({iss: base, aud: CLIENT_ID, ...subject, nonce, iat: now, exp: now + 3600, email: state.customers[sub].email, sid: token("sid")}));
     return `${header}.${payload}.${b64u(sign("RSA-SHA256", Buffer.from(`${header}.${payload}`), state.privateKey))}`;
   }
 
@@ -163,7 +167,7 @@ export function createFakeProvider({origin, file} = {}) {
       const own = (list, id) => list.find(item => item.id === id);
       const addressInput = input => ({...input, province: input.zoneCode, country: input.territoryCode === "US" ? "United States" : input.territoryCode});
       switch (name) {
-        case "IQONAccountOverview": case "IQONAccountProfile": case "IQONAccountOrders": case "IQONAccountAddresses": case "IQONAccountSubscriptions": case "IQONSubscriptionExtrasList":
+        case "IQONSessionCustomer": case "IQONAccountOverview": case "IQONAccountProfile": case "IQONAccountOrders": case "IQONAccountAddresses": case "IQONAccountSubscriptions": case "IQONSubscriptionExtrasList":
           return json({data: {customer: customer()}});
         case "IQONAccountOrder": {
           const o = own(c.orders, v.id);

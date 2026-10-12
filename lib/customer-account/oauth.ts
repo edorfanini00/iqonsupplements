@@ -99,7 +99,13 @@ async function loadJwks(config: CustomerAccountConfig, fetcher: Fetcher, force: 
   return data.keys;
 }
 
-export type IdTokenClaims = {sub: string; email?: string; sid?: string; exp: number};
+/**
+ * Verified claims. The token proves the sign-in event (signature, issuer, audience, expiry, nonce).
+ * It is not the source of customer identity: Shopify's own client never reads `sub`, and the
+ * session's customer is taken from the Customer Account API with the new access token.
+ * `subShape` is recorded only for diagnostics; the claim's value is never logged.
+ */
+export type IdTokenClaims = {sub: string | null; subShape: "string" | "absent" | "empty" | "number" | "other"; email?: string; sid?: string; exp: number};
 
 function decodePart<T>(part: string): T {
   return JSON.parse(new TextDecoder().decode(fromBase64url(part))) as T;
@@ -126,7 +132,7 @@ export async function verifyIdToken(config: CustomerAccountConfig, idToken: stri
   if (typeof claims.exp !== "number" || claims.exp + 60 < seconds) throw new ProviderError("rejected", "id_token expired");
   if (typeof claims.iat === "number" && claims.iat - 300 > seconds) throw new ProviderError("rejected", "id_token issued in the future");
   if (expectedNonce !== null && claims.nonce !== expectedNonce) throw new ProviderError("rejected", "id_token nonce mismatch");
-  if (typeof claims.sub !== "string" || !claims.sub) throw new ProviderError("rejected", "id_token subject missing");
-  return {sub: claims.sub, exp: claims.exp, ...(typeof claims.email === "string" ? {email: claims.email} : {}), ...(typeof claims.sid === "string" ? {sid: claims.sid} : {})};
+  const subShape: IdTokenClaims["subShape"] = typeof claims.sub === "string" ? (claims.sub ? "string" : "empty") : claims.sub === undefined || claims.sub === null ? "absent" : typeof claims.sub === "number" ? "number" : "other";
+  return {sub: subShape === "string" ? claims.sub as string : null, subShape, exp: claims.exp, ...(typeof claims.email === "string" ? {email: claims.email} : {}), ...(typeof claims.sid === "string" ? {sid: claims.sid} : {})};
 }
 
