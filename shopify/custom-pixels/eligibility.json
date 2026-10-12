@@ -1,0 +1,16 @@
+{
+  "pixelId": "1006368245818889",
+  "note": "Variants whose checkout events may be sent to Meta. Every line of an order must be listed here or the order sends nothing. Adding a variant requires a content/eligibility review of that product (claims, name, URL, label). IDs read from the public storefront on 2026-10-12.",
+  "reviewStatus": "pending-content-review",
+  "variants": {
+    "52086268985639": "creatine-monohydrate",
+    "52086149480743": "hydrolyzed-collagen-peptides",
+    "52086282486055": "colostrum-powder"
+  },
+  "neverEligible": {
+    "52086119760167": "glp-1-support",
+    "52086123430183": "keto-5",
+    "52086204694823": "liver-support",
+    "52086297329959": "colon-gentle-cleanse"
+  }
+}
