@@ -25,17 +25,17 @@ test("cookie header parsing: exact name, restrictive merge, other cookies ignore
   assert.equal(p.choiceKey(p.parseAdChoice(G)), "AAAAAAAAAAAAAAAAAAAAAA");
 });
 
-test("restriction and checkout consent: only expressed values, GPC restricts sale of data, nothing invented", () => {
+test("restriction and checkout consent: only expressed values, GPC turns marketing and sale of data off, nothing invented", () => {
   const granted = p.parseAdChoice(G), denied = p.parseAdChoice(D);
   assert.equal(p.adRestriction(null, false), null);
   assert.equal(p.adRestriction(null, true), "gpc");
   assert.equal(p.adRestriction(granted, true), "gpc");
   assert.equal(p.adRestriction(denied, true), "denied");
   assert.equal(p.checkoutVisitorConsent(null, false), null);
-  assert.deepEqual(p.checkoutVisitorConsent(null, true), {saleOfData: false});
+  assert.deepEqual(p.checkoutVisitorConsent(null, true), {marketing: false, saleOfData: false});
   assert.deepEqual(p.checkoutVisitorConsent(denied, false), {marketing: false, saleOfData: false});
   assert.deepEqual(p.checkoutVisitorConsent(granted, false), {marketing: true, saleOfData: true});
-  assert.deepEqual(p.checkoutVisitorConsent(granted, true), {marketing: true, saleOfData: false});
+  assert.deepEqual(p.checkoutVisitorConsent(granted, true), {marketing: false, saleOfData: false}, "GPC overrides a stored grant");
   for (const [choice, gpc] of [[null, false], [null, true], [denied, false], [granted, true]]) {
     const consent = p.checkoutVisitorConsent(choice, gpc) || {};
     assert.ok(!("analytics" in consent) && !("preferences" in consent), "analytics/preferences are never expressed here");

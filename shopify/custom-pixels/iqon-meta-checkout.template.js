@@ -8,16 +8,20 @@
 // consent (including the storefront's `_cs` handoff, Shopify's hosted opt-out page and GPC)
 // allow marketing and sale of data. The checks below repeat that decision at every event.
 //
-// Sends at most InitiateCheckout and Purchase. No PageView, no automatic events, no customer
-// data, no product names or URLs. An order is sent only when EVERY line is an allowlisted
-// variant; otherwise nothing is sent for it. The storefront's `_iqon_ad_restriction` cart
-// attribute (opt-out or GPC on www.iqonbody.com) blocks sending; it can never grant anything.
+// Sends at most InitiateCheckout and Purchase, each as ONE parameter-controlled request to Meta's
+// image-pixel endpoint: no Meta SDK, so no queue, no automatic events, no cookies, and no
+// automatic page URL or referrer (dl is a fixed neutral URL; the request carries no Referer).
+// No customer data, product names or URLs. The checkout token is sent only as a SHA-256 hash.
+// An order is sent only when EVERY line is an allowlisted variant; otherwise nothing is sent.
+// The storefront's `_iqon_ad_restriction` cart attribute blocks sending; it never grants.
 const CONFIG = /*__IQON_PIXEL_CONFIG__*/{};
 
 const RESTRICTION_ATTRIBUTE = "_iqon_ad_restriction";
+const NEUTRAL_URL = "https://www.iqonbody.com/";
 let privacy = typeof init !== "undefined" && init && init.customerPrivacy ? init.customerPrivacy : null;
-let revoked = false;
-const sent = new Set();
+// Counts withdrawals; an event decided before a withdrawal is never sent after it.
+let withdrawals = 0;
+const claimed = new Set();
 
 function permitted() {
   return !!privacy && privacy.marketingAllowed === true && privacy.saleOfDataAllowed === true;
@@ -26,13 +30,7 @@ function permitted() {
 if (typeof api !== "undefined" && api && api.customerPrivacy && typeof api.customerPrivacy.subscribe === "function") {
   api.customerPrivacy.subscribe("visitorConsentCollected", function (event) {
     privacy = event && event.customerPrivacy ? event.customerPrivacy : null;
-    if (!permitted() && typeof window.fbq === "function" && !revoked) {
-      revoked = true;
-      window.fbq("consent", "revoke");
-    } else if (permitted() && revoked && typeof window.fbq === "function") {
-      revoked = false;
-      window.fbq("consent", "grant");
-    }
+    if (!permitted()) withdrawals++;
   });
 }
 
@@ -47,7 +45,7 @@ function restricted(checkout) {
   // An unreadable attribute list cannot show that no restriction exists.
   if (!attributes) return true;
   return attributes.some(function (attribute) {
-    return attribute && attribute.key === RESTRICTION_ATTRIBUTE && attribute.value !== "";
+    return !attribute || typeof attribute.key !== "string" || (attribute.key === RESTRICTION_ATTRIBUTE && attribute.value !== "");
   });
 }
 
@@ -82,47 +80,60 @@ function payloadFor(checkout) {
   };
 }
 
-function loadMeta() {
-  if (typeof window.fbq === "function") return window.fbq;
-  const fbq = function () {
-    if (fbq.callMethod) fbq.callMethod.apply(fbq, arguments);
-    else fbq.queue.push(arguments);
-  };
-  fbq.push = fbq; fbq.loaded = true; fbq.version = "2.0"; fbq.queue = [];
-  // No automatic PageView on history changes and no automatic button/metadata collection.
-  fbq.disablePushState = true;
-  window.fbq = fbq; window._fbq = window._fbq || fbq;
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = "https://connect.facebook.net/en_US/fbevents.js";
-  document.head.appendChild(script);
-  fbq("set", "autoConfig", false, CONFIG.pixelId);
-  fbq("consent", "grant");
-  fbq("init", CONFIG.pixelId);
-  return fbq;
+async function sha256Hex(text) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest)).map(function (byte) { return byte.toString(16).padStart(2, "0"); }).join("");
 }
 
-function handle(eventName, checkout, eventId) {
+function storage() {
+  return typeof browser !== "undefined" && browser && browser.localStorage && typeof browser.localStorage.getItem === "function" ? browser.localStorage : null;
+}
+
+// One request with every parameter set here; Meta receives nothing the code did not choose.
+function requestUrl(eventName, eventId, payload) {
+  const params = new URLSearchParams({id: CONFIG.pixelId, ev: eventName, eid: eventId, dl: NEUTRAL_URL, noscript: "1"});
+  for (const key of Object.keys(payload)) {
+    const value = payload[key];
+    params.set("cd[" + key + "]", typeof value === "object" ? JSON.stringify(value) : String(value));
+  }
+  return "https://www.facebook.com/tr?" + params.toString();
+}
+
+async function handle(eventName, checkout, idSource) {
   const decision = {event: eventName, permitted: permitted(), restricted: restricted(checkout), eligible: false};
   const payload = payloadFor(checkout);
   decision.eligible = !!payload;
   if (CONFIG.mode === "diagnostic") {
+    // Diagnostic builds never contact Meta under any condition.
     console.info("[iqon-meta-checkout diagnostic]", JSON.stringify(decision));
     return;
   }
-  if (!decision.permitted || decision.restricted || !payload || !eventId || sent.has(eventId)) return;
-  sent.add(eventId);
-  loadMeta()("track", eventName, payload, {eventID: eventId});
+  if (!decision.permitted || decision.restricted || !payload || !idSource) return;
+  const decidedAt = withdrawals;
+  let eventId;
+  try { eventId = eventName === "Purchase" ? idSource : "ic_" + await sha256Hex("iqon-ic:" + idSource); }
+  catch (error) { return; } // no hashing available: never fall back to the raw token
+  const key = "iqon_meta_sent:" + eventId;
+  if (claimed.has(key)) return;
+  claimed.add(key);
+  const store = storage();
+  if (store) {
+    try { if (await store.getItem(key)) return; await store.setItem(key, "1"); } catch (error) { /* documented: checkout_completed fires once per checkout */ }
+  }
+  // Fresh gate at the moment of sending: still permitted, and no withdrawal since the decision.
+  if (!permitted() || withdrawals !== decidedAt) return;
+  try { await fetch(requestUrl(eventName, eventId, payload), {method: "GET", mode: "no-cors", credentials: "include", referrerPolicy: "no-referrer", keepalive: true}); }
+  catch (error) { /* tracking failures never affect checkout */ }
 }
 
 analytics.subscribe("checkout_started", function (event) {
   const checkout = event && event.data && event.data.checkout;
-  const token = checkout && typeof checkout.token === "string" && /^[A-Za-z0-9_-]{1,100}$/.test(checkout.token) ? checkout.token : null;
-  handle("InitiateCheckout", checkout, token && "ic_" + token);
+  const token = checkout && typeof checkout.token === "string" && /^[A-Za-z0-9_-]{1,200}$/.test(checkout.token) ? checkout.token : null;
+  return handle("InitiateCheckout", checkout, token);
 });
 
 analytics.subscribe("checkout_completed", function (event) {
   const checkout = event && event.data && event.data.checkout;
   const orderId = numericId(checkout && checkout.order && checkout.order.id);
-  handle("Purchase", checkout, orderId && "purchase_" + orderId);
+  return handle("Purchase", checkout, orderId && "purchase_" + orderId);
 });

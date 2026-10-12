@@ -47,9 +47,10 @@ export function adRestriction(choice: AdChoice | null, gpc: boolean): AdRestrict
   return gpc ? "gpc" : null;
 }
 
-/** Only what the visitor expressed here (or GPC); null means "no preference": Shopify's defaults apply. */
+/** Only what the visitor expressed here; null means "no preference": Shopify's defaults apply.
+ * GPC is an opt-out of advertising sharing, so it turns marketing off too and overrides a grant. */
 export function checkoutVisitorConsent(choice: AdChoice | null, gpc: boolean): CheckoutVisitorConsent | null {
-  if (choice?.decision === "denied") return {marketing: false, saleOfData: false};
-  if (choice?.decision === "granted") return {marketing: true, saleOfData: !gpc};
-  return gpc ? {saleOfData: false} : null;
+  if (gpc || choice?.decision === "denied") return {marketing: false, saleOfData: false};
+  if (choice?.decision === "granted") return {marketing: true, saleOfData: true};
+  return null;
 }

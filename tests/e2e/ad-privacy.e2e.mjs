@@ -195,7 +195,7 @@ test("GPC: Allow is disabled, the bag is restricted as gpc, checkout gets saleOf
   await shot(page, "privacy-gpc-phone");
   await addToBag(page);
   const result = await checkoutFromBag(page);
-  assert.deepEqual(result.checkout.consent, {saleOfData: false});
+  assert.deepEqual(result.checkout.consent, {marketing: false, saleOfData: false});
   assert.equal(restrictionFor({attributes: result.checkout.attributes}), "gpc");
   assert.deepEqual(tracked(result.meta), []);
   await ctx.close();

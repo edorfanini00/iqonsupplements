@@ -1,10 +1,11 @@
 // Runs the GENERATED Shopify custom pixel code (exactly what would be pasted into Shopify) in a
-// sandbox with mocked `analytics`, `init`, `api.customerPrivacy`, `window` and `document`.
-// Nothing is loaded from Meta; the fbq stub only records calls.
+// sandbox with mocked `analytics`, `init`, `api.customerPrivacy`, `browser.localStorage` and a
+// recording `fetch`. Nothing leaves the process. Provider behaviour is NOT proven here.
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import { createHash, webcrypto } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { buildPixel, pixelConfig } from "../../scripts/build-checkout-pixel.mjs";
 
@@ -14,29 +15,35 @@ const eligibility = JSON.parse(read("eligibility.json"));
 const CREATINE = "52086268985639", COLLAGEN = "52086149480743", COLOSTRUM = "52086282486055";
 const GLP1 = "52086119760167", LIVER = "52086204694823", NMN = "52086293889319";
 const ALLOWED = {analyticsProcessingAllowed: true, marketingAllowed: true, preferencesProcessingAllowed: true, saleOfDataAllowed: true};
+const TOKEN = "SYNTHtok_abc123";
+const hashedIc = "ic_" + createHash("sha256").update(`iqon-ic:${TOKEN}`).digest("hex");
 
-function run(mode = "live", {privacy = ALLOWED, withApi = true, withInit = true} = {}) {
-  const handlers = {}, privacyHandlers = [], scripts = [], logs = [], fbqCalls = [];
+function fakeStorage(map = new Map()) {
+  return {map, getItem: async key => map.has(key) ? map.get(key) : null, setItem: async (key, value) => { map.set(key, value); }};
+}
+
+function run(mode = "live", {privacy = ALLOWED, withApi = true, withInit = true, storage = fakeStorage(), crypto = webcrypto, fetchDelay = null} = {}) {
+  const handlers = {}, privacyHandlers = [], requests = [], logs = [];
   const window = {};
-  const document = {head: {appendChild: node => scripts.push(node.src)}, createElement: () => ({})};
   const context = {
-    window, document, console: {info: (...args) => logs.push(args.join(" "))},
+    window, console: {info: (...args) => logs.push(args.join(" "))}, crypto, TextEncoder, URLSearchParams, Uint8Array, Array, Promise,
+    document: {createElement: () => { throw new Error("no DOM/script injection expected"); }},
+    fetch: async (url, init) => { if (fetchDelay) await fetchDelay; requests.push({url, init}); return {ok: true}; },
     analytics: {subscribe: (name, handler) => { handlers[name] = handler; }},
+    ...(storage ? {browser: {localStorage: storage}} : {}),
     ...(withInit ? {init: {customerPrivacy: privacy}} : {}),
     ...(withApi ? {api: {customerPrivacy: {subscribe: (name, handler) => { assert.equal(name, "visitorConsentCollected"); privacyHandlers.push(handler); }}}} : {}),
   };
   vm.createContext(context);
   vm.runInContext(read(`iqon-meta-checkout.${mode}.js`), context);
-  // Replace the queue stub with a recorder once the pixel created it (as fbevents.js would).
-  const fbqRecorder = () => {
-    const recorded = window.fbq ? [...window.fbq.queue].map(args => [...args]) : [];
-    // JSON round trip: objects created inside the vm realm have different prototypes.
-    return JSON.parse(JSON.stringify([...recorded, ...fbqCalls]));
-  };
+  const sends = () => requests.map(({url, init}) => {
+    const parsed = new URL(url);
+    const cd = {};
+    for (const [key, value] of parsed.searchParams) if (key.startsWith("cd[")) cd[key.slice(3, -1)] = value;
+    return {origin: parsed.origin + parsed.pathname, ev: parsed.searchParams.get("ev"), eid: parsed.searchParams.get("eid"), id: parsed.searchParams.get("id"), dl: parsed.searchParams.get("dl"), cd, url, init: JSON.parse(JSON.stringify(init))};
+  });
   return {
-    handlers, scripts, logs, window,
-    calls: fbqRecorder,
-    tracks: () => fbqRecorder().filter(args => args[0] === "track"),
+    handlers, logs, window, requests, sends,
     consent: next => privacyHandlers.forEach(handler => handler({customerPrivacy: next})),
     complete: checkout => handlers.checkout_completed({name: "checkout_completed", data: {checkout}}),
     start: checkout => handlers.checkout_started({name: "checkout_started", data: {checkout}}),
@@ -45,122 +52,145 @@ function run(mode = "live", {privacy = ALLOWED, withApi = true, withInit = true}
 
 const line = (variant, quantity = 1) => ({quantity, title: "never sent", variant: {id: variant, product: {id: "9", title: "never sent", url: "/products/never-sent"}}});
 const checkout = (lines, extra = {}) => ({
-  token: "tok_123", currencyCode: "USD", totalPrice: {amount: "59.98", currencyCode: "USD"}, attributes: [],
+  token: TOKEN, currencyCode: "USD", totalPrice: {amount: "59.98", currencyCode: "USD"}, attributes: [],
   email: "buyer@example.invalid", order: {id: "gid://shopify/Order/987654"}, lineItems: lines, ...extra,
 });
 
-test("eligible order: exactly one Purchase with deterministic ID, minimal payload, no PageView or automatic events", () => {
+test("eligible order: one controlled Purchase request, deterministic ID, no SDK, no referrer, no PageView", async () => {
   const pixel = run();
-  assert.deepEqual(pixel.scripts, [], "Meta is not loaded before an eligible, permitted event");
-  pixel.complete(checkout([line(`gid://shopify/ProductVariant/${CREATINE}`, 2)]));
-  pixel.complete(checkout([line(CREATINE, 2)])); // thank-you page reload
-  assert.deepEqual(pixel.scripts, ["https://connect.facebook.net/en_US/fbevents.js"]);
-  assert.equal(pixel.window.fbq.disablePushState, true);
-  const calls = pixel.calls();
-  assert.deepEqual(calls.slice(0, 3), [["set", "autoConfig", false, "1006368245818889"], ["consent", "grant"], ["init", "1006368245818889"]]);
-  assert.deepEqual(pixel.tracks(), [["track", "Purchase", {
-    value: 59.98, currency: "USD", content_type: "product", content_ids: [CREATINE],
-    contents: [{id: CREATINE, quantity: 2}], num_items: 2,
-  }, {eventID: "purchase_987654"}]]);
-  const serialized = JSON.stringify(calls);
-  for (const secret of ["buyer@example.invalid", "never sent", "/products/", "tok_123", "PageView"]) assert.ok(!serialized.includes(secret), secret);
+  await pixel.complete(checkout([line(`gid://shopify/ProductVariant/${CREATINE}`, 2)]));
+  await pixel.complete(checkout([line(CREATINE, 2)])); // same sandbox, repeated event
+  const sends = pixel.sends();
+  assert.equal(sends.length, 1);
+  const [send] = sends;
+  assert.equal(send.origin, "https://www.facebook.com/tr");
+  assert.deepEqual({ev: send.ev, eid: send.eid, id: send.id, dl: send.dl}, {ev: "Purchase", eid: "purchase_987654", id: "1006368245818889", dl: "https://www.iqonbody.com/"});
+  assert.deepEqual(send.cd, {value: "59.98", currency: "USD", content_type: "product", content_ids: `["${CREATINE}"]`, contents: `[{"id":"${CREATINE}","quantity":2}]`, num_items: "2"});
+  assert.deepEqual(send.init, {method: "GET", mode: "no-cors", credentials: "include", referrerPolicy: "no-referrer", keepalive: true});
+  assert.equal(pixel.window.fbq, undefined, "no Meta SDK");
+  for (const secret of ["buyer@example.invalid", "never sent", "/products/", TOKEN, "PageView", "checkouts"]) assert.ok(!send.url.includes(secret), secret);
 });
 
-test("all three reviewed products together are eligible; InitiateCheckout uses the checkout token", () => {
+test("S1: InitiateCheckout uses a SHA-256 of the checkout token; the raw token never leaves", async () => {
   const pixel = run();
   const cart = checkout([line(CREATINE), line(COLLAGEN, 3), line(COLOSTRUM)]);
-  pixel.start(cart);
-  pixel.complete(cart);
-  assert.deepEqual(pixel.tracks().map(args => [args[1], args[3].eventID, args[2].num_items]), [["InitiateCheckout", "ic_tok_123", 5], ["Purchase", "purchase_987654", 5]]);
+  await pixel.start(cart);
+  await pixel.complete(cart);
+  assert.deepEqual(pixel.sends().map(s => [s.ev, s.eid, s.cd.num_items]), [["InitiateCheckout", hashedIc, "5"], ["Purchase", "purchase_987654", "5"]]);
+  assert.ok(pixel.requests.every(r => !r.url.includes(TOKEN) && !JSON.stringify(r.init).includes(TOKEN)));
+  const noCrypto = run("live", {crypto: {subtle: {digest: async () => { throw new Error("unavailable"); }}}});
+  await noCrypto.start(cart);
+  assert.deepEqual(noCrypto.sends(), [], "no hashing ⇒ no InitiateCheckout, never the raw token");
 });
 
-test("mixed and unreviewed carts send nothing at all (no stripping, no renaming, no Meta load)", () => {
+test("S2: a withdrawal while the send is pending (storage/hash in flight) stops it; nothing is queued for later", async () => {
+  const cart = checkout([line(CREATINE)]);
+  let release;
+  const slow = fakeStorage();
+  const gate = new Promise(resolve => { release = resolve; });
+  const original = slow.getItem; slow.getItem = async key => { await gate; return original(key); };
+  const pixel = run("live", {storage: slow});
+  const pending = pixel.complete(cart);
+  pixel.consent({...ALLOWED, saleOfDataAllowed: false});
+  pixel.consent(ALLOWED); // re-granted before the send: still not sent, the decision predates a withdrawal
+  release(); await pending;
+  assert.deepEqual(pixel.sends(), []);
+  // A later, freshly decided event after the re-grant is allowed.
+  const fresh = run();
+  fresh.consent({...ALLOWED, marketingAllowed: false});
+  await fresh.complete(cart);
+  assert.deepEqual(fresh.sends(), []);
+  fresh.consent(ALLOWED);
+  await fresh.complete(checkout([line(CREATINE)], {order: {id: "555"}}));
+  assert.deepEqual(fresh.sends().map(s => s.eid), ["purchase_555"]);
+});
+
+test("S3: a fresh sandbox (thank-you reload) sharing Shopify browser storage does not resend", async () => {
+  const shared = fakeStorage();
+  const cart = checkout([line(CREATINE)]);
+  const first = run("live", {storage: shared});
+  await first.complete(cart);
+  const second = run("live", {storage: shared});
+  await second.complete(cart);
+  assert.equal(first.sends().length + second.sends().length, 1);
+  assert.equal(shared.map.get("iqon_meta_sent:purchase_987654"), "1");
+  const broken = {getItem: async () => { throw new Error("denied"); }, setItem: async () => { throw new Error("denied"); }};
+  const fallback = run("live", {storage: broken});
+  await fallback.complete(cart);
+  assert.equal(fallback.sends().length, 1, "storage failure relies on Shopify's documented once-per-checkout event");
+});
+
+test("mixed and unreviewed carts send nothing at all (no stripping, no renaming)", async () => {
   for (const lines of [[line(CREATINE), line(GLP1)], [line(LIVER)], [line(COLLAGEN), line(NMN)], [line("123")], [line(null)], [line(CREATINE, 0)], [line(CREATINE, 1.5)], []]) {
     const pixel = run();
-    pixel.start(checkout(lines));
-    pixel.complete(checkout(lines));
-    assert.deepEqual(pixel.tracks(), [], JSON.stringify(lines));
-    assert.deepEqual(pixel.scripts, []);
+    await pixel.start(checkout(lines));
+    await pixel.complete(checkout(lines));
+    assert.deepEqual(pixel.sends(), [], JSON.stringify(lines));
   }
 });
 
-test("missing or denied Shopify permission sends nothing", () => {
+test("missing or denied Shopify permission sends nothing", async () => {
   for (const options of [
     {privacy: {...ALLOWED, marketingAllowed: false}}, {privacy: {...ALLOWED, saleOfDataAllowed: false}},
     {privacy: {...ALLOWED, marketingAllowed: undefined}}, {privacy: null}, {withInit: false},
   ]) {
     const pixel = run("live", options);
-    pixel.complete(checkout([line(CREATINE)]));
-    assert.deepEqual(pixel.tracks(), [], JSON.stringify(options));
-    assert.deepEqual(pixel.scripts, []);
+    await pixel.complete(checkout([line(CREATINE)]));
+    assert.deepEqual(pixel.sends(), [], JSON.stringify(options));
   }
 });
 
-test("withdrawal during checkout revokes Meta and stops Purchase; a later grant is honoured", () => {
+test("withdrawal during checkout stops Purchase; unknown state is not permission", async () => {
   const pixel = run();
   const cart = checkout([line(CREATINE)]);
-  pixel.start(cart);
+  await pixel.start(cart);
   pixel.consent({...ALLOWED, saleOfDataAllowed: false});
-  pixel.complete(cart);
-  assert.deepEqual(pixel.tracks().map(args => args[1]), ["InitiateCheckout"]);
-  assert.ok(pixel.calls().some(args => args[0] === "consent" && args[1] === "revoke"));
+  await pixel.complete(cart);
   pixel.consent(null);
-  pixel.complete(cart);
-  assert.deepEqual(pixel.tracks().map(args => args[1]), ["InitiateCheckout"], "unknown state after an event is not permission");
-
-  const late = run("live", {privacy: {...ALLOWED, marketingAllowed: false}});
-  late.consent(ALLOWED);
-  late.complete(cart);
-  assert.deepEqual(late.tracks().map(args => args[1]), ["Purchase"]);
+  await pixel.complete(cart);
+  assert.deepEqual(pixel.sends().map(s => s.ev), ["InitiateCheckout"]);
 });
 
-test("the storefront restriction attribute blocks sending; unreadable attributes are treated as restricted", () => {
-  for (const attributes of [[{key: "_iqon_ad_restriction", value: "denied"}], [{key: "_iqon_ad_restriction", value: "gpc"}], undefined, null, "x"]) {
+test("the storefront restriction attribute blocks sending; unreadable attributes are treated as restricted", async () => {
+  for (const attributes of [[{key: "_iqon_ad_restriction", value: "denied"}], [{key: "_iqon_ad_restriction", value: "gpc"}], [{key: "_iqon_ad_restriction", value: null}], [null], undefined, null, "x"]) {
     const pixel = run();
-    pixel.complete(checkout([line(CREATINE)], {attributes}));
-    assert.deepEqual(pixel.tracks(), [], JSON.stringify(attributes));
+    await pixel.complete(checkout([line(CREATINE)], {attributes}));
+    assert.deepEqual(pixel.sends(), [], JSON.stringify(attributes));
   }
   const pixel = run();
-  pixel.complete(checkout([line(CREATINE)], {attributes: [{key: "gift_note", value: "hi"}, {key: "_iqon_ad_restriction", value: ""}]}));
-  assert.equal(pixel.tracks().length, 1, "other attributes and an empty value do not restrict");
+  await pixel.complete(checkout([line(CREATINE)], {attributes: [{key: "gift_note", value: "hi"}, {key: "_iqon_ad_restriction", value: ""}]}));
+  assert.equal(pixel.sends().length, 1, "other attributes and an empty value do not restrict");
 });
 
-test("malformed checkout payloads never send and never throw", () => {
-  const bad = [
-    undefined, null, {}, checkout([line(CREATINE)], {order: null}), checkout([line(CREATINE)], {order: {id: "abc"}}),
-    checkout([line(CREATINE)], {totalPrice: {amount: "NaN", currencyCode: "USD"}}), checkout([line(CREATINE)], {totalPrice: {amount: "-1", currencyCode: "USD"}}),
-    checkout([line(CREATINE)], {totalPrice: {amount: "10", currencyCode: "usd"}, currencyCode: "usd"}), checkout([{quantity: 1}]), checkout("lines"),
-  ];
+test("malformed checkout payloads never send and never throw", async () => {
+  const bad = [undefined, null, {}, checkout([line(CREATINE)], {totalPrice: {amount: "NaN", currencyCode: "USD"}}), checkout([line(CREATINE)], {totalPrice: {amount: "-1", currencyCode: "USD"}}),
+    checkout([line(CREATINE)], {totalPrice: {amount: "10", currencyCode: "usd"}, currencyCode: "usd"}), checkout([{quantity: 1}]), checkout("lines")];
   for (const value of bad) {
     const pixel = run();
-    assert.doesNotThrow(() => pixel.complete(value));
-    assert.doesNotThrow(() => pixel.start(value));
-    // Order-ID problems only affect Purchase; everything else here also blocks InitiateCheckout.
-    const orderOnly = value && value.order !== undefined && !(value.order && /^gid/.test(value.order.id));
-    assert.deepEqual(pixel.tracks().filter(args => !orderOnly || args[1] === "Purchase"), [], JSON.stringify(value));
+    await assert.doesNotReject(async () => { await pixel.complete(value); await pixel.start(value); });
+    assert.deepEqual(pixel.sends(), [], JSON.stringify(value));
+  }
+  for (const extra of [{order: null}, {order: {id: "abc"}}]) {
+    const pixel = run(); await pixel.complete(checkout([line(CREATINE)], extra));
+    assert.deepEqual(pixel.sends(), []);
   }
   const pixel = run();
-  pixel.start(checkout([line(CREATINE)], {token: "bad token/with spaces"}));
-  assert.deepEqual(pixel.tracks(), []);
+  await pixel.start(checkout([line(CREATINE)], {token: "bad token/with spaces"}));
+  assert.deepEqual(pixel.sends(), []);
 });
 
-test("diagnostic artifact never loads Meta and logs only the decision", () => {
+test("diagnostic artifact never contacts Meta, even when everything is permitted and eligible", async () => {
   const pixel = run("diagnostic");
-  pixel.start(checkout([line(CREATINE)]));
-  pixel.complete(checkout([line(CREATINE), line(GLP1)], {attributes: [{key: "_iqon_ad_restriction", value: "denied"}]}));
-  assert.deepEqual(pixel.scripts, []);
-  assert.equal(pixel.window.fbq, undefined);
+  await pixel.start(checkout([line(CREATINE)]));
+  await pixel.complete(checkout([line(CREATINE)]));
+  await pixel.complete(checkout([line(CREATINE), line(GLP1)], {attributes: [{key: "_iqon_ad_restriction", value: "denied"}]}));
+  assert.deepEqual(pixel.requests, []);
   assert.deepEqual(pixel.logs.map(entry => JSON.parse(entry.replace("[iqon-meta-checkout diagnostic] ", ""))), [
     {event: "InitiateCheckout", permitted: true, restricted: false, eligible: true},
+    {event: "Purchase", permitted: true, restricted: false, eligible: true},
     {event: "Purchase", permitted: true, restricted: true, eligible: false},
   ]);
-  assert.ok(!pixel.logs.join().includes("example.invalid"));
-});
-
-test("works without the consent subscription API (no withdrawal events) but still requires initial permission", () => {
-  const pixel = run("live", {withApi: false});
-  pixel.complete(checkout([line(CREATINE)]));
-  assert.equal(pixel.tracks().length, 1);
+  assert.ok(!pixel.logs.join().includes("example.invalid") && !pixel.logs.join().includes(TOKEN));
 });
 
 test("generator: committed artifacts are current; never-eligible or malformed allowlists are refused", () => {

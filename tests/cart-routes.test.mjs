@@ -303,12 +303,12 @@ test("no choice and no GPC: the exact plain checkout path (Shopify regional defa
   assert.deepEqual(state.operations, ["IQONCartRead"]);
 });
 
-test("GPC (header or page) restricts the cart and sends only saleOfData:false", async t => {
+test("GPC (header or page) restricts the cart and turns marketing and sale of data off", async t => {
   controls(t);
   for (const options of [{gpc: true}, {body: {gpc: true}}]) {
     const state = fixture(t); await add(fixtureProducts[0]);
     const {data} = await checkoutWith(t, options);
-    assert.deepEqual(consentOf(data.checkoutUrl), {saleOfData: false});
+    assert.deepEqual(consentOf(data.checkoutUrl), {marketing: false, saleOfData: false});
     assert.equal(restrictionOf(state), "gpc");
     assert.equal(data.consentHandoff, "sent");
   }
@@ -330,7 +330,7 @@ test("opt-out restricts the cart, keeps other attributes, sends a full denial, a
   assert.equal(result.setCookie, null, "checkout never writes the choice cookie");
 });
 
-test("allow passes the visitor's grant (sale of data still off under GPC); nothing in a body can grant", async t => {
+test("allow passes the visitor’s grant (GPC overrides it); nothing in a body can grant", async t => {
   controls(t);
   let state = fixture(t); await add(fixtureProducts[0]);
   let {data} = await checkoutWith(t, {cookie: `iqon_ad_choice=${CHOICE.granted}`});
@@ -338,7 +338,7 @@ test("allow passes the visitor's grant (sale of data still off under GPC); nothi
   assert.equal(restrictionOf(state), null);
   assert.equal(data.choice, "AAAAAAAAAAAAAAAAAAAAAA");
   ({data} = await checkoutWith(t, {cookie: `iqon_ad_choice=${CHOICE.granted}`, gpc: true}));
-  assert.deepEqual(consentOf(data.checkoutUrl), {marketing: true, saleOfData: false});
+  assert.deepEqual(consentOf(data.checkoutUrl), {marketing: false, saleOfData: false});
   assert.equal(restrictionOf(state), "gpc");
   state = fixture(t); await add(fixtureProducts[0]);
   ({data} = await checkoutWith(t, {body: {marketing: true, saleOfData: true, grant: true, choice: CHOICE.granted}}));
@@ -387,7 +387,7 @@ test("context failures: grants fall back to Shopify defaults; opt-outs stay rest
   // A transient first failure is retried and the context still sent.
   state = fixture(t); await add(fixtureProducts[0]); state.failContext = 1;
   result = await checkoutWith(t, {gpc: true});
-  assert.deepEqual(consentOf(result.data.checkoutUrl), {saleOfData: false}); assert.equal(state.contexts.length, 2);
+  assert.deepEqual(consentOf(result.data.checkoutUrl), {marketing: false, saleOfData: false}); assert.equal(state.contexts.length, 2);
   // A context answer for another (or no) cart is not used.
   for (const contextCart of [null, {id: "gid://shopify/Cart/other", checkoutUrl: "https://iqon-test.myshopify.com/checkouts/other"}]) {
     state = fixture(t); await add(fixtureProducts[0]); state.contextCart = contextCart;
