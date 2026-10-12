@@ -16,27 +16,13 @@ const bindingsUrl = dataUrl(`
     get: key => jar.has(key) ? {value: jar.get(key)} : undefined,
     set: (key, value, options) => {jar.set(key, value); cookieOptions.set(key, options);}
   });
-  export const requestHeaders = new Headers({host: "iqon.example"});
-  export const headers = async () => requestHeaders;
+  export const headers = async () => new Headers();
 `);
-const { jar, cookieOptions, requestHeaders } = await import(bindingsUrl);
+const { jar, cookieOptions } = await import(bindingsUrl);
 const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
 const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)));
-const privacyUrl = dataUrl(compile("../lib/privacy.ts"));
-// Checkout only reads the ledger. Its ordering is proven against PostgreSQL in
-// tests/privacy-ledger.test.mjs; here a plain read stub holds the saved decision.
-const ledgerUrl = dataUrl(`
-  export const saved = {records: new Map(), down: false};
-  export const privacyLedger = {
-    read: async key => {if (saved.down) throw new Error("connection refused"); return saved.records.get(key) ?? null;},
-    save: async () => {throw new Error("checkout never saves");},
-  };
-`);
-const { saved: ledger } = await import(ledgerUrl);
 const imports = {
   "./commerce-policy": policyUrl,
-  "./privacy": privacyUrl,
-  "./privacy.server": dataUrl(compile("../lib/privacy.server.ts").replace('"next/headers"', JSON.stringify(bindingsUrl)).replace('"./privacy-ledger"', JSON.stringify(ledgerUrl)).replace('"./privacy"', JSON.stringify(privacyUrl))),
   react: dataUrl("export const cache = fn => fn;"),
   "next/headers": bindingsUrl,
   "./catalog": dataUrl("export const products = [];"),
@@ -61,7 +47,7 @@ const fixtureProducts = [
 const plans = [{id:"gid://shopify/SellingPlan/10",name:"Deliver every month",price:26.10}, {id:"gid://shopify/SellingPlan/20",name:"Deliver every 2 months",price:27.55}];
 const planAllocation = plan => ({sellingPlan:{id:plan.id,name:plan.name,recurringDeliveries:true,options:[{name:"Delivery",value:plan.name}],priceAdjustments:[{orderCount:null}]},priceAdjustments:[{price:money(plan.price),compareAtPrice:money(29),perDeliveryPrice:money(plan.price)}]});
 function fixture(t) {
-  jar.clear(); cookieOptions.clear(); requestHeaders.delete("sec-gpc"); ledger.records.clear(); ledger.down = false;
+  jar.clear(); cookieOptions.clear();
   const previous = {...process.env};
   process.env.SHOPIFY_STORE_DOMAIN = "iqon-test.myshopify.com";
   process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN = "test-only-token";
@@ -70,7 +56,7 @@ function fixture(t) {
     for (const key of ["SHOPIFY_STORE_DOMAIN", "SHOPIFY_STOREFRONT_PRIVATE_TOKEN", "SHOPIFY_API_VERSION"])
       previous[key] === undefined ? delete process.env[key] : process.env[key] = previous[key];
   });
-  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false, consents: [], urls: [], checkoutError: false};
+  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false};
   const recalculate = () => {
     const discount = state.cart.discountCodes.some(code => code.code === "SAVE10");
     let total = 0;
@@ -83,18 +69,10 @@ function fixture(t) {
     state.cart.totalQuantity = state.cart.lines.nodes.reduce((sum, line) => sum + line.quantity, 0);
     state.cart.cost = {subtotalAmount: money(total), totalAmount: money(total)};
   };
-  t.mock.method(globalThis, "fetch", async (url, options) => {
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
     const {query, variables} = JSON.parse(options.body);
     const operation = query.match(/(?:query|mutation) (\w+)/)[1];
-    state.operations.push(operation); state.urls.push(url);
-    if (operation === "IQONCheckoutCart") {
-      // Stand in for Shopify: encode the contextual consent into the returned checkout URL.
-      assert.match(query, /@inContext\(visitorConsent: \$visitorConsent\)/);
-      if (state.checkoutError) return Response.json({errors: [{message: "fixture failure"}]});
-      state.consents.push(variables.visitorConsent);
-      const cart = state.cart?.id === variables.id ? state.cart : null;
-      return Response.json({data: {cart: cart && {...cart, checkoutUrl: consentUrl(cart.checkoutUrl, variables.visitorConsent)}}});
-    }
+    state.operations.push(operation);
     if (operation === "IQONCatalog") return Response.json({data: {products: {
       pageInfo: {hasNextPage: false, endCursor: null}, nodes: fixtureProducts.map(p => ({
         handle: p.handle, title: p.handle, description: "Fixture", productType: "Fixture", tags: [`iqon-${p.category}`],
@@ -134,21 +112,6 @@ function fixture(t) {
   });
   return state;
 }
-const consentUrl = (base, consent) => consent ? `${base}?_cs=${Buffer.from(JSON.stringify(consent)).toString("base64url")}.sig%2Fx` : base;
-const readConsent = url => {const value = new URL(url).searchParams.get("_cs"); return value ? JSON.parse(Buffer.from(value.split(".")[0], "base64url")) : null;};
-const ID = "__Host-iqon_privacy_id";
-const TOKEN = "t".repeat(43);
-const KEY = (await import("node:crypto")).createHash("sha256").update(TOKEN).digest("hex");
-// Records a saved decision in the ledger for this browser's identity; returns its version.
-const decide = (choices, revision = 1) => {
-  jar.set(ID, TOKEN);
-  ledger.records.set(KEY, {choices: {...choices}, revision});
-  return `${KEY.slice(0, 12)}.${revision}`;
-};
-const all = value => ({analytics: value, marketing: value, preferences: value, saleOfData: value});
-const checkout = (body = {}, extra = {}) => routes.checkoutResponse(new Request(`${origin}/api/checkout`, {
-  method: "POST", headers: {Origin: origin, "Content-Type": "application/json", ...extra}, body: typeof body === "string" ? body : JSON.stringify(body),
-}));
 const add = item => routes.mutateCartResponse(request({action: "add", id: item.handle, variantId: item.variantId, quantity: 1}));
 
 test("a supplement bag persists, updates, discounts and reaches hosted checkout", async t => {
@@ -276,154 +239,4 @@ test("checkout removes old skincare and requires review before handing off to Sh
   assert.equal(response.status,422);
   const data=await response.json();assert.equal(data.cart.items.length,1);assert.ok(!data.checkoutUrl);
   assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
-});
-
-test("checkout sends the visitor's saved decision with a fresh contextual read: unknown, granted, denied", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]);
-  let response = await checkout();
-  assert.equal(response.status, 200);
-  let data = await response.json();
-  // No choice: nothing is invented, so Shopify receives no expressed preference.
-  assert.equal(state.consents.at(-1), null); assert.equal(readConsent(data.checkoutUrl), null);
-  assert.equal(data.privacyVersion, "none.0");
-  const granted = decide(all(true), 3);
-  data = await (await checkout()).json();
-  assert.deepEqual(state.consents.at(-1), all(true)); assert.deepEqual(readConsent(data.checkoutUrl), all(true));
-  assert.equal(data.privacyVersion, granted);
-  decide({...all(true), marketing: false, saleOfData: false}, 4);
-  const withdrawn = await (await checkout()).json();
-  assert.deepEqual(readConsent(withdrawn.checkoutUrl), {analytics: true, preferences: true, marketing: false, saleOfData: false});
-  assert.notEqual(withdrawn.checkoutUrl, data.checkoutUrl);
-  // Every handoff performs its own contextual query; nothing is cached between them.
-  assert.equal(state.operations.filter(op => op === "IQONCheckoutCart").length, 3);
-  assert.ok(!state.operations.includes("IQONCartRead"));
-});
-
-test("checkout returns Shopify's URL byte for byte, including the signed _cs value", async t => {
-  fixture(t); await add(fixtureProducts[0]); decide(all(false));
-  const data = await (await checkout()).json();
-  assert.match(data.checkoutUrl, /\?_cs=[A-Za-z0-9_-]+\.sig%2Fx$/);
-  assert.equal(data.checkoutUrl, consentUrl("https://iqon-test.myshopify.com/checkouts/test-only", all(false)));
-});
-
-test("GPC from the header or the browser overrides a stored grant at checkout", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); decide(all(true));
-  const expected = {analytics: true, preferences: true, marketing: false, saleOfData: false};
-  await checkout({}, {"Sec-GPC": "1"});
-  assert.deepEqual(state.consents.at(-1), expected);
-  await checkout({privacy: {gpc: true}});
-  assert.deepEqual(state.consents.at(-1), expected);
-  // A page cannot switch a GPC header off.
-  await checkout({privacy: {gpc: false}}, {"Sec-GPC": "1"});
-  assert.deepEqual(state.consents.at(-1), expected);
-  decide(all(null));
-  await checkout({}, {"Sec-GPC": "1"});
-  assert.deepEqual(state.consents.at(-1), {marketing: false, saleOfData: false});
-});
-
-test("an unsaved withdrawal from the page applies at checkout, and the page can never add a grant", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); decide(all(true));
-  await checkout({privacy: {restrict: {marketing: false, saleOfData: false}}});
-  assert.deepEqual(state.consents.at(-1), {analytics: true, preferences: true, marketing: false, saleOfData: false});
-  decide(all(null));
-  const before = state.consents.length;
-  for (const body of [{privacy: {restrict: {marketing: true}}}, {privacy: {restrict: {marketing: null}}}, {privacy: {restrict: {ads: false}}},
-    {privacy: {grant: {marketing: true}}}, {privacy: {gpc: "1"}}, {privacy: []}, {privacy: null}, {consent: all(true)}, [], "not json", "x".repeat(2000)]) {
-    const response = await checkout(body);
-    assert.ok([400, 413].includes(response.status), JSON.stringify(body).slice(0, 40));
-    assert.ok(!("checkoutUrl" in await response.json()));
-  }
-  assert.equal(state.consents.length, before);
-  // A forged unprefixed cookie cannot stand in for the host only decision cookie.
-  // A plain identity cookie planted for the production host is not the __Host- cookie.
-  jar.delete(ID); jar.set("iqon_privacy_id", TOKEN);
-  await checkout();
-  assert.equal(state.consents.at(-1), null);
-});
-
-test("checkout fails closed on Shopify errors, keeps the bag, and never logs the checkout link", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); decide(all(true));
-  const logged = [];
-  for (const method of ["log", "info", "warn", "error", "debug"]) t.mock.method(console, method, (...args) => logged.push(args.join(" ")));
-  state.checkoutError = true;
-  const failed = await checkout();
-  assert.equal(failed.status, 502);
-  const body = await failed.json();
-  assert.ok(!("checkoutUrl" in body)); assert.match(body.error, /try again/i);
-  // Shopping continues: the bag still reads and updates.
-  const bag = await (await routes.getCartResponse()).json();
-  assert.equal(bag.count, 1);
-  assert.equal((await add(fixtureProducts[1])).status, 200);
-  state.checkoutError = false;
-  const ok = await (await checkout()).json();
-  assert.ok(ok.checkoutUrl.includes("_cs="));
-  assert.ok(!logged.some(line => /_cs=|checkouts\/|test-only-secret/.test(line)), "checkout links must not be logged");
-});
-
-test("the consent read uses Storefront API 2025-10 or later even if an older version is configured", async t => {
-  const state = fixture(t); process.env.SHOPIFY_API_VERSION = "2025-04";
-  await add(fixtureProducts[0]); decide(all(false));
-  await checkout();
-  const index = state.operations.lastIndexOf("IQONCheckoutCart");
-  assert.equal(state.urls[index], "https://iqon-test.myshopify.com/api/2025-10/graphql.json");
-  assert.equal(state.urls[state.operations.indexOf("IQONCartCreate")], "https://iqon-test.myshopify.com/api/2025-04/graphql.json");
-  process.env.SHOPIFY_API_VERSION = "2026-07";
-  await checkout();
-  assert.equal(state.urls.at(-1), "https://iqon-test.myshopify.com/api/2026-07/graphql.json");
-});
-
-test("checkout after returning from Shopify uses the withdrawn decision, not the earlier grant", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); const first_ = decide(all(true), 1);
-  const first = await (await checkout()).json();
-  // Visitor returns from hosted checkout and withdraws on the storefront.
-  const withdrawn = decide({...all(true), marketing: false}, 2);
-  const second = await (await checkout()).json();
-  assert.notEqual(second.checkoutUrl, first.checkoutUrl);
-  assert.equal(readConsent(second.checkoutUrl).marketing, false);
-  assert.equal(second.privacyVersion, withdrawn); assert.notEqual(second.privacyVersion, first_);
-  // Concurrent handoffs each read the decision current at their own request.
-  const [a, b] = await Promise.all([checkout(), checkout({privacy: {restrict: {analytics: false}}})]);
-  assert.equal(readConsent((await a.json()).checkoutUrl).analytics, true);
-  assert.equal(readConsent((await b.json()).checkoutUrl).analytics, false);
-  assert.equal(state.consents.length, 4);
-});
-
-test("checkout refuses a link when the page shows a different decision than the one saved", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]);
-  const shown = decide(all(true), 1);
-  decide(all(false), 2); // saved in another tab after this page last read it
-  const before = state.consents.length;
-  const response = await checkout({privacy: {version: shown}});
-  assert.equal(response.status, 409);
-  const body = await response.json();
-  assert.equal(body.privacyChanged, true); assert.ok(!("checkoutUrl" in body));
-  assert.equal(state.consents.length, before, "no contextual read happens for a stale page");
-  for (const version of [5, "x".repeat(65), null]) assert.equal((await checkout({privacy: {version}})).status, 400);
-});
-
-test("pending withdrawal cookies restrict checkout even when the page sends nothing", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]); decide(all(true));
-  jar.set("__Host-iqon_privacy_pending_marketing", "1791757000000-peer");
-  jar.set("__Host-iqon_privacy_pending_saleOfData", "not a token"); // malformed values are ignored
-  await checkout();
-  assert.deepEqual(state.consents.at(-1), {...all(true), marketing: false});
-});
-
-test("ledger outage: a visitor who made choices gets every optional purpose declined, never a grant or a default", async t => {
-  const state = fixture(t); await add(fixtureProducts[0]);
-  // Saved: advertising and sharing granted, analytics and preferences explicitly declined.
-  const shown = decide({analytics: false, marketing: true, preferences: false, saleOfData: true});
-  await checkout({privacy: {version: shown}});
-  assert.deepEqual(state.consents.at(-1), {analytics: false, marketing: true, preferences: false, saleOfData: true});
-  ledger.down = true;
-  const response = await checkout({privacy: {version: shown}});
-  assert.equal(response.status, 200, "shopping continues during an outage");
-  assert.deepEqual(state.consents.at(-1), all(false), "no saved decline falls back to regional defaults");
-  await checkout({}, {"Sec-GPC": "1"});
-  assert.deepEqual(state.consents.at(-1), all(false));
-  // A visitor who never made a choice has no identity, needs no ledger, and stays unexpressed.
-  jar.delete(ID);
-  await checkout();
-  assert.equal(state.consents.at(-1), null);
-  ledger.down = false;
 });

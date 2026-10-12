@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Runs a command against a fresh, owned, loopback-only PostgreSQL cluster with the privacy
-# ledger and customer-account session migrations applied, then stops the cluster and removes
-# only its own directory. Same isolation rules as scripts/privacy-test-db.sh.
+# Runs a command against a fresh, owned, loopback-only PostgreSQL cluster with the
+# customer-account session migration applied, then stops the cluster and removes only its
+# own directory. Ambient libpq settings are ignored so nothing can point it elsewhere.
 #   scripts/account-test-db.sh node --import tsx --test tests/customer-account/*.test.ts
-# Exports ACCOUNT_TEST_DATABASE_URL (and PRIVACY_TEST_DATABASE_URL) to the command.
+# Exports ACCOUNT_TEST_DATABASE_URL and ACCOUNT_TEST_PSQL to the command.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-migrations=("${root}/prisma/migrations/20261011000000_storefront_privacy_consents/migration.sql" "${root}/prisma/migrations/20261011010000_customer_account_sessions/migration.sql")
+migrations=("${root}/prisma/migrations/20261011010000_customer_account_sessions/migration.sql")
 for tool in initdb pg_ctl psql createdb; do command -v "$tool" >/dev/null || { echo "account-test-db: $tool not found" >&2; exit 69; }; done
 [[ $# -gt 0 ]] || { echo "usage: $0 <command...>" >&2; exit 64; }
 
@@ -39,9 +39,7 @@ createdb "${pin[@]}" "$database"
 for migration in "${migrations[@]}"; do psql "${pin[@]}" -d "$database" -v ON_ERROR_STOP=1 -q -f "$migration"; done
 
 export ACCOUNT_TEST_DATABASE_URL="postgresql://${user}@127.0.0.1:${port}/${database}?connection_limit=10"
-export PRIVACY_TEST_DATABASE_URL="$ACCOUNT_TEST_DATABASE_URL"
 export ACCOUNT_TEST_PSQL="psql -h 127.0.0.1 -p $port -U $user -d $database"
-export PRIVACY_TEST_PSQL="psql -h 127.0.0.1 -p $port -U $user -d $database"
 echo "account-test-db: owned cluster on 127.0.0.1:$port database $database" >&2
 set +e
 "$@"

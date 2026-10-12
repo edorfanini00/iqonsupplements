@@ -2,7 +2,8 @@
 -- The browser holds only an opaque "id.secret" cookie; this row is the session of record.
 -- tokens is AES-256-GCM sealed (key from CUSTOMER_ACCOUNT_SESSION_SECRET, row id as context);
 -- secret_hash is an HMAC of the cookie secret. No plaintext provider credentials are stored.
--- Rollback: DROP TABLE "customer_account_sessions";
+-- Rollback: revert the application code and leave this additive table in place. Only if the
+-- table itself must be removed afterwards: DROP TABLE "customer_account_sessions";
 -- CreateTable
 CREATE TABLE "customer_account_sessions" (
     "id" VARCHAR(64) NOT NULL,

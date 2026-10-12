@@ -157,11 +157,14 @@
 .profile-facts dd{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;overflow-wrap:anywhere}
 .profile-facts small{font-size:13px;color:#808182}
 
-.privacy-inline{max-width:640px}
-.privacy-inline h2{margin-bottom:6px}
-.privacy-inline-lead{font-size:15px;color:#5b5c5d;margin-bottom:18px}
-.privacy-inline .privacy-body{padding:0}
-
+.privacy-hosted{display:flex;flex-direction:column;gap:14px;max-width:640px}
+.privacy-hosted-link{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 22px;border:1px solid var(--line);border-radius:4px;background:#f6f7f8;transition:background .2s,border-color .2s}
+.privacy-hosted-link:hover{background:#f0f1f2;border-color:#c9cacb}
+.privacy-hosted-link span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.privacy-hosted-link strong{font-family:var(--serif);font-weight:400;font-size:21px;letter-spacing:-.3px}
+.privacy-hosted-link small{font-size:13px;color:#707172;line-height:1.55}
+.privacy-hosted-link svg{flex:none;color:#707172}
+.privacy-hosted .account-note{margin-top:6px}
 .account-dialog h2{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-.4px}
 .account-dialog .button{min-height:44px}
 

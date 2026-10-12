@@ -53,6 +53,8 @@ const browser = await chromium.launch({args: ["--host-resolver-rules=MAP * ~NOTF
 test.after(async () => {await browser.close(); server.kill("SIGTERM"); console.log(`screenshots: ${shots}`);});
 
 const external = [];
+// The real public pages (verified separately); the browser here only ever reaches a MOCK of them.
+const HOSTED = {policy: "https://nr9zd0-t5.myshopify.com/policies/privacy-policy", choices: "https://nr9zd0-t5.myshopify.com/pages/data-sharing-opt-out"};
 const AUTHORIZE = `/authentication/${SHOP_ID}/oauth/authorize`, LOGOUT = `/authentication/${SHOP_ID}/logout`;
 
 /** Strict checks on the app's REAL /account/login response before any MOCK step runs. */
@@ -83,7 +85,7 @@ async function context({mobile = false, customer: initialCustomer = A} = {}) {
   let customer = initialCustomer;
   provider.configure({failGraphql: 0, failToken: 0, restrictHidden: false, graphqlDelayMs: 0});
   const ctx = await browser.newContext({viewport: mobile ? {width: 390, height: 844} : {width: 1440, height: 900}, deviceScaleFactor: mobile ? 2 : 1, isMobile: mobile, hasTouch: mobile});
-  const hosted = [];
+  const hosted = [], hostedPrivacy = [];
   const hop = location => `<!doctype html><meta name="robots" content="noindex"><title>MOCK hop</title><script>location.replace(${JSON.stringify(location)})</script>`;
   await ctx.route(() => true, async route => {
     const url = new URL(route.request().url());
@@ -97,6 +99,10 @@ async function context({mobile = false, customer: initialCustomer = A} = {}) {
       return route.fulfill({status: 302, headers: {location: url.searchParams.get("post_logout_redirect_uri")}});
     }
     if (url.origin === "https://shopify.com" && url.pathname.startsWith(`/${SHOP_ID}/account/`)) return route.fulfill({status: 200, contentType: "text/html", body: "<!doctype html><title>MOCK Shopify page</title><h1>MOCK Shopify hosted page</h1>"});
+    if (url.href === HOSTED.choices || url.href === HOSTED.policy) {
+      hostedPrivacy.push(url.href);
+      return route.fulfill({status: 200, contentType: "text/html", body: "<!doctype html><title>MOCK Shopify privacy page</title><h1>MOCK of the hosted Shopify page</h1>"});
+    }
     if (url.origin !== base) { external.push(url.href); return route.abort(); }
     if (url.pathname === "/__escape-probe") return route.fulfill({status: 302, headers: {location: `https://shopify.com/authentication/${SHOP_ID}/escape-probe`}});
     if (url.pathname !== "/account/login" && url.pathname !== "/account/logout") return route.continue();
@@ -107,7 +113,7 @@ async function context({mobile = false, customer: initialCustomer = A} = {}) {
     if (!location.startsWith("https://shopify.com/")) return route.fulfill({response});
     return route.fulfill({status: 200, headers: {"content-type": "text/html", "cache-control": "no-store", ...(headers["set-cookie"] ? {"set-cookie": headers["set-cookie"]} : {})}, body: hop(location)});
   });
-  return {ctx, hosted, signInAs: next => { customer = next; }};
+  return {ctx, hosted, hostedPrivacy, signInAs: next => { customer = next; }};
 }
 const shot = (page, name) => page.screenshot({path: path.join(shots, `${name}.png`), fullPage: true});
 /** Fail in seconds with the actual URL, instead of a 30 s timeout, if the flow leaves the app. */
@@ -117,7 +123,8 @@ function guard(page) {
   page.on("framenavigated", frame => {
     if (frame !== page.mainFrame()) return;
     const url = new URL(frame.url());
-    if (url.origin !== base && url.protocol !== "about:" && !(url.origin === "https://shopify.com" && url.pathname.startsWith(`/${SHOP_ID}/account/`))) external.push(`navigated:${url.origin}${url.pathname}`);
+    const hostedPage = url.href === HOSTED.choices || url.href === HOSTED.policy;
+    if (url.origin !== base && url.protocol !== "about:" && !hostedPage && !(url.origin === "https://shopify.com" && url.pathname.startsWith(`/${SHOP_ID}/account/`))) external.push(`navigated:${url.origin}${url.pathname}`);
   });
   return page;
 }
@@ -346,27 +353,55 @@ test("guests can open /account/privacy without signing in (footer access), at de
   }
 });
 
-test("integrated privacy: guest footer link opens the canonical inline controls; a saved choice persists (PostgreSQL ledger)", async () => {
+test("hosted privacy: the footer Privacy link opens /account/privacy with the verified Shopify pages; no custom privacy runtime remains", async () => {
   for (const mobile of [false, true]) {
-    const {ctx} = await context({mobile});
+    const {ctx, hostedPrivacy} = await context({mobile});
     const page = await newPage(ctx);
     await page.goto(`${base}/`);
-    const link = page.getByRole("contentinfo").getByRole("link", {name: "Your Privacy Choices"});
-    assert.equal(await link.getAttribute("href"), "/account/privacy");
-    await link.click();
+    const footerLink = page.getByRole("contentinfo").getByRole("link", {name: "Privacy", exact: true});
+    assert.equal(await footerLink.getAttribute("href"), "/account/privacy");
+    await footerLink.click();
     await page.waitForURL(`${base}/account/privacy`);
-    const region = page.getByRole("region", {name: "Your Privacy Choices"});
-    await region.getByRole("switch", {name: "Analytics"}).click();
-    await region.getByRole("button", {name: "Save choices"}).click();
-    await region.getByText("Your privacy choices are saved.").waitFor();
-    await page.reload();
-    const after = page.getByRole("region", {name: "Your Privacy Choices"});
-    await after.getByRole("switch", {name: "Analytics"}).waitFor();
-    assert.equal(await after.getByRole("switch", {name: "Analytics"}).getAttribute("aria-checked"), "true", "persisted across reload");
-    assert.equal(await page.getByRole("dialog").count(), 0, "inline, not a second sheet");
-    await shot(page, `privacy-integrated-guest-${mobile ? "phone" : "desktop"}`);
+    const choices = page.getByRole("link", {name: /Your Privacy Choices/});
+    const policy = page.getByRole("link", {name: /Privacy policy/});
+    assert.equal(await choices.getAttribute("href"), HOSTED.choices);
+    assert.equal(await policy.getAttribute("href"), HOSTED.policy);
+    await page.getByText("This site doesn’t run advertising or analytics tracking of its own.").waitFor();
+    assert.equal(await page.getByRole("switch").count(), 0, "no custom consent controls");
+    // Capture from the top with no focused skip link (client navigation keeps the footer scroll offset).
+    // globals.css sets smooth scrolling, so jump instantly and wait until the page is at the top.
+    await page.evaluate(() => { window.scrollTo({top: 0, behavior: "instant"}); document.activeElement?.blur?.(); });
+    await page.waitForFunction(() => window.scrollY === 0);
+    await shot(page, `privacy-hosted-guest-${mobile ? "phone" : "desktop"}`);
+    // The link really leaves for Shopify's page (served here by a MOCK of that exact URL).
+    await choices.click();
+    await page.waitForURL(HOSTED.choices);
+    assert.deepEqual(hostedPrivacy, [HOSTED.choices]);
     await ctx.close();
   }
+  // The failed custom implementation is gone, not hidden.
+  for (const method of ["GET", "POST"]) {
+    const response = await fetch(`${base}/api/privacy`, {method, headers: {"content-type": "application/json", origin: base}, body: method === "POST" ? "{}" : undefined});
+    assert.equal(response.status, 404, `${method} /api/privacy`);
+  }
+});
+
+test("no advertising or analytics requests leave the browser on storefront and account pages", async () => {
+  const {ctx} = await context();
+  const page = await newPage(ctx);
+  const seen = [];
+  // Only the MOCK sign-in hop (fulfilled locally by the router) may leave the app origin.
+  page.on("request", request => { const url = new URL(request.url()); if (url.origin !== base && !(url.origin === "https://shopify.com" && url.pathname === AUTHORIZE)) seen.push(url.href); });
+  for (const path of ["/", "/collections/supplements", "/collections/skincare", "/checkout", "/account", "/account/privacy", "/help"]) {
+    await page.goto(`${base}${path}`);
+    await page.waitForLoadState("networkidle");
+  }
+  await signIn(page);
+  await page.waitForLoadState("networkidle");
+  assert.deepEqual(seen, [], "no third-party requests at all");
+  const cookies = (await ctx.cookies()).map(c => c.name).sort();
+  assert.deepEqual(cookies.filter(name => !["iqb_ca"].includes(name)), [], "no tracking or consent cookies");
+  await ctx.close();
 });
 
 test("phone: every account destination, including Privacy, is visible without scrolling the menu", async () => {
@@ -382,8 +417,8 @@ test("phone: every account destination, including Privacy, is visible without sc
   await page.screenshot({path: path.join(shots, "account-nav-phone.png")});
   await nav.getByRole("link", {name: "Privacy", exact: true}).click();
   await page.waitForURL(`${base}/account/privacy`);
-  await page.getByRole("region", {name: "Your Privacy Choices"}).waitFor();
-  await shot(page, "privacy-integrated-signed-in-phone");
+  await page.getByRole("link", {name: /Your Privacy Choices/}).waitFor();
+  await shot(page, "privacy-hosted-signed-in-phone");
   await ctx.close();
 });
 
@@ -396,11 +431,10 @@ test("profile edit, privacy seam, empty and error states", async () => {
   await page.getByText("Your name is updated.").waitFor();
   assert.equal(provider.load().customers[A].firstName, "Avery Ann");
   await page.goto(`${base}/account/privacy`);
-  // Signed in: the canonical privacy panel inline, inside the account menu.
-  const region = page.getByRole("region", {name: "Your Privacy Choices"});
-  await region.getByRole("switch", {name: "Analytics"}).waitFor();
+  // Signed in: the same hosted links, inside the account menu.
+  assert.equal(await page.getByRole("link", {name: /Your Privacy Choices/}).getAttribute("href"), HOSTED.choices);
   await page.getByRole("navigation", {name: "Account"}).waitFor();
-  await shot(page, "privacy-seam-desktop");
+  await shot(page, "privacy-hosted-signed-in-desktop");
   // Data outage after sign-in: the section says so and recovers on retry, without signing out.
   provider.configure({failGraphql: 1});
   await page.getByRole("link", {name: "Orders"}).click();

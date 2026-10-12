@@ -1,22 +1,26 @@
 "use client";
 
-import { PrivacyPanel } from "../../privacy-choices";
-import { useStore } from "../../store-shell";
+import { ArrowUpRight } from "lucide-react";
+import { HOSTED_PRIVACY } from "@/lib/hosted-privacy";
 import { PageHeading, useAccount } from "../account-client";
 
 // Public: guests reach this from the footer; signed-in customers see it in the account menu.
-// The controls are the canonical privacy panel bound to the store shell's single privacy state;
-// choices belong to this browser, not to the account.
+// Privacy choices are handled on Shopify's own pages for the IQON store.
 export default function AccountPrivacyPage() {
-  const {privacy, privacyLinks} = useStore();
   const {session} = useAccount();
   return <>
     <PageHeading title="Privacy"/>
-    <p className="account-meta">{session?.status === "signed_in" ? "These choices are saved for this browser, not for your account, so set them on each device you use." : "No sign-in needed. These choices are saved for this browser."}</p>
-    <section className="account-section privacy-inline" aria-label="Your Privacy Choices">
-      <h2>Your Privacy Choices</h2>
-      <p className="privacy-inline-lead">Choose how IQON may use your data on this site and when you check out.</p>
-      <PrivacyPanel privacy={privacy} links={privacyLinks}/>
+    {session?.status !== "signed_in" && <p className="account-meta">No sign-in needed.</p>}
+    <section className="account-section privacy-hosted" aria-label="Privacy options">
+      <a className="privacy-hosted-link" href={HOSTED_PRIVACY.choices} rel="noopener">
+        <span><strong>Your Privacy Choices</strong><small>Opt out of the sale or sharing of your personal information, on Shopify’s page for the IQON store.</small></span>
+        <ArrowUpRight size={18}/>
+      </a>
+      <a className="privacy-hosted-link" href={HOSTED_PRIVACY.policy} rel="noopener">
+        <span><strong>Privacy policy</strong><small>How IQON collects, uses and shares personal information.</small></span>
+        <ArrowUpRight size={18}/>
+      </a>
+      <p className="account-note">These pages are hosted by Shopify. Choices you make there are recorded by Shopify for the IQON store and its checkout. This site doesn’t run advertising or analytics tracking of its own.</p>
     </section>
   </>;
 }

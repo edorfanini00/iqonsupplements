@@ -38,9 +38,6 @@ const CART_FRAGMENT = `fragment IQONCart on Cart {
   }
 }`;
 const CART_QUERY_BODY = `query IQONCartRead($id: ID!) { cart(id: $id) { ...IQONCart } }`;
-// Read fresh at handoff so checkoutUrl carries the visitor's current consent as _cs.
-// Requires Storefront API 2025-10 or later. A null visitorConsent expresses no preference.
-const CHECKOUT_QUERY_BODY = `query IQONCheckoutCart($id: ID!, $visitorConsent: VisitorConsent) @inContext(visitorConsent: $visitorConsent) { cart(id: $id) { ...IQONCart } }`;
 const CREATE_BODY = `mutation IQONCartCreate($input: CartInput!) {
   cartCreate(input: $input) { cart { ...IQONCart } userErrors { field message } warnings { message } }
 }`;
@@ -57,10 +54,9 @@ const DISCOUNT_BODY = `mutation IQONCartDiscounts($cartId: ID!, $discountCodes: 
   cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) { cart { ...IQONCart } userErrors { field message } }
 }`;
 export const CART_QUERY = CART_QUERY_BODY + CART_FRAGMENT;
-export const CART_CHECKOUT = CHECKOUT_QUERY_BODY + CART_FRAGMENT;
 export const CART_CREATE = CREATE_BODY + CART_FRAGMENT;
 export const CART_ADD = ADD_BODY + CART_FRAGMENT;
 export const CART_UPDATE = UPDATE_BODY + CART_FRAGMENT;
 export const CART_REMOVE = REMOVE_BODY + CART_FRAGMENT;
 export const CART_DISCOUNTS = DISCOUNT_BODY + CART_FRAGMENT;
-export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CHECKOUT_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CART_FRAGMENT].join("\n");
+export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CART_FRAGMENT].join("\n");

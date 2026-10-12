@@ -15,7 +15,7 @@ shares nothing with this code.
 | `GET /account/callback` | Checks state (constant time) against the transaction, exchanges the code with the PKCE verifier, verifies the id_token (RS256 via shop JWKS, issuer, audience, expiry, nonce), creates the session, 303 to an allowlisted path. |
 | `POST /account/logout` | Same-origin only. Revokes the session row (no cookie change), then 303 to Shopify end-session. |
 | `/account`, `/account/orders[/id]`, `/account/subscriptions[/id]`, `/account/addresses`, `/account/profile` | Signed-in pages (client components reading `/api/account/*`). |
-| `/account/privacy`, `/account/signed-out` | **Public**: no session needed. `/account/privacy` renders the canonical privacy panel (`PrivacyPanel` from `app/privacy-choices.tsx`) inline, bound to the store shell's single `usePrivacy` state; the footer's "Your Privacy Choices" links here. |
+| `/account/privacy`, `/account/signed-out` | **Public**: no session needed. `/account/privacy` links to Shopify's hosted **Your Privacy Choices** (data sharing opt-out) and **Privacy policy** pages for the IQON store (`lib/hosted-privacy.ts`). It is in the account menu and the storefront footer ("Privacy"). This site keeps no consent state and loads no advertising or analytics scripts. |
 | `/api/account/*` | JSON BFF. Customer-scoped Customer Account API queries only; no Admin API. |
 
 ## Sessions (round 1 design: durable, server-side)
@@ -99,11 +99,12 @@ routes, reached as fresh navigations after the real `/account/login` 303 has bee
 
 ## Rollback
 
-Additive. Requires migration `prisma/migrations/20261011010000_customer_account_sessions` (and the
-privacy ledger migration `20261011000000_storefront_privacy_consents` from the integrated privacy
-work) applied to the existing database **before** the code is deployed; without the table, sign-in
-returns "unavailable" and nothing else on the storefront changes.
-- Disable: unset the four required env vars ("opening soon", API 503 `not_configured`) or revert.
+Additive. Requires migration `prisma/migrations/20261011010000_customer_account_sessions` applied to
+the existing database **before** the code is deployed; without the table, sign-in returns
+"unavailable" and nothing else on the storefront changes.
+- **Preferred rollback: code only.** Revert or redeploy the previous build and leave the additive
+  table in place (unused, harmless).
+- Disable without a deploy: unset the four required env vars ("opening soon", API 503 `not_configured`).
 - Revoke every session: `UPDATE customer_account_sessions SET revoked_at = now() WHERE revoked_at IS NULL;`
   (rotating `CUSTOMER_ACCOUNT_SESSION_SECRET` also makes every row unreadable).
-- Remove: `DROP TABLE "customer_account_sessions";` after reverting the code.
+- Only if the table must go, after the code is reverted: `DROP TABLE "customer_account_sessions";`

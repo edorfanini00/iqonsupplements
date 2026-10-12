@@ -3,9 +3,7 @@ import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
-import { CATALOG_QUERY, CART_QUERY, CART_CHECKOUT, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
-import { readPrivacyState } from "./privacy.server";
-import { OUTAGE_DECLINED, PrivacyInputError, gpcHeader, restrictChoices, validateRestriction, visitorConsent } from "./privacy";
+import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 
 // Standard server environment variables work on Vercel and on the retained
@@ -124,53 +122,17 @@ export async function mutateCartResponse(request:Request) {
     return Response.json(snapshot,{headers:responseHeaders});
   } catch(error) {return fail(error);}
 }
-// The ledger's saved decision is authoritative. Pending withdrawal cookies and the page
-// may only remove permissions, and either GPC signal removes advertising and sharing. When
-// the page names the decision version it is showing, a different saved version gets no
-// link. If the ledger cannot be read for a visitor who made a choice, every optional purpose
-// is declined for this handoff and checkout continues.
-async function checkoutPrivacy(request:Request) {
-  if(Number(request.headers.get("content-length")||0)>1024) throw new CommerceError("Invalid request.",413);
-  const text=await request.text();
-  if(text.length>1024) throw new CommerceError("Invalid request.",413);
-  let input:unknown;
-  try {input=text?JSON.parse(text):{};}catch {throw new CommerceError("Invalid request.",400);}
-  if(!input||typeof input!=="object"||Array.isArray(input)||Object.keys(input).some(key=>key!=="privacy")) throw new CommerceError("Invalid request.",400);
-  const privacy=(input as {privacy?:unknown}).privacy;
-  if(privacy!==undefined&&(!privacy||typeof privacy!=="object"||Array.isArray(privacy)||Object.keys(privacy).some(key=>key!=="restrict"&&key!=="gpc"&&key!=="version")))
-    throw new CommerceError("Invalid request.",400);
-  const {restrict,gpc,version}=(privacy||{}) as {restrict?:unknown;gpc?:unknown;version?:unknown};
-  if(gpc!==undefined&&typeof gpc!=="boolean") throw new CommerceError("Invalid request.",400);
-  if(version!==undefined&&(typeof version!=="string"||version.length>64)) throw new CommerceError("Invalid request.",400);
-  let restriction;
-  try {restriction=validateRestriction(restrict);}catch(error){if(error instanceof PrivacyInputError)throw new CommerceError("Invalid request.",400);throw error;}
-  const state=await readPrivacyState();
-  const restricted=restrictChoices(restrictChoices(state.choices,state.pending),restriction);
-  if(state.status==="unavailable") return {version:state.version,stale:false,
-    consent:visitorConsent(restrictChoices(restricted,Object.fromEntries(OUTAGE_DECLINED.map(p=>[p,false]))),gpc===true||gpcHeader(request.headers))};
-  return {version:state.version,stale:version!==undefined&&version!==state.version,consent:visitorConsent(restricted,gpc===true||gpcHeader(request.headers))};
-}
-// visitorConsent on @inContext needs Storefront API 2025-10 or later.
-const consentVersion=(version:string)=>version<"2025-10"?"2025-10":version;
 export async function checkoutResponse(request:Request) {
   try {
     sameOrigin(request);
-    const privacy=await checkoutPrivacy(request);
-    if(privacy.stale) return Response.json({error:"Your privacy choices changed. Please try again.",privacyChanged:true},{status:409,headers:responseHeaders});
-    const settings=config();
-    if(!settings) throw new CommerceError("Orders are not open yet.",503);
-    const id=await cartId();
-    // Refresh immediately before handing the buyer to Shopify's hosted checkout. Every
-    // handoff is a new contextualized read; a checkout URL is never cached or reused.
-    const current=id?(await shopifyRequest<{cart:ShopifyCart|null}>({...settings,version:consentVersion(settings.version)},CART_CHECKOUT,{id,visitorConsent:privacy.consent},await buyerIP())).cart:null;
-    const refreshed=await removeUpcomingProducts(current);
+    // Refresh immediately before handing the buyer to Shopify's hosted checkout.
+    const refreshed=await removeUpcomingProducts(await readCart());
     const cart=refreshed.cart;
     if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
     if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
     const url=new URL(cart.checkoutUrl);
     if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
-    // Returned exactly as Shopify issued it: the signed _cs consent parameter must not be altered.
-    return Response.json({checkoutUrl:cart.checkoutUrl,privacyVersion:privacy.version},{headers:responseHeaders});
+    return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
   }catch(error){return fail(error);}
 }
