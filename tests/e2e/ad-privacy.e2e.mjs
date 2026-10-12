@@ -329,7 +329,7 @@ test("storefront: after Allow, PageView/ViewContent/AddToCart only on reviewed r
     assert.equal(event.referer, null, "no Referer header");
     assert.equal(event.id, "1006368245818889");
     assert.match(event.eid, /^[0-9a-f]{32}$/);
-    const {page: _page, ...sent} = event;
+    const sent = {...event}; delete sent.page;
     assert.ok(!JSON.stringify(sent).includes("example.com") && !JSON.stringify(sent).includes("glp") && !JSON.stringify(sent).includes("Creatine") && !JSON.stringify(sent).includes("#"), JSON.stringify(sent));
   }
   assert.equal(await page.evaluate(() => typeof window.fbq), "undefined");

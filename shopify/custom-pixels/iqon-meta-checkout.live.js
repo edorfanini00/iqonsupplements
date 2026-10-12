@@ -113,18 +113,18 @@ async function handle(eventName, checkout, idSource) {
   const decidedAt = withdrawals;
   let eventId;
   try { eventId = eventName === "Purchase" ? idSource : "ic_" + await sha256Hex("iqon-ic:" + idSource); }
-  catch (error) { return; } // no hashing available: never fall back to the raw token
+  catch { return; } // no hashing available: never fall back to the raw token
   const key = "iqon_meta_sent:" + eventId;
   if (claimed.has(key)) return;
   claimed.add(key);
   const store = storage();
   if (store) {
-    try { if (await store.getItem(key)) return; await store.setItem(key, "1"); } catch (error) { /* documented: checkout_completed fires once per checkout */ }
+    try { if (await store.getItem(key)) return; await store.setItem(key, "1"); } catch { /* documented: checkout_completed fires once per checkout */ }
   }
   // Fresh gate at the moment of sending: still permitted, and no withdrawal since the decision.
   if (!permitted() || withdrawals !== decidedAt) return;
   try { await fetch(requestUrl(eventName, eventId, payload), {method: "GET", mode: "no-cors", credentials: "include", referrerPolicy: "no-referrer", keepalive: true}); }
-  catch (error) { /* tracking failures never affect checkout */ }
+  catch { /* tracking failures never affect checkout */ }
 }
 
 analytics.subscribe("checkout_started", function (event) {
