@@ -32,37 +32,40 @@ export function ProductPurchaseOptions({ purchase, setPurchase, plan, plans, set
   const billingCopy = billing || "per billing cycle";
   return <div className="product-purchase-choices">
     <RadioGroup className="purchase-options" value={purchase} onValueChange={value => setPurchase(value as Purchase)} aria-label="Purchase option">
-      {plan && <label className={`purchase-option subscription-option ${purchase === "subscription" ? "selected" : ""}`}>
-        <RadioGroupItem value="subscription"/>
-        <span><strong>{saving ? `Subscribe & save ${saving}%` : "Subscribe"}{phased && saving > 0 && <em className="subscription-saving">Save {saving}% initially</em>}</strong>
-          <small>{saved ? `Save ${money(saved, currency)} ${phased ? "on your first order" : "every order"}` : "Automatic recurring deliveries"}</small>
-        </span>
-        <span className="subscription-price">{saved > 0 && <s>{money(oneTimePrice, currency)}</s>}<b>{money(plan.price, plan.currency)}</b><small>{billing || "per billing cycle"}</small></span>
-      </label>}
+      {plan && <div className="subscription-choice">
+        <label className={`purchase-option subscription-option ${purchase === "subscription" ? "selected" : ""}`}>
+          <RadioGroupItem value="subscription"/>
+          <span><strong>{saving ? `Subscribe & save ${saving}%` : "Subscribe"}{phased && saving > 0 && <em className="subscription-saving">Save {saving}% initially</em>}</strong>
+            <small>{saved ? `Save ${money(saved, currency)} ${phased ? "on your first order" : "every order"}` : "Automatic recurring deliveries"}</small>
+          </span>
+          <span className="subscription-price">{saved > 0 && <s>{money(oneTimePrice, currency)}</s>}<b>{money(plan.price, plan.currency)}</b><small>{billing || "per billing cycle"}</small></span>
+        </label>
+        {purchase === "subscription" && plan && <div className="subscription-details">
+          {plans.length > 1 && <div className="subscription-schedule"><label htmlFor={selectId}>Delivery plan</label>
+            <select id={selectId} value={plan.id} onChange={event => setPlanId(event.target.value)}>
+              {plans.map(option => <option key={option.id} value={option.id}>{option.name} · {money(option.price, option.currency)}</option>)}
+            </select>
+          </div>}
+          <ul className="subscription-benefits">
+            {saving > 0 && <li>{saving}% off {phased ? "your first order" : "every order"}{monthly && !phased && ` · Save ${money(saved, currency)} a month`}</li>}
+            <li>Free to skip or cancel anytime</li>
+            <li>{delivery ? `Ships ${delivery} automatically` : "Automatic recurring deliveries"}</li>
+          </ul>
+          <p className="subscription-terms">{phased
+            ? `${money(plan.price, plan.currency)} for ${plan.initialOrderCount === 1 ? "the first order" : plan.initialOrderCount ? `the first ${plan.initialOrderCount} orders` : "the initial billing period"}, then ${money(plan.recurringPrice!, plan.currency)} ${billingCopy}.`
+            : `${money(plan.price, plan.currency)} ${billingCopy}.`}
+            {!payPerDelivery && ` ${money(plan.perDeliveryPrice, plan.currency)} per delivery.`}
+            {" "}Renews and charges automatically. Skip or cancel anytime from your <a href="/account">account</a>. Shipping and taxes calculated at checkout.
+          </p>
+          {plan.description && <p className="subscription-description">{plan.description}</p>}
+        </div>}
+      </div>}
       {!requiresSellingPlan && <label className={`purchase-option ${purchase === "once" ? "selected" : ""}`}>
         <RadioGroupItem value="once"/>
         <span><strong>One time purchase</strong><small>Order whenever you need</small></span>
         <b>{money(oneTimePrice, currency)}</b>
       </label>}
     </RadioGroup>
-    {purchase === "subscription" && plan && <div className="subscription-details">
-      {plans.length > 1 && <div className="subscription-schedule"><label htmlFor={selectId}>Delivery plan</label>
-        <select id={selectId} value={plan.id} onChange={event => setPlanId(event.target.value)}>
-          {plans.map(option => <option key={option.id} value={option.id}>{option.name} · {money(option.price, option.currency)}</option>)}
-        </select>
-      </div>}
-      <ul className="subscription-benefits">
-        {saving > 0 && <li>{saving}% off {phased ? "your first order" : "every order"}{monthly && !phased && ` · Save ${money(saved, currency)} a month`}</li>}
-        <li>Free to skip or cancel anytime</li>
-        <li>{delivery ? `Ships ${delivery} automatically` : "Automatic recurring deliveries"}</li>
-      </ul>
-      <p className="subscription-terms">{phased
-        ? `${money(plan.price, plan.currency)} for ${plan.initialOrderCount === 1 ? "the first order" : plan.initialOrderCount ? `the first ${plan.initialOrderCount} orders` : "the initial billing period"}, then ${money(plan.recurringPrice!, plan.currency)} ${billingCopy}.`
-        : `${money(plan.price, plan.currency)} ${billingCopy}.`}
-        {!payPerDelivery && ` ${money(plan.perDeliveryPrice, plan.currency)} per delivery.`}
-        {" "}Renews and charges automatically. Skip or cancel anytime from your <a href="/account">account</a>. Shipping and taxes calculated at checkout.
-      </p>
-      {plan.description && <p className="subscription-description">{plan.description}</p>}
-    </div>}
+
   </div>;
 }

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { ProductPurchaseOptions } from "../../app/product-purchase-options";
 import { ProductPage } from "../../app/shop-pages";
 import { products, productPrice, type ProductSellingPlan } from "../../lib/catalog";
@@ -17,6 +17,34 @@ vi.mock("../../app/customer-reviews",()=>({CustomerReviews:()=>null,ProductRevie
 afterEach(()=>{cleanup();vi.clearAllMocks();});
 const plans:ProductSellingPlan[]=[{id:"gid://shopify/SellingPlan/10",name:"Every month",options:[{name:"Deliver",value:"Every month"}],price:26.1,compareAtPrice:29,perDeliveryPrice:26.1,currency:"USD"},{id:"gid://shopify/SellingPlan/20",name:"Every 2 months",options:[{name:"Deliver",value:"Every 2 months"}],price:27.55,compareAtPrice:29,perDeliveryPrice:27.55,currency:"USD"}];
 const supplement={...products.find(p=>p.id==="creatine-monohydrate")!,available:true,price:29,currency:"USD",variants:[{id:"gid://shopify/ProductVariant/1",title:"Default Title",price:29,currency:"USD",available:true,sellingPlans:plans}]};
+
+it("attaches subscription details before one time and preserves radio keyboard navigation",async()=>{
+  const {container}=render(React.createElement(ProductPage,{product:supplement}));
+  const group=screen.getByRole("radiogroup",{name:"Purchase option"});
+  const subscription=screen.getByRole("radio",{name:/Subscribe & save/});
+  const once=screen.getByRole("radio",{name:/One time purchase/});
+  const card=subscription.closest("label")!;
+  const details=container.querySelector(".subscription-details")!;
+  expect(details).toBeTruthy();
+  expect(card.nextElementSibling).toBe(details);
+  expect(details.compareDocumentPosition(once) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(details.closest("label")).toBeNull();
+  expect(group.contains(subscription) && group.contains(once)).toBe(true);
+  expect(details.contains(screen.getByRole("combobox",{name:"Delivery plan"}))).toBe(true);
+  expect(subscription.getAttribute("aria-checked")).toBe("true");
+  subscription.focus();
+  fireEvent.keyDown(subscription,{key:"ArrowDown"});
+  await waitFor(()=>expect(once.getAttribute("aria-checked")).toBe("true"));
+  expect(document.activeElement).toBe(once);
+  expect(container.querySelector(".subscription-details")).toBeNull();
+  expect(screen.queryByRole("combobox",{name:"Delivery plan"})).toBeNull();
+  fireEvent.keyDown(once,{key:"ArrowUp"});
+  await waitFor(()=>expect(subscription.getAttribute("aria-checked")).toBe("true"));
+  expect(document.activeElement).toBe(subscription);
+  expect(card.nextElementSibling).toBe(container.querySelector(".subscription-details"));
+  fireEvent.click(once);
+  expect(container.querySelector(".subscription-details")).toBeNull();
+});
 
 it("selects the real delivery plan and passes its ID to the bag",()=>{
   const {container}=render(React.createElement(ProductPage,{product:supplement}));
