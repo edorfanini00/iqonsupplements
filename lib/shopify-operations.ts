@@ -11,7 +11,7 @@ export const CATALOG_QUERY = `query IQONCatalog($after: String) {
           sellingPlanAllocations(first: 50) {
             pageInfo { hasNextPage }
             nodes {
-              sellingPlan { id name description recurringDeliveries options { name value } priceAdjustments { orderCount } }
+              sellingPlan { id name description recurringDeliveries billingPolicy { ... on SellingPlanRecurringBillingPolicy { interval intervalCount } } deliveryPolicy { ... on SellingPlanRecurringDeliveryPolicy { interval intervalCount } } options { name value } priceAdjustments { orderCount } }
               priceAdjustments { price { amount currencyCode } compareAtPrice { amount currencyCode } perDeliveryPrice { amount currencyCode } }
             }
           }

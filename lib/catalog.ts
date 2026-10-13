@@ -8,6 +8,7 @@ export type ProductSellingPlan = {
   id:string; name:string; description?:string|null; options:{name:string;value:string}[];
   price:number; currency:string; compareAtPrice:number; perDeliveryPrice:number;
   recurringPrice?:number; initialOrderCount?:number|null;
+  billingInterval?:string; billingIntervalCount?:number; deliveryInterval?:string; deliveryIntervalCount?:number;
 };
 export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean; sellingPlans?:ProductSellingPlan[]};
 export type Product = {

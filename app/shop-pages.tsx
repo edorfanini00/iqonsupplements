@@ -32,7 +32,7 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  const [variantId,setVariantId]=useState(p.variants?.find(v=>v.available)?.id||p.variants?.[0]?.id||"");
  const variant=p.variants?.find(v=>v.id===variantId);
  const [quantity,setQuantity]=useState(1);
- const [purchase,setPurchase]=useState<Purchase>("once");
+ const [purchase,setPurchase]=useState<Purchase>("subscription");
  const [planId,setPlanId]=useState("");
  const plans=live&&!comingSoon?variant?.sellingPlans||[]:[];
  const plan=plans.find(option=>option.id===planId)||plans[0];
