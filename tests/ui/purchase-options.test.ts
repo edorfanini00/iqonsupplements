@@ -22,12 +22,12 @@ it("selects the real delivery plan and passes its ID to the bag",()=>{
   const {container}=render(React.createElement(ProductPage,{product:supplement}));
   fireEvent.click(screen.getByRole("radio",{name:/Subscribe & save/}));
   expect(container.querySelector(".product-title-row")?.textContent).toContain("$26.10");
-  expect(screen.getByRole("radio",{name:/One-time purchase/}).closest("label")?.textContent).toContain("$29");
+  expect(screen.getByRole("radio",{name:/One time purchase/}).closest("label")?.textContent).toContain("$29");
   fireEvent.change(screen.getByRole("combobox",{name:"Delivery plan"}),{target:{value:plans[1].id}});
   expect(screen.getByText(/\$27.55 per billing cycle/)).toBeTruthy();
   fireEvent.click(screen.getAllByRole("button",{name:/Add subscription/})[0]);
   expect(store.add).toHaveBeenCalledWith(supplement.id,1,"subscription","Every 2 months",supplement.variants[0].id,plans[1].id);
-  fireEvent.click(screen.getByRole("radio",{name:/One-time purchase/}));
+  fireEvent.click(screen.getByRole("radio",{name:/One time purchase/}));
   fireEvent.click(screen.getAllByRole("button",{name:/Add to bag/})[0]);
   expect(store.add).toHaveBeenLastCalledWith(supplement.id,1,"once","once",supplement.variants[0].id,undefined);
 });
@@ -58,4 +58,44 @@ it("keeps all seven skincare pages browseable with no purchase controls, even if
     expect(dailyProductPrice(product)).toBeNull();
     cleanup();
   }
+});
+
+
+it("preselects a monthly 15% plan, shows true savings and keeps one time one tap away",()=>{
+  const plan={...plans[0],price:41.62,perDeliveryPrice:41.62,compareAtPrice:48.97,billingInterval:"MONTH",billingIntervalCount:1,deliveryInterval:"MONTH",deliveryIntervalCount:1};
+  const product={...supplement,price:48.97,variants:[{...supplement.variants[0],price:48.97,sellingPlans:[plan]}]};
+  const {container}=render(React.createElement(ProductPage,{product}));
+  expect(screen.getByRole("radio",{name:/Subscribe & save 15%/}).getAttribute("aria-checked")).toBe("true");
+  expect(screen.getByText("Save $7.35 every order")).toBeTruthy();
+  expect(screen.getByText("15% off every order · Save $7.35 a month")).toBeTruthy();
+  expect(screen.getByText("Ships every month automatically")).toBeTruthy();
+  expect(container.querySelector(".subscription-terms")?.textContent).toContain("$41.62 every month. Renews and charges automatically.");
+  expect(screen.getByRole("link",{name:"account"}).getAttribute("href")).toBe("/account");
+  fireEvent.click(screen.getAllByRole("button",{name:/Add subscription/})[0]);
+  expect(store.add).toHaveBeenLastCalledWith(product.id,1,"subscription","Every month",product.variants[0].id,plan.id);
+  fireEvent.click(screen.getByRole("radio",{name:/One time purchase/}));
+  expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
+  expect(container.querySelector(".subscription-details")).toBeNull();
+});
+
+it("does not advertise per-order savings by comparing prepaid billing to one delivery",()=>{
+  const plan={...plans[0],price:70,perDeliveryPrice:23.33,compareAtPrice:87,billingInterval:"MONTH",billingIntervalCount:3,deliveryInterval:"MONTH",deliveryIntervalCount:1};
+  render(React.createElement(ProductPurchaseOptions,{purchase:"subscription",setPurchase:vi.fn(),plan,plans:[plan],setPlanId:vi.fn(),oneTimePrice:29,currency:"USD"}));
+  expect(screen.queryByText(/off every order/)).toBeNull();
+  expect(screen.getByText(/\$70 every 3 months/)).toBeTruthy();
+  expect(screen.getByText(/\$23.33 per delivery/)).toBeTruthy();
+});
+
+it("falls back to one time for a variant with no plan and preserves an explicit one time choice",()=>{
+  const product={...supplement,variants:[{...supplement.variants[0],title:"Small"},{...supplement.variants[0],id:"gid://shopify/ProductVariant/2",title:"Large",sellingPlans:[]}]};
+  render(React.createElement(ProductPage,{product}));
+  fireEvent.change(screen.getByRole("combobox",{name:"Select option"}),{target:{value:product.variants[1].id}});
+  expect(screen.queryByRole("radio",{name:/Subscribe/})).toBeNull();
+  fireEvent.click(screen.getAllByRole("button",{name:/Add to bag/})[0]);
+  expect(store.add).toHaveBeenLastCalledWith(product.id,1,"once","once",product.variants[1].id,undefined);
+  fireEvent.change(screen.getByRole("combobox",{name:"Select option"}),{target:{value:product.variants[0].id}});
+  fireEvent.click(screen.getByRole("radio",{name:/One time purchase/}));
+  fireEvent.change(screen.getByRole("combobox",{name:"Select option"}),{target:{value:product.variants[1].id}});
+  fireEvent.change(screen.getByRole("combobox",{name:"Select option"}),{target:{value:product.variants[0].id}});
+  expect(screen.getByRole("radio",{name:/One time purchase/}).getAttribute("aria-checked")).toBe("true");
 });

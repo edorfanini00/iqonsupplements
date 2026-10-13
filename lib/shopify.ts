@@ -32,7 +32,7 @@ export async function shopifyRequest<T>(config:ShopifyConfig, query:string, vari
 
 type ShopifyMoney={amount:string;currencyCode:string};
 type ShopifyPlanAllocation={
-  sellingPlan:{id:string;name:string;description?:string|null;recurringDeliveries:boolean;options:{name:string;value:string}[];priceAdjustments?:{orderCount:number|null}[]};
+  sellingPlan:{id:string;name:string;description?:string|null;recurringDeliveries:boolean;billingPolicy?:{interval?:string;intervalCount?:number}|null;deliveryPolicy?:{interval?:string;intervalCount?:number}|null;options:{name:string;value:string}[];priceAdjustments?:{orderCount:number|null}[]};
   priceAdjustments:{price:ShopifyMoney;compareAtPrice:ShopifyMoney;perDeliveryPrice:ShopifyMoney}[];
 };
 export type ShopifyProduct = {
@@ -53,6 +53,8 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
       if(!first||!Number.isFinite(Number(first.price.amount))||Number(first.price.amount)<0||first.price.currencyCode!==v.price.currencyCode) return [];
       const next=a.priceAdjustments[1];
       return [{id:a.sellingPlan.id,name:a.sellingPlan.name,description:a.sellingPlan.description,options:a.sellingPlan.options,
+        billingInterval:a.sellingPlan.billingPolicy?.interval,billingIntervalCount:a.sellingPlan.billingPolicy?.intervalCount,
+        deliveryInterval:a.sellingPlan.deliveryPolicy?.interval,deliveryIntervalCount:a.sellingPlan.deliveryPolicy?.intervalCount,
         price:Number(first.price.amount),currency:first.price.currencyCode,compareAtPrice:Number(first.compareAtPrice.amount),perDeliveryPrice:Number(first.perDeliveryPrice.amount),
         ...(next?{recurringPrice:Number(next.price.amount),initialOrderCount:a.sellingPlan.priceAdjustments?.[0]?.orderCount}:{}),
       }];

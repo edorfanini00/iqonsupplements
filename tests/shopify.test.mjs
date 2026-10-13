@@ -77,12 +77,16 @@ test("cart writes reject foreign origins, non-JSON bodies, and malformed quantit
   assert.equal(validQuantity(20),20);assert.equal(validQuantity(0,true),0);
 });
 
-const subscriptionAllocation = {sellingPlan:{id:"gid://shopify/SellingPlan/1",name:"Every month",recurringDeliveries:true,options:[{name:"Delivery",value:"Monthly"}],priceAdjustments:[{orderCount:3}]},priceAdjustments:[{price:{amount:"40.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"40.00",currencyCode:"EUR"}},{price:{amount:"42.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"42.00",currencyCode:"EUR"}}]};
+const subscriptionAllocation = {sellingPlan:{id:"gid://shopify/SellingPlan/1",name:"Every month",recurringDeliveries:true,billingPolicy:{interval:"MONTH",intervalCount:1},deliveryPolicy:{interval:"MONTH",intervalCount:1},options:[{name:"Delivery",value:"Monthly"}],priceAdjustments:[{orderCount:3}]},priceAdjustments:[{price:{amount:"40.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"40.00",currencyCode:"EUR"}},{price:{amount:"42.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"42.00",currencyCode:"EUR"}}]};
 const withPlans = allocations => ({...product,requiresSellingPlan:true,variants:{pageInfo:{hasNextPage:false},nodes:[{...product.variants.nodes[1],sellingPlanAllocations:{pageInfo:{hasNextPage:false},nodes:allocations}}]}});
 test("subscriptions retain exact Shopify pricing phases and allow required recurring purchases",()=>{
   const p=mapProduct(withPlans([subscriptionAllocation]),0);
   assert.equal(p.available,true);
   assert.equal(p.variants[0].sellingPlans[0].price,40);
+  assert.equal(p.variants[0].sellingPlans[0].billingInterval,"MONTH");
+  assert.equal(p.variants[0].sellingPlans[0].billingIntervalCount,1);
+  assert.equal(p.variants[0].sellingPlans[0].deliveryInterval,"MONTH");
+  assert.equal(p.variants[0].sellingPlans[0].deliveryIntervalCount,1);
   assert.equal(p.variants[0].sellingPlans[0].recurringPrice,42);
   assert.equal(p.variants[0].sellingPlans[0].initialOrderCount,3);
   assert.equal(p.variants[0].sellingPlans[0].compareAtPrice,45.75);

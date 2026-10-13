@@ -23,7 +23,7 @@
 .product-essentials>p>span{color:var(--pdp-ink);font-weight:500}
 .product-page .product-format{display:none}
 .product-page .purchase-option{padding:13px 14px}
-.product-page .purchase-option small{display:none}
+.product-page .purchase-option small{display:block}
 .product-page .purchase-option strong{font-size:13px}
 .product-page .add-to-bag-row{margin-top:12px;gap:8px}
 .product-page .add-to-bag-row>.button{min-height:48px;padding-inline:16px;font-size:13px}
