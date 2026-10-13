@@ -14,7 +14,8 @@ Explicit events:
 Account, affiliate and API routes are excluded. Direct portal loads do not load
 the script. On client navigation into a portal, Meta consent is revoked and no
 explicit events are sent; automatic Meta configuration and its history listener
-are disabled so App Router alone owns PageView. The script
+are disabled so App Router alone owns PageView. Events use Meta’s standard
+`trackSingle` API for the configured dataset, including repeat SPA PageViews. The script
 already loaded in the document remains until a full navigation. GPC is checked
 before initialization and every explicit event. There is no custom consent banner,
 consent persistence, tracker API, database, visitor cookie, or WAF change.

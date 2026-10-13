@@ -14,7 +14,7 @@ beforeEach(() => {
   browser.navigator.globalPrivacyControl = false;
   calls.length = 0;
 });
-const events = (name: string) => calls.filter(call => call[0] === "track" && call[1] === name);
+const events = (name: string) => calls.filter(call => call[0] === "trackSingle" && call[1] === "1006368245818889" && call[2] === name).map(call => ["track", ...call.slice(2)]);
 
 test("GPC blocks initialization, page, product and cart events", () => {
   browser.navigator.globalPrivacyControl = true;
@@ -40,7 +40,7 @@ test("account, affiliates and API routes are excluded, including nested routes",
     assert.equal(initializePixel(), false);
     trackPageView(pathname); trackViewContent(product); trackCartAddition([], [line()], product.variantId);
   }
-  assert.equal(calls.filter(call => call[0] === "track").length, 0);
+  assert.equal(calls.filter(call => call[0] === "trackSingle").length, 0);
   for (const pathname of ["/", "/products/creatine", "/collections/all", "/checkout"]) assert.equal(isStorefrontPath(pathname), true);
 });
 test("product payload uses numeric catalog variant IDs, USD and total value", () => {

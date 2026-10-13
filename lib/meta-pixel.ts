@@ -62,7 +62,9 @@ export function trackPageView(route: string) {
   }
   if (!initializePixel() || lastPage === route) return;
   window.fbq?.("consent", "grant");
-  window.fbq?.("track", "PageView");
+  // trackSingle supports repeated explicit SPA views; Meta deduplicates the
+  // broadcast track(PageView) for the document when its history listener is off.
+  window.fbq?.("trackSingle", META_PIXEL_ID, "PageView");
   lastPage = route;
 }
 
@@ -80,7 +82,7 @@ export function trackViewContent(product: ProductEvent) {
   if (!payload) return;
   const key = `${window.location.pathname}${window.location.search}:${product.variantId}`;
   if (lastProduct === key || !initializePixel()) return;
-  window.fbq?.("track", "ViewContent", payload);
+  window.fbq?.("trackSingle", META_PIXEL_ID, "ViewContent", payload);
   lastProduct = key;
 }
 export function resetProductView() { lastProduct = undefined; }
@@ -95,5 +97,5 @@ export function trackCartAddition(before: CartItem[], after: CartItem[], variant
   if (!line || quantity <= 0 || line.amount === undefined) return;
   const payload = productPayload({variantId, name: line.name || line.id,
     price: line.amount / line.quantity, currency: line.currency || "USD", quantity});
-  if (payload && initializePixel()) window.fbq?.("track", "AddToCart", payload);
+  if (payload && initializePixel()) window.fbq?.("trackSingle", META_PIXEL_ID, "AddToCart", payload);
 }
