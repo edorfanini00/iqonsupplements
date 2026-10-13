@@ -505,7 +505,7 @@ body { background:#fafbfb; }
 /* Real Shopify subscription choices; pricing remains supplied by the store. */
 .product-purchase-choices { margin-top:4px; }
 .subscription-saving { display:inline-block; margin-left:8px; padding:3px 6px; background:#dde4e7; color:#37434b; font-size:10px; font-weight:500; font-style:normal; letter-spacing:.02em; }
-.subscription-details { padding:16px; border:1px solid var(--line); border-top:0; background:#f6f7f7; }
+.subscription-details { padding:16px; border:1px solid #46575e; border-top:0; background:#f6f7f7; }
 .subscription-schedule { display:flex; flex-direction:column; gap:8px; }
 .subscription-schedule label,.subscription-plan-name { font-size:12px; font-weight:500; }
 .subscription-schedule select { width:100%; min-height:44px; padding:10px 30px 10px 12px; border:1px solid #cbd0d2; border-radius:0; background:#fff; font:inherit; font-size:13px; color:inherit; }
