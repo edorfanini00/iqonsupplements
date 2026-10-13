@@ -25,6 +25,7 @@ test("GPC blocks initialization, page, product and cart events", () => {
 });
 test("standard base initializes only once and suppresses automatic configuration", () => {
   initializePixel(); initializePixel();
+  assert.equal(window.fbq?.disablePushState, true);
   assert.equal(calls.filter(call => call[0] === "init").length, 1);
   assert.deepEqual(calls[0], ["set", "autoConfig", false, "1006368245818889"]);
 });

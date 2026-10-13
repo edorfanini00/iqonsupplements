@@ -8,6 +8,7 @@ type Pixel = {
   push: Pixel;
   loaded: boolean;
   version: string;
+  disablePushState?: boolean;
 };
 declare global {
   interface Window { fbq?: Pixel; _fbq?: Pixel }
@@ -42,6 +43,9 @@ export function initializePixel() {
     window.fbq = queue;
     window._fbq = queue;
   }
+  // App Router owns PageView. Meta's history listener would otherwise send
+  // automatic views before our route effect can exclude account/affiliate pages.
+  window.fbq.disablePushState = true;
   // Only the explicit storefront events below; no automatic button/form events.
   window.fbq("set", "autoConfig", false, META_PIXEL_ID);
   window.fbq("init", META_PIXEL_ID);
