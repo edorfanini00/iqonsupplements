@@ -20,7 +20,7 @@ test("GPC blocks initialization, page, product and cart events", () => {
   browser.navigator.globalPrivacyControl = true;
   assert.equal(initializePixel(), false);
   trackPageView("/"); trackViewContent(product);
-  trackCartAddition([], [line()], product.variantId);
+  trackCartAddition([line()], product.variantId, 1);
   assert.equal(calls.filter(call => call[0] !== "consent").length, 0);
 });
 test("standard base initializes only once and suppresses automatic configuration", () => {
@@ -38,7 +38,7 @@ test("account, affiliates and API routes are excluded, including nested routes",
     assert.equal(isStorefrontPath(pathname), false);
     browser.location.pathname = pathname;
     assert.equal(initializePixel(), false);
-    trackPageView(pathname); trackViewContent(product); trackCartAddition([], [line()], product.variantId);
+    trackPageView(pathname); trackViewContent(product); trackCartAddition([line()], product.variantId, 1);
   }
   assert.equal(calls.filter(call => call[0] === "trackSingle").length, 0);
   for (const pathname of ["/", "/products/creatine", "/collections/all", "/checkout"]) assert.equal(isStorefrontPath(pathname), true);
@@ -62,19 +62,32 @@ test("ViewContent deduplicates repeated effects, tracks changed variants and lat
 function line(overrides: Partial<CartItem> = {}): CartItem {
   return {id: "creatine", variantId: product.variantId, quantity: 2, amount: 70, name: "Creatine", currency: "USD", purchase: "once", frequency: "once", ...overrides};
 }
-test("AddToCart tracks confirmed quantity delta and returned price, not the full existing line", () => {
-  trackCartAddition([line({quantity: 1})], [line()], product.variantId);
+test("AddToCart tracks this successful request, not the full existing line", () => {
+  trackCartAddition([line()], product.variantId, 1);
   assert.deepEqual(events("AddToCart")[0]?.[2], {...productPayload({...product, price: 35}), value: 35});
 });
-test("no AddToCart for no increase, removed/missing line, or missing amount", () => {
-  trackCartAddition([line()], [line()], product.variantId);
-  trackCartAddition([line()], [], product.variantId);
-  trackCartAddition([], [line({amount: undefined})], product.variantId);
+test("expired-cart replacement still tracks the successful addition", () => {
+  // The tab could have cached quantity 2, but Shopify replaced its expired cart.
+  trackCartAddition([line({quantity: 1, amount: 39.99})], product.variantId, 1);
+  assert.deepEqual(events("AddToCart")[0]?.[2], productPayload(product));
+});
+test("another tab's addition is not counted again in this request", () => {
+  // Cached quantity 1 -> other tab adds 1 -> this successful request adds 1.
+  trackCartAddition([line({quantity: 3, amount: 119.97})], product.variantId, 1);
+  assert.deepEqual(events("AddToCart")[0]?.[2], productPayload(product));
+});
+test("no AddToCart for absent line, missing price, or invalid request quantity", () => {
+  trackCartAddition([], product.variantId, 1);
+  trackCartAddition([line({amount: undefined})], product.variantId, 1);
+  for (const quantity of [0, -1, 1.5, NaN]) trackCartAddition([line()], product.variantId, quantity);
   assert.equal(events("AddToCart").length, 0);
+});
+test("quantity cannot exceed the returned line if Shopify adjusts it", () => {
+  trackCartAddition([line({quantity: 1, amount: 39.99})], product.variantId, 2);
+  assert.deepEqual(events("AddToCart")[0]?.[2], productPayload(product));
 });
 test("subscription additions match their selling plan and use its actual price", () => {
   const plan = "gid://shopify/SellingPlan/456";
-  trackCartAddition([line()], [line(), line({sellingPlanId: plan, amount: 50})], product.variantId, plan);
-  const payload = events("AddToCart")[0]?.[2];
-  assert.deepEqual(payload, productPayload({...product, price: 25, quantity: 2}));
+  trackCartAddition([line(), line({sellingPlanId: plan, amount: 50})], product.variantId, 2, plan);
+  assert.deepEqual(events("AddToCart")[0]?.[2], productPayload({...product, price: 25, quantity: 2}));
 });

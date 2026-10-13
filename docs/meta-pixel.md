@@ -9,7 +9,7 @@ browser does not report Global Privacy Control.
 Explicit events:
 - `PageView`: initial page and App Router pathname/query changes, deduplicated on effect replay.
 - `ViewContent`: live product pages and selected variant changes; numeric Shopify variant ID, USD price and product name.
-- `AddToCart`: successful shared cart-add response only; confirmed quantity increase and returned line price, including subscription plans.
+- `AddToCart`: successful shared cart-add response only; this request’s quantity (bounded by the returned line) and returned line price, including subscription plans.
 
 Account, affiliate and API routes are excluded. Direct portal loads do not load
 the script. On client navigation into a portal, Meta consent is revoked and no

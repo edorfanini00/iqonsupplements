@@ -82,7 +82,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       if(!variant||!p.available)return;
       if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
       setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(snapshot=>{
-        if(snapshot)trackCartAddition(cart,snapshot.items,variant.id,sellingPlanId);
+        if(snapshot)trackCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);
       });return;
     }
     if(purchase!=="once")return;

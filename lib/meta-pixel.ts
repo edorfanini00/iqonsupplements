@@ -87,14 +87,14 @@ export function trackViewContent(product: ProductEvent) {
 }
 export function resetProductView() { lastProduct = undefined; }
 
-// Use the confirmed quantity delta and returned line price, including selling plans
-// and Shopify quantity adjustments. Failed requests never reach this helper.
-export function trackCartAddition(before: CartItem[], after: CartItem[], variantId: string, sellingPlanId?: string) {
-  if (!pixelAllowed()) return;
-  const matches = (line: CartItem) => line.variantId === variantId && line.sellingPlanId === sellingPlanId;
-  const line = after.find(matches);
-  const quantity = (line?.quantity || 0) - (before.find(matches)?.quantity || 0);
-  if (!line || quantity <= 0 || line.amount === undefined) return;
+// Called only after this add request succeeds. A browser's cached cart can be
+// stale (another tab, or an expired cart), so never infer this operation's quantity
+// by subtracting that cache. Bound the accepted request by the returned line.
+export function trackCartAddition(items: CartItem[], variantId: string, requestedQuantity: number, sellingPlanId?: string) {
+  if (!pixelAllowed() || !Number.isInteger(requestedQuantity) || requestedQuantity < 1) return;
+  const line = items.find(item => item.variantId === variantId && item.sellingPlanId === sellingPlanId);
+  if (!line || line.quantity <= 0 || line.amount === undefined) return;
+  const quantity = Math.min(requestedQuantity, line.quantity);
   const payload = productPayload({variantId, name: line.name || line.id,
     price: line.amount / line.quantity, currency: line.currency || "USD", quantity});
   if (payload && initializePixel()) window.fbq?.("trackSingle", META_PIXEL_ID, "AddToCart", payload);
