@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useId, useMemo, useState, useRef, type ReactNode } from "react";
+import { Suspense, createContext, useContext, useEffect, useId, useMemo, useState, useRef, type ReactNode } from "react";
 import { ArrowRight, Minus, Plus, Search, ShoppingBag, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { StoreNavigation } from "./store-navigation";
@@ -10,6 +10,8 @@ import { departmentHome } from "@/lib/departments";
 import type { Category } from "@/lib/catalog";
 import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Purchase, type Product, type StoreCatalog } from "@/lib/catalog";
 import { isComingSoon } from "@/lib/commerce-policy";
+import { StorefrontMetaPixel } from "./meta-pixel";
+import { trackCartAddition } from "@/lib/meta-pixel";
 import type { CartSnapshot } from "@/lib/shopify";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
@@ -48,6 +50,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     if(data.cart)applySnapshot(data.cart);
     if(!response.ok)throw new Error(data.error||"We couldn’t update your bag. Please try again.");
     applySnapshot(data);
+    return data as CartSnapshot;
   }
   const retryCart=async()=>{
     if(lock.current)return;
@@ -67,10 +70,10 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const transact=async(input:Record<string,unknown>)=>{
     if(lock.current||!hydrated)return false;
     lock.current=true;setBusy(true);setError("");
-    try {await requestCart(input);return true;}catch(e){setError(e instanceof Error?e.message:"We couldn’t update your bag. Please try again.");return false;}
+    try {return await requestCart(input);}catch(e){setError(e instanceof Error?e.message:"We couldn’t update your bag. Please try again.");return false;}
     finally{lock.current=false;setBusy(false);}
   };
-  const applyDiscounts=(codes:string[])=>transact({action:"discount",discountCodes:codes});
+  const applyDiscounts=async(codes:string[])=>!!(await transact({action:"discount",discountCodes:codes}));
   const add=(id:string,quantity=1,purchase:Purchase="once",frequency="once",variantId?:string,sellingPlanId?:string)=>{
     const p=findProduct(id);if(!p||isComingSoon(p)||p.pricePending||p.available===false||mode==="unavailable")return;
     if(live){
@@ -78,7 +81,9 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       const variant=p.variants?.find(v=>v.id===variantId)||p.variants?.find(v=>v.available);
       if(!variant||!p.available)return;
       if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
-      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})});return;
+      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(snapshot=>{
+        if(snapshot)trackCartAddition(cart,snapshot.items,variant.id,sellingPlanId);
+      });return;
     }
     if(purchase!=="once")return;
     const item={id,quantity:Math.max(1,Math.min(20,Math.floor(quantity))),purchase,frequency:purchase==="once"?"once":frequency};
@@ -99,8 +104,9 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   };
   const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count};
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
-  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}><Suspense fallback={null}><StorefrontMetaPixel/></Suspense>{children}</StoreContext.Provider>;
   return <StoreContext.Provider value={value}>
+    <Suspense fallback={null}><StorefrontMetaPixel/></Suspense>
     <a className="skip-link" href="#main">Skip to content</a>
     {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span className="preview-review-notice">Illustrative ratings &amp; review counts</span><span>Orders are not enabled yet</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
