@@ -1,0 +1,139 @@
+// IQON Body — Meta checkout pixel (Shopify custom pixel). GENERATED FILE SOURCE: edit this
+// template, then run `node scripts/build-checkout-pixel.mjs`; never edit the generated copies.
+//
+// Install (parent only, after review): Settings → Customer events → Add custom pixel.
+//   Customer privacy → Permission: "Required", Marketing checked.
+//   Data sale: "Data collected qualifies as data sale".
+// Shopify then loads this code only when its own privacy settings and the visitor's current
+// consent (including the storefront's `_cs` handoff, Shopify's hosted opt-out page and GPC)
+// allow marketing and sale of data. The checks below repeat that decision at every event.
+//
+// Sends at most InitiateCheckout and Purchase, each as ONE parameter-controlled request to Meta's
+// image-pixel endpoint: no Meta SDK, so no queue, no automatic events, no cookies, and no
+// automatic page URL or referrer (dl is a fixed neutral URL; the request carries no Referer).
+// No customer data, product names or URLs. The checkout token is sent only as a SHA-256 hash.
+// An order is sent only when EVERY line is an allowlisted variant; otherwise nothing is sent.
+// The storefront's `_iqon_ad_restriction` cart attribute blocks sending; it never grants.
+const CONFIG = /*__IQON_PIXEL_CONFIG__*/{};
+
+const RESTRICTION_ATTRIBUTE = "_iqon_ad_restriction";
+const NEUTRAL_URL = "https://www.iqonbody.com/";
+let privacy = typeof init !== "undefined" && init && init.customerPrivacy ? init.customerPrivacy : null;
+// Counts withdrawals; an event decided before a withdrawal is never sent after it.
+let withdrawals = 0;
+const claimed = new Set();
+
+function permitted() {
+  return !!privacy && privacy.marketingAllowed === true && privacy.saleOfDataAllowed === true;
+}
+
+if (typeof api !== "undefined" && api && api.customerPrivacy && typeof api.customerPrivacy.subscribe === "function") {
+  api.customerPrivacy.subscribe("visitorConsentCollected", function (event) {
+    privacy = event && event.customerPrivacy ? event.customerPrivacy : null;
+    if (!permitted()) withdrawals++;
+  });
+}
+
+function numericId(value) {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const tail = String(value).trim().split("/").pop();
+  return /^\d{1,20}$/.test(tail) ? tail : null;
+}
+
+function restricted(checkout) {
+  const attributes = checkout && Array.isArray(checkout.attributes) ? checkout.attributes : null;
+  // An unreadable attribute list cannot show that no restriction exists.
+  if (!attributes) return true;
+  return attributes.some(function (attribute) {
+    return !attribute || typeof attribute.key !== "string" || (attribute.key === RESTRICTION_ATTRIBUTE && attribute.value !== "");
+  });
+}
+
+// Returns the event payload, or null when any line is not an allowlisted variant.
+function eligibleContents(checkout) {
+  const lines = checkout && Array.isArray(checkout.lineItems) ? checkout.lineItems : [];
+  if (!lines.length) return null;
+  const contents = [];
+  for (const line of lines) {
+    const id = numericId(line && line.variant && line.variant.id);
+    const quantity = line && line.quantity;
+    if (!id || !Object.prototype.hasOwnProperty.call(CONFIG.variants, id)) return null;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 1000) return null;
+    contents.push({id: id, quantity: quantity});
+  }
+  return contents;
+}
+
+function payloadFor(checkout) {
+  const contents = eligibleContents(checkout);
+  const money = checkout && checkout.totalPrice;
+  const value = money ? Number(money.amount) : NaN;
+  const currency = (money && money.currencyCode) || (checkout && checkout.currencyCode);
+  if (!contents || !Number.isFinite(value) || value < 0 || !/^[A-Z]{3}$/.test(String(currency))) return null;
+  return {
+    value: Math.round(value * 100) / 100,
+    currency: currency,
+    content_type: "product",
+    content_ids: contents.map(function (item) { return item.id; }),
+    contents: contents,
+    num_items: contents.reduce(function (sum, item) { return sum + item.quantity; }, 0),
+  };
+}
+
+async function sha256Hex(text) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest)).map(function (byte) { return byte.toString(16).padStart(2, "0"); }).join("");
+}
+
+function storage() {
+  return typeof browser !== "undefined" && browser && browser.localStorage && typeof browser.localStorage.getItem === "function" ? browser.localStorage : null;
+}
+
+// One request with every parameter set here; Meta receives nothing the code did not choose.
+function requestUrl(eventName, eventId, payload) {
+  const params = new URLSearchParams({id: CONFIG.pixelId, ev: eventName, eid: eventId, dl: NEUTRAL_URL, noscript: "1"});
+  for (const key of Object.keys(payload)) {
+    const value = payload[key];
+    params.set("cd[" + key + "]", typeof value === "object" ? JSON.stringify(value) : String(value));
+  }
+  return "https://www.facebook.com/tr?" + params.toString();
+}
+
+async function handle(eventName, checkout, idSource) {
+  const decision = {event: eventName, permitted: permitted(), restricted: restricted(checkout), eligible: false};
+  const payload = payloadFor(checkout);
+  decision.eligible = !!payload;
+  if (CONFIG.mode === "diagnostic") {
+    // Diagnostic builds never contact Meta under any condition.
+    console.info("[iqon-meta-checkout diagnostic]", JSON.stringify(decision));
+    return;
+  }
+  if (!decision.permitted || decision.restricted || !payload || !idSource) return;
+  const decidedAt = withdrawals;
+  let eventId;
+  try { eventId = eventName === "Purchase" ? idSource : "ic_" + await sha256Hex("iqon-ic:" + idSource); }
+  catch { return; } // no hashing available: never fall back to the raw token
+  const key = "iqon_meta_sent:" + eventId;
+  if (claimed.has(key)) return;
+  claimed.add(key);
+  const store = storage();
+  if (store) {
+    try { if (await store.getItem(key)) return; await store.setItem(key, "1"); } catch { /* documented: checkout_completed fires once per checkout */ }
+  }
+  // Fresh gate at the moment of sending: still permitted, and no withdrawal since the decision.
+  if (!permitted() || withdrawals !== decidedAt) return;
+  try { await fetch(requestUrl(eventName, eventId, payload), {method: "GET", mode: "no-cors", credentials: "include", referrerPolicy: "no-referrer", keepalive: true}); }
+  catch { /* tracking failures never affect checkout */ }
+}
+
+analytics.subscribe("checkout_started", function (event) {
+  const checkout = event && event.data && event.data.checkout;
+  const token = checkout && typeof checkout.token === "string" && /^[A-Za-z0-9_-]{1,200}$/.test(checkout.token) ? checkout.token : null;
+  return handle("InitiateCheckout", checkout, token);
+});
+
+analytics.subscribe("checkout_completed", function (event) {
+  const checkout = event && event.data && event.data.checkout;
+  const orderId = numericId(checkout && checkout.order && checkout.order.id);
+  return handle("Purchase", checkout, orderId && "purchase_" + orderId);
+});

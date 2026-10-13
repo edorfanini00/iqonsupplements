@@ -209,3 +209,11 @@
 @media(prefers-reduced-motion:reduce){.account-skeleton span{animation:none}}
 .address-form-actions .quiet-button,.subscription-actions .quiet-button{display:inline-block;margin:0;padding:8px 4px}
 .account-public{max-width:860px}
+.ad-choices{max-width:640px}
+.ad-choices-intro{font-size:15px;line-height:1.6;margin:10px 0 14px}
+.ad-choices-status{font-size:15px;line-height:1.6;padding:14px 16px;border:1px solid var(--line);border-radius:4px;background:#f6f7f8}
+.ad-choices-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.ad-choice-button{display:inline-flex;align-items:center;justify-content:center;min-width:132px;min-height:48px;background:#fff;color:#181818;border:1px solid #181818;cursor:pointer}
+.ad-choice-button[aria-pressed=true]{background:#181818;color:#fff;border-color:#181818}
+.ad-choice-button:disabled{opacity:.45;cursor:not-allowed}
+.ad-choices-message{margin-top:14px;font-size:14px;line-height:1.5}

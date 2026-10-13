@@ -23,6 +23,7 @@ export const CATALOG_QUERY = `query IQONCatalog($after: String) {
 
 const CART_FRAGMENT = `fragment IQONCart on Cart {
   id checkoutUrl totalQuantity
+  attributes { key value }
   discountCodes { code applicable }
   cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
   lines(first: 100) {
@@ -53,10 +54,17 @@ const REMOVE_BODY = `mutation IQONCartRemove($cartId: ID!, $lineIds: [ID!]!) {
 const DISCOUNT_BODY = `mutation IQONCartDiscounts($cartId: ID!, $discountCodes: [String!]!) {
   cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) { cart { ...IQONCart } userErrors { field message } }
 }`;
+// Checkout handoff: Shopify encodes the visitor's expressed choices into checkoutUrl (`_cs`).
+const CHECKOUT_BODY = `query IQONCartCheckout($id: ID!, $consent: VisitorConsent) @inContext(visitorConsent: $consent) { cart(id: $id) { ...IQONCart } }`;
+const ATTRIBUTES_BODY = `mutation IQONCartAttributes($cartId: ID!, $attributes: [AttributeInput!]!) {
+  cartAttributesUpdate(cartId: $cartId, attributes: $attributes) { cart { ...IQONCart } userErrors { field message } warnings { message } }
+}`;
 export const CART_QUERY = CART_QUERY_BODY + CART_FRAGMENT;
+export const CART_CHECKOUT = CHECKOUT_BODY + CART_FRAGMENT;
+export const CART_ATTRIBUTES = ATTRIBUTES_BODY + CART_FRAGMENT;
 export const CART_CREATE = CREATE_BODY + CART_FRAGMENT;
 export const CART_ADD = ADD_BODY + CART_FRAGMENT;
 export const CART_UPDATE = UPDATE_BODY + CART_FRAGMENT;
 export const CART_REMOVE = REMOVE_BODY + CART_FRAGMENT;
 export const CART_DISCOUNTS = DISCOUNT_BODY + CART_FRAGMENT;
-export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CART_FRAGMENT].join("\n");
+export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CHECKOUT_BODY, ATTRIBUTES_BODY, CART_FRAGMENT].join("\n");

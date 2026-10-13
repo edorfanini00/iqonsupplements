@@ -8,6 +8,7 @@ import "./product-story-v4.css";
 import "./skincare-product-story.css";
 import "./supplement-product-story.css";
 import { StoreShell } from "./store-shell";
+import { AdPrivacyProvider } from "./ad-privacy-client";
 import { getStoreCatalog } from "@/lib/shopify.server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -18,5 +19,5 @@ export const metadata: Metadata = {
 };
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const catalog=await getStoreCatalog();
-  return <html lang="en"><head>{catalog.mode!=="live"&&<meta name="codex-preview" content="development"/>}</head><body><StoreShell catalog={catalog}>{children}</StoreShell></body></html>;
+  return <html lang="en"><head>{catalog.mode!=="live"&&<meta name="codex-preview" content="development"/>}</head><body><AdPrivacyProvider controls={process.env.AD_PRIVACY_CONTROLS==="on"} events={process.env.META_STOREFRONT_EVENTS==="on"}><StoreShell catalog={catalog}>{children}</StoreShell></AdPrivacyProvider></body></html>;
 }
