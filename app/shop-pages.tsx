@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { trackViewContent } from "@/lib/meta-pixel";
+import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, ChevronRight } from "lucide-react";
 import { ProductPurchaseOptions } from "./product-purchase-options";
 import { isComingSoon } from "@/lib/commerce-policy";
@@ -42,6 +43,9 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  const oneTimePrice=variant?.price??unitPrice(p);
  const price=selectedPlan?.price??oneTimePrice;
  const currency=selectedPlan?.currency||variant?.currency||p.currency||"USD";
+ useEffect(()=>{
+  if(live&&variantId&&!comingSoon)trackViewContent({variantId,name:p.name,price,currency});
+ },[live,variantId,comingSoon,p.name,price,currency]);
  const related=products.filter(other=>other.category===p.category&&other.id!==p.id);
  const addSelection=()=>add(p.id,quantity,selectedPurchase,selectedPlan?.options.map(option=>option.value).join(" / ")||"once",variantId,selectedPlan?.id);
  return <main id="main" className="product-page"><ProductSwitcher product={p} products={products}/><nav className="breadcrumbs product-breadcrumbs section-pad" aria-label="Breadcrumb"><Link href="/">IQON</Link><ChevronRight size={12}/><Link href={`/collections/${p.category}`}>{p.category}</Link><ChevronRight size={12}/><span>{p.name}</span></nav><section id="overview" className={`product-detail section-pad ${p.category==="supplements"?"supplied-product-detail":"skincare-product-detail"}`}><ProductGallery key={p.id} product={p}/>
