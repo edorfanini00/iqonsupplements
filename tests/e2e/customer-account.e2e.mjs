@@ -1,8 +1,8 @@
-// Browser tests for IQON Body customer accounts.
+// Browser tests for IQON Daily customer accounts.
 // Runs the real production build (`npm run build:vercel`) under `next start`. The Shopify
 // side is a MOCK (tests/customer-account/fake-provider.mjs): hosted sign-in and logout are
 // simulated by Playwright routes, token/JWKS/GraphQL calls by a server-side fetch hook.
-// These tests prove the IQON Body flow and UI, NOT live Shopify behavior.
+// These tests prove the IQON Daily flow and UI, NOT live Shopify behavior.
 //
 //   PLAYWRIGHT_CORE=/path/to/node_modules/playwright-core node --test --test-concurrency=1 tests/e2e/customer-account.e2e.mjs
 import test from "node:test";
@@ -135,6 +135,19 @@ async function signIn(page, returnPath = "/account") {
   try { await page.waitForURL(url => url.origin === base && url.pathname === returnPath && !url.search, {timeout: 8_000}); }
   catch { throw new Error(`sign-in did not return to ${returnPath}; at ${page.url()}; external=${JSON.stringify(external.slice(-3))}`); }
 }
+
+test("Daily homepage metadata uses the public canonical without mislabeling account pages", async () => {
+  const {ctx} = await context();
+  try {
+    const page = await newPage(ctx);
+    await page.goto(base);
+    assert.equal(await page.title(), "IQON Daily — Supplements & Skincare");
+    assert.equal(await page.locator('link[rel="canonical"]').getAttribute("href"), "https://www.iqondaily.com");
+    await page.goto(`${base}/account`);
+    assert.equal(await page.title(), "My Account — IQON Daily");
+    assert.equal(await page.locator('link[rel="canonical"]').count(), 0, "homepage canonical is not inherited by account pages");
+  } finally { await ctx.close(); }
+});
 
 test("real /account/login response: 303 to the provider with state, nonce, PKCE and an HttpOnly transaction cookie", async () => {
   const {ctx} = await context();

@@ -4,7 +4,7 @@
  *   node --import tsx scripts/render-order-email-previews.ts --out docs/emails [--screenshots] [--asset-origin http://127.0.0.1:8765]
  *
  * The saved HTML always points at the production asset origin
- * (https://www.iqonbody.com). --asset-origin only affects screenshots, so they
+ * (https://www.iqondaily.com). --asset-origin only affects screenshots, so they
  * can load public/ from a local static server before the assets are deployed.
  * Screenshots: 390px (mobile) and 1280px (desktop), plus prefers-color-scheme
  * dark at 390px, all at 2x.

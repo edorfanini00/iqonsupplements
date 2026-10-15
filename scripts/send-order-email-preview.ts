@@ -7,7 +7,7 @@
  * Hard allowlist: refuses any recipient other than the owner. Subjects are
  * prefixed with [TEST]. --asset-base lets previews load images from a pushed
  * commit (raw.githubusercontent.com/.../public) before /images/email/* is
- * deployed to www.iqonbody.com. Never prints the API key.
+ * deployed to www.iqondaily.com. Never prints the API key.
  */
 import { Resend } from "resend";
 import { brandConfig } from "../lib/orders/emails/format";

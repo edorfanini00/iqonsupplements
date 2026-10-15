@@ -11,4 +11,4 @@ test('bootstrap refuses independent accounts before DB work',()=>{
  const result=spawnSync(process.execPath,['--import','tsx','scripts/bootstrap-affiliates.ts'],{encoding:'utf8',env:{PATH:process.env.PATH,NODE_ENV:'test'}});
  assert.notEqual(result.status,0);assert.match(result.stderr,/Independent affiliate bootstrap is disabled/);
 });
-test('duplicate scheduled ownership is gone even when directly invoked',async()=>{assert.equal((await GET(new Request('https://www.iqonbody.com/api/cron/leaderboard'))).status,410);});
+test('duplicate scheduled ownership is gone even when directly invoked',async()=>{assert.equal((await GET(new Request('https://www.iqondaily.com/api/cron/leaderboard'))).status,410);});

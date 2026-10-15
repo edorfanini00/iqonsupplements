@@ -252,7 +252,7 @@ test("brand config: env overrides, unsafe origins ignored, emails masked for log
   assert.deepEqual(brandConfig({}), BRAND);
   assert.equal(brandConfig({}).supportEmail, "info@iqonhealth.com", "owner decision: support inbox and Reply-To");
   assert.equal(brandConfig({ SUPPLEMENTS_EMAIL_ASSET_ORIGIN: "https://preview.iqonbody.com/x" }).assetOrigin, "https://preview.iqonbody.com");
-  assert.equal(brandConfig({ SUPPLEMENTS_EMAIL_ASSET_ORIGIN: "http://insecure.test" }).assetOrigin, "https://www.iqonbody.com");
+  assert.equal(brandConfig({ SUPPLEMENTS_EMAIL_ASSET_ORIGIN: "http://insecure.test" }).assetOrigin, "https://www.iqondaily.com");
   assert.equal(brandConfig({ SUPPLEMENTS_SUPPORT_EMAIL: "help@iqonbody.com" }).supportEmail, "help@iqonbody.com");
   assert.equal(maskEmail("ava.morgan@example.com"), "a***@example.com");
   assert.equal(maskEmail(null), "(none)");
@@ -274,9 +274,9 @@ test("images: Storefront first, then catalog by handle or title, then placeholde
   const resolved = await resolveLineItemImages(items, BRAND, lookup);
   assert.deepEqual(resolved.map((i) => i.imageUrl), [
     "https://cdn.shopify.com/s/files/creatine.jpg",
-    "https://www.iqonbody.com/images/email/products/hydrolyzed-collagen-peptides.jpg",
-    "https://www.iqonbody.com/images/email/products/nmn.jpg",
-    "https://www.iqonbody.com/images/email/products/placeholder.jpg",
+    "https://www.iqondaily.com/images/email/products/hydrolyzed-collagen-peptides.jpg",
+    "https://www.iqondaily.com/images/email/products/nmn.jpg",
+    "https://www.iqondaily.com/images/email/products/placeholder.jpg",
   ]);
 });
 
@@ -295,4 +295,22 @@ test("Storefront image lookup builds the query from variant ids and maps the res
   assert.match(body!.query, /preferredContentType:JPG/);
   assert.deepEqual(map.get("variant:8001"), { handle: "creatine-monohydrate", imageUrl: "https://cdn.shopify.com/creatine.jpg" });
   assert.equal((await storefrontImageLookup({}, 1000, fetcher)(["1"], [])).size, 0);
+});
+
+// Provider-issued links are opaque; rewriting their host can strand historical orders.
+test("Daily email assets preserve provider order links, legacy links, and sender support", async () => {
+  for (const orderStatusUrl of [
+    "https://www.iqonbody.com/68512342/orders/abc/authenticate?key=synthetic&locale=en",
+    "https://nr9zd0-t5.myshopify.com/68512342/orders/abc/authenticate?key=synthetic",
+  ]) {
+    const order = await snapshot({order_status_url: orderStatusUrl});
+    for (const email of [renderOrderConfirmationEmail(order, brandConfig({})), renderShippingConfirmationEmail(shipment(order), brandConfig({}))]) {
+      assert.ok(email.text.includes(orderStatusUrl));
+      assert.ok(email.html.includes('https://www.iqondaily.com/images/email/iqon-wordmark-ink.png'));
+      assert.ok(email.html.includes('href="https://www.iqondaily.com/"'));
+      assert.ok(email.html.includes("info@iqonhealth.com"));
+    }
+  }
+  assert.equal(brandConfig({SUPPLEMENTS_EMAIL_ASSET_ORIGIN: "https://www.iqonbody.com"}).assetOrigin,
+    "https://www.iqonbody.com", "explicit asset origin remains available for rollback");
 });

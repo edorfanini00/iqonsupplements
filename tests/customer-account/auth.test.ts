@@ -25,6 +25,23 @@ test("configuration: absent is 'not configured', partial or weak is rejected", (
   assert.equal(customerAccountConfig({...env, CUSTOMER_ACCOUNT_PUBLIC_ORIGIN: "http://localhost:3918"})!.secureCookies, false);
 });
 
+test("domain cutover keeps OAuth pinned to the explicit registered origin", async () => {
+  for (const origin of ["https://www.iqondaily.com", "https://www.iqonbody.com"]) {
+    const config = customerAccountConfig({...env, CUSTOMER_ACCOUNT_PUBLIC_ORIGIN: origin})!;
+    assert.equal(config.callbackUrl, `${origin}/account/callback`);
+    assert.equal(config.logoutRedirectUrl, `${origin}/account/signed-out`);
+    assert.equal(config.secureCookies, true);
+    const t = setup({env: {...env, CUSTOMER_ACCOUNT_PUBLIC_ORIGIN: origin}});
+    const response = await handlers.loginRoute(new Request("https://untrusted.example/account/login", {
+      headers: {"x-forwarded-host": "untrusted.example", "x-forwarded-proto": "http"},
+    }), t.deps);
+    assert.equal(new URL(location(response)).searchParams.get("redirect_uri"), `${origin}/account/callback`);
+    assert.ok(response.headers.getSetCookie().every(cookie => !/; Domain=/i.test(cookie)), "session cookies remain host-only");
+  }
+  assert.throws(() => customerAccountConfig({...env, CUSTOMER_ACCOUNT_PUBLIC_ORIGIN: ""}), AccountUnavailable,
+    "public brand origin cannot silently replace missing auth configuration");
+});
+
 test("return destinations are a fixed same-origin allowlist (open redirect attempts)", () => {
   for (const ok of ["/account", "/account/orders", "/account/orders/9101", "/account/subscriptions/6101", "/account/privacy"]) assert.equal(safeReturnPath(ok), ok);
   for (const bad of ["//evil.example", "https://evil.example/account", "/account/../admin", "/account/orders/abc", "/\\evil.example", "javascript:alert(1)", "/account?x=1", "/account/orders/1/../../x", "/affiliates/dashboard", "", null, 42])

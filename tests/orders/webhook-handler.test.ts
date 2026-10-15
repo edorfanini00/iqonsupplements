@@ -261,7 +261,7 @@ test("shipping email reuses the stored snapshot (name, subscription label, image
   const text = visibleText(shipped.html);
   assert.ok(text.includes("Good news, Ava."));
   assert.ok(text.includes("Subscription: Delivered every 30 days, save 10%"));
-  assert.ok(shipped.html.includes("https://www.iqonbody.com/images/email/products/creatine-monohydrate.jpg"));
+  assert.ok(shipped.html.includes("https://www.iqondaily.com/images/email/products/creatine-monohydrate.jpg"));
 });
 
 test("shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address", async () => {

@@ -33,7 +33,7 @@ const imports = {
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);
 const routes = await import(dataUrl(serverSource));
-const origin = "https://iqon.example";
+const origin = "https://www.iqondaily.com";
 const request = (body, path = "cart") => new Request(`${origin}/api/${path}`, {
   method: "POST", headers: { Origin: origin, "Content-Type": "application/json" }, body: JSON.stringify(body),
 });

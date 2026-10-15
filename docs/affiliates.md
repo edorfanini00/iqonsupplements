@@ -1,9 +1,11 @@
 # One IQON affiliate program, two branded portals
 
+Migration target: `https://www.iqondaily.com`. External production settings must be verified and changed in the order in [the domain migration runbook](domain-migration.md); examples below do not assert that cutover is complete.
+
 ## Authority and repository map
 
 - **Canonical program, identity and financial authority:** `Juliovivas99/IQON`, Health portal `https://www.iqonhealth.com/affiliates`.
-- **Supplements/skincare branded client:** `edorfanini00/iqonsupplements`, portal `https://www.iqonbody.com/affiliates`.
+- **Supplements/skincare branded client:** `edorfanini00/iqonsupplements`, portal `https://www.iqondaily.com/affiliates`.
 - This branch continues PR #4's existing affiliate UI and Shopify adapters. The earlier `edorfanini00/IQONwebsite` copy is provenance only, not the live Health platform.
 - An implementation branch or passing build is not evidence that the shared service is configured or released. Check the release manifest and deployed commit before announcing cross-store support.
 
@@ -16,7 +18,7 @@ The supplements server acts as a same-origin backend-for-frontend (BFF) for expl
 Required server-only supplements configuration:
 
 - `SHARED_AFFILIATE_HEALTH_ORIGIN`: canonical Health HTTPS origin (production `https://www.iqonhealth.com`).
-- `SHARED_AFFILIATE_PORTAL_ORIGIN`: exact supplements HTTPS origin (production `https://www.iqonbody.com`).
+- `SHARED_AFFILIATE_PORTAL_ORIGIN`: exact supplements HTTPS origin (production `https://www.iqondaily.com`).
 - `SHARED_AFFILIATE_RELAY_SECRET`: dedicated random secret of at least 32 characters, provisioned on both services. Do not reuse the WordPress, Shopify, bank encryption or auth-signing secrets.
 
 Health also receives the expected portal origin and relay secret. Use a separate explicitly configured authority and secret for previews. Do not point a financial test preview at production. Origin checks, no-store responses, cookie flags, redirect rejection and server-side permissions are acceptance requirements.
