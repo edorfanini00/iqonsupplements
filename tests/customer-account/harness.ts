@@ -15,7 +15,7 @@ export const store = prismaSessionStore(prisma);
 after(() => prisma.$disconnect());
 export const SESSION_COOKIE = "__Host-iqb_ca";
 
-export const ORIGIN = "https://www.iqonbody.example";
+export const ORIGIN = "https://www.iqondaily.com";
 export const SECRET = Buffer.from("0123456789abcdef0123456789abcdef-test-only-secret").toString("base64");
 export const env = {
   SHOPIFY_CUSTOMER_ACCOUNT_CLIENT_ID: CLIENT_ID, SHOPIFY_CUSTOMER_ACCOUNT_SHOP_ID: SHOP_ID,

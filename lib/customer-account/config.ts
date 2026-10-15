@@ -1,10 +1,10 @@
-// IQON Body customer accounts: Shopify Customer Account API (public client, PKCE).
+// IQON Daily customer accounts: Shopify Customer Account API (public client, PKCE).
 // Shopify is the only customer identity. Nothing here shares state with the affiliate portal.
 
 export type CustomerAccountConfig = {
   clientId: string;
   shopId: string;
-  /** Exact public origin of this storefront, e.g. https://www.iqonbody.com. Never derived from the request. */
+  /** Exact public origin of this storefront, e.g. https://www.iqondaily.com. Never derived from the request. */
   origin: string;
   apiVersion: string;
   secret: Uint8Array;

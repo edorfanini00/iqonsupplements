@@ -57,7 +57,7 @@ export function CategoryRevenue({preset,audience}:{preset:string;audience:'admin
  const report=current?.report;
  const loading=bounds.supported&&!report&&!current?.error;
  return <section aria-label="Body category revenue" className="mb-10" aria-busy={loading}>
-  <SectionTitle eyebrow="IQON Body" title="Category revenue" right={<span className="text-[10px] uppercase tracking-[0.16em] font-sans text-[#64717a]">{rangeLabel(preset)}</span>}/>
+  <SectionTitle eyebrow="IQON Daily" title="Category revenue" right={<span className="text-[10px] uppercase tracking-[0.16em] font-sans text-[#64717a]">{rangeLabel(preset)}</span>}/>
   {!bounds.supported?<p className="text-sm text-[#64717a]">Choose a period of at most 366 days for category reporting.</p>:current?.error?<p role="alert" className="glass-surface rounded-lg px-5 py-3 text-sm text-[#20282c]">{current.error} <button className="underline" onClick={()=>setAttempt(n=>n+1)}>Retry categories</button></p>:<>
    <div className={`grid grid-cols-1 ${audience==='admin'?'md:grid-cols-2':'md:grid-cols-3'} gap-3 md:gap-4`}>
     {categories.map(k=><div key={k} className="contents">

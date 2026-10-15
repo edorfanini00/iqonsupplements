@@ -1,6 +1,7 @@
+import { STOREFRONT_ORIGIN } from "../../storefront";
 import type { EmailAddress, EmailBrandConfig } from "./types";
 
-export const DEFAULT_ASSET_ORIGIN = "https://www.iqonbody.com";
+export const DEFAULT_ASSET_ORIGIN = STOREFRONT_ORIGIN;
 /** Owner decision: the IQON support inbox, also used as Reply-To. */
 export const DEFAULT_SUPPORT_EMAIL = "info@iqonhealth.com";
 

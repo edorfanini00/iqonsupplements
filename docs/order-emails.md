@@ -1,6 +1,8 @@
 # IQON order emails (order confirmation and shipping confirmation)
 
-Customer transactional emails for the IQON supplements storefront (www.iqonbody.com), sent through Resend from Shopify webhooks.
+Migration target: `https://www.iqondaily.com`. External production settings must be verified and changed in the order in [the domain migration runbook](domain-migration.md); examples below do not assert that cutover is complete.
+
+Customer transactional emails for the IQON supplements storefront (www.iqondaily.com), sent through Resend from Shopify webhooks.
 
 * **Order confirmation**: one per paid order (`orders/paid`), except subscription renewal orders (owner decision, see Subscription renewals).
 * **Shipping confirmation**: one per fulfilment, once it carries tracking (`fulfillments/create`, `fulfillments/update`).
@@ -106,7 +108,7 @@ When a renewal is recognised, the `order_confirmation` row is written as `skippe
 | `SUPPLEMENTS_ORDER_EMAIL_FROM` | Optional From override for order emails only. Default in code: `IQON <info@iqonhealth.com>`. `SUPPLEMENTS_EMAIL_FROM` (contact/affiliate mailers) is not used for order mail | No (optional, leave unset) |
 | `SUPPLEMENTS_DATABASE_URL` | Postgres for the idempotency ledger (Prisma) | **No** (required; route fails closed with 503 without it) |
 | `SUPPLEMENTS_SUPPORT_EMAIL` | Support address shown in emails and used as Reply-To | No (optional, default above) |
-| `SUPPLEMENTS_EMAIL_ASSET_ORIGIN` | https origin for email images and links, default `https://www.iqonbody.com` | No (optional) |
+| `SUPPLEMENTS_EMAIL_ASSET_ORIGIN` | https origin for email images and links, default `https://www.iqondaily.com` | No (optional) |
 | `SHOPIFY_STORE_DOMAIN`, `SHOPIFY_STOREFRONT_PRIVATE_TOKEN`, `SHOPIFY_API_VERSION` | Storefront API image lookup (existing) | Yes |
 | `SUPPLEMENTS_SHOPIFY_CLIENT_ID`, `SUPPLEMENTS_SHOPIFY_CLIENT_SECRET`, `SUPPLEMENTS_SHOPIFY_STORE_DOMAIN` | Optional Admin API order read (existing client) | Yes (Production only) |
 | `SUPPLEMENTS_SHOPIFY_ADMIN_TOKEN` | Alternative Admin auth (existing) | No (optional) |
@@ -137,7 +139,7 @@ Configure everything first, deploy, and only then register the webhooks. A webho
    Recording all three keeps any later `migrate deploy` a no-op (same two tables as above). Check with `psql "$SUPPLEMENTS_DATABASE_URL" -c '\dt'`: it must list exactly `_prisma_migrations` and `supplements_transactional_emails`. If anything else appears, drop and recreate the database and start again.
 2. **Resend**: set `SUPPLEMENTS_RESEND_API_KEY` (a key from the Resend account where `iqonhealth.com` is verified). Leave `SUPPLEMENTS_SUPPORT_EMAIL` unset (default `info@iqonhealth.com`). The From defaults to `IQON <info@iqonhealth.com>`; no domain step is needed.
 3. **Webhook secret**: set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET`. For Option A (app subscription) the value is known in advance: the app client secret. For Option B (admin webhooks), the signing key is shown on Settings > Notifications > Webhooks. Verify in admin whether it is visible before the first webhook exists. If it is not, create the webhooks, then immediately set the key and redeploy; deliveries in that short window get a 503 and are retried by Shopify.
-4. **Deploy** this branch. It also ships `public/images/email/*`, which the emails reference. Check that `https://www.iqonbody.com/images/email/iqon-wordmark-ink.png` returns 200.
+4. **Deploy** this branch. It also ships `public/images/email/*`, which the emails reference. Check that `https://www.iqondaily.com/images/email/iqon-wordmark-ink.png` returns 200.
 5. **Register the webhooks** (below).
 6. **Turn off Shopify's customer notifications and Supliful's customer emails** (owner decisions, see Avoid duplicate customer emails below), so customers only get the IQON emails.
 7. **Test order**: place a Shopify test order **with a discount code** (test orders send normally and are flagged `test_order` in logs), then fulfil it with tracking. Check:
@@ -175,7 +177,7 @@ For rows from 2 and 3, search the Resend dashboard for the recipient (`snapshot-
 
 ### Registering the webhooks
 
-Endpoint: `https://www.iqonbody.com/api/webhooks/shopify/orders` (one route, three topics).
+Endpoint: `https://www.iqondaily.com/api/webhooks/shopify/orders` (one route, three topics).
 
 **Option A: app subscription (recommended).** Signed with the **app client secret** (`SUPPLEMENTS_SHOPIFY_CLIENT_SECRET`), so set `SUPPLEMENTS_SHOPIFY_WEBHOOK_SECRET` to that value. Run once per topic via the Admin GraphQL API with the supplements app:
 
@@ -183,7 +185,7 @@ Endpoint: `https://www.iqonbody.com/api/webhooks/shopify/orders` (one route, thr
 mutation Subscribe($topic: WebhookSubscriptionTopic!) {
   webhookSubscriptionCreate(
     topic: $topic
-    webhookSubscription: { callbackUrl: "https://www.iqonbody.com/api/webhooks/shopify/orders", format: JSON }
+    webhookSubscription: { callbackUrl: "https://www.iqondaily.com/api/webhooks/shopify/orders", format: JSON }
   ) {
     webhookSubscription { id topic }
     userErrors { field message }

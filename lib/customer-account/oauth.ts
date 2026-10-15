@@ -11,7 +11,7 @@ export class ProviderError extends Error {
   constructor(public kind: "rejected" | "unavailable", message: string) { super(message); }
 }
 
-const USER_AGENT = "IQON Body customer account (Shopify Customer Account API client)";
+const USER_AGENT = "IQON Daily customer account (Shopify Customer Account API client)";
 export function providerHeaders(config: CustomerAccountConfig, extra: Record<string, string> = {}) {
   // Shopify requires the registered JavaScript origin and a User-Agent on public-client requests.
   return {"Origin": config.origin, "User-Agent": USER_AGENT, ...extra};

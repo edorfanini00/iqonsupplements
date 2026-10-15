@@ -4,7 +4,7 @@ import type { EmailBrandConfig } from "../../lib/orders/emails/types";
 
 export const SECRET = "synthetic-webhook-secret-for-tests";
 export const SHOP = "nr9zd0-t5.myshopify.com";
-export const BRAND: EmailBrandConfig = { assetOrigin: "https://www.iqonbody.com", siteUrl: "https://www.iqonbody.com/", supportEmail: "info@iqonhealth.com" };
+export const BRAND: EmailBrandConfig = { assetOrigin: "https://www.iqondaily.com", siteUrl: "https://www.iqondaily.com/", supportEmail: "info@iqonhealth.com" };
 
 export function sign(body: string | Buffer, secret = SECRET): string {
   return createHmac("sha256", secret).update(body).digest("base64");

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { STOREFRONT_ORIGIN } from "@/lib/storefront";
 import "./globals.css";
 import "./experience.css";
 import "./refinement.css";
@@ -11,8 +12,9 @@ import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "IQON — Supplements & Skincare",
-  description: "Explore the IQON collection. A considered approach to supplements, skincare and the everyday.",
+  metadataBase: new URL(STOREFRONT_ORIGIN),
+  title: "IQON Daily — Supplements & Skincare",
+  description: "Explore the IQON Daily collection. A considered approach to supplements, skincare and the everyday.",
   robots: { index: false, follow: false },
   icons: { icon: "/favicon.svg" },
 };

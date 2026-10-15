@@ -1,4 +1,4 @@
-/* IQON Body customer account. Uses the storefront tokens from globals.css. */
+/* IQON Daily customer account. Uses the storefront tokens from globals.css. */
 .account-page{padding-top:46px;padding-bottom:96px;min-height:62vh}
 .account-frame{display:grid;grid-template-columns:220px minmax(0,1fr);gap:7%;align-items:start}
 .account-frame-loading{display:block}

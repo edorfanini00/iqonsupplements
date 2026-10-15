@@ -1,6 +1,8 @@
-# IQON Body customer accounts ("My Account")
+# IQON Daily customer accounts ("My Account")
 
-First-party `/account` area on the IQON Body storefront backed by the **Shopify Customer
+Migration target: `https://www.iqondaily.com`. External production settings must be verified and changed in the order in [the domain migration runbook](domain-migration.md); examples below do not assert that cutover is complete.
+
+First-party `/account` area on the IQON Daily storefront backed by the **Shopify Customer
 Account API** of the existing Headless storefront (public client, OAuth 2.0 authorization
 code + PKCE S256). Shopify remains the only customer identity (passwordless email code), the
 commerce record and the payment/subscription provider. This site stores no passwords, cards or
@@ -95,7 +97,7 @@ The browser suite runs the production build. Server-side calls to `https://shopi
 the MOCK provider (`tests/e2e/customer-account-server-hook.mjs`); every other outbound request
 is refused. The browser can resolve only `localhost`. Hosted Shopify sign-in/logout are MOCK
 routes, reached as fresh navigations after the real `/account/login` 303 has been checked.
-**These tests prove IQON Body's side of the flow, not live Shopify behavior.**
+**These tests prove IQON Daily's side of the flow, not live Shopify behavior.**
 
 ## Rollback
 
