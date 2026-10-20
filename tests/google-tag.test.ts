@@ -9,9 +9,9 @@ const COLLAGEN = "/products/hydrolyzed-collagen-peptides";
 const left: string[] = [];
 const scripts: string[] = [];
 const location = {
-  hostname: "www.iqondaily.com", pathname: CREATINE, search: "",
+  hostname: "www.iqondaily.com", pathname: CREATINE, search: "", hash: "",
   get origin() { return `https://${this.hostname}`; },
-  get href() { return `${this.origin}${this.pathname}${this.search}`; },
+  get href() { return `${this.origin}${this.pathname}${this.search}${this.hash}`; },
   reload() { left.push("reload"); },
   assign(href: string) { left.push(href); },
 };
@@ -24,12 +24,11 @@ const browser = {
 Object.defineProperty(globalThis, "window", {value: browser, configurable: true});
 Object.defineProperty(globalThis, "document", {value: browser.document, configurable: true});
 
-const config: GoogleConfig = {adsId: "AW-123456789", ga4Id: "G-ABC123DEF4", adsAddToCartLabel: "AbC-dEf_123", hostnames: ["www.iqondaily.com"]};
+const config: GoogleConfig = {adsId: "AW-123456789", ga4Id: "G-ABC123DEF4", hostnames: ["www.iqondaily.com"]};
 const env = {
   NEXT_PUBLIC_GOOGLE_TRACKING_ENABLED: "true",
   NEXT_PUBLIC_GOOGLE_ADS_ID: "AW-123456789",
   NEXT_PUBLIC_GOOGLE_GA4_ID: "G-ABC123DEF4",
-  NEXT_PUBLIC_GOOGLE_ADS_ADD_TO_CART_LABEL: "AbC-dEf_123",
   NEXT_PUBLIC_GOOGLE_TAG_HOSTNAMES: "www.iqondaily.com, iqondaily.com",
 };
 const granted = {analytics: true, adStorage: true, adUserData: true};
@@ -41,7 +40,7 @@ const DENIED = {ad_storage: "denied", analytics_storage: "denied", ad_user_data:
 const calls = () => (browser.dataLayer || []).map(entry => Array.from(entry));
 const events = (name?: string) => calls().filter(call => call[0] === "event" && (!name || call[1] === name));
 const consents = () => calls().filter(call => call[0] === "consent");
-const at = (route: string) => { const url = new URL(route, ORIGIN); location.pathname = url.pathname; location.search = url.search; };
+const at = (route: string) => { const url = new URL(route, ORIGIN); location.pathname = url.pathname; location.search = url.search; location.hash = url.hash; };
 function line(overrides: Partial<CartItem> = {}): CartItem {
   return {id: "creatine-monohydrate", variantId: variant, quantity: 2, amount: 70, name: "Creatine", currency: "USD", purchase: "once", frequency: "once", ...overrides};
 }
@@ -69,11 +68,12 @@ test("absent or invalid configuration disables the tag", () => {
   for (const invalid of [
     {NEXT_PUBLIC_GOOGLE_TRACKING_ENABLED: undefined}, {NEXT_PUBLIC_GOOGLE_TRACKING_ENABLED: "1"}, {NEXT_PUBLIC_GOOGLE_TRACKING_ENABLED: "false"},
     {NEXT_PUBLIC_GOOGLE_ADS_ID: "616-667-2235"}, {NEXT_PUBLIC_GOOGLE_ADS_ID: "AW-abc"}, {NEXT_PUBLIC_GOOGLE_ADS_ID: "AW-123\"><script>"},
-    {NEXT_PUBLIC_GOOGLE_GA4_ID: "UA-1234-1"}, {NEXT_PUBLIC_GOOGLE_ADS_ADD_TO_CART_LABEL: "bad label"},
-    {NEXT_PUBLIC_GOOGLE_ADS_ID: "", NEXT_PUBLIC_GOOGLE_GA4_ID: ""}, {NEXT_PUBLIC_GOOGLE_ADS_ID: ""},
+    {NEXT_PUBLIC_GOOGLE_GA4_ID: "UA-1234-1"},
+    {NEXT_PUBLIC_GOOGLE_ADS_ID: "", NEXT_PUBLIC_GOOGLE_GA4_ID: ""},
     {NEXT_PUBLIC_GOOGLE_TAG_HOSTNAMES: ""}, {NEXT_PUBLIC_GOOGLE_TAG_HOSTNAMES: "*.vercel.app"}, {NEXT_PUBLIC_GOOGLE_TAG_HOSTNAMES: "https://www.iqondaily.com"},
   ]) assert.equal(readGoogleConfig({...env, ...invalid}), null, JSON.stringify(invalid));
-  assert.equal(readGoogleConfig({...env, NEXT_PUBLIC_GOOGLE_ADS_ADD_TO_CART_LABEL: ""})?.adsAddToCartLabel, undefined);
+  // The removed native Ads AddToCart label is not read, even if still set somewhere.
+  assert.deepEqual(readGoogleConfig({...env, NEXT_PUBLIC_GOOGLE_ADS_ADD_TO_CART_LABEL: "AbC-dEf_123"} as typeof env), readGoogleConfig(env));
   assert.equal(readGoogleConfig({...env, NEXT_PUBLIC_GOOGLE_GA4_ID: ""})?.ga4Id, undefined);
 
   configureGoogleTag(null);
@@ -131,12 +131,13 @@ test("each purpose is mapped separately; Ads needs both ad_storage and ad_user_d
   trackGooglePageView(CREATINE);
   assert.equal(events("page_view").length, 0, "page_view is analytics-only");
   trackGoogleCartAddition(cart([line()]), variant, 1);
-  assert.deepEqual((events("add_to_cart")[0]?.[2] as {send_to: string[]}).send_to, ["AW-123456789/AbC-dEf_123"]);
+  assert.equal(events().length, 0, "Ads never receives add_to_cart: GA4-only, informational, no native Ads conversion");
 
-  configureGoogleTag({...config, adsAddToCartLabel: undefined, ga4Id: undefined});
+  configureGoogleTag({...config, ga4Id: undefined});
   setGoogleConsent(granted);
-  trackGoogleCartAddition(cart([line()]), variant, 1);
-  assert.equal(events().length, 0, "no unlabeled (remarketing-style) Ads events");
+  trackGooglePageView(CREATINE); trackGoogleCartAddition(cart([line()]), variant, 1);
+  assert.equal(events().length, 0, "an Ads-only tag sends no events");
+  assert.doesNotMatch(JSON.stringify(calls()), /"conversion"|AW-123456789\//, "no conversion command or AW-ID/label destination");
 });
 
 test("only the three advertised product pages are eligible", () => {
@@ -152,7 +153,8 @@ test("only the three advertised product pages are eligible", () => {
 });
 
 test("dirty URLs, sensitive same-origin referrers, GPC and unlisted hosts fail closed", () => {
-  for (const search of ["?utm_term=jane%40example.com", "?utm_source=google", "?email=a%40b.com", "?token=secret", "?gclid=a%40b", "?gclid=" + "a".repeat(201), "?discount=SAVE"]) {
+  for (const search of ["?utm_term=jane%40example.com", "?utm_source=google", "?email=a%40b.com", "?token=secret", "?gclid=a%40b", "?gclid=" + "a".repeat(201), "?discount=SAVE",
+    "?gclid=Abc_1&utm_campaign=x", "?gclid=Abc_1#token=synthetic-secret", "#token=synthetic-secret", "#access_token=abc", "?gclid=Abc_1&gad_source=1#email=a%40b.com"]) {
     configureGoogleTag(config); at(CREATINE + search);
     setGoogleConsent(granted); trackGooglePageView(CREATINE + search);
     assert.equal(browser.dataLayer, undefined, search);
@@ -174,6 +176,31 @@ test("dirty URLs, sensitive same-origin referrers, GPC and unlisted hosts fail c
   assert.equal(browser.dataLayer, undefined);
   trackGooglePageView(CREATINE);
   assert.deepEqual((events("page_view")[0]?.[2] as {page_referrer: string}).page_referrer, `${ORIGIN}/`);
+});
+
+test("auto-tagging URLs: click IDs with numeric gad_source/gad_campaignid only", () => {
+  for (const search of ["?gclid=Abc_123", "?gbraid=g-1", "?wbraid=w_1", "?gclid=Abc_123&gad_source=1", "?gclid=Abc_123&gad_source=1&gad_campaignid=21234567890",
+    "?gad_campaignid=21234567890&gbraid=g-1&gad_source=5", "?wbraid=w_1&gad_source=2", "#reviews", "?gclid=Abc_123&gad_source=1#product-formula", "#main"]) {
+    assert.equal(googleEligibleUrl(new URL(CREATINE + search, ORIGIN)), true, search);
+  }
+  for (const search of [
+    "?gad_source=1", "?gad_campaignid=21234567890", "?gad_source=1&gad_campaignid=2", // gad_* without a click ID
+    "?gclid=Abc_1&gad_source=abc", "?gclid=Abc_1&gad_source=1a", "?gclid=Abc_1&gad_source=-1", "?gclid=Abc_1&gad_source=1.0", "?gclid=Abc_1&gad_source=",
+    "?gclid=Abc_1&gad_source=5551234", "?gclid=Abc_1&gad_campaignid=" + "1".repeat(21), "?gclid=Abc_1&gad_campaignid=jane%40example.com",
+    "?gclid=Abc_1&gad_campaignid=1%202", "?gclid=Abc_1&gad_campaignid=%EF%BC%91", // space, full-width digit
+    "?gclid=Abc_1&gad_other=1", "?gclid=Abc_1&gad_source=1&gad_source=2", "?gclid=a&gclid=b", "?gclid=", "?gclid=a+b", "?gclid=%3Cscript%3E",
+    "?gclid=Abc_1&utm_source=google", "?gclid=Abc_1&dclid=x", "?gclid=Abc_1&fbclid=x", "?GCLID=Abc_1", "?gclid=Abc_1&__proto__=1", "?gclid=Abc_1&constructor=1",
+    "#token=synthetic-secret", "#reviews&token=x", "#unknown-section", "?gclid=Abc_1#id_token=x",
+  ]) assert.equal(googleEligibleUrl(new URL(CREATINE + search, ORIGIN)), false, search);
+
+  at(`${CREATINE}?gclid=Abc_123&gad_source=1&gad_campaignid=21234567890#reviews`);
+  setGoogleConsent(granted); trackGooglePageView(`${CREATINE}?gclid=Abc_123&gad_source=1&gad_campaignid=21234567890`);
+  assert.equal((events("page_view")[0]?.[2] as {page_location: string}).page_location,
+    `${ORIGIN}${CREATINE}?gclid=Abc_123&gad_source=1&gad_campaignid=21234567890`, "gad_* kept under ad consent; fragment never forwarded");
+  configureGoogleTag(config);
+  setGoogleConsent(analyticsOnly); trackGooglePageView(`${CREATINE}?gclid=Abc_123&gad_source=1&gad_campaignid=21234567890`);
+  assert.equal((events("page_view")[0]?.[2] as {page_location: string}).page_location, `${ORIGIN}${CREATINE}`, "analytics-only strips all ad parameters");
+  assert.doesNotMatch(JSON.stringify(calls()), /#|reviews/);
 });
 
 test("click IDs reach page metadata only under advertising consent; titles never leave", () => {
@@ -224,13 +251,16 @@ test("a narrower grant, GPC or an ineligible client navigation after load also l
   assert.equal(events().length, 1);
 });
 
-test("pending (not yet executed) script: withdrawal still leaves before queued hits can run", () => {
-  // The script element is appended but gtag.js has not executed; the queue holds
-  // the earlier grant and events. Leaving the document discards both.
+test("pending (not yet executed) script: withdrawal requests leaving the document", () => {
+  // Mocked: proves only that reload() is requested and nothing more is queued. It is
+  // NOT proof that queued Google hits cannot run before unload; that needs the real
+  // isolated browser network/cookie test (activation gate 2).
   setGoogleConsent(granted); trackGooglePageView(CREATINE);
   assert.equal(scripts.length, 1);
+  const count = calls().length;
   setGoogleConsent(null);
   assert.deepEqual(left, ["reload"]);
+  assert.equal(calls().length, count + 1, "only the denied update is added");
 });
 
 test("click guard turns links to ineligible pages into full navigations once Google may run", () => {
@@ -244,6 +274,12 @@ test("click guard turns links to ineligible pages into full navigations once Goo
   assert.deepEqual(left, [`${ORIGIN}/products/glp-1-support`]);
   assert.deepEqual(consents().at(-1), ["consent", "update", DENIED]);
   assert.deepEqual(click("/account"), {prevented: false, stopped: false}, "only once");
+
+  configureGoogleTag(config); left.length = 0;
+  setGoogleConsent(granted);
+  assert.deepEqual(click(`${CREATINE}#reviews`), {prevented: false, stopped: false}, "own section anchors stay in-page");
+  assert.deepEqual(click(`${CREATINE}#token=synthetic-secret`), {prevented: true, stopped: true}, "unknown fragments leave");
+  assert.deepEqual(left, [`${ORIGIN}${CREATINE}#token=synthetic-secret`, "reload"], "a fragment-only change does not unload, so it also reloads");
 });
 
 test("add_to_cart only for a clean successful addition of an advertised product", () => {
@@ -268,8 +304,8 @@ test("add_to_cart only for a clean successful addition of an advertised product"
     const {value, items, send_to} = call[2] as {value: number; items: unknown[]; send_to: string[]};
     return {value, items, send_to};
   }), [
-    {send_to: ["G-ABC123DEF4", "AW-123456789/AbC-dEf_123"], value: 35, items: [{item_id: "52086268985639", price: 35, quantity: 1}]},
-    {send_to: ["G-ABC123DEF4", "AW-123456789/AbC-dEf_123"], value: 50, items: [{item_id: "52086268985639", price: 25, quantity: 2}]},
+    {send_to: ["G-ABC123DEF4"], value: 35, items: [{item_id: "52086268985639", price: 35, quantity: 1}]},
+    {send_to: ["G-ABC123DEF4"], value: 50, items: [{item_id: "52086268985639", price: 25, quantity: 2}]},
   ]);
   // Only the allowlisted path identifies the page; no names, customer, cart or checkout data.
   assert.doesNotMatch(JSON.stringify(events().map(call => ({...call[2] as object, page_location: undefined}))), /creatine|name|email|cart|checkout/i);
