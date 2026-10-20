@@ -47,18 +47,47 @@ function AccordionTrigger({
   )
 }
 
+const subscribeToHydration = () => () => {}
+
+function useHydrated() {
+  return React.useSyncExternalStore(subscribeToHydration, () => true, () => false)
+}
+
+// Closed panels stay mounted so their answers are part of the HTML and the rendered page.
+// While closed they are collapsed and visibility:hidden: not shown, not focusable and not
+// in the accessibility tree. The panel height is measured continuously because Radix only
+// measures mounted panels at render time. The closing animation is enabled after
+// hydration so server-rendered closed panels do not animate on page load.
 function AccordionContent({
   className,
   children,
+  style,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+  const hydrated = useHydrated()
+  const panelRef = React.useRef<HTMLDivElement>(null)
+  const [height, setHeight] = React.useState<number>()
+  React.useLayoutEffect(() => {
+    const panel = panelRef.current
+    if (!panel || typeof ResizeObserver === "undefined") return
+    const measure = () => setHeight(panel.offsetHeight)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(panel)
+    return () => observer.disconnect()
+  }, [])
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+      className={cn(
+        "overflow-hidden text-sm data-[state=open]:animate-accordion-down data-[state=closed]:h-0 data-[state=closed]:invisible",
+        hydrated && "data-[state=closed]:animate-[iqon-accordion-up_0.2s_ease-out]"
+      )}
+      style={{ "--radix-accordion-content-height": height === undefined ? undefined : `${height}px`, ...style } as React.CSSProperties}
       {...props}
+      forceMount
     >
-      <div className={cn("pt-0 pb-4", className)}>{children}</div>
+      <div ref={panelRef} className={cn("pt-0 pb-4", className)}>{children}</div>
     </AccordionPrimitive.Content>
   )
 }

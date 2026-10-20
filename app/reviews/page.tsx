@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import type { Metadata } from "next";
 import { CustomerReviews } from "../customer-reviews";
+export const metadata:Metadata={title:"Customer reviews | IQON",description:"Customer perspectives on the IQON supplement and skincare collections."};
 export default async function ReviewsPage({searchParams}:{searchParams:Promise<{collection?:string}>}){
  const {collection}=await searchParams;
  const category=collection==='skincare'||collection==='supplements'?collection:undefined;

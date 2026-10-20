@@ -246,6 +246,8 @@ h1,h2{font-family:var(--display);font-weight:450;letter-spacing:-.025em;line-hei
 .department-about-copy>p:last-child{font-size:13px;line-height:1.7;color:#747b7d;max-width:260px}
 .department-menu-backdrop{position:fixed;inset:0;background:#1821243d;z-index:39;animation:iqon-fade .18s ease-out}
 @keyframes iqon-fade{from{opacity:0}to{opacity:1}}
+/* Closed accordion panels stay mounted; keep them visible only while they collapse. */
+@keyframes iqon-accordion-up{from{height:var(--radix-accordion-content-height,auto);visibility:visible}to{height:0;visibility:visible}}
 .department-mobile-sheet{width:min(430px,92vw)!important;max-width:none!important;padding:28px 24px;overflow-y:auto;gap:0}
 .department-mobile-sheet>[data-slot='sheet-title']{margin-bottom:9px}
 .department-mobile-sheet>[data-slot='sheet-description']{font-size:12px;margin:12px 0 24px}
