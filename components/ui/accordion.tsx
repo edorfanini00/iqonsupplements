@@ -47,15 +47,30 @@ function AccordionTrigger({
   )
 }
 
+const subscribeToHydration = () => () => {}
+
+// Server and hydration renders keep closed panels in the HTML, hidden, so answers and
+// label details are readable without JavaScript. After hydration Radix unmounts closed
+// panels again, which keeps its open/close measurement and animation unchanged.
+function useHydrated() {
+  return React.useSyncExternalStore(subscribeToHydration, () => true, () => false)
+}
+
 function AccordionContent({
   className,
   children,
+  forceMount,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+  const hydrated = useHydrated()
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+      className={cn(
+        "overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+        !hydrated && "data-[state=closed]:hidden"
+      )}
+      forceMount={hydrated ? forceMount : true}
       {...props}
     >
       <div className={cn("pt-0 pb-4", className)}>{children}</div>
