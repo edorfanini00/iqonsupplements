@@ -84,7 +84,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       if(!variant||!p.available)return;
       if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
       setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(snapshot=>{
-        if(snapshot){trackCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);trackGoogleCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);}
+        if(snapshot){trackCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);try{trackGoogleCartAddition(snapshot,variant.id,quantity,sellingPlanId);}catch{}}
       });return;
     }
     if(purchase!=="once")return;

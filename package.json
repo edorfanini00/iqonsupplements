@@ -23,7 +23,7 @@
     "test:affiliates": "node --import tsx --test tests/affiliates/*.test.ts",
     "test:order-emails": "node --import tsx --test tests/orders/*.test.ts",
     "test:affiliate-ui": "vitest run --config tests/ui/vitest.config.mjs",
-    "test:tracking": "node --import tsx --test tests/meta-pixel.test.ts tests/google-tag.test.ts",
+    "test:tracking": "node --import tsx --test tests/meta-pixel.test.ts tests/google-tag.test.ts && vitest run --config tests/ui/vitest.config.mjs tests/ui/google-store-shell.test.ts",
     "typecheck:next": "tsc -p tsconfig.next.json --noEmit --incremental false"
   },
   "dependencies": {
