@@ -49,31 +49,45 @@ function AccordionTrigger({
 
 const subscribeToHydration = () => () => {}
 
-// Server and hydration renders keep closed panels in the HTML, hidden, so answers and
-// label details are readable without JavaScript. After hydration Radix unmounts closed
-// panels again, which keeps its open/close measurement and animation unchanged.
 function useHydrated() {
   return React.useSyncExternalStore(subscribeToHydration, () => true, () => false)
 }
 
+// Closed panels stay mounted so their answers are part of the HTML and the rendered page.
+// While closed they are collapsed and visibility:hidden: not shown, not focusable and not
+// in the accessibility tree. The panel height is measured continuously because Radix only
+// measures mounted panels at render time. The closing animation is enabled after
+// hydration so server-rendered closed panels do not animate on page load.
 function AccordionContent({
   className,
   children,
-  forceMount,
+  style,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
   const hydrated = useHydrated()
+  const panelRef = React.useRef<HTMLDivElement>(null)
+  const [height, setHeight] = React.useState<number>()
+  React.useLayoutEffect(() => {
+    const panel = panelRef.current
+    if (!panel || typeof ResizeObserver === "undefined") return
+    const measure = () => setHeight(panel.offsetHeight)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(panel)
+    return () => observer.disconnect()
+  }, [])
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
       className={cn(
-        "overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
-        !hydrated && "data-[state=closed]:hidden"
+        "overflow-hidden text-sm data-[state=open]:animate-accordion-down data-[state=closed]:h-0 data-[state=closed]:invisible",
+        hydrated && "data-[state=closed]:animate-[iqon-accordion-up_0.2s_ease-out]"
       )}
-      forceMount={hydrated ? forceMount : true}
+      style={{ "--radix-accordion-content-height": height === undefined ? undefined : `${height}px`, ...style } as React.CSSProperties}
       {...props}
+      forceMount
     >
-      <div className={cn("pt-0 pb-4", className)}>{children}</div>
+      <div ref={panelRef} className={cn("pt-0 pb-4", className)}>{children}</div>
     </AccordionPrimitive.Content>
   )
 }
