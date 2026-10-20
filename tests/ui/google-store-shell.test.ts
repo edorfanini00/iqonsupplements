@@ -7,7 +7,8 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const nav = vi.hoisted(() => ({pathname: "/products/creatine-monohydrate", search: "", push: vi.fn()}));
-const google = vi.hoisted(() => ({trackGooglePageView: vi.fn(), trackGoogleCartAddition: vi.fn(), guardGoogleNavigation: vi.fn()}));
+const google = vi.hoisted(() => ({trackGooglePageView: vi.fn(), trackGoogleCartAddition: vi.fn(), guardGoogleNavigation: vi.fn(), watchGoogleLocation: vi.fn()}));
+const unwatch = vi.hoisted(() => ({calls: 0}));
 vi.mock("next/navigation", () => ({usePathname: () => nav.pathname, useSearchParams: () => new URLSearchParams(nav.search), useRouter: () => ({push: nav.push})}));
 vi.mock("@/lib/google-tag", () => google);
 vi.mock("../../app/meta-pixel", () => ({StorefrontMetaPixel: () => null}));
@@ -75,7 +76,9 @@ it("never tracks when the add request throws", async () => {
   expect(google.trackGoogleCartAddition).not.toHaveBeenCalled();
 });
 
-it("mounts one page_view owner and the click guard; SPA navigation reports each route once", async () => {
+it("mounts one page_view owner, the click guard and the hash/history recheck; SPA navigation reports each route once", async () => {
+  unwatch.calls = 0;
+  google.watchGoogleLocation.mockImplementation(() => () => { unwatch.calls++; });
   const view = render(shell());
   await waitFor(() => expect(google.trackGooglePageView).toHaveBeenCalledWith("/products/creatine-monohydrate"));
   view.rerender(shell());
@@ -86,9 +89,12 @@ it("mounts one page_view owner and the click guard; SPA navigation reports each 
   expect(google.trackGooglePageView.mock.calls.map(call => call[0])).toEqual(["/products/creatine-monohydrate", "/products/colostrum-powder?gclid=abc", "/account"]);
   fireEvent.click(document.body);
   expect(google.guardGoogleNavigation).toHaveBeenCalledTimes(1);
+  expect(google.watchGoogleLocation).toHaveBeenCalledTimes(1);
+  expect(unwatch.calls).toBe(0);
   view.unmount();
   fireEvent.click(document.body);
   expect(google.guardGoogleNavigation).toHaveBeenCalledTimes(1);
+  expect(unwatch.calls).toBe(1);
 });
 
 it("affiliate portal shell still mounts the owner (so a loaded tag can leave the page)", async () => {

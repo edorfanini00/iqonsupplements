@@ -68,7 +68,39 @@ gtag() call**, and denied consent still allows cookieless pings. So this code do
 not rely on mid-page disabling. Once the script element exists, any narrower state
 leaves the document:
 - withdrawal, `null` consent, a narrower grant or GPC;
-- a client navigation to an ineligible page.
+- a client navigation to an ineligible page;
+- a **fragment-only or history change** to a URL that is no longer eligible.
+
+Fragment-only changes don't change the App Router path or query, so the page-view
+effect never sees them. These include the address bar, hash links, Next's own
+hash-only `Link`/`router.push`, and back/forward. While mounted,
+`StorefrontGoogleTag` runs `watchGoogleLocation()`, which calls
+`recheckGoogleLocation()` on:
+- `hashchange` and `popstate`;
+- every `history.pushState`/`replaceState` call. These fire no event, and Next 16
+  routes its own navigations through them (`next/dist/client/components/app-router.js`).
+  The wrapper calls the original first and only adds the recheck; arguments,
+  return values and exceptions are unchanged.
+
+Installing the watcher is all-or-nothing: if any step throws, everything installed
+so far is undone. Unmounting removes the listeners and restores the original
+methods. If another script (e.g. Next's router) has wrapped ours since, ours stays
+in the chain as an inert pass-through. Nothing rechecks after unmount.
+
+The recheck tests the actual document URL:
+- The storefront's known section anchors (`#reviews`, `#product-formula`…) stay
+  in-page and send nothing, so there's no duplicate `page_view`.
+- An unknown fragment (e.g. `#token=…`) after the script element exists leaves the
+  document immediately, and later wrapper calls queue nothing.
+- Before the script exists, the recheck does nothing. Any later grant rechecks the
+  same URL, so the page stays script-free.
+- The reload keeps the fragment, so the new document is ineligible from the start.
+  That means there's no reload loop.
+
+Residual: code that calls `History.prototype.pushState.call(history, …)` directly
+bypasses every instance wrapper, Next's included, and fires no event. It's caught
+at the next event, history call, page view or cart call, not immediately. The
+mounted tests cover this case.
 
 On leaving, the code pushes a denied update, then:
 - calls `location.reload()`;
@@ -85,7 +117,8 @@ that `reload()`/`assign()` is *requested* and nothing more is queued, **not** th
 already-queued Google hits cannot run before the document unloads. Unproven:
 - whether gtag.js sends queued or new hits before or while unloading;
 - whether automatic collection fires in the short interval before a reload
-  triggered by `router.push` or back/forward (not link clicks);
+  triggered by `router.push`, back/forward or a fragment change (not link
+  clicks);
 - automatic events on eligible pages.
 
 Activation stays blocked until the isolated real-runtime test below records the
@@ -112,12 +145,14 @@ No Purchase webhook, server relay, cart attributes or linker handoff was added.
      transiently after a grant (each narrowing reloads the page).
 
    Shopify consent sharing requires checkout and storefront on the same root
-   domain. Update the `/account/privacy` copy, which today mentions only Meta, at
-   the same time.
+   domain. A choice on Shopify's hosted "Your Privacy Choices" page is an opt-out
+   recorded by Shopify. On its own, it is **not** affirmative consent to Google on
+   this separate headless site.
 2. **Real-runtime transition test** [engineering]. Use an isolated GA4 property
    and Ads test destination and capture network and cookies. Cover:
    - grant, then withdrawal, null, GPC, ineligible link click,
-     `router.push`/back, and a delayed script load;
+     `router.push`/back, fragment-only changes (address bar, back/forward,
+     `pushState`/`replaceState`), and a delayed script load;
    - landing URLs with UTMs or tokens, and sensitive referrers.
 
    Record the exact requests and cookies. The mocked unit tests are not a
@@ -161,6 +196,18 @@ No Purchase webhook, server relay, cart attributes or linker handoff was added.
    `GOOGLE_PRODUCTS`, the query or fragment allowlist, or the transmitted fields
    needs a new content-specific review and recorded approval.
 
+7. **Customer disclosure** [privacy owner + legal review], together with gate 1:
+   - `/account/privacy` today says Google Analytics/Ads measurement is **not
+     active**, and that turning it on would first need on-site consent and an
+     updated notice. Before activation, replace that sentence with an accurate
+     description of what Google measures, on which pages, under which consent,
+     and how to withdraw.
+   - The Shopify-hosted privacy policy (Shopify template, last updated
+     2026-10-06, read-only check) names no measurement vendor. Whether it must name
+     Google Analytics/Ads and this headless storefront is an account-side legal
+     decision. Make any edit in Shopify admin, reviewed, before activation.
+     Nothing was published here.
+
 ## Rollback
 
 `NEXT_PUBLIC_*` values are compiled into the client bundle. To disable:
@@ -176,7 +223,7 @@ the PR.
 
 ```sh
 npm run test:tracking
-npx vitest run --config tests/ui/vitest.config.mjs tests/ui/google-store-shell.test.ts
+npx vitest run --config tests/ui/vitest.config.mjs tests/ui/google-store-shell.test.ts tests/ui/google-tag-navigation.test.ts tests/ui/privacy-notice.test.ts
 npm run typecheck:next
 npx eslint lib/google-tag.ts app/google-tag.tsx tests/google-tag.test.ts tests/ui/google-store-shell.test.ts
 npm run build:vercel

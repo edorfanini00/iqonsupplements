@@ -20,7 +20,9 @@ export default function AccountPrivacyPage() {
         <span><strong>Privacy policy</strong><small>How IQON collects, uses and shares personal information.</small></span>
         <ArrowUpRight size={18}/>
       </a>
-      <p className="account-note">These pages are hosted by Shopify. Choices you make there are recorded by Shopify for the IQON store and its checkout. Our storefront uses the Meta pixel to measure page views, product views and additions to your bag. It does not load when your browser sends Global Privacy Control. Account and affiliate pages are excluded.</p>
+      <p className="account-note">These pages are hosted by Shopify. Choices you make there are recorded by Shopify for the IQON store and its checkout.</p>
+      <p className="account-note">Our storefront uses the Meta pixel to measure page views, product views and additions to your bag. It does not load when your browser sends Global Privacy Control. Account and affiliate pages are excluded.</p>
+      <p className="account-note">Google Analytics and Google Ads measurement is not active on this storefront. Turning it on would first require a way to give or refuse consent on this site and an updated notice. A choice on Shopify’s pages alone would not count as consent to it.</p>
     </section>
   </>;
 }

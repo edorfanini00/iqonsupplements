@@ -377,7 +377,7 @@ test("hosted privacy: the footer Privacy link opens /account/privacy with the ve
     const policy = page.getByRole("link", {name: /Privacy policy/});
     assert.equal(await choices.getAttribute("href"), HOSTED.choices);
     assert.equal(await policy.getAttribute("href"), HOSTED.policy);
-    await page.getByText("This site doesn’t run advertising or analytics tracking of its own.").waitFor();
+    await page.getByText("Google Analytics and Google Ads measurement is not active on this storefront.", {exact: false}).waitFor();
     assert.equal(await page.getByRole("switch").count(), 0, "no custom consent controls");
     // Capture from the top with no focused skip link (client navigation keeps the footer scroll offset).
     // globals.css sets smooth scrolling, so jump instantly and wait until the page is at the top.

@@ -205,6 +205,59 @@ export function guardGoogleNavigation(event: MouseEvent) {
   } catch {}
 }
 
+// Fragment-only changes (address bar, hash links, back/forward) and history
+// traversal don't change the App Router path or query, so the page-view effect never
+// sees them. Recheck the actual document URL: once gtag.js may run, a URL Google may
+// not see (e.g. an unknown #token=… fragment) leaves the document. Known section
+// anchors stay eligible and send nothing. Before the script exists this does nothing,
+// and any later sync() rechecks the same URL, so the page stays script-free.
+export function recheckGoogleLocation() {
+  try { if (scriptAdded && !leaving && !eligible(currentRoute)) leave(); } catch {}
+}
+
+// Rechecks on every way the document URL can change without a full load:
+// hashchange, popstate, and pushState/replaceState, which fire no event (Next's own
+// hash-only Link and router.push navigations use them, as can third-party code).
+// The history wrappers call the original first and only add the recheck; they never
+// change arguments, return values or exceptions. Installation is all-or-nothing: if
+// any step throws, everything already installed is undone before rethrowing.
+// Cleanup removes the listeners and restores the original methods, or, if another
+// script (e.g. Next's router) has since wrapped ours, leaves ours as an inert
+// pass-through, so nothing rechecks after unmount.
+export function watchGoogleLocation() {
+  let active = true;
+  const undo: (() => void)[] = [];
+  const cleanup = () => {
+    active = false;
+    while (undo.length) try { undo.pop()!(); } catch {}
+  };
+  const recheck = () => { if (active) recheckGoogleLocation(); };
+  const listen = (type: "hashchange" | "popstate") => {
+    window.addEventListener(type, recheck);
+    undo.push(() => window.removeEventListener(type, recheck));
+  };
+  const wrap = (name: "pushState" | "replaceState") => {
+    const original = window.history[name];
+    const wrapped = function (this: History, ...args: Parameters<History["pushState"]>) {
+      const result = original.apply(this, args);
+      recheck();
+      return result;
+    };
+    window.history[name] = wrapped;
+    undo.push(() => { if (window.history[name] === wrapped) window.history[name] = original; });
+  };
+  try {
+    listen("hashchange");
+    listen("popstate");
+    wrap("pushState");
+    wrap("replaceState");
+  } catch (error) {
+    cleanup();
+    throw error;
+  }
+  return cleanup;
+}
+
 // One owner for initial and App Router page views. Nothing observed while denied
 // or ineligible is replayed later.
 export function trackGooglePageView(route: string) {
