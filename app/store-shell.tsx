@@ -12,6 +12,8 @@ import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, t
 import { isComingSoon } from "@/lib/commerce-policy";
 import { StorefrontMetaPixel } from "./meta-pixel";
 import { trackCartAddition } from "@/lib/meta-pixel";
+import { StorefrontGoogleTag } from "./google-tag";
+import { trackGoogleCartAddition } from "@/lib/google-tag";
 import type { CartSnapshot } from "@/lib/shopify";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
@@ -82,7 +84,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       if(!variant||!p.available)return;
       if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
       setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(snapshot=>{
-        if(snapshot)trackCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);
+        if(snapshot){trackCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);trackGoogleCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);}
       });return;
     }
     if(purchase!=="once")return;
@@ -104,9 +106,9 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   };
   const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count};
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
-  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}><Suspense fallback={null}><StorefrontMetaPixel/></Suspense>{children}</StoreContext.Provider>;
+  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}><Suspense fallback={null}><StorefrontMetaPixel/><StorefrontGoogleTag/></Suspense>{children}</StoreContext.Provider>;
   return <StoreContext.Provider value={value}>
-    <Suspense fallback={null}><StorefrontMetaPixel/></Suspense>
+    <Suspense fallback={null}><StorefrontMetaPixel/><StorefrontGoogleTag/></Suspense>
     <a className="skip-link" href="#main">Skip to content</a>
     {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span className="preview-review-notice">Illustrative ratings &amp; review counts</span><span>Orders are not enabled yet</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
