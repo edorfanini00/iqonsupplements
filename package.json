@@ -23,7 +23,8 @@
     "test:affiliates": "node --import tsx --test tests/affiliates/*.test.ts",
     "test:order-emails": "node --import tsx --test tests/orders/*.test.ts",
     "test:affiliate-ui": "vitest run --config tests/ui/vitest.config.mjs",
-    "typecheck:next": "tsc -p tsconfig.next.json --noEmit --incremental false"
+    "typecheck:next": "tsc -p tsconfig.next.json --noEmit --incremental false",
+    "test:seo": "node --import tsx --test tests/seo/seo.test.ts && npm run build:vercel && node --test --test-concurrency=1 tests/seo/route-matrix.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
