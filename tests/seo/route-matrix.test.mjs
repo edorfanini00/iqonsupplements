@@ -72,7 +72,8 @@ const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a =
 const H1_TEXT = {"/": "For the life you want to live.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.",
   "/approach": "The everyday deserves attention.", "/reviews": "Your experience has a place here.", "/affiliates": "Good routines. Shared together."};
 const h1s = doc => [...doc.querySelectorAll("h1")].map(h => h.textContent);
-const SHIPPING_NOTE = "Available shipping options and costs are shown at checkout. Processing and delivery can vary by product and destination.";
+const SHIPPING_NOTE = "Shipping usually takes 3 to 5 days. Available shipping options and costs are shown at checkout.";
+const SHOP_TRACKING_NOTE = "Tracking updates are available through Shop once your order is on its way.";
 const PRIVATE = ["/checkout", "/account", "/account/orders", "/affiliates", "/affiliates/login", "/api/cart", "/api/affiliates/me", "/api/account/session"];
 
 test("production, live catalog, canonical and alias hosts", async t => {
@@ -224,16 +225,20 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.ok(article.citation.length > 0 && article.citation.every(url => /^https:\/\//.test(url)));
     assert.equal(dom((await get(port, "/journal")).body).title, "Supplement & skincare guides | IQON");
   });
-  await t.test("shipping answer matches the product page, with no delivery window or policy link", async () => {
-    const helpHtml = (await get(port, "/help")).body;
-    const answer = [...dom(helpHtml).querySelectorAll("main [data-slot=accordion-item]")].find(item => /How long does shipping take/.test(item.textContent));
-    assert.ok(answer, "shipping question in server HTML");
-    assert.match(answer.textContent, new RegExp(SHIPPING_NOTE.replace(/[.]/g, "\\.")));
-    for (const url of ["/help", "/products/creatine-monohydrate", "/products/liver-support"]) {
-      const body = (await get(port, url)).body;
-      assert.ok(body.includes(SHIPPING_NOTE), `${url}: shared shipping statement`);
-      assert.doesNotMatch(body, /\d\s*[–-]\s*\d+\s*business days|ships within|free shipping/i, url);
+  await t.test("help and product pages state the owner's 3 to 5 day window; help adds Shop tracking; no policy link", async () => {
+    const answerOf = doc => [...doc.querySelectorAll("main [data-slot=accordion-item]")].find(item => /How long does shipping take/.test(item.textContent))?.querySelector("[data-slot=accordion-content]")?.textContent.trim();
+    // Raw server HTML: the help answer is the shared statement plus the Shop tracking note, verbatim.
+    assert.equal(answerOf(dom((await get(port, "/help")).body)), `${SHIPPING_NOTE} ${SHOP_TRACKING_NOTE}`);
+    for (const url of ["/products/creatine-monohydrate", "/products/liver-support", "/products/daily-travel-kit"]) {
+      const shipping = [...dom((await get(port, url)).body).querySelectorAll("[data-slot=accordion-item]")].find(item => /^Shipping/.test(item.textContent.trim()));
+      assert.equal(shipping?.querySelector("[data-slot=accordion-content]")?.textContent.trim(), SHIPPING_NOTE, `${url}: PDP shipping statement`);
     }
+    for (const url of ["/help", "/products/creatine-monohydrate"]) {
+      const body = (await get(port, url)).body;
+      assert.doesNotMatch(body, /business days?|guaranteed (delivery|shipping)|ships within|free shipping/i, url);
+      assert.ok(!body.includes("Processing and delivery can vary"), `${url}: superseded wording removed`);
+    }
+    assert.ok(!(await get(port, "/products/creatine-monohydrate")).body.includes(SHOP_TRACKING_NOTE), "tracking note is help-only");
     // No conventional policy URL is linked until the merchant publishes one (they are 404 today).
     for (const url of PUBLIC) assert.equal(dom((await get(port, url)).body).querySelector('a[href*="/policies/shipping"], a[href*="/policies/refund"], a[href*="/policies/terms"]'), null, url);
   });
@@ -336,10 +341,12 @@ test("production without Shopify configuration: preview fixtures are never index
   // Preview-fixture homepage modes render the same hero headings.
   for (const url of ["/", "/skincare"]) assert.deepEqual(h1s(dom((await get(server.port, url)).body)), [H1_TEXT[url]], url);
   assert.ok(!(await get(server.port, "/sitemap.xml")).body.includes("/products/"));
-  // Preview fixtures are never linked as orderable, and the preview help answer makes no delivery promise.
+  // Preview fixtures are never linked as orderable; the preview help answer gives the window but no Shop tracking claim.
   for (const url of ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format", "/collections/supplements"])
     assert.equal(dom((await get(server.port, url)).body).querySelector(".guide-products, .catalog-formats"), null, url);
-  assert.doesNotMatch((await get(server.port, "/help")).body, /business days/);
+  const previewHelp = (await get(server.port, "/help")).body;
+  assert.ok(previewHelp.includes("Shipping usually takes 3 to 5 days. Shipping options and costs will be shown at checkout once orders open."));
+  assert.doesNotMatch(previewHelp, /business days|through Shop/);
 });
 
 test("preview deployment: nothing is indexable and robots.txt blocks crawling", async t => {

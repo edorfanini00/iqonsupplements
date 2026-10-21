@@ -4,7 +4,7 @@
 //   node --import tsx --test tests/seo/buyer-paths.test.ts
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SHIPPING_NOTE, isOrderable } from "../../lib/commerce-policy";
+import { SHIPPING_NOTE, SHOP_TRACKING_NOTE, isOrderable } from "../../lib/commerce-policy";
 import { orderableFormats, productGuides, sectionFact, sectionProducts } from "../../lib/buyer-paths";
 import { products as editorialProducts, type Product } from "../../lib/catalog";
 import { formatOrder } from "../../lib/departments";
@@ -81,7 +81,10 @@ test("format selection lists only formats that can be ordered now", () => {
   assert.deepEqual(orderableFormats(live.map(p => p.type === "Gummies" ? {...p, available: false} : p), "live"), ["Powder", "Capsules", "Sachets"]);
 });
 
-test("the shipping statement makes no delivery-time or policy promise", () => {
-  assert.match(SHIPPING_NOTE, /shown at checkout/);
-  assert.doesNotMatch(SHIPPING_NOTE, /\d|business day|guarantee|free|refund|return/i);
+test("the shipping statement is the owner's 3 to 5 day window, with checkout-calculated options", () => {
+  assert.equal(SHIPPING_NOTE, "Shipping usually takes 3 to 5 days. Available shipping options and costs are shown at checkout.");
+  // Not business days, no guarantee, no start point, no region, no policy.
+  assert.doesNotMatch(SHIPPING_NOTE, /business|guarantee|from (the )?(date|order|dispatch)|after (you|your)|\bUS\b|\bUSA\b|United States|contiguous|free|refund|return/i);
+  assert.equal(SHOP_TRACKING_NOTE, "Tracking updates are available through Shop once your order is on its way.");
+  assert.doesNotMatch(SHOP_TRACKING_NOTE, /we('ll| will)? (email|text|send)|SMS/i, "no separate IQON message implied");
 });
