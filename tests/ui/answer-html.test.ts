@@ -4,19 +4,24 @@ import { renderToString, renderToStaticMarkup } from "react-dom/server";
 import { hydrateRoot } from "react-dom/client";
 import { act } from "react";
 import { readFileSync } from "node:fs";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
 import { products } from "../../lib/catalog";
 import { productContent } from "../../lib/product-content";
 import { ProductStory } from "../../app/product-story";
-import ApproachPage, { metadata as approachMetadata } from "../../app/approach/page";
-import { metadata as helpMetadata } from "../../app/help/page";
-import { metadata as journalMetadata } from "../../app/journal/page";
+import ApproachPage, { generateMetadata as approachMetadata } from "../../app/approach/page";
+import { generateMetadata as helpMetadata } from "../../app/help/page";
+import { generateMetadata as journalMetadata } from "../../app/journal/page";
 import { metadata as reviewsMetadata } from "../../app/reviews/page";
 import { generateMetadata as collectionMetadata } from "../../app/collections/[category]/page";
 import { metadata as rootMetadata } from "../../app/layout";
-import { metadata as skincareHomeMetadata } from "../../app/skincare/page";
+import { generateMetadata as skincareHomeMetadata } from "../../app/skincare/page";
+
+// Request scope for generateMetadata: the canonical host with a live catalog.
+const request = vi.hoisted(() => ({host: "www.iqondaily.com"}));
+vi.mock("next/headers", () => ({headers: async () => new Headers({host: request.host}), cookies: async () => new Map()}));
+vi.mock("@/lib/shopify.server", () => ({getStoreCatalog: async () => ({mode: "live", products: [], currency: "USD"})}));
 
 const faq = () => React.createElement(Accordion, { type: "single", collapsible: true, defaultValue: "open" },
   React.createElement(AccordionItem, { value: "open" }, React.createElement(AccordionTrigger, null, "Open question"), React.createElement(AccordionContent, null, "Open answer")),
@@ -90,17 +95,33 @@ describe("answers in the initial HTML", () => {
 });
 
 describe("page titles and links", () => {
-  it("gives storefront pages descriptive titles without overriding the root robots gate", async () => {
-    const pages = [approachMetadata, helpMetadata, journalMetadata, reviewsMetadata, skincareHomeMetadata,
-      ...await Promise.all(["all", "supplements", "skincare"].map(category => collectionMetadata({ params: Promise.resolve({ category }) })))];
-    const titles = pages.map(page => String(page.title));
-    expect(new Set(titles).size).toBe(titles.length);
-    for (const page of pages) {
-      expect(String(page.title)).toMatch(/\| IQON$/);
-      expect(page.description).toBeTruthy();
-      expect(page).not.toHaveProperty("robots");
-      expect(page).not.toHaveProperty("alternates");
+  const publicPages = async () => [await approachMetadata(), await helpMetadata(), await journalMetadata(), await skincareHomeMetadata(),
+    ...await Promise.all(["all", "supplements", "skincare"].map(category => collectionMetadata({ params: Promise.resolve({ category }) })))];
+
+  it("gives storefront pages descriptive titles and a www canonical; only the canonical production host is indexable", async () => {
+    const previous = process.env.VERCEL_ENV;
+    try {
+      process.env.VERCEL_ENV = "production";
+      const pages = await publicPages();
+      const titles = [...pages, reviewsMetadata].map(page => String(page.title));
+      expect(new Set(titles).size).toBe(titles.length);
+      for (const page of pages) {
+        expect(String(page.title)).toMatch(/\| IQON$/);
+        expect(page.description).toBeTruthy();
+        expect(page.robots).toEqual({ index: true, follow: true });
+        expect(String(page.alternates?.canonical)).toMatch(/^https:\/\/www\.iqondaily\.com\//);
+      }
+      request.host = "www.iqonbody.com";
+      for (const page of await publicPages()) expect(page.robots).toEqual({ index: false, follow: true });
+      request.host = "www.iqondaily.com";
+      process.env.VERCEL_ENV = "preview";
+      for (const page of await publicPages()) expect(page.robots).toEqual({ index: false, follow: true });
+    } finally {
+      request.host = "www.iqondaily.com";
+      if (previous === undefined) delete process.env.VERCEL_ENV; else process.env.VERCEL_ENV = previous;
     }
+    // Anything that does not opt in, including /reviews (no published reviews yet), keeps the root noindex.
+    expect(reviewsMetadata).not.toHaveProperty("robots");
     expect(rootMetadata.robots).toEqual({ index: false, follow: false });
     expect(await collectionMetadata({ params: Promise.resolve({ category: "unknown" }) })).toEqual({});
   });

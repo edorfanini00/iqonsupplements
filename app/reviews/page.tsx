@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import { CustomerReviews } from "../customer-reviews";
+// No published customer reviews yet: keep the root layout's noindex until genuine reviews exist.
 export const metadata:Metadata={title:"Customer reviews | IQON",description:"Customer perspectives on the IQON supplement and skincare collections."};
 export default async function ReviewsPage({searchParams}:{searchParams:Promise<{collection?:string}>}){
  const {collection}=await searchParams;

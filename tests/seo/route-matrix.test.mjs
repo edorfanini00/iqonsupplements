@@ -1,0 +1,180 @@
+// Indexability route matrix against the real production build (`npm run build:vercel`).
+// Shopify is a MOCK (tests/seo/fake-shopify-hook.mjs); Host headers simulate the domains
+// served by the one Vercel deployment. Proves routing/metadata behavior, NOT live Shopify.
+//
+//   npm run build:vercel && node --test --test-concurrency=1 tests/seo/route-matrix.test.mjs
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import http from "node:http";
+import os from "node:os";
+import path from "node:path";
+import { spawn } from "node:child_process";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const root = fileURLToPath(new URL("../..", import.meta.url));
+const WWW = "www.iqondaily.com";
+const ALIASES = ["iqondaily.com", "www.iqonbody.com", "iqon-supplements-git-main.vercel.app"];
+const work = fs.mkdtempSync(path.join(os.tmpdir(), "iqon-seo-matrix-"));
+let nextPort = Number(process.env.SEO_MATRIX_PORT || 3961);
+
+async function startServer(name, env) {
+  const port = nextPort++;
+  const out = fs.openSync(path.join(work, `${name}.log`), "a");
+  const child = spawn(path.join(root, "node_modules/.bin/next"), ["start", "-p", String(port)], {cwd: root, stdio: ["ignore", out, out], env: {
+    ...process.env, NODE_ENV: "production", SHOPIFY_STORE_DOMAIN: "", SHOPIFY_STOREFRONT_PRIVATE_TOKEN: "", NEXT_PUBLIC_META_PIXEL_ID: "",
+    NODE_OPTIONS: `--import ${pathToFileURL(path.join(root, "tests/seo/fake-shopify-hook.mjs")).href}`, ...env,
+  }});
+  process.on("exit", () => child.kill("SIGTERM"));
+  for (let i = 0; ; i++) {
+    try {if ((await get(port, "/journal")).status) break;} catch {}
+    if (i > 120) throw new Error(`next start (${name}) did not become ready; see ${work}/${name}.log`);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  return {port, stop: () => child.kill("SIGTERM")};
+}
+const live = {VERCEL_ENV: "production", FAKE_SHOPIFY: "live", SHOPIFY_STORE_DOMAIN: "iqon-test.myshopify.com", SHOPIFY_STOREFRONT_PRIVATE_TOKEN: "test-token"};
+
+// fetch() cannot set Host; use http.request so each domain is simulated exactly.
+function get(port, pathname, host = WWW, userAgent = "Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)") {
+  return new Promise((resolve, reject) => {
+    const req = http.request({host: "127.0.0.1", port, path: pathname, headers: {host, "user-agent": userAgent, accept: "text/html"}}, res => {
+      let body = ""; res.setEncoding("utf8"); res.on("data", c => body += c);
+      res.on("end", () => resolve({status: res.statusCode, headers: res.headers, body}));
+    });
+    req.on("error", reject); req.end();
+  });
+}
+const head = html => html.split("</head>")[0];
+const robotsMeta = html => head(html).match(/<meta name="robots" content="([^"]+)"/)?.[1];
+// Next writes the root canonical without its trailing slash; compare normalized URLs.
+const canonical = html => {const href = head(html).match(/<link rel="canonical" href="([^"]+)"/)?.[1]; return href && new URL(href).href;};
+const jsonLd = html => [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].flatMap(m => [JSON.parse(m[1])].flat());
+const locs = xml => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
+function assertIndexable(r, url) {
+  assert.equal(r.status, 200, url);
+  assert.equal(r.headers["x-robots-tag"], undefined, `${url} X-Robots-Tag`);
+  assert.equal(robotsMeta(r.body), "index, follow", `${url} robots meta (in <head>)`);
+  assert.equal(canonical(r.body), `https://${WWW}${url}`, `${url} canonical`);
+}
+function assertNoindex(r, url, {status = 200} = {}) {
+  assert.equal(r.status, status, url);
+  const meta = robotsMeta(r.body) || "";
+  assert.ok(/noindex/.test(meta) || /noindex/.test(r.headers["x-robots-tag"] || ""), `${url} must be noindex (meta=${meta}, header=${r.headers["x-robots-tag"]})`);
+}
+const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides"];
+const PRIVATE = ["/checkout", "/account", "/account/orders", "/affiliates", "/affiliates/login", "/api/cart", "/api/affiliates/me", "/api/account/session"];
+
+test("production, live catalog, canonical and alias hosts", async t => {
+  const server = await startServer("live", live);
+  t.after(server.stop);
+  const {port} = server;
+
+  await t.test("public pages are indexable with www canonical in <head>", async () => {
+    for (const url of PUBLIC) assertIndexable(await get(port, url), url);
+  });
+  await t.test("query parameters canonicalize to the clean URL", async () => {
+    const r = await get(port, "/collections/supplements?format=powder&sort=price");
+    assert.equal(canonical(r.body), `https://${WWW}/collections/supplements`);
+  });
+  await t.test("thin, placeholder and missing pages stay out", async () => {
+    assertNoindex(await get(port, "/reviews"), "/reviews");
+    assertNoindex(await get(port, "/reviews?collection=skincare"), "/reviews?collection");
+    assertNoindex(await get(port, "/products/keto-5"), "editorial-only product");
+    assertNoindex(await get(port, "/products/not-a-product"), "missing product", {status: 404});
+    assertNoindex(await get(port, "/journal/not-an-article"), "missing article", {status: 404});
+    assertNoindex(await get(port, "/collections/nope"), "missing collection", {status: 404});
+  });
+  await t.test("private paths send X-Robots-Tag noindex, nofollow", async () => {
+    for (const url of PRIVATE) {
+      const r = await get(port, url);
+      assert.match(r.headers["x-robots-tag"] || "", /noindex, nofollow/, `${url} (status ${r.status})`);
+    }
+  });
+  await t.test("legacy and Vercel hosts: same 200 page, no redirect, noindex + www canonical", async () => {
+    for (const host of ALIASES) for (const url of ["/", "/products/creatine-monohydrate", "/journal"]) {
+      const r = await get(port, url, host);
+      assert.equal(r.status, 200, `${host}${url} must not redirect`);
+      assert.equal(r.headers["x-robots-tag"], "noindex", `${host}${url}`);
+      assert.equal(robotsMeta(r.body), "noindex, follow", `${host}${url}`);
+      assert.match(canonical(r.body), new RegExp(`^https://${WWW.replace(/\./g, "\\.")}/`));
+    }
+  });
+  await t.test("robots.txt and sitemap.xml are valid and in sync", async () => {
+    const robots = await get(port, "/robots.txt");
+    assert.equal(robots.status, 200);
+    assert.match(robots.body, /User-Agent: \*\nAllow: \/\nDisallow: \/account\nDisallow: \/affiliates\nDisallow: \/checkout\nDisallow: \/api\//);
+    assert.match(robots.body, /Sitemap: https:\/\/www\.iqondaily\.com\/sitemap\.xml/);
+    assert.doesNotMatch(robots.body, /Disallow: \/\n|GPTBot|ClaudeBot|PerplexityBot/);
+    const sitemap = await get(port, "/sitemap.xml");
+    assert.equal(sitemap.status, 200);
+    assert.match(sitemap.headers["content-type"], /xml/);
+    assert.doesNotMatch(sitemap.body, /<lastmod>/, "no fabricated lastmod");
+    const urls = locs(sitemap.body);
+    assert.ok(urls.includes(`https://${WWW}/products/creatine-monohydrate`));
+    assert.ok(!urls.some(u => /keto-5|\/reviews|\/checkout|\/account|\/affiliates|\/api\/|\?/.test(u)), urls.join("\n"));
+    for (const url of urls) {
+      const {pathname} = new URL(url);
+      assert.ok(url.startsWith(`https://${WWW}/`));
+      const r = await get(port, pathname);
+      assertIndexable(r, pathname);
+      for (const disallowed of ["/account", "/affiliates", "/checkout", "/api/"]) assert.ok(!pathname.startsWith(disallowed), `${pathname} blocked by robots.txt`);
+    }
+    for (const host of ALIASES) {
+      assert.doesNotMatch((await get(port, "/robots.txt", host)).body, /Sitemap:/);
+      assert.deepEqual(locs((await get(port, "/sitemap.xml", host)).body), []);
+    }
+  });
+  await t.test("structured data matches visible facts", async () => {
+    const r = await get(port, "/products/creatine-monohydrate");
+    const [product, crumbs] = jsonLd(r.body);
+    assert.equal(product["@type"], "Product");
+    assert.equal(product.offers.price, "39.00");
+    assert.match(r.body, /\$39/, "visible price");
+    assert.equal(product.offers.availability, "https://schema.org/InStock");
+    assert.deepEqual(crumbs.itemListElement.map(i => i.name), ["IQON", "supplements", "Creatine Monohydrate"]);
+    assert.ok(!/aggregateRating|"review"|gtin/.test(JSON.stringify(product)));
+    const soon = jsonLd((await get(port, "/products/anti-aging-cleanser-with-peptides")).body)[0];
+    assert.equal(soon.offers, undefined, "coming soon: no offer");
+    const sold = await get(port, "/products/nmn");
+    assert.equal(jsonLd(sold.body)[0].offers.availability, "https://schema.org/OutOfStock");
+    assert.doesNotMatch(sold.body, /<\/script><script>alert/, "catalog text cannot break out of JSON-LD");
+    const article = jsonLd((await get(port, "/journal/reading-a-supplement-label")).body)[0];
+    assert.equal(article["@type"], "Article");
+    assert.equal(article.headline, "Read the label with confidence.");
+    assert.ok(!("datePublished" in article));
+    const home = jsonLd((await get(port, "/")).body).map(x => x["@type"]);
+    assert.deepEqual(home, ["Organization", "WebSite"]);
+  });
+  await t.test("browsers get the same head metadata as crawlers", async () => {
+    const r = await get(port, "/products/creatine-monohydrate", WWW, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36");
+    assert.equal(canonical(r.body), `https://${WWW}/products/creatine-monohydrate`);
+  });
+});
+
+test("production, Shopify outage: shopping pages fail closed, static pages stay indexable", async t => {
+  const server = await startServer("down", {...live, FAKE_SHOPIFY: "down"});
+  t.after(server.stop);
+  for (const url of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements"]) assertNoindex(await get(server.port, url), url);
+  const product = await get(server.port, "/products/creatine-monohydrate");
+  assertNoindex(product, "product during outage");
+  assert.equal(jsonLd(product.body).length, 0);
+  for (const url of ["/approach", "/journal", "/journal/reading-a-supplement-label"]) assertIndexable(await get(server.port, url), url);
+  const urls = locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname);
+  assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal")), urls.join(","));
+});
+
+test("production without Shopify configuration: preview fixtures are never indexed or enumerated", async t => {
+  const server = await startServer("unconfigured", {VERCEL_ENV: "production"});
+  t.after(server.stop);
+  for (const url of ["/", "/collections/all", "/products/creatine-monohydrate", "/help"]) assertNoindex(await get(server.port, url), url);
+  assert.ok(!(await get(server.port, "/sitemap.xml")).body.includes("/products/"));
+});
+
+test("preview deployment: nothing is indexable and robots.txt blocks crawling", async t => {
+  const server = await startServer("preview", {...live, VERCEL_ENV: "preview"});
+  t.after(server.stop);
+  for (const url of PUBLIC) assertNoindex(await get(server.port, url), url);
+  assert.match((await get(server.port, "/robots.txt")).body, /User-Agent: \*\nDisallow: \/\n/);
+  assert.deepEqual(locs((await get(server.port, "/sitemap.xml")).body), []);
+});
