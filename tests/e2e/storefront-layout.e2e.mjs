@@ -1,6 +1,8 @@
 // Rendered layout regressions for the public storefront: no horizontal page overflow on narrow
-// phones, readable footer links, hydrated H1 text that keeps a word space at each <br>, and the
-// guide → product → bag → checkout handoff (the synthetic checkout URL is aborted: no order exists).
+// phones, readable footer links and homepage muted text, hydrated H1 text that keeps a word space
+// at each <br>, the guide → product → bag → checkout handoff (the synthetic checkout URL is
+// aborted: no order exists), and homepage photographs whose srcset choice still covers each frame
+// at the screen's density (the eager, high-priority LCP hero included).
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
 // catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
@@ -168,3 +170,68 @@ for (const device of VIEWPORTS) {
     }
   });
 }
+
+const LOW_CONTRAST_TEXT = [".department-switch a:not(.is-active)", ".skin-community-intro figcaption", ".skin-community-note .eyebrow", ".skin-community-note>p:not(.eyebrow)"];
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: homepage muted text meets WCAG AA 4.5:1`, async () => {
+    const {page, close} = await open(device, "/");
+    // Each visible element's text color against the nearest painted background behind it.
+    const items = await page.evaluate(selectors => selectors.flatMap(s => [...document.querySelectorAll(s)].filter(e => e.getClientRects().length).map(e => {
+      let background = "rgb(255, 255, 255)";
+      for (let a = e; a; a = a.parentElement) {const c = getComputedStyle(a).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+      return {s, text: e.textContent.trim(), color: getComputedStyle(e).color, background};
+    })), LOW_CONTRAST_TEXT);
+    for (const s of LOW_CONTRAST_TEXT) assert.ok(items.some(i => i.s === s), `${s} is not rendered`);
+    for (const i of items) assert.ok(contrast(i.color, i.background) >= 4.5, `${i.s} "${i.text}": ${i.color} on ${i.background} = ${contrast(i.color, i.background).toFixed(2)}:1`);
+    await close();
+  });
+
+  test(`${device.name}px: homepage photographs are right-sized without losing resolution`, async () => {
+    const {page, close} = await open(device, "/");
+    // Load every lazy image, then compare each chosen file's real pixels with what the frame needs.
+    await page.evaluate(() => document.querySelectorAll("img[loading=lazy]").forEach(img => {img.loading = "eager";}));
+    await page.waitForFunction(() => [...document.images].filter(i => i.currentSrc.startsWith(location.origin) && i.getClientRects().length).every(i => i.complete));
+    const images = await page.evaluate(async () => Promise.all([...document.images].filter(i => i.currentSrc.startsWith(location.origin) && i.getClientRects().length && i.closest("main")).map(async img => {
+      const file = new Image(); file.src = img.currentSrc; await file.decode();
+      const box = img.getBoundingClientRect();
+      const candidates = (img.parentElement.tagName === "PICTURE" && [...img.parentElement.querySelectorAll("source")].find(s => matchMedia(s.media).matches)?.srcset || img.srcset || "")
+        .split(",").map(c => c.trim().split(/\s+/)).filter(c => c[0]).map(([url, w]) => ({url: new URL(url, location.href).href, w: parseInt(w)}));
+      // object-fit: cover scales the file until it fills both box dimensions.
+      const cssPxPerFilePx = Math.max(box.width / file.naturalWidth, box.height / file.naturalHeight);
+      return {src: img.currentSrc.replace(location.origin, ""), lcp: img.closest(".campaign-hero") !== null, loading: img.getAttribute("loading"), fetchPriority: img.getAttribute("fetchpriority"),
+        density: 1 / cssPxPerFilePx, largest: !candidates.length || img.currentSrc === candidates.reduce((a, b) => b.w > a.w ? b : a).url,
+        candidates};
+    })));
+    const dpr = device.deviceScaleFactor || 1;
+    const hero = images.find(i => i.lcp && !i.src.includes("cdn.shopify"));
+    assert.ok(hero, "hero photograph missing");
+    assert.equal(hero.loading, null, "LCP hero must not be lazy-loaded");
+    assert.equal(hero.fetchPriority, "high");
+    for (const i of images) {
+      // A smaller file may be chosen only when it still covers the frame at this screen density.
+      if (!i.largest) assert.ok(i.density >= dpr * 0.98, `${i.src}: ${i.density.toFixed(2)} file px per CSS px < DPR ${dpr}`);
+      for (const c of i.candidates) {
+        const width = Number(c.url.match(/-(\d+)w\.webp$/)?.[1] ?? NaN);
+        if (!Number.isNaN(width)) assert.equal(width, c.w, `${c.url}: srcset descriptor ${c.w}w`);
+      }
+    }
+    if (device.isMobile) assert.match(hero.src, /iqon-coastal-mobile-v32-750w\.webp$/, "phones receive the 750px mobile hero");
+    await close();
+  });
+}
+
+test("every local srcset candidate on the homepage is served as WebP at its declared width", async () => {
+  const {page, close} = await open(VIEWPORTS[1], "/");
+  const candidates = await page.evaluate(() => [...new Set([...document.querySelectorAll("img[srcset], source[srcset]")].flatMap(e => e.srcset.split(",").map(c => c.trim().split(/\s+/)))
+    .filter(([url]) => url.startsWith("/")).map(c => c.join(" ")))].map(c => c.split(" ")));
+  assert.ok(candidates.length >= 10, JSON.stringify(candidates));
+  for (const [url, descriptor] of candidates) {
+    const response = await fetch(base + url);
+    assert.equal(response.status, 200, url);
+    assert.equal(response.headers.get("content-type"), "image/webp", url);
+    const width = await page.evaluate(async src => {const i = new Image(); i.src = src; await i.decode(); return i.naturalWidth;}, url);
+    assert.equal(`${width}w`, descriptor, url);
+  }
+  await close();
+});
