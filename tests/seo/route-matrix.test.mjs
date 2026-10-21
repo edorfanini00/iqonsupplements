@@ -239,6 +239,15 @@ test("production, live catalog, canonical and alias hosts", async t => {
       assert.ok(!body.includes("Processing and delivery can vary"), `${url}: superseded wording removed`);
     }
     assert.ok(!(await get(port, "/products/creatine-monohydrate")).body.includes(SHOP_TRACKING_NOTE), "tracking note is help-only");
+    // Products that cannot be ordered now (coming-soon skincare, sold-out NMN) carry no shipping window or accordion.
+    for (const url of ["/products/anti-aging-cleanser-with-peptides", "/products/nmn"]) {
+      const body = (await get(port, url)).body; const doc = dom(body);
+      assert.ok(![...doc.querySelectorAll("[data-slot=accordion-trigger]")].some(t => t.textContent.trim() === "Shipping"), `${url}: no Shipping accordion`);
+      assert.ok(!body.includes("3 to 5 days") && !body.includes("options and costs are shown at checkout"), `${url}: no window`);
+    }
+    const skin = dom((await get(port, "/products/anti-aging-cleanser-with-peptides")).body);
+    assert.equal(skin.querySelector(".add-to-bag-row, .sticky-purchase"), null, "no purchase affordance on coming-soon skincare");
+    assert.ok(skin.querySelector(".skincare-launch-note button[disabled]")?.textContent.includes("Not available to order yet"));
     // No conventional policy URL is linked until the merchant publishes one (they are 404 today).
     for (const url of PUBLIC) assert.equal(dom((await get(port, url)).body).querySelector('a[href*="/policies/shipping"], a[href*="/policies/refund"], a[href*="/policies/terms"]'), null, url);
   });
@@ -344,6 +353,7 @@ test("production without Shopify configuration: preview fixtures are never index
   // Preview fixtures are never linked as orderable; the preview help answer gives the window but no Shop tracking claim.
   for (const url of ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format", "/collections/supplements"])
     assert.equal(dom((await get(server.port, url)).body).querySelector(".guide-products, .catalog-formats"), null, url);
+  assert.ok(!(await get(server.port, "/products/creatine-monohydrate")).body.includes("3 to 5 days"), "preview PDP: not orderable, no window");
   const previewHelp = (await get(server.port, "/help")).body;
   assert.ok(previewHelp.includes("Shipping usually takes 3 to 5 days. Shipping options and costs will be shown at checkout once orders open."));
   assert.doesNotMatch(previewHelp, /business days|through Shop/);

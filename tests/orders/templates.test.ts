@@ -214,6 +214,8 @@ test("shipping confirmation with tracking", async () => {
   // HTML and plain text carry the same intro; no delivery window or speed promise in either.
   const intro = "Your parcel has left us and is now with UPS. Shipping usually takes 3 to 5 days.";
   assert.ok(visible.includes(intro) && email.text.includes(intro));
+  assert.equal(email.preheader, "Your parcel is with UPS. Track it any time.");
+  assert.ok(email.html.includes(email.preheader), "preheader in HTML");
   assertOwnerShippingWindow(email);
   assertCustomerCopyClean(email.html, email.text);
 });
@@ -236,6 +238,8 @@ test("shipping confirmation, partial shipment, no carrier URL", async () => {
   assert.ok(visible.includes(intro) && email.text.includes(intro));
   assert.ok(email.text.includes(MORE_TO_FOLLOW_COPY) && email.text.includes("IN THIS SHIPMENT"));
   assert.ok(email.text.includes("Track your parcel: https://parcelsapp.com/en/tracking/1Z999AA10123456784"));
+  assert.equal(email.preheader, "Your parcel is on its way. Track it any time.", "universal tracker link exists");
+  assert.ok(email.html.includes(email.preheader));
   assertOwnerShippingWindow(email);
   assertCustomerCopyClean(email.html, email.text);
 });
@@ -248,6 +252,15 @@ test("shipping confirmation without any tracking link still states the window an
   assert.ok(visible.includes(intro) && email.text.includes(intro));
   assert.ok(!visible.includes("Track your parcel") && !email.text.includes("Track your parcel"), "no link to a missing tracker");
   assert.ok(visible.includes("Carrier") && email.text.includes("Carrier: UPS"), "carrier still shown");
+  // No tracking link: the preheader states where the parcel is and invites no tracking.
+  assert.equal(email.preheader, "Your parcel is with UPS.");
+  assert.ok(email.html.includes(email.preheader));
+  for (const body of [email.html, email.text]) assert.ok(!/track it any time/i.test(body), "no tracking invitation without a link");
+  const bare = renderShippingConfirmationEmail(shipment(order, { trackingUrl: null, trackingNumber: null, carrier: null }), BRAND);
+  assert.equal(bare.preheader, "Your parcel is on its way.");
+  for (const body of [bare.html, bare.text]) assert.ok(!/track it any time|track your parcel/i.test(body));
+  assert.ok(visibleText(bare.html).includes("Your parcel has left us and is now on its way to you. Shipping usually takes 3 to 5 days."));
+  assertOwnerShippingWindow(bare);
   assertOwnerShippingWindow(email);
 });
 

@@ -29,13 +29,12 @@ export function renderShippingConfirmationEmail(shipment: ShipmentDetails, brand
     ? `Part of your IQON order ${shipment.orderName} is on its way`
     : `Your IQON order ${shipment.orderName} is on its way`;
   const carrierPhrase = shipment.carrier ? ` with ${shipment.carrier}` : "";
-  const preheader = shipment.carrier
-    ? `Your parcel is with ${shipment.carrier}. Track it any time.`
-    : "Your parcel is on its way. Track it any time.";
+  const trackingUrl = shipmentTrackingUrl(shipment);
+  // Invite tracking only when the email has a tracking link.
+  const preheader = `${shipment.carrier ? `Your parcel is with ${shipment.carrier}.` : "Your parcel is on its way."}${trackingUrl ? " Track it any time." : ""}`;
   const what = partial ? "Part of your order is on its way." : "Your order is on its way.";
   const title = name ? `Good news, ${name}. ${what}` : `Good news. ${what}`;
   const intro = `Your parcel has left us and is now${carrierPhrase || " on its way to you"}. ${DELIVERY_TIMING_COPY}`;
-  const trackingUrl = shipmentTrackingUrl(shipment);
   const orderStatusUrl = safeHttpsUrl(shipment.orderStatusUrl);
 
   const trackingCells = twoColumns(

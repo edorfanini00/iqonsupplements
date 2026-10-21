@@ -149,4 +149,22 @@ for (const device of VIEWPORTS) {
     assert.match(handoff.url(), /^https:\/\/iqon-test\.myshopify\.com\/cart\/c\/synthetic-\d+\?key=synthetic$/);
     await close();
   });
+
+  test(`${device.name}px: hydrated product pages show the shipping window only where the product is orderable`, async () => {
+    for (const [url, orderable] of [["/products/creatine-monohydrate", true], ["/products/anti-aging-cleanser-with-peptides", false], ["/products/nmn", false]]) {
+      const {page, close} = await open(device, url);
+      const triggers = await page.$$eval("[data-slot=accordion-trigger]", ts => ts.map(t => t.textContent.trim()));
+      const text = await page.evaluate(() => document.querySelector("main").innerText);
+      if (orderable) {
+        const trigger = page.locator("[data-slot=accordion-trigger]", {hasText: "Shipping"});
+        await trigger.scrollIntoViewIfNeeded(); await trigger.click();
+        assert.match(await page.locator("[data-slot=accordion-item]", {has: trigger}).innerText(), /Shipping usually takes 3 to 5 days\. Available shipping options and costs are shown at checkout\./, url);
+      } else {
+        assert.ok(!triggers.includes("Shipping") && !text.includes("3 to 5 days"), `${url}: ${JSON.stringify(triggers)}`);
+      }
+      const m = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
+      assert.ok(m.scroll <= m.client, `${url}: page scrolls sideways (${JSON.stringify(m)})`);
+      await close();
+    }
+  });
 }
