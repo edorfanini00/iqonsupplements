@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { isCanonicalProduction, isIndexable, isListedProduct, jsonLdScript, normalHost, pageMetadata, productJsonLd, robotsRules, sitemapPaths, articleJsonLd, journalArticleTitle, organizationJsonLd } from "../../lib/seo";
 import { DEFAULT_SUPPORT_EMAIL } from "../../lib/orders/emails/format";
 import { LEGACY_PRODUCT_REDIRECTS } from "../../lib/legacy-redirects";
@@ -14,6 +15,17 @@ const live: StoreCatalog = {mode: "live", currency: "USD", products: [listed, pl
 // A successful Shopify response with no products: the merged catalog holds only editorial placeholders.
 const emptyLive: StoreCatalog = {mode: "live", currency: "USD", products: [placeholder]};
 const prod = {vercelEnv: "production", host: "www.iqondaily.com", catalog: live};
+const indexNowKey = "4ebd9e4e989144ffebac389bceb45ce1785f3eb39a69832a0abf358c14c740e9";
+
+test("IndexNow public verification file has exact key bytes and stays out of the sitemap", () => {
+  const keyPath = `/${indexNowKey}.txt`;
+  assert.match(indexNowKey, /^[a-f0-9]{64}$/);
+  const bytes = readFileSync(new URL(`../../public${keyPath}`, import.meta.url));
+  assert.deepEqual(bytes, Buffer.from(indexNowKey, "utf8"), "filename matches content, without BOM, whitespace or newline");
+  for (const context of [prod, {...prod, catalog: emptyLive}, {...prod, catalog: {...live, mode: "unavailable" as const}}, {...prod, host: "iqondaily.com"}, {...prod, vercelEnv: "preview"}]) {
+    assert.equal(sitemapPaths(context, journalArticles).includes(keyPath), false, "verification file is not a content URL");
+  }
+});
 
 test("only the production deployment on www.iqondaily.com is indexable", () => {
   assert.equal(isCanonicalProduction(prod), true);
