@@ -67,6 +67,10 @@ const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-suppl
 const dom = html => new JSDOM(html).window.document;
 /** In-page links whose target id is not in the server-rendered document. */
 const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute("href")).filter(h => h.length > 1 && !doc.getElementById(decodeURIComponent(h.slice(1))));
+/** Exact H1 copy: every `<br>` line break must still read as two words in textContent. */
+const H1_TEXT = {"/": "For the life you want to live.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.",
+  "/approach": "The everyday deserves attention.", "/reviews": "Your experience has a place here.", "/affiliates": "Good routines. Shared together."};
+const h1s = doc => [...doc.querySelectorAll("h1")].map(h => h.textContent);
 const PRIVATE = ["/checkout", "/account", "/account/orders", "/affiliates", "/affiliates/login", "/api/cart", "/api/affiliates/me", "/api/account/session"];
 
 test("production, live catalog, canonical and alias hosts", async t => {
@@ -203,6 +207,12 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.ok(article.citation.length > 0 && article.citation.every(url => /^https:\/\//.test(url)));
     assert.equal(dom((await get(port, "/journal")).body).title, "Supplement & skincare guides | IQON");
   });
+  await t.test("headings with a visual <br> keep a word space in the server HTML", async () => {
+    for (const [url, h1] of Object.entries(H1_TEXT)) assert.deepEqual(h1s(dom((await get(port, url)).body)), [h1], url);
+    assert.equal(dom((await get(port, "/journal")).body).querySelector(".journal-heading h1 + p").textContent,
+      "Useful details. Everyday routines. A closer look at supplements and skincare.");
+    for (const url of PUBLIC) for (const text of h1s(dom((await get(port, url)).body))) assert.doesNotMatch(text, /[a-z.][A-Z]|[a-z]\.[a-z]/, `${url}: ${text}`);
+  });
   await t.test("browsers get the same head metadata as crawlers", async () => {
     const r = await get(port, "/products/creatine-monohydrate", WWW, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36");
     assert.equal(canonical(r.body), `https://${WWW}/products/creatine-monohydrate`);
@@ -240,6 +250,8 @@ test("production without Shopify configuration: preview fixtures are never index
   const server = await startServer("unconfigured", {VERCEL_ENV: "production"});
   t.after(server.stop);
   for (const url of ["/", "/collections/all", "/products/creatine-monohydrate", "/help"]) assertNoindex(await get(server.port, url), url);
+  // Preview-fixture homepage modes render the same hero headings.
+  for (const url of ["/", "/skincare"]) assert.deepEqual(h1s(dom((await get(server.port, url)).body)), [H1_TEXT[url]], url);
   assert.ok(!(await get(server.port, "/sitemap.xml")).body.includes("/products/"));
 });
 
