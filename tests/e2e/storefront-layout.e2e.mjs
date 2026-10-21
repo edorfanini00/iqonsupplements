@@ -2,7 +2,8 @@
 // phones, readable footer links and homepage muted text, hydrated H1 text that keeps a word space
 // at each <br>, the guide → product → bag → checkout handoff (the synthetic checkout URL is
 // aborted: no order exists), and homepage photographs whose srcset choice still covers each frame
-// at the screen's density (the eager, high-priority LCP hero included).
+// at the screen's density (the eager, high-priority LCP hero included), and expanded Help and product
+// accordion answers (including the approved shipping copy) at WCAG AA contrast.
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
 // catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
@@ -218,6 +219,45 @@ for (const device of VIEWPORTS) {
     }
     if (device.isMobile) assert.match(hero.src, /iqon-coastal-mobile-v32-750w\.webp$/, "phones receive the 750px mobile hero");
     await close();
+  });
+}
+
+const SHIPPING_ANSWER = "Shipping usually takes 3 to 5 days. Available shipping options and costs are shown at checkout.";
+const WHITE = "rgb(255, 255, 255)";
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: expanded Help and product accordion answers meet WCAG AA 4.5:1`, async () => {
+    for (const [url, accordion, shippingQuestion] of [["/help", ".help-wrap", "How long does shipping take?"], ["/products/creatine-monohydrate", ".product-accordion", "Shipping"]]) {
+      const {page, close} = await open(device, url);
+      const triggers = page.locator(`${accordion} [data-slot='accordion-trigger']`);
+      const count = await triggers.count();
+      assert.ok(count >= 3, `${url}: ${count} accordion items`);
+      const answers = [];
+      for (let i = 0; i < count; i++) {
+        const trigger = triggers.nth(i);
+        if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click();
+        // Each settled answer's text color against the nearest painted background (and plain white).
+        answers.push(await trigger.evaluate(async t => {
+          const content = t.closest("[data-slot='accordion-item']").querySelector("[data-slot='accordion-content']");
+          await new Promise(resolve => setTimeout(resolve, 400));
+          const text = [...content.querySelectorAll("*")].find(e => [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) || content;
+          let background = "rgb(255, 255, 255)";
+          for (let a = text; a; a = a.parentElement) {const c = getComputedStyle(a).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+          return {question: t.textContent.trim(), answer: content.textContent.trim(), height: content.getBoundingClientRect().height, color: getComputedStyle(text).color, background};
+        }));
+      }
+      const shipping = answers.find(a => a.question === shippingQuestion);
+      assert.ok(shipping?.answer.startsWith(SHIPPING_ANSWER), `${url}: shipping answer ${JSON.stringify(shipping)}`);
+      if (shipping) {
+        await triggers.filter({hasText: shippingQuestion}).scrollIntoViewIfNeeded();
+        await page.screenshot({path: path.join(shots, `${device.name}_${url === "/help" ? "help" : "pdp"}_shipping_answer.png`)});
+      }
+      await close();
+      for (const a of answers) {
+        assert.ok(a.height > 0, `${url} "${a.question}": answer did not expand`);
+        for (const background of [a.background, WHITE]) assert.ok(contrast(a.color, background) >= 4.5, `${url} "${a.question}": ${a.color} on ${background} = ${contrast(a.color, background).toFixed(2)}:1`);
+      }
+    }
   });
 }
 
