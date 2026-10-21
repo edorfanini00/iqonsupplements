@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isCanonicalProduction, isIndexable, isListedProduct, jsonLdScript, normalHost, pageMetadata, productJsonLd, robotsRules, sitemapPaths, articleJsonLd } from "../../lib/seo";
+import { isCanonicalProduction, isIndexable, isListedProduct, jsonLdScript, normalHost, pageMetadata, productJsonLd, robotsRules, sitemapPaths, articleJsonLd, journalArticleTitle, organizationJsonLd } from "../../lib/seo";
+import { DEFAULT_SUPPORT_EMAIL } from "../../lib/orders/emails/format";
 import { LEGACY_PRODUCT_REDIRECTS } from "../../lib/legacy-redirects";
 import type { Product, StoreCatalog } from "../../lib/catalog";
 import { journalArticles } from "../../lib/journal";
@@ -94,6 +95,22 @@ test("Article JSON-LD has no fabricated dates or people", () => {
   const data = articleJsonLd(journalArticles[0]);
   for (const key of ["datePublished", "dateModified"]) assert.equal(key in data, false);
   assert.equal((data.author as {"@type": string})["@type"], "Organization");
+});
+
+test("journal article titles name the journal, not \"Latest News\"", () => {
+  assert.equal(journalArticleTitle({title: "Read the label with confidence."}), "Read the label with confidence | IQON Journal");
+  for (const article of journalArticles) {
+    const title = journalArticleTitle(article);
+    assert.ok(title.startsWith(article.title.replace(/\.$/, "")) && title.endsWith(" | IQON Journal"), title);
+    assert.doesNotMatch(title, /Latest News|\. \|/);
+  }
+});
+
+test("Organization contact is the owner-approved support inbox only", () => {
+  assert.equal(DEFAULT_SUPPORT_EMAIL, "info@iqonhealth.com");
+  const [org] = organizationJsonLd();
+  assert.deepEqual(org.contactPoint, {"@type": "ContactPoint", contactType: "customer support", email: "info@iqonhealth.com"});
+  for (const invented of ["telephone", "address", "areaServed", "hoursAvailable"]) assert.equal(JSON.stringify(org).includes(invented), false, invented);
 });
 
 test("JSON-LD cannot break out of its script element", () => {

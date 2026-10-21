@@ -24,6 +24,7 @@
     "test:order-emails": "node --import tsx --test tests/orders/*.test.ts",
     "test:affiliate-ui": "vitest run --config tests/ui/vitest.config.mjs",
     "typecheck:next": "tsc -p tsconfig.next.json --noEmit --incremental false",
+    "test:layout": "node --test --test-concurrency=1 tests/e2e/storefront-layout.e2e.mjs",
     "test:seo": "node --import tsx --test tests/seo/seo.test.ts && npm run build:vercel && node --test --test-concurrency=1 tests/seo/route-matrix.test.mjs"
   },
   "dependencies": {
@@ -68,6 +69,7 @@
     "eslint-config-next": "16.2.6",
     "graphql": "^16.14.2",
     "jsdom": "30.1.0",
+    "playwright-core": "1.63.0",
     "prisma": "^6.19.0",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",

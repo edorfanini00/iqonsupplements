@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { Category, Product, StoreCatalog } from "./catalog";
 import { isRedirectedProductHandle } from "./legacy-redirects";
 import type { JournalArticle } from "./journal";
+import { DEFAULT_SUPPORT_EMAIL } from "./orders/emails/format";
 
 // The one public origin. The same deployment also answers on legacy and Vercel
 // hosts; those stay reachable (old order links) but are never indexable.
@@ -92,7 +93,9 @@ export function jsonLdScript(data: JsonLd | JsonLd[]) {
 
 export function organizationJsonLd(): JsonLd[] {
   return [
-    {"@context": "https://schema.org", "@type": "Organization", "@id": `${CANONICAL_ORIGIN}/#organization`, name: SITE_NAME, url: canonicalUrl("/"), logo: canonicalUrl("/favicon.svg")},
+    {"@context": "https://schema.org", "@type": "Organization", "@id": `${CANONICAL_ORIGIN}/#organization`, name: SITE_NAME, url: canonicalUrl("/"), logo: canonicalUrl("/favicon.svg"),
+      // The support inbox shown on /help and linked from the footer. No phone or address is published.
+      contactPoint: {"@type": "ContactPoint", contactType: "customer support", email: DEFAULT_SUPPORT_EMAIL}},
     {"@context": "https://schema.org", "@type": "WebSite", "@id": `${CANONICAL_ORIGIN}/#website`, name: SITE_NAME, url: canonicalUrl("/"), publisher: {"@id": `${CANONICAL_ORIGIN}/#organization`}},
   ];
 }
@@ -119,6 +122,12 @@ export function productJsonLd(product: Product, comingSoon: boolean): JsonLd | n
     image: (product.images?.length ? product.images.map(i => i.src) : [product.image]).map(src => canonicalUrl(src)),
     brand: {"@type": "Brand", name: SITE_NAME}, url: canonicalUrl(`/products/${product.id}`), offers: offer,
   };
+}
+
+/** The articles are evergreen guides, so their titles name the journal rather than the "Latest News" nav label. */
+const JOURNAL_NAME = "IQON Journal";
+export function journalArticleTitle(article: Pick<JournalArticle, "title">) {
+  return `${article.title.replace(/[.\s]+$/, "")} | ${JOURNAL_NAME}`;
 }
 
 export function articleJsonLd(article: JournalArticle): JsonLd {
