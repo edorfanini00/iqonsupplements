@@ -51,6 +51,17 @@ Set the Shopify values listed in `.env.example` as server-side Vercel environmen
 
 The native Next.js build checks `tsconfig.next.json`, which covers the application and its imported dependencies. Unused Cloudflare deployment/database tooling belongs to the separate Worker target. TypeScript validation remains enabled.
 
+### Rendered layout test
+
+`npm run test:layout` drives Chromium through the pinned `playwright-core` dev dependency against a local `next start` of the production build, with a mock Shopify catalog. Browsers are not downloaded by `npm ci`; install the matching Chromium once per machine:
+
+```sh
+npm ci
+npx playwright-core install chromium
+npm run build:vercel
+npm run test:layout
+```
+
 ### Existing Worker / Sites target
 
 The original local and private-hosting commands remain available:

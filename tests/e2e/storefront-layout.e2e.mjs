@@ -4,7 +4,12 @@
 // catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
 //
-//   npm run build:vercel && PLAYWRIGHT_CORE=/path/to/node_modules/playwright-core npm run test:layout
+// Uses the pinned `playwright-core` dev dependency. Browsers are not fetched by `npm ci`, so on a
+// clean machine install the matching Chromium once first. PLAYWRIGHT_CORE may optionally point at
+// another playwright-core directory, as in the other e2e files.
+//
+//   npx playwright-core install chromium   # once per machine
+//   npm run build:vercel && npm run test:layout
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

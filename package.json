@@ -69,6 +69,7 @@
     "eslint-config-next": "16.2.6",
     "graphql": "^16.14.2",
     "jsdom": "30.1.0",
+    "playwright-core": "1.63.0",
     "prisma": "^6.19.0",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
