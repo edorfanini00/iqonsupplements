@@ -15,6 +15,7 @@ import { JSDOM } from "jsdom";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const WWW = "www.iqondaily.com";
+const INDEXNOW_KEY = "4ebd9e4e989144ffebac389bceb45ce1785f3eb39a69832a0abf358c14c740e9";
 const ALIASES = ["iqondaily.com", "www.iqonbody.com", "iqon-supplements-git-main.vercel.app"];
 const work = fs.mkdtempSync(path.join(os.tmpdir(), "iqon-seo-matrix-"));
 let nextPort = Number(process.env.SEO_MATRIX_PORT || 3961);
@@ -78,6 +79,21 @@ test("production, live catalog, canonical and alias hosts", async t => {
   t.after(server.stop);
   const {port} = server;
 
+  await t.test("IndexNow key is served as exact public text and aliases remain noindex", async () => {
+    const keyPath = `/${INDEXNOW_KEY}.txt`;
+    const r = await get(port, keyPath);
+    assert.equal(r.status, 200);
+    assert.match(r.headers["content-type"] || "", /^text\/plain(?:;|$)/i);
+    assert.equal(r.body, INDEXNOW_KEY, "no HTML wrapper, BOM or newline");
+    assert.equal(r.headers.location, undefined, "canonical verification URL does not redirect");
+    assert.equal(r.headers["x-robots-tag"], undefined);
+    assert.ok(!locs((await get(port, "/sitemap.xml")).body).includes(`https://${WWW}${keyPath}`));
+    for (const host of ALIASES) {
+      const alias = await get(port, keyPath, host);
+      assert.equal(alias.status, 200, host);
+      assert.equal(alias.headers["x-robots-tag"], "noindex", host);
+    }
+  });
   await t.test("public pages are indexable with www canonical in <head>", async () => {
     for (const url of PUBLIC) assertIndexable(await get(port, url), url);
   });
