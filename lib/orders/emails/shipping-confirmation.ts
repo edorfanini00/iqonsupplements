@@ -6,8 +6,11 @@ import {
 } from "./layout";
 import type { EmailBrandConfig, RenderedEmail, ShipmentDetails } from "./types";
 
-/** Matches the storefront help page ("Shipping takes 3 to 5 business days"). */
-export const SHIPPING_TIME_COPY = "Shipping usually takes 3 to 5 business days.";
+/** No delivery window is promised: none is an approved policy. Matches the storefront's shipping statement
+ * (lib/commerce-policy.ts SHIPPING_NOTE: delivery can vary by product and destination). */
+export const DELIVERY_TIMING_COPY = "Delivery times vary by carrier and destination.";
+/** Added only when the email has a tracking link to point to. */
+export const TRACKING_UPDATES_COPY = "Your tracking link shows the latest updates from the carrier.";
 export const MORE_TO_FOLLOW_COPY =
   "This parcel holds part of your order. The rest will follow in a separate shipment, and we will email you again when it is on its way.";
 
@@ -33,8 +36,8 @@ export function renderShippingConfirmationEmail(shipment: ShipmentDetails, brand
     : "Your parcel is on its way. Track it any time.";
   const what = partial ? "Part of your order is on its way." : "Your order is on its way.";
   const title = name ? `Good news, ${name}. ${what}` : `Good news. ${what}`;
-  const intro = `Your parcel has left us and is now${carrierPhrase || " on its way to you"}. ${SHIPPING_TIME_COPY}`;
   const trackingUrl = shipmentTrackingUrl(shipment);
+  const intro = `Your parcel has left us and is now${carrierPhrase || " on its way to you"}. ${DELIVERY_TIMING_COPY}${trackingUrl ? ` ${TRACKING_UPDATES_COPY}` : ""}`;
   const orderStatusUrl = safeHttpsUrl(shipment.orderStatusUrl);
 
   const trackingCells = twoColumns(
