@@ -35,7 +35,7 @@
 .supp-research-links{display:grid;margin:23px 0 17px;border-top:1px solid #c7d2d6}
 .supp-research-links a{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid #c7d2d6;color:#465f6c;font-size:11px;line-height:1.6}
 .supp-research-links svg{flex-shrink:0}
-.supplement-pdp-story .supp-research-copy>.supp-research-scope{font-size:11px;line-height:1.7;color:#6c7e87}
+.supplement-pdp-story .supp-research-copy>.supp-research-scope{font-size:11px;line-height:1.7;color:#607078}
 .supplement-pdp-story>.pdp-disclaimer{padding:0 max(calc((100% - var(--skin-width))/2),4vw) 48px;font-size:10px;color:#758189;max-width:none}
 .supplement-pdp-story .supplement-amounts{width:100%;table-layout:fixed;margin-top:22px}
 .supplement-pdp-story .supplement-amounts th:first-child{width:75%}
@@ -66,3 +66,25 @@
  .supplement-pdp-story .supp-research{grid-template-columns:1fr;gap:23px}.supplement-pdp-story .supp-research h2{font-size:30px;max-width:22ch}.supplement-pdp-story .supp-research-copy>p{font-size:13px}.supp-research-links{margin-top:18px}
  .supplement-pdp-story>.pdp-disclaimer{padding:0 22px 35px}
 }
+
+/* WCAG AA (>=4.5:1) for small text on the supplement PDP's flat painted panels. Each colour keeps
+   its original hue, darkened only until it clears 4.6:1 on the darkest panel it sits on. Scoped to
+   supplement product pages; skincare stories and the rest of the storefront keep their colours.
+   Text set over photography (e.g. the benefits figcaption) is intentionally excluded. */
+.product-page:has(.supplement-pdp-story) .purchase-option small{color:#6b6c6d}
+.product-page:has(.supplement-pdp-story) .sticky-purchase small{color:#6a6b6d}
+.product-page:has(.supplement-pdp-story) :is(.fact-kicker,.fact-art-note,.fact-art-value>span){color:#606a73}
+.product-page:has(.supplement-pdp-story) .section-heading .eyebrow{color:#6b6c6d}
+.supplement-pdp-story>.pdp-disclaimer{color:#646e75}
+.supplement-pdp-story .skin-kicker{color:#616e74}
+.supplement-pdp-story .skin-timing-label{color:#61757e}
+.supplement-pdp-story .skin-application-photo figcaption{color:#526672}
+.supplement-pdp-story .skin-step-top{color:#596d77}
+.supplement-pdp-story .skin-compare-table tr>th:first-child{color:#5f6e75}
+.supplement-pdp-story .skin-compare-product p>span{color:#5a686f}
+.supplement-pdp-story .skin-compare-table td{color:#526975}
+.supplement-pdp-story .skin-explore-hint{color:#617077}
+.supplement-pdp-story .supp-fact-strip dt{color:#5c707a}
+.supplement-pdp-story .supp-fact-strip dd>span{color:#607079}
+.supplement-pdp-story .skin-ingredient-summary{color:#5a686f}
+.supplement-pdp-story .skin-ingredient-tags>span{color:#5a686f}

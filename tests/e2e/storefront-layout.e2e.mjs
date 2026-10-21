@@ -3,7 +3,8 @@
 // at each <br>, the guide → product → bag → checkout handoff (the synthetic checkout URL is
 // aborted: no order exists), and homepage photographs whose srcset choice still covers each frame
 // at the screen's density (the eager, high-priority LCP hero included), and expanded Help and product
-// accordion answers (including the approved shipping copy) at WCAG AA contrast.
+// accordion answers (including the approved shipping copy) and corrected Help / supplement product
+// muted text at WCAG AA contrast.
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
 // catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
@@ -249,7 +250,15 @@ for (const device of VIEWPORTS) {
       const shipping = answers.find(a => a.question === shippingQuestion);
       assert.ok(shipping?.answer.startsWith(SHIPPING_ANSWER), `${url}: shipping answer ${JSON.stringify(shipping)}`);
       if (shipping) {
-        await triggers.filter({hasText: shippingQuestion}).scrollIntoViewIfNeeded();
+        // Single-open accordions close Shipping while later answers are checked: reopen it for the capture.
+        const trigger = triggers.filter({hasText: shippingQuestion}).first();
+        if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click();
+        assert.equal(await trigger.getAttribute("aria-expanded"), "true", `${url}: Shipping answer is not open for the screenshot`);
+        const panel = trigger.locator("xpath=ancestor::*[@data-slot='accordion-item'][1]//*[@data-slot='accordion-content']");
+        await page.waitForFunction(el => el.getBoundingClientRect().height > 0, await panel.elementHandle());
+        assert.match(await panel.innerText(), /^Shipping usually takes 3 to 5 days\./);
+        await panel.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(400);
         await page.screenshot({path: path.join(shots, `${device.name}_${url === "/help" ? "help" : "pdp"}_shipping_answer.png`)});
       }
       await close();
@@ -260,6 +269,45 @@ for (const device of VIEWPORTS) {
     }
   });
 }
+
+// Muted text corrected to WCAG AA on Help and orderable supplement product pages (flat painted panels only;
+// text over photography is excluded). Each selector must render at some width; every visible match must pass.
+const CORRECTED_TEXT = {
+  "/help": [".help-wrap .eyebrow", ".help-wrap>div>p:last-child"],
+  "/products/creatine-monohydrate": [".purchase-option small", ".sticky-purchase small", ".fact-kicker", ".fact-art-note", ".fact-art-value>span", ".section-heading .eyebrow",
+    ".supplement-pdp-story>.pdp-disclaimer", ".supplement-pdp-story .skin-kicker", ".supplement-pdp-story .skin-timing-label", ".supplement-pdp-story .skin-application-photo figcaption>span",
+    ".supplement-pdp-story .skin-step-top>span", ".supplement-pdp-story .supp-research-scope", ".supplement-pdp-story .skin-compare-table tr>th:first-child:not(:has(.sr-only))",
+    ".supplement-pdp-story .skin-compare-product p>span", ".supplement-pdp-story .skin-compare-table td"],
+  "/products/liver-support": [".supplement-pdp-story .skin-explore-hint", ".supplement-pdp-story .supp-fact-strip dt", ".supplement-pdp-story .supp-fact-strip dd>span",
+    ".supplement-pdp-story .skin-ingredient-summary", ".supplement-pdp-story .skin-ingredient-tags>span"],
+};
+const correctedSeen = new Set();
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: corrected Help and supplement product text meets WCAG AA 4.5:1`, async () => {
+    for (const [url, selectors] of Object.entries(CORRECTED_TEXT)) {
+      const {page, close} = await open(device, url);
+      // Scroll through so scroll-revealed elements (sticky purchase bar) are laid out.
+      await page.evaluate(async () => {for (let y = 0; y < document.body.scrollHeight; y += 600) {scrollTo(0, y); await new Promise(r => setTimeout(r, 50));}});
+      const items = await page.evaluate(selectors => selectors.flatMap(s => [...document.querySelectorAll(s)]
+        .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== "hidden" && e.textContent.trim()).map(e => {
+          let background = "rgb(255, 255, 255)";
+          for (let a = e; a; a = a.parentElement) {const c = getComputedStyle(a).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+          return {s, text: e.textContent.trim().slice(0, 40), color: getComputedStyle(e).color, background};
+        })), selectors);
+      await close();
+      for (const i of items) {
+        correctedSeen.add(`${url} ${i.s}`);
+        assert.ok(contrast(i.color, i.background) >= 4.5, `${url} ${i.s} "${i.text}": ${i.color} on ${i.background} = ${contrast(i.color, i.background).toFixed(2)}:1`);
+      }
+    }
+  });
+}
+
+test("every corrected Help / supplement product selector was rendered and checked", () => {
+  const missing = Object.entries(CORRECTED_TEXT).flatMap(([url, selectors]) => selectors.map(s => `${url} ${s}`)).filter(k => !correctedSeen.has(k));
+  assert.deepEqual(missing, []);
+});
 
 test("every local srcset candidate on the homepage is served as WebP at its declared width", async () => {
   const {page, close} = await open(VIEWPORTS[1], "/");
