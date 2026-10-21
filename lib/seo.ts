@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import type { Product, StoreCatalog } from "./catalog";
+import type { Category, Product, StoreCatalog } from "./catalog";
+import { isRedirectedProductHandle } from "./legacy-redirects";
 import type { JournalArticle } from "./journal";
 
 // The one public origin. The same deployment also answers on legacy and Vercel
@@ -12,7 +13,7 @@ export const DEFAULT_SHARE_IMAGE = "/images/supplements/20_group_all_row.webp";
 /** Crawl/index exclusions. Listed in robots.txt and sent as X-Robots-Tag. */
 export const PRIVATE_PATHS = ["/account", "/affiliates", "/checkout", "/api/"];
 
-export type IndexContext = {vercelEnv?: string; host?: string | null; catalogMode?: StoreCatalog["mode"]};
+export type IndexContext = {vercelEnv?: string; host?: string | null; catalog?: StoreCatalog};
 
 export function normalHost(host?: string | null) {
   return (host || "").split(",")[0].trim().toLowerCase().replace(/:\d+$/, "");
@@ -23,14 +24,21 @@ export function isCanonicalProduction({vercelEnv, host}: IndexContext) {
   return vercelEnv === "production" && normalHost(host) === CANONICAL_HOST;
 }
 
-/** Pages that show catalog data (prices, availability, store copy) also need a live Shopify catalog. */
-export function isIndexable(context: IndexContext, {requiresLiveCatalog = false, eligible = true} = {}) {
-  return eligible && isCanonicalProduction(context) && (!requiresLiveCatalog || context.catalogMode === "live");
+/** A product page is genuine only when Shopify returned it (editorial-only entries have no variants)
+ * and its URL is not a redirect source. */
+export function isListedProduct(catalog: StoreCatalog | undefined, product: Product | undefined): product is Product {
+  return catalog?.mode === "live" && !!product && (product.variants?.length ?? 0) > 0 && !isRedirectedProductHandle(product.id);
 }
 
-/** A product page is genuine only when Shopify returned it; editorial-only entries have no variants. */
-export function isListedProduct(catalog: StoreCatalog, product: Product | undefined): product is Product {
-  return catalog.mode === "live" && !!product && (product.variants?.length ?? 0) > 0;
+/** Shopify-returned products. A successful but empty Shopify response leaves only editorial placeholders: none listed. */
+export function listedProducts(catalog: StoreCatalog | undefined, category?: Category) {
+  return (catalog?.products ?? []).filter(p => isListedProduct(catalog, p) && (!category || p.category === category));
+}
+
+/** Pages that show catalog data (prices, availability, store copy) also need live Shopify products
+ * (in their category, when given); preview, outage and empty catalogs fail closed. */
+export function isIndexable(context: IndexContext, {requiresLiveCatalog = false, catalogCategory, eligible = true}: {requiresLiveCatalog?: boolean; catalogCategory?: Category; eligible?: boolean} = {}) {
+  return eligible && isCanonicalProduction(context) && (!requiresLiveCatalog || listedProducts(context.catalog, catalogCategory).length > 0);
 }
 
 export function canonicalUrl(path: string) {
@@ -60,16 +68,20 @@ export function robotsRules(context: IndexContext) {
 
 /** Pages that render without the catalog. */
 export const STATIC_PUBLIC_PATHS = ["/approach", "/journal"];
-/** Pages whose content depends on a live catalog. /reviews is excluded: it has no published reviews. */
-export const CATALOG_PUBLIC_PATHS = ["/", "/help", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare"];
+/** Pages whose content depends on live Shopify products (in a category, when given).
+ * /reviews is excluded: it has no published reviews. Must match each page's publicPageMetadata() options. */
+export const CATALOG_PUBLIC_PAGES: {path: string; category?: Category}[] = [
+  {path: "/"}, {path: "/help"}, {path: "/skincare", category: "skincare"},
+  {path: "/collections/all"}, {path: "/collections/supplements", category: "supplements"}, {path: "/collections/skincare", category: "skincare"},
+];
+export const collectionCategory = (category: string): Category | undefined => category === "supplements" || category === "skincare" ? category : undefined;
 
 /** Only canonical, 200, indexable URLs. No lastmod: no trustworthy modification date exists for these pages. */
-export function sitemapPaths(context: IndexContext, catalog: StoreCatalog, articles: Pick<JournalArticle, "slug">[]) {
+export function sitemapPaths(context: IndexContext, articles: Pick<JournalArticle, "slug">[]) {
   if (!isCanonicalProduction(context)) return [];
-  const paths = [...STATIC_PUBLIC_PATHS, ...articles.map(a => `/journal/${a.slug}`)];
-  if (catalog.mode === "live") paths.unshift(...CATALOG_PUBLIC_PATHS);
-  if (catalog.mode === "live") paths.push(...catalog.products.filter(p => isListedProduct(catalog, p)).map(p => `/products/${encodeURIComponent(p.id)}`));
-  return [...new Set(paths)];
+  const catalogPages = CATALOG_PUBLIC_PAGES.filter(page => isIndexable(context, {requiresLiveCatalog: true, catalogCategory: page.category})).map(page => page.path);
+  const products = listedProducts(context.catalog).map(p => `/products/${encodeURIComponent(p.id)}`);
+  return [...new Set([...catalogPages, ...STATIC_PUBLIC_PATHS, ...articles.map(a => `/journal/${a.slug}`), ...products])];
 }
 
 type JsonLd = Record<string, unknown>;
@@ -91,19 +103,21 @@ export function breadcrumbJsonLd(items: {name: string; path: string}[]): JsonLd 
   }))};
 }
 
-/** Mirrors the visible product facts. The offer is the one-time price shown in the purchase options;
- * coming-soon products and subscription-only products get no offer. No ratings, GTINs or policies. */
-export function productJsonLd(product: Product, comingSoon: boolean): JsonLd {
+/** Mirrors the visible product facts. The offer is the "One time purchase" price shown for the default
+ * variant (the page's first available variant). Coming-soon, unpriced and subscription-only products have no
+ * verifiable one-time offer, so no Product node is emitted for them (an offer-less Product is an invalid rich
+ * result). No ratings, GTINs or policies. */
+export function productJsonLd(product: Product, comingSoon: boolean): JsonLd | null {
   const variant = product.variants?.find(v => v.available) || product.variants?.[0];
-  const offer = !comingSoon && variant && !product.requiresSellingPlan ? {
+  if (comingSoon || product.pricePending || product.requiresSellingPlan || !variant || !Number.isFinite(variant.price)) return null;
+  const offer = {
     "@type": "Offer", url: canonicalUrl(`/products/${product.id}`), price: variant.price.toFixed(2), priceCurrency: variant.currency,
     availability: product.available !== false && variant.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-  } : undefined;
+  };
   return {
     "@context": "https://schema.org", "@type": "Product", name: product.name,
     image: (product.images?.length ? product.images.map(i => i.src) : [product.image]).map(src => canonicalUrl(src)),
-    brand: {"@type": "Brand", name: SITE_NAME}, url: canonicalUrl(`/products/${product.id}`),
-    ...(offer ? {offers: offer} : {}),
+    brand: {"@type": "Brand", name: SITE_NAME}, url: canonicalUrl(`/products/${product.id}`), offers: offer,
   };
 }
 

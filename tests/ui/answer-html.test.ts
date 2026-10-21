@@ -21,7 +21,11 @@ import { generateMetadata as skincareHomeMetadata } from "../../app/skincare/pag
 // Request scope for generateMetadata: the canonical host with a live catalog.
 const request = vi.hoisted(() => ({host: "www.iqondaily.com"}));
 vi.mock("next/headers", () => ({headers: async () => new Headers({host: request.host}), cookies: async () => new Map()}));
-vi.mock("@/lib/shopify.server", () => ({getStoreCatalog: async () => ({mode: "live", products: [], currency: "USD"})}));
+// One Shopify-returned product per category (placeholders without variants would not count).
+vi.mock("@/lib/shopify.server", () => ({getStoreCatalog: async () => ({mode: "live", currency: "USD", products: (["supplements", "skincare"] as const).map(category => ({
+  id: `listed-${category}`, name: category, category, type: "", number: "01", price: 10, size: "", descriptor: "", description: "", image: "", campaign: "", tone: "", ritual: "",
+  variants: [{id: `v-${category}`, title: "Default Title", price: 10, currency: "USD", available: true}],
+}))})}));
 
 const faq = () => React.createElement(Accordion, { type: "single", collapsible: true, defaultValue: "open" },
   React.createElement(AccordionItem, { value: "open" }, React.createElement(AccordionTrigger, null, "Open question"), React.createElement(AccordionContent, null, "Open answer")),

@@ -111,7 +111,15 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.match(sitemap.headers["content-type"], /xml/);
     assert.doesNotMatch(sitemap.body, /<lastmod>/, "no fabricated lastmod");
     const urls = locs(sitemap.body);
-    assert.ok(urls.includes(`https://${WWW}/products/creatine-monohydrate`));
+    // Complete, not just valid: every catalog page and exactly the listed Shopify products.
+    for (const page of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/approach", "/journal", "/journal/reading-a-supplement-label"])
+      assert.ok(urls.includes(`https://${WWW}${page === "/" ? "/" : page}`), page);
+    assert.deepEqual(urls.filter(u => u.includes("/products/")).map(u => new URL(u).pathname).sort(),
+      ["/products/anti-aging-cleanser-with-peptides", "/products/creatine-monohydrate", "/products/liver-support", "/products/nmn"]);
+    for (const handle of ["gentle-cleanser", "peptide-serum", "barrier-cream"]) {
+      assert.equal((await get(port, `/products/${handle}`)).status, 308, `${handle} redirects`);
+      assert.ok(!urls.some(u => u.endsWith(`/products/${handle}`)), `${handle} not in sitemap`);
+    }
     assert.ok(!urls.some(u => /keto-5|\/reviews|\/checkout|\/account|\/affiliates|\/api\/|\?/.test(u)), urls.join("\n"));
     for (const url of urls) {
       const {pathname} = new URL(url);
@@ -130,12 +138,21 @@ test("production, live catalog, canonical and alias hosts", async t => {
     const [product, crumbs] = jsonLd(r.body);
     assert.equal(product["@type"], "Product");
     assert.equal(product.offers.price, "39.00");
-    assert.match(r.body, /\$39/, "visible price");
+    // Subscription is selected by default (headline shows $33.15); the offer is the visible one-time option.
+    assert.match(r.body, /<strong>One time purchase<\/strong>.*?<\/span><b>\$39<\/b>/, "visible one-time price");
+    assert.match(r.body, /\$33\.15/, "subscription price is visible too");
+    assert.notEqual(product.offers.price, "33.15");
     assert.equal(product.offers.availability, "https://schema.org/InStock");
     assert.deepEqual(crumbs.itemListElement.map(i => i.name), ["IQON", "supplements", "Creatine Monohydrate"]);
     assert.ok(!/aggregateRating|"review"|gtin/.test(JSON.stringify(product)));
-    const soon = jsonLd((await get(port, "/products/anti-aging-cleanser-with-peptides")).body)[0];
-    assert.equal(soon.offers, undefined, "coming soon: no offer");
+    // No verifiable one-time offer: breadcrumb only, never an offer-less Product item.
+    for (const [url, category] of [["/products/anti-aging-cleanser-with-peptides", "skincare"], ["/products/liver-support", "supplements"]]) {
+      const page = await get(port, url);
+      assertIndexable(page, url);
+      assert.deepEqual(jsonLd(page.body).map(x => x["@type"]), ["BreadcrumbList"], url);
+      assert.equal(jsonLd(page.body)[0].itemListElement[1].name, category);
+    }
+    assert.doesNotMatch((await get(port, "/products/liver-support")).body, /One time purchase/, "subscription-only page shows no one-time price");
     const sold = await get(port, "/products/nmn");
     assert.equal(jsonLd(sold.body)[0].offers.availability, "https://schema.org/OutOfStock");
     assert.doesNotMatch(sold.body, /<\/script><script>alert/, "catalog text cannot break out of JSON-LD");
@@ -152,12 +169,27 @@ test("production, live catalog, canonical and alias hosts", async t => {
   });
 });
 
+test("production, successful but empty Shopify response: editorial placeholders are not indexed or listed", async t => {
+  const server = await startServer("empty", {...live, FAKE_SHOPIFY: "empty"});
+  t.after(server.stop);
+  for (const url of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/keto-5"]) {
+    const r = await get(server.port, url);
+    assertNoindex(r, url);
+    assert.ok(!jsonLd(r.body).some(x => x["@type"] === "Product"), url);
+  }
+  for (const url of ["/approach", "/journal"]) assertIndexable(await get(server.port, url), url);
+  const urls = locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname);
+  assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal")), urls.join(","));
+});
+
 test("production, Shopify outage: shopping pages fail closed, static pages stay indexable", async t => {
   const server = await startServer("down", {...live, FAKE_SHOPIFY: "down"});
   t.after(server.stop);
   for (const url of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements"]) assertNoindex(await get(server.port, url), url);
   const product = await get(server.port, "/products/creatine-monohydrate");
   assertNoindex(product, "product during outage");
+  // Existing behavior: during an outage any product slug gets the 200 "back shortly" page (noindex), not a 404.
+  assertNoindex(await get(server.port, "/products/not-a-product"), "unknown slug during outage");
   assert.equal(jsonLd(product.body).length, 0);
   for (const url of ["/approach", "/journal", "/journal/reading-a-supplement-label"]) assertIndexable(await get(server.port, url), url);
   const urls = locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname);

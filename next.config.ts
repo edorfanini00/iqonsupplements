@@ -1,15 +1,12 @@
 import type { NextConfig } from "next";
 import { CANONICAL_HOST, PRIVATE_PATHS } from "./lib/seo";
+import { LEGACY_PRODUCT_REDIRECTS } from "./lib/legacy-redirects";
 
 const noindex = (value: string) => [{key: "X-Robots-Tag", value}];
 
 const nextConfig: NextConfig = {
   async redirects() {
-    return [
-      {source:"/products/gentle-cleanser",destination:"/products/anti-aging-cleanser-with-peptides",permanent:true},
-      {source:"/products/peptide-serum",destination:"/collections/skincare",permanent:true},
-      {source:"/products/barrier-cream",destination:"/collections/skincare",permanent:true},
-    ];
+    return LEGACY_PRODUCT_REDIRECTS.map(({handle, destination}) => ({source: `/products/${handle}`, destination, permanent: true}));
   },
   async headers() {
     return [
