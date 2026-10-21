@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { CollectionPage } from "../../shop-pages";
 import { collectionCategory } from "@/lib/seo";
+import { SKINCARE_COMING_SOON } from "@/lib/commerce-policy";
 import { publicPageMetadata } from "@/lib/seo.server";
-const collectionMetadata:Record<string,{title:string;description:string}>={all:{title:"All products | IQON",description:"Browse every IQON supplement and skincare product in one place."},supplements:{title:"Supplements | IQON",description:"Shop IQON supplements, each with its format, contents and current price."},skincare:{title:"Skincare products | IQON",description:"Explore the IQON skincare collection ahead of launch."}};
+const collectionMetadata:Record<string,{title:string;description:string}>={all:{title:"All products | IQON",description:SKINCARE_COMING_SOON?"Shop IQON supplements and preview the skincare collection, coming soon.":"Browse every IQON supplement and skincare product in one place."},supplements:{title:"Supplements | IQON",description:"Shop IQON supplements, each with its format, contents and current price."},skincare:{title:"Skincare products | IQON",description:"Explore the IQON skincare collection ahead of launch."}};
 // Filter and sort parameters canonicalize to the clean collection URL.
 export async function generateMetadata({params}:{params:Promise<{category:string}>}){const {category}=await params;const page=collectionMetadata[category];return page?publicPageMetadata({...page,path:`/collections/${category}`,requiresLiveCatalog:true,catalogCategory:collectionCategory(category)}):{};}
 export default async function CollectionRoute({params,searchParams}:{params:Promise<{category:string}>;searchParams:Promise<{format?:string;sort?:string}>}){const {category}=await params;const query=await searchParams;if(!["all","supplements","skincare"].includes(category))notFound();return <CollectionPage category={category as "all"|"supplements"|"skincare"} initialFormat={typeof query.format==="string"?query.format:"all"} initialSort={typeof query.sort==="string"?query.sort:"featured"}/>;}

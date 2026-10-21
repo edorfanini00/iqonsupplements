@@ -1,4 +1,6 @@
-export type JournalArticle={slug:string;title:string;dek:string;category:string;readTime:string;image:string;imageAlt:string;sections:{heading:string;paragraphs:string[]}[];sources?:{label:string;url:string}[]};
+export type JournalArticle={slug:string;title:string;dek:string;category:string;readTime:string;image:string;imageAlt:string;sections:{heading:string;paragraphs:string[];format?:string;products?:string[]}[];sources?:{label:string;url:string}[]};
+/** `format` (a Shopify product type) and `products` (handles) name the products a section discusses. The article
+ * links only those a shopper can order now; each product page links back to the guide that discusses it. */
 export const journalArticles:JournalArticle[]=[
   {
     "slug": "reading-a-supplement-label",
@@ -11,6 +13,7 @@ export const journalArticles:JournalArticle[]=[
     "sections": [
       {
         "heading": "Begin with the full name",
+        "products": ["creatine-monohydrate"],
         "paragraphs": [
           "The front of a bottle introduces a product. The full label gives you a closer look. Start with the ingredient name and its form: creatine monohydrate, for example, is more specific than creatine alone. Then find the Supplement Facts panel. Reading these details in the same order each time can make an unfamiliar label feel much easier to navigate."
         ]
@@ -23,12 +26,14 @@ export const journalArticles:JournalArticle[]=[
       },
       {
         "heading": "Give the numbers their context",
+        "products": ["colostrum-powder"],
         "paragraphs": [
           "Read the unit beside each amount. Grams, milligrams and micrograms describe different scales: one gram equals 1,000 milligrams. The percentage Daily Value, where provided, places a nutrient amount against a reference value. Some dietary ingredients have no established Daily Value, which the panel identifies. For blends, check whether an amount applies to an individual ingredient or to the blend as a whole."
         ]
       },
       {
         "heading": "Meet the rest of the formula",
+        "products": ["hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"],
         "paragraphs": [
           "Read the ingredient statement alongside the facts panel. It can include components such as the capsule shell, flavorings and sweeteners. These details matter when taste, allergies or dietary preferences influence your choice. An unflavored option, for instance, is a flavor description; the ingredient list tells you the rest. Storage and preparation directions are also worth reading before finding a place for the product at home."
         ]
@@ -72,24 +77,28 @@ export const journalArticles:JournalArticle[]=[
       },
       {
         "heading": "Powders make preparation part of the ritual",
+        "format": "Powder",
         "paragraphs": [
           "A powder asks for a little time and a place to prepare it. You may need a measuring tool, a suitable liquid and a glass or shaker, depending on the product's directions. That can suit someone who enjoys a familiar kitchen routine. Flavor is another part of the decision: consider what you genuinely enjoy drinking and follow the specified measuring and mixing instructions."
         ]
       },
       {
         "heading": "Capsules keep the process compact",
+        "format": "Capsules",
         "paragraphs": [
           "Capsules remove the measuring and mixing steps. Their size and the number in a serving are still worth considering, especially if swallowing capsules feels inconvenient. Read the directions for timing and whether the product should be taken with food. A compact bottle may work well in a busy day, provided you can store it according to the label and keep its instructions close."
         ]
       },
       {
         "heading": "Sachets are easy to take along",
+        "format": "Sachets",
         "paragraphs": [
           "Individual packets make it convenient to carry a few sachets without the full outer container. They can suit a trip, an office drawer or a bag, within the product's storage requirements. Preparation varies: a packet may still call for water, a cup or another step. Consider that whole process when comparing convenience. Keep the product name and directions available, especially when leaving the outer packaging at home."
         ]
       },
       {
         "heading": "Gummies put taste and texture first",
+        "format": "Gummies",
         "paragraphs": [
           "A gummy offers a chewable option with its own flavor and texture. Read the serving size and look at the ingredients used for sweetness and structure, including any details relevant to your dietary preferences. Across formats, the most useful comparison brings the formula and the experience together. Choose something you can prepare and use as directed on an ordinary day, with a taste, texture and amount of preparation that feels comfortable."
         ]

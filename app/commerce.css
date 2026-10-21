@@ -534,3 +534,31 @@ body { background:#fafbfb; }
 .subscription-schedule { margin-bottom:14px; }
 .subscription-terms a { text-decoration:underline; text-underline-offset:3px; }
 @media(max-width:450px) { .purchase-option.subscription-option { gap:9px; padding:14px 12px; } .subscription-option strong { font-size:13px; } }
+
+/* Buyer paths: collection format selection and guide links, guide → product links, product → guide links. */
+.catalog-selection { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px 40px; margin:-10px 0 34px; padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.catalog-formats { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; }
+.catalog-formats>span { font-size:12px; font-weight:500; letter-spacing:1.4px; text-transform:uppercase; color:#687279; margin-right:6px; }
+.catalog-formats a { display:inline-flex; align-items:center; min-height:40px; padding:0 16px; border:1px solid #d6d9db; border-radius:999px; font-size:14px; transition:border-color .2s,background .2s; }
+.catalog-formats a:hover { border-color:#8c9094; }
+.catalog-formats a[aria-current] { background:#28292a; border-color:#28292a; color:#fff; }
+.catalog-guides { display:flex; flex-direction:column; align-items:flex-end; gap:4px; font-size:14px; line-height:1.6; color:#687279; }
+.catalog-guides a { display:inline-flex; align-items:center; gap:5px; color:var(--ink); border-bottom:1px solid #929394; }
+.guide-products { margin-top:28px; padding:22px 0 4px; border-top:1px solid var(--border); }
+.guide-products ul { list-style:none; margin:12px 0 0; padding:0; }
+.guide-products li+li { border-top:1px solid #e6e8e9; }
+.guide-products a { display:flex; align-items:center; justify-content:space-between; gap:18px; min-height:48px; padding:12px 0; font-size:16px; }
+.guide-products a>span { display:flex; flex-direction:column; gap:2px; }
+.guide-products small { font-size:14px; color:#687279; }
+.guide-products a:hover>span { text-decoration:underline; text-underline-offset:4px; }
+.guide-products svg { flex-shrink:0; }
+.product-guides { margin-top:26px; display:flex; flex-wrap:wrap; align-items:center; gap:4px 26px; }
+.product-guides .eyebrow { width:100%; color:#687279; }
+.product-guides .under-link { margin-top:0; white-space:normal; gap:12px; }
+@media(max-width:760px) {
+ .catalog-selection { margin:-8px 0 28px; display:block; }
+ .catalog-formats { margin-bottom:14px; }
+ .catalog-formats>span { width:100%; margin:0 0 2px; }
+ .catalog-guides { align-items:flex-start; gap:8px; }
+ .guide-products a { font-size:15px; }
+}

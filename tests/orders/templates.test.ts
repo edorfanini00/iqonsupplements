@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { renderOrderConfirmationEmail } from "../../lib/orders/emails/order-confirmation";
-import { MORE_TO_FOLLOW_COPY, SHIPPING_TIME_COPY, renderShippingConfirmationEmail } from "../../lib/orders/emails/shipping-confirmation";
+import { DELIVERY_TIMING_COPY, MORE_TO_FOLLOW_COPY, renderShippingConfirmationEmail } from "../../lib/orders/emails/shipping-confirmation";
 import { brandConfig, maskEmail } from "../../lib/orders/emails/format";
 import { resolveLineItemImages, storefrontImageLookup } from "../../lib/orders/emails/images";
 import type { OrderSnapshot, ShipmentDetails } from "../../lib/orders/emails/types";
@@ -187,12 +187,22 @@ test("email markup is table based, 600px, Outlook and dark mode aware, and only 
   }
 });
 
+/** The owner's window, exactly as on the storefront: "3 to 5 days" once, never business days or a guarantee, and no
+ * tracking-update promise (Shopify/Shop sends those). Same in HTML and plain text. */
+const WINDOW = "Shipping usually takes 3 to 5 days.";
+function assertOwnerShippingWindow(email: { html: string; text: string }) {
+  for (const body of [visibleText(email.html), email.text]) {
+    assert.equal(body.split(WINDOW).length - 1, 1, "window stated exactly once");
+    assert.doesNotMatch(body, /business days?|guarantee|within \d+|arrives? (by|in)|latest updates/i);
+  }
+}
+
 test("shipping confirmation with tracking", async () => {
   const order = await snapshot();
   const email = renderShippingConfirmationEmail(shipment(order), BRAND);
   const visible = visibleText(email.html);
   assert.equal(email.subject, "Your IQON order #1042 is on its way");
-  for (const expected of ["Good news, Ava. Your order is on its way.", "UPS", "1Z999AA10123456784", "Track your parcel", SHIPPING_TIME_COPY, "Creatine Monohydrate", "Delivering to", "1 Market Street"])
+  for (const expected of ["Good news, Ava. Your order is on its way.", "UPS", "1Z999AA10123456784", "Track your parcel", DELIVERY_TIMING_COPY, "Creatine Monohydrate", "Delivering to", "1 Market Street"])
     assert.ok(visible.includes(expected), `missing ${expected}`);
   // Same preference as lib/orders/tracking.ts resolveTrackingUrl: universal tracker by number first.
   assert.ok(email.html.includes('href="https://parcelsapp.com/en/tracking/1Z999AA10123456784"'));
@@ -201,6 +211,12 @@ test("shipping confirmation with tracking", async () => {
   assert.ok(!visible.includes("$39.00"), "shipping email does not repeat prices");
   assert.ok(!visible.includes(MORE_TO_FOLLOW_COPY));
   assert.ok(email.text.includes("Tracking number: 1Z999AA10123456784"));
+  // HTML and plain text carry the same intro; no delivery window or speed promise in either.
+  const intro = "Your parcel has left us and is now with UPS. Shipping usually takes 3 to 5 days.";
+  assert.ok(visible.includes(intro) && email.text.includes(intro));
+  assert.equal(email.preheader, "Your parcel is with UPS. Track it any time.");
+  assert.ok(email.html.includes(email.preheader), "preheader in HTML");
+  assertOwnerShippingWindow(email);
   assertCustomerCopyClean(email.html, email.text);
 });
 
@@ -218,7 +234,34 @@ test("shipping confirmation, partial shipment, no carrier URL", async () => {
   assert.ok(visible.includes("In this shipment"));
   assert.ok(!visible.includes("NMN"));
   assert.ok(email.html.includes("https://parcelsapp.com/en/tracking/1Z999AA10123456784"));
+  const intro = "Your parcel has left us and is now on its way to you. Shipping usually takes 3 to 5 days.";
+  assert.ok(visible.includes(intro) && email.text.includes(intro));
+  assert.ok(email.text.includes(MORE_TO_FOLLOW_COPY) && email.text.includes("IN THIS SHIPMENT"));
+  assert.ok(email.text.includes("Track your parcel: https://parcelsapp.com/en/tracking/1Z999AA10123456784"));
+  assert.equal(email.preheader, "Your parcel is on its way. Track it any time.", "universal tracker link exists");
+  assert.ok(email.html.includes(email.preheader));
+  assertOwnerShippingWindow(email);
   assertCustomerCopyClean(email.html, email.text);
+});
+
+test("shipping confirmation without any tracking link still states the window and shows no tracking button", async () => {
+  const order = await snapshot();
+  const email = renderShippingConfirmationEmail(shipment(order, { trackingUrl: null, trackingNumber: null }), BRAND);
+  const visible = visibleText(email.html);
+  const intro = "Your parcel has left us and is now with UPS. Shipping usually takes 3 to 5 days.";
+  assert.ok(visible.includes(intro) && email.text.includes(intro));
+  assert.ok(!visible.includes("Track your parcel") && !email.text.includes("Track your parcel"), "no link to a missing tracker");
+  assert.ok(visible.includes("Carrier") && email.text.includes("Carrier: UPS"), "carrier still shown");
+  // No tracking link: the preheader states where the parcel is and invites no tracking.
+  assert.equal(email.preheader, "Your parcel is with UPS.");
+  assert.ok(email.html.includes(email.preheader));
+  for (const body of [email.html, email.text]) assert.ok(!/track it any time/i.test(body), "no tracking invitation without a link");
+  const bare = renderShippingConfirmationEmail(shipment(order, { trackingUrl: null, trackingNumber: null, carrier: null }), BRAND);
+  assert.equal(bare.preheader, "Your parcel is on its way.");
+  for (const body of [bare.html, bare.text]) assert.ok(!/track it any time|track your parcel/i.test(body));
+  assert.ok(visibleText(bare.html).includes("Your parcel has left us and is now on its way to you. Shipping usually takes 3 to 5 days."));
+  assertOwnerShippingWindow(bare);
+  assertOwnerShippingWindow(email);
 });
 
 test("no first name falls back to warm generic greetings", async () => {

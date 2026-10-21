@@ -90,7 +90,7 @@ Suggested bundles, subject to landed-cost review:
 
 Do not stack the full subscription discount on these bundle prices by default. Bundle recommendations are merchandising proposals, not a claim that combined products have been tested together. Start with ordinary prices, not permanent “sales” or invented crossed-out reference prices.
 
-**Shipping hypothesis:** free standard US shipping from **$75 after discounts**, with **$5.95 below $75**. This is a proposal to check against fulfillment quotes, not a configured rate or a promise that it is profitable. The website currently says 3–5 business days; obtain a fulfillment commitment that supports that statement before launch. Confirm whether the timeframe includes processing.
+**Shipping hypothesis:** free standard US shipping from **$75 after discounts**, with **$5.95 below $75**. This is a proposal to check against fulfillment quotes, not a configured rate or a promise that it is profitable. The website currently says 3–5 business days; obtain a fulfillment commitment that supports that statement before launch. Confirm whether the timeframe includes processing. *(Correction, 21 October 2026: the owner confirmed shipping usually takes 3 to 5 days (calendar days, not business days; no guarantee). The storefront help page, product pages and shipping email now say "Shipping usually takes 3 to 5 days." Checkout shows the calculated options and costs. The rate proposal above is unchanged and still unconfigured.)*
 
 ## Margin decision before publishing
 
