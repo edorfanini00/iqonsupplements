@@ -72,6 +72,7 @@ const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a =
 const H1_TEXT = {"/": "For the life you want to live.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.",
   "/approach": "The everyday deserves attention.", "/reviews": "Your experience has a place here.", "/affiliates": "Good routines. Shared together."};
 const h1s = doc => [...doc.querySelectorAll("h1")].map(h => h.textContent);
+const SHIPPING_NOTE = "Available shipping options and costs are shown at checkout. Processing and delivery can vary by product and destination.";
 const PRIVATE = ["/checkout", "/account", "/account/orders", "/affiliates", "/affiliates/login", "/api/cart", "/api/affiliates/me", "/api/account/session"];
 
 test("production, live catalog, canonical and alias hosts", async t => {
@@ -223,6 +224,70 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.ok(article.citation.length > 0 && article.citation.every(url => /^https:\/\//.test(url)));
     assert.equal(dom((await get(port, "/journal")).body).title, "Supplement & skincare guides | IQON");
   });
+  await t.test("shipping answer matches the product page, with no delivery window or policy link", async () => {
+    const helpHtml = (await get(port, "/help")).body;
+    const answer = [...dom(helpHtml).querySelectorAll("main [data-slot=accordion-item]")].find(item => /How long does shipping take/.test(item.textContent));
+    assert.ok(answer, "shipping question in server HTML");
+    assert.match(answer.textContent, new RegExp(SHIPPING_NOTE.replace(/[.]/g, "\\.")));
+    for (const url of ["/help", "/products/creatine-monohydrate", "/products/liver-support"]) {
+      const body = (await get(port, url)).body;
+      assert.ok(body.includes(SHIPPING_NOTE), `${url}: shared shipping statement`);
+      assert.doesNotMatch(body, /\d\s*[–-]\s*\d+\s*business days|ships within|free shipping/i, url);
+    }
+    // No conventional policy URL is linked until the merchant publishes one (they are 404 today).
+    for (const url of PUBLIC) assert.equal(dom((await get(port, url)).body).querySelector('a[href*="/policies/shipping"], a[href*="/policies/refund"], a[href*="/policies/terms"]'), null, url);
+  });
+  await t.test("guides link only to orderable products, and those products link back", async () => {
+    const sectionLinks = doc => Object.fromEntries([...doc.querySelectorAll(".article-body > section")].map(section =>
+      [section.querySelector("h2").textContent, [...section.querySelectorAll(".guide-products a")].map(a => a.getAttribute("href"))]));
+    const format = dom((await get(port, "/journal/finding-your-supplement-format")).body);
+    assert.deepEqual(sectionLinks(format), {
+      "Picture an ordinary day": [], "Powders make preparation part of the ritual": ["/products/creatine-monohydrate"],
+      // NMN is a sold-out capsule; the generic Daily Travel Kit has no format; Keto-5 is an editorial placeholder.
+      "Capsules keep the process compact": ["/products/liver-support"], "Sachets are easy to take along": [], "Gummies put taste and texture first": [],
+    });
+    assert.match(format.querySelector('.guide-products a[href="/products/creatine-monohydrate"]').textContent, /Creatine Monohydrate.*281 g powder/);
+    const label = dom((await get(port, "/journal/reading-a-supplement-label")).body);
+    // Colostrum and both collagens are not in this mock catalog: their links fail closed.
+    assert.deepEqual(Object.values(sectionLinks(label)).flat(), ["/products/creatine-monohydrate"]);
+    assert.match(label.querySelector(".guide-products a").textContent, /Single-ingredient, unflavored powder/);
+    assert.equal(dom((await get(port, "/journal/a-simple-skincare-routine")).body).querySelector(".guide-products"), null, "coming-soon skincare is never a purchase link");
+    for (const href of ["/products/creatine-monohydrate", "/products/liver-support"]) {
+      const r = await get(port, href);
+      assertIndexable(r, href);
+      assert.match(dom(r.body).querySelector(".add-to-bag-row button.button-dark").textContent, /^Add (subscription|to bag)/, `${href} is orderable`);
+    }
+    const guides = async url => [...dom((await get(port, url)).body).querySelectorAll(".product-guides a")].map(a => a.getAttribute("href"));
+    assert.deepEqual(await guides("/products/creatine-monohydrate"), ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format"]);
+    assert.deepEqual(await guides("/products/liver-support"), ["/journal/finding-your-supplement-format"]);
+    for (const url of ["/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"]) assert.deepEqual(await guides(url), [], url);
+  });
+  await t.test("collections separate orderable supplements from the skincare preview and link the guides", async () => {
+    const all = dom((await get(port, "/collections/all")).body);
+    assert.equal(all.querySelector(".catalog-heading p:last-child").textContent, "Supplements are available to order now. Skincare is shown as a preview and can’t be ordered yet.");
+    assert.deepEqual([...all.querySelectorAll(".catalog-departments a")].map(a => a.textContent), ["Supplements", "Skincare preview"]);
+    assert.equal(all.querySelector('meta[name="description"]').getAttribute("content"), "Shop IQON supplements and preview the skincare collection, coming soon.");
+    const supplements = dom((await get(port, "/collections/supplements")).body);
+    assert.doesNotMatch(supplements.querySelector(".catalog-heading").textContent, /\d/, "no hardcoded count");
+    assert.deepEqual([...supplements.querySelectorAll(".catalog-guides a")].map(a => [a.getAttribute("href"), a.textContent]),
+      [["/journal/finding-your-supplement-format", "Find a format that fits"], ["/journal/reading-a-supplement-label", "Read the label with confidence"]]);
+    // Only formats with an orderable product (NMN, the other capsule, is sold out; Liver Support is orderable).
+    const formats = [...supplements.querySelectorAll(".catalog-formats a")].map(a => [a.getAttribute("href"), a.textContent]);
+    assert.deepEqual(formats, [["/collections/supplements?format=powder", "Powders"], ["/collections/supplements?format=capsules", "Capsules"]]);
+    const filtered = dom((await get(port, "/collections/supplements?format=powder")).body);
+    assert.deepEqual([...filtered.querySelectorAll(".catalog-formats a[aria-current]")].map(a => a.getAttribute("href")), ["/collections/supplements"]);
+    assert.equal(dom((await get(port, "/collections/skincare")).body).querySelector(".catalog-selection"), null);
+    // Every new buyer-path link resolves: format filters canonicalize to the clean collection.
+    const hrefs = new Set();
+    for (const url of ["/collections/supplements", "/journal/finding-your-supplement-format", "/journal/reading-a-supplement-label", "/products/creatine-monohydrate"])
+      for (const a of dom((await get(port, url)).body).querySelectorAll(".catalog-selection a, .guide-products a, .product-guides a")) hrefs.add(a.getAttribute("href"));
+    assert.ok(hrefs.size >= 6, [...hrefs].join(","));
+    for (const href of hrefs) {
+      const r = await get(port, href);
+      assert.equal(r.status, 200, href);
+      assert.equal(canonical(r.body), `https://${WWW}${href.split("?")[0]}`, href);
+    }
+  });
   await t.test("headings with a visual <br> keep a word space in the server HTML", async () => {
     for (const [url, h1] of Object.entries(H1_TEXT)) assert.deepEqual(h1s(dom((await get(port, url)).body)), [h1], url);
     assert.equal(dom((await get(port, "/journal")).body).querySelector(".journal-heading h1 + p").textContent,
@@ -258,6 +323,8 @@ test("production, Shopify outage: shopping pages fail closed, static pages stay 
   assertNoindex(await get(server.port, "/products/not-a-product"), "unknown slug during outage");
   assert.equal(jsonLd(product.body).length, 0);
   for (const url of ["/approach", "/journal", "/journal/reading-a-supplement-label"]) assertIndexable(await get(server.port, url), url);
+  // Guides stay indexable but offer no product as a next purchase step while Shopify is down.
+  for (const url of ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format"]) assert.equal(dom((await get(server.port, url)).body).querySelector(".guide-products"), null, url);
   const urls = locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname);
   assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal")), urls.join(","));
 });
@@ -269,6 +336,10 @@ test("production without Shopify configuration: preview fixtures are never index
   // Preview-fixture homepage modes render the same hero headings.
   for (const url of ["/", "/skincare"]) assert.deepEqual(h1s(dom((await get(server.port, url)).body)), [H1_TEXT[url]], url);
   assert.ok(!(await get(server.port, "/sitemap.xml")).body.includes("/products/"));
+  // Preview fixtures are never linked as orderable, and the preview help answer makes no delivery promise.
+  for (const url of ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format", "/collections/supplements"])
+    assert.equal(dom((await get(server.port, url)).body).querySelector(".guide-products, .catalog-formats"), null, url);
+  assert.doesNotMatch((await get(server.port, "/help")).body, /business days/);
 });
 
 test("preview deployment: nothing is indexable and robots.txt blocks crawling", async t => {

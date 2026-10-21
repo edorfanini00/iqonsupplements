@@ -1,5 +1,6 @@
 // Rendered layout regressions for the public storefront: no horizontal page overflow on narrow
-// phones, readable footer links, and hydrated H1 text that keeps a word space at each <br>.
+// phones, readable footer links, hydrated H1 text that keeps a word space at each <br>, and the
+// guide → product → bag → checkout handoff (the synthetic checkout URL is aborted: no order exists).
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
 // catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
@@ -32,7 +33,7 @@ const VIEWPORTS = [
   {name: "390", viewport: {width: 390, height: 844}, deviceScaleFactor: 2, isMobile: true, hasTouch: true},
   {name: "1440", viewport: {width: 1440, height: 900}},
 ];
-const ROUTES = ["/", "/skincare", "/help", "/products/creatine-monohydrate", "/products/daily-travel-kit"];
+const ROUTES = ["/", "/skincare", "/help", "/collections/all", "/collections/supplements", "/journal/finding-your-supplement-format", "/journal/reading-a-supplement-label", "/products/creatine-monohydrate", "/products/daily-travel-kit"];
 const H1_TEXT = {"/": "For the life you want to live.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.", "/approach": "The everyday deserves attention."};
 
 try {await fetch(`${base}/`); throw new Error(`port ${port} is already in use; stop the other server first`);} catch (error) {if (error.message.includes("already in use")) throw error;}
@@ -107,5 +108,45 @@ for (const device of VIEWPORTS) {
       assert.ok(lines >= 2, `${url}: H1 lost its line break`);
       await close();
     }
+  });
+
+  test(`${device.name}px: hydrated guide and collection links match the server HTML`, async () => {
+    for (const [url, selector] of [["/journal/finding-your-supplement-format", ".guide-products a"], ["/collections/supplements", ".catalog-selection a"], ["/products/creatine-monohydrate", ".product-guides a"]]) {
+      const raw = await (await fetch(base + url)).text();
+      const serverLinks = [...raw.matchAll(/<a[^>]+href="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, "&"));
+      const {page, close} = await open(device, url);
+      const links = await page.$$eval(selector, as => as.map(a => ({href: a.getAttribute("href"), visible: a.getBoundingClientRect().width > 0 && getComputedStyle(a).visibility !== "hidden"})));
+      await close();
+      assert.ok(links.length >= 2, `${url}: ${JSON.stringify(links)}`);
+      for (const link of links) {
+        assert.ok(link.visible, `${url}: ${link.href} hidden`);
+        assert.ok(serverLinks.includes(link.href), `${url}: ${link.href} missing from server HTML`);
+      }
+    }
+  });
+
+  test(`${device.name}px: guide → live product → one-time purchase → checkout handoff`, async () => {
+    const {page, close} = await open(device, "/journal/finding-your-supplement-format");
+    const link = page.locator('.guide-products a[href="/products/creatine-monohydrate"]');
+    await link.scrollIntoViewIfNeeded();
+    await page.screenshot({path: path.join(shots, `${device.name}_guide_product_links.png`)});
+    await link.click();
+    await page.waitForURL(`${base}/products/creatine-monohydrate`);
+    await page.waitForFunction(() => Object.keys(document.querySelector("main") || {}).some(k => k.startsWith("__reactFiber")));
+    await page.locator(".purchase-option", {hasText: "One time purchase"}).click();
+    const add = page.locator(".add-to-bag-row button.button-dark");
+    await add.scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => !document.querySelector(".add-to-bag-row button.button-dark")?.disabled);
+    assert.match(await add.textContent(), /^Add to bag\s*\$39/);
+    const [cartRequest] = await Promise.all([page.waitForRequest(r => r.url().endsWith("/api/cart") && r.method() === "POST"), add.click()]);
+    const body = JSON.parse(cartRequest.postData());
+    assert.deepEqual([body.action, body.id, body.purchase, body.sellingPlanId], ["add", "creatine-monohydrate", "once", undefined], "one-time line, no selling plan");
+    const checkout = page.locator(".bag-sheet button", {hasText: "Secure checkout"});
+    await page.waitForFunction(() => !!document.querySelector(".bag-sheet") && /\$39/.test(document.querySelector(".bag-sheet").textContent));
+    await page.waitForFunction(() => [...document.querySelectorAll(".bag-sheet button")].some(b => /Secure checkout/.test(b.textContent) && !b.disabled));
+    await page.screenshot({path: path.join(shots, `${device.name}_bag_before_checkout.png`)});
+    const [handoff] = await Promise.all([page.waitForRequest(r => r.url().startsWith("https://iqon-test.myshopify.com/cart/c/")), checkout.click()]);
+    assert.match(handoff.url(), /^https:\/\/iqon-test\.myshopify\.com\/cart\/c\/synthetic-\d+\?key=synthetic$/);
+    await close();
   });
 }
