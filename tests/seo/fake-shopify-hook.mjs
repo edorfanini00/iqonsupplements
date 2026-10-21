@@ -18,6 +18,8 @@ const catalog = [
   product("liver-support", "Liver Support", "iqon-supplements", variant(4, "45.00", true, [monthly("38.25", "45.00")]), {requiresSellingPlan: true}),
   product("nmn", "NMN </script><script>alert(1)</script>", "iqon-supplements", variant(2, "59.50", false)),
   product("anti-aging-cleanser-with-peptides", "Anti-Aging Cleanser", "iqon-skincare", variant(3, "48.00")),
+  // A tagged Shopify product with no editorial productContent: rendered by the generic PDP.
+  product("daily-travel-kit", "Daily Travel Kit", "iqon-supplements", variant(8, "25.00")),
   // Handles that next.config permanently redirects: never sitemap entries.
   product("gentle-cleanser", "Gentle Cleanser", "iqon-skincare", variant(5, "30.00")),
   product("peptide-serum", "Peptide Serum", "iqon-skincare", variant(6, "60.00")),

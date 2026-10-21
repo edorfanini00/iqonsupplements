@@ -184,3 +184,14 @@ html{scrollbar-gutter:stable}
 @media(max-width:760px){.product-card-meta>button{min-width:44px;min-height:44px}}
 
 @media(min-width:761px) and (max-width:1050px){.pdp-section-nav{overflow-x:auto;justify-content:flex-start!important;padding-left:32px;padding-right:32px;gap:25px!important}}
+
+/* Support contact on /help. */
+.help-contact{margin-top:32px;font-style:normal;font-size:15px;line-height:1.8;color:#4f5b61}
+.help-contact a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+/* Below ~380px the wordmark and tagline no longer fit side by side: wrap the tagline instead of widening the page. */
+@media(max-width:380px){.footer-main>.footer-brand{flex-wrap:wrap;gap:18px}}
+/* Generic PDP band: the 1920px-wide image must not size the single mobile column. */
+@media(max-width:760px){.pdp-editorial{grid-template-columns:minmax(0,1fr)}.pdp-editorial>img{width:100%}}
+/* 320px PDP: the sticky "Add subscription $00.00" bar was ~13px too wide. Tighten the button and let the product name side shrink instead of widening the page. */
+@media(max-width:380px){.product-page .sticky-purchase>div{min-width:0;overflow:hidden}.product-page .sticky-purchase>.button{padding-inline:10px;gap:8px}}
+@media(max-width:370px){.product-page .sticky-purchase img{display:none}}

@@ -56,7 +56,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   return <div className="product-experience product-story-v4">
     <nav className="pdp-section-nav" aria-label="Product information">
       <a href="#product-benefits">Benefits</a><a href="#product-formula">Ingredients</a>
-      <a href="#product-routine">How to use</a>{research && <a href="#ingredient-science">Research</a>}
+      {content.routine && <a href="#product-routine">How to use</a>}{research && <a href="#ingredient-science">Research</a>}
       {comparison.length > 1 && <a href="#compare">Compare</a>}<a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a>
     </nav>
     <section id="product-benefits" className="story-overview pdp-section" aria-labelledby="benefits-heading">

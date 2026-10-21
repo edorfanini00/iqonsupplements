@@ -11,6 +11,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { JSDOM } from "jsdom";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const WWW = "www.iqondaily.com";
@@ -62,7 +63,10 @@ function assertNoindex(r, url, {status = 200} = {}) {
   const meta = robotsMeta(r.body) || "";
   assert.ok(/noindex/.test(meta) || /noindex/.test(r.headers["x-robots-tag"] || ""), `${url} must be noindex (meta=${meta}, header=${r.headers["x-robots-tag"]})`);
 }
-const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides"];
+const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"];
+const dom = html => new JSDOM(html).window.document;
+/** In-page links whose target id is not in the server-rendered document. */
+const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute("href")).filter(h => h.length > 1 && !doc.getElementById(decodeURIComponent(h.slice(1))));
 const PRIVATE = ["/checkout", "/account", "/account/orders", "/affiliates", "/affiliates/login", "/api/cart", "/api/affiliates/me", "/api/account/session"];
 
 test("production, live catalog, canonical and alias hosts", async t => {
@@ -115,7 +119,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
     for (const page of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/approach", "/journal", "/journal/reading-a-supplement-label"])
       assert.ok(urls.includes(`https://${WWW}${page === "/" ? "/" : page}`), page);
     assert.deepEqual(urls.filter(u => u.includes("/products/")).map(u => new URL(u).pathname).sort(),
-      ["/products/anti-aging-cleanser-with-peptides", "/products/creatine-monohydrate", "/products/liver-support", "/products/nmn"]);
+      ["/products/anti-aging-cleanser-with-peptides", "/products/creatine-monohydrate", "/products/daily-travel-kit", "/products/liver-support", "/products/nmn"]);
     for (const handle of ["gentle-cleanser", "peptide-serum", "barrier-cream"]) {
       assert.equal((await get(port, `/products/${handle}`)).status, 308, `${handle} redirects`);
       assert.ok(!urls.some(u => u.endsWith(`/products/${handle}`)), `${handle} not in sitemap`);
@@ -160,8 +164,44 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.equal(article["@type"], "Article");
     assert.equal(article.headline, "Read the label with confidence.");
     assert.ok(!("datePublished" in article));
-    const home = jsonLd((await get(port, "/")).body).map(x => x["@type"]);
-    assert.deepEqual(home, ["Organization", "WebSite"]);
+    const home = jsonLd((await get(port, "/")).body);
+    assert.deepEqual(home.map(x => x["@type"]), ["Organization", "WebSite"]);
+    assert.deepEqual(home[0].contactPoint, {"@type": "ContactPoint", contactType: "customer support", email: "info@iqonhealth.com"});
+  });
+  await t.test("support inbox is a visible mailto link on /help and in every footer", async () => {
+    const help = dom((await get(port, "/help")).body);
+    const contact = help.querySelector("main address.help-contact a[href='mailto:info@iqonhealth.com']");
+    assert.equal(contact?.textContent, "info@iqonhealth.com", "address visible on /help, outside the collapsed answers");
+    assert.equal(contact.closest("[data-slot=accordion-content]"), null);
+    for (const url of PUBLIC) {
+      const links = [...dom((await get(port, url)).body).querySelectorAll("footer.store-footer a[href^='mailto:']")];
+      assert.deepEqual(links.map(a => [a.getAttribute("href"), a.textContent]), [["mailto:info@iqonhealth.com", "Contact us"]], url);
+    }
+    assert.doesNotMatch((await get(port, "/help")).body, /tel:|within \d+ (hours|business days) of your email/i, "no phone or response-time promise");
+  });
+  await t.test("PDP section links point at sections that exist", async () => {
+    // Generic Shopify product (no editorial productContent): no ingredient/routine jump links at all.
+    const generic = dom((await get(port, "/products/daily-travel-kit")).body);
+    assert.equal(generic.querySelector("h1")?.textContent, "Daily Travel Kit");
+    assert.equal(generic.querySelector(".product-jump-links"), null);
+    assert.equal(generic.querySelector('a[href="#product-formula"], a[href="#product-routine"]'), null);
+    assert.ok(generic.querySelector(".add-to-bag-row button"), "purchase path still rendered");
+    // Editorial products keep their working links.
+    for (const url of ["/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides"]) {
+      const doc = dom((await get(port, url)).body);
+      assert.deepEqual([...doc.querySelectorAll(".product-jump-links a")].map(a => a.getAttribute("href")), ["#product-formula", "#product-routine"], url);
+      assert.ok(doc.getElementById("product-formula") && doc.getElementById("product-routine"), url);
+    }
+    for (const url of PUBLIC) assert.deepEqual(brokenHashLinks(dom((await get(port, url)).body)), [], url);
+  });
+  await t.test("journal guides are titled as IQON Journal; H1 and citations unchanged", async () => {
+    const doc = dom((await get(port, "/journal/reading-a-supplement-label")).body);
+    assert.equal(doc.title, "Read the label with confidence | IQON Journal");
+    assert.equal(doc.querySelector('meta[property="og:title"]').getAttribute("content"), doc.title);
+    assert.deepEqual([...doc.querySelectorAll("h1")].map(h => h.textContent), ["Read the label with confidence."]);
+    const article = jsonLd(doc.documentElement.outerHTML)[0];
+    assert.ok(article.citation.length > 0 && article.citation.every(url => /^https:\/\//.test(url)));
+    assert.equal(dom((await get(port, "/journal")).body).title, "Supplement & skincare guides | IQON");
   });
   await t.test("browsers get the same head metadata as crawlers", async () => {
     const r = await get(port, "/products/creatine-monohydrate", WWW, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36");
