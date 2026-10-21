@@ -7,7 +7,11 @@ import type { Product, Category } from "@/lib/catalog";
 import type { CustomerReview } from "@/lib/reviews";
 import { sampleReviewCards } from "@/lib/skincare-design-preview";
 import { supplementReviewCards } from "@/lib/review-design-preview";
+import { localSrcSet } from "@/lib/responsive-images";
 import "./community-reviews.css";
+
+// Mobile figures are 68vw by 330px, so narrow phones crop the 4:5 photograph by height (266px wide).
+const INTRO_SIZES = "(max-width:391px) 266px, (max-width:760px) 68vw, 30vw";
 
 function ReviewStars({rating,sample=false}:{rating:number;sample?:boolean}) {
   return <span className="skin-review-stars" aria-label={sample?'Sample star treatment, not a customer rating':`${rating} out of 5 stars`}>{[1,2,3,4,5].map(n=><span className="skin-review-star" key={n}><Star size={14}/><span style={{width:`${Math.max(0,Math.min(1,rating-n+1))*100}%`}}><Star size={14} fill="currentColor"/></span></span>)}</span>;
@@ -60,9 +64,9 @@ export function CommunityReviews({reviews,products,designPreview=false,category=
       </div>
       <div className="skin-review-controls"><Link className="button button-outline" href={reviewHref}>Read all reviews</Link></div>
     </>:<div className="skin-community-intro" tabIndex={0} role="region" aria-label={`IQON ${category} brand stories`}>
-      <figure><img src={introImages[0].src} alt={introImages[0].alt} width={1086} height={1448} loading="lazy"/><figcaption>The daily ritual</figcaption></figure>
+      <figure><img src={introImages[0].src} srcSet={localSrcSet(introImages[0].src)} sizes={INTRO_SIZES} alt={introImages[0].alt} width={1086} height={1448} loading="lazy"/><figcaption>The daily ritual</figcaption></figure>
       <div className="skin-community-note"><p className="eyebrow">CUSTOMER REVIEWS</p><h3>{skin?"Every skin.":"Every routine."}<br/>A story to tell.</h3><p>Customer reviews will appear here after launch.</p><Link className="under-link" href={reviewHref}>Visit customer reviews<ArrowUpRight size={15}/></Link></div>
-      <figure><img src={introImages[1].src} alt={introImages[1].alt} width={1086} height={1448} loading="lazy"/><figcaption>The everyday essentials</figcaption></figure>
+      <figure><img src={introImages[1].src} srcSet={localSrcSet(introImages[1].src)} sizes={INTRO_SIZES} alt={introImages[1].alt} width={1086} height={1448} loading="lazy"/><figcaption>The everyday essentials</figcaption></figure>
     </div>}
   </section>;
 }

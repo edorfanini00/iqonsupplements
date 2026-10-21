@@ -14,13 +14,14 @@ import { DEFAULT_SUPPORT_EMAIL } from "@/lib/orders/emails/format";
 import { StorefrontMetaPixel } from "./meta-pixel";
 import { trackCartAddition } from "@/lib/meta-pixel";
 import type { CartSnapshot } from "@/lib/shopify";
+import { shopifySrcSet } from "@/lib/responsive-images";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 const StoreContext = createContext<StoreContextType | null>(null);
 export function useStore() {const value=useContext(StoreContext); if(!value) throw new Error("Store context missing"); return value;}
-// Use the supplied label artwork verbatim for the black header wordmark.
+// Use the supplied label artwork verbatim for the black header wordmark (lossless WebP of the PNG, pixel-identical).
 // The viewBox trims transparent padding; the white footer retains its existing artwork.
-export function Wordmark({large=false}:{large?:boolean}) {return <svg className={`wordmark wordmark-artwork ${large?"wordmark-large":""}`} viewBox={large?"172 64 265 97":"44 46 363 132"} role="img" aria-label="IQON" focusable="false"><image href={large?"/images/brand/iqon-logo.png":"/images/brand/iqon-logo-label-original.png"} width={large?600:450} height="225"/></svg>;}
+export function Wordmark({large=false}:{large?:boolean}) {return <svg className={`wordmark wordmark-artwork ${large?"wordmark-large":""}`} viewBox={large?"172 64 265 97":"44 46 363 132"} role="img" aria-label="IQON" focusable="false"><image href={large?"/images/brand/iqon-logo.webp":"/images/brand/iqon-logo-label-original.webp"} width={large?600:450} height="225"/></svg>;}
 
 export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreCatalog}) {
   const {products,mode}=catalog; const router=useRouter(); const findProduct=(id:string)=>products.find(p=>p.id===id);
@@ -146,11 +147,11 @@ export function Quantity({value,setValue,min=1,label="product",disabled=false}:{
 export function ProductCard({product:p,compact=false}:{product:Product;compact?:boolean}) {
  const {add,busy,ready}=useStore();
  return <article className={`product-card ${p.category==="supplements"?"supplied-product":"skincare-product"} ${compact?"compact-card":""}`}>
-  <Link className="product-visual" href={`/products/${p.id}`}><img src={p.image} alt={`IQON ${p.name}`} loading="lazy" width={1122} height={1402}/></Link>
+  <Link className="product-visual" href={`/products/${p.id}`}><img src={p.image} srcSet={shopifySrcSet(p.image)} sizes="(max-width:760px) 70vw, 30vw" alt={`IQON ${p.name}`} loading="lazy" width={1122} height={1402}/></Link>
   <div className="product-card-title"><Link href={`/products/${p.id}`}><h3>{p.name}</h3></Link></div>
   <p>{p.descriptor}</p>
   <div className="product-card-info"><span className={isComingSoon(p)||p.pricePending?"price-pending":""}>{productPrice(p)}</span><span>{p.size}</span></div>
-  {isComingSoon(p)||p.pricePending||p.available===false||p.requiresSellingPlan?<Link className="button button-dark product-card-action" aria-label={`View ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add ${p.name} to bag`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
+  {isComingSoon(p)||p.pricePending||p.available===false||p.requiresSellingPlan?<Link className="button button-dark product-card-action" aria-label={`View product: ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add to bag: ${p.name}`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
  </article>;
 }
 function Footer(){const {mode,currency,department}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><a href={`mailto:${DEFAULT_SUPPORT_EMAIL}`}>Contact us</a><Link href="/account/privacy" prefetch={false}>Privacy</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}

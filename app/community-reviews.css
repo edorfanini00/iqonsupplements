@@ -32,11 +32,11 @@
 .skin-community-intro { display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:20px; padding:0 var(--space-gutter); align-items:stretch; }
 .skin-community-intro figure { margin:0; min-width:0; }
 .skin-community-intro figure>img { width:100%; aspect-ratio:4/4.5; object-fit:cover; border-radius:8px; }
-.skin-community-intro figcaption { text-align:center; font-size:11px; color:#758087; margin-top:13px; }
+.skin-community-intro figcaption { text-align:center; font-size:11px; color:#5f696e; margin-top:13px; }
 .skin-community-note { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:#eef1ee; border-radius:8px; padding:35px 24px; margin-bottom:28px; }
-.skin-community-note .eyebrow { font-size:11px; margin-bottom:28px; color:#647178; }
+.skin-community-note .eyebrow { font-size:11px; margin-bottom:28px; color:#5f696e; }
 .skin-community-note h3 { font-family:var(--serif); font-size:clamp(28px,2.8vw,42px); letter-spacing:-.045em; line-height:1.1; font-weight:400; }
-.skin-community-note>p:not(.eyebrow) { font-size:13px; line-height:1.7; color:#637078; margin:24px 0; }
+.skin-community-note>p:not(.eyebrow) { font-size:13px; line-height:1.7; color:#5f696e; margin:24px 0; }
 .skin-community-note .under-link { font-size:12px; gap:15px; }
 .supplement-community .skin-review-card.skin-review-with-media { flex-basis:277px; }
 @media(max-width:760px) {

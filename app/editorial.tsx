@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { journalArticles } from "@/lib/journal";
+import { localSrcSet } from "@/lib/responsive-images";
 
 export function HumanStory({skincare=false,compact=false,movement=false,imageSrc,imageAlt}:{skincare?:boolean;compact?:boolean;movement?:boolean;imageSrc?:string;imageAlt?:string}) {
   return <section className={`human-story ${skincare?"human-story-skin":""} ${compact?"human-story-compact":""}`}>
@@ -19,7 +20,8 @@ export function JournalPreview({skincare=false}:{skincare?:boolean}) {
   "reading-a-supplement-label":{image:"/images/skincare/editorial/news-reading-labels-iqon-v11.webp",imageAlt:"IQON Hydra C + Ferulic Serum and cosmetic pads on a silver desk"},
  };
  const articles=skincare?[...journalArticles].map(a=>({...a,...skincareImages[a.slug]})).sort((a,b)=>Number(b.slug==="a-simple-skincare-routine")-Number(a.slug==="a-simple-skincare-routine")):journalArticles;
- return <section className="journal-preview section-pad"><div className="section-heading"><div><p className="eyebrow">LATEST NEWS</p><h2>A little more understanding.</h2></div><Link className="under-link" href="/journal">All stories<ArrowUpRight size={16}/></Link></div><div className="journal-grid">{articles.map(a=><Link className="journal-card" key={a.slug} href={`/journal/${a.slug}`}><div><img src={a.image} alt={a.imageAlt} width={900} height={675} loading="lazy"/></div><p className="eyebrow">{a.category} <span>{a.readTime}</span></p><h3>{a.title}<ArrowUpRight size={21}/></h3><p>{a.dek}</p></Link>)}</div></section>;
+ // Each 4:3 frame crops a 3:2 photograph by height, so it needs 1.125x the card width.
+ return <section className="journal-preview section-pad"><div className="section-heading"><div><p className="eyebrow">LATEST NEWS</p><h2>A little more understanding.</h2></div><Link className="under-link" href="/journal">All stories<ArrowUpRight size={16}/></Link></div><div className="journal-grid">{articles.map(a=><Link className="journal-card" key={a.slug} href={`/journal/${a.slug}`}><div><img src={a.image} srcSet={localSrcSet(a.image)} sizes="(max-width:760px) 88vw, 33vw" alt={a.imageAlt} width={900} height={675} loading="lazy"/></div><p className="eyebrow">{a.category} <span>{a.readTime}</span></p><h3>{a.title}<ArrowUpRight size={21}/></h3><p>{a.dek}</p></Link>)}</div></section>;
 }
 
 /** One continuous photograph, with copy positioned inside its natural negative space. */
@@ -32,7 +34,7 @@ export function SkincareCampaign({crosslink=false}:{crosslink?:boolean}) {
 
 export function SupplementCampaign() {
  return <section className="product-campaign product-campaign-supplements">
-  <picture><source media="(max-width:760px)" srcSet="/images/editorial/supplement-campaign-mobile-v12.webp"/><img src="/images/editorial/supplement-campaign-desktop-v12.webp" alt="IQON GLP-1 Support and Creatine Monohydrate on a cool silver-blue surface with directional studio light" width={2172} height={724} loading="lazy"/></picture>
+  <picture><source media="(max-width:760px)" srcSet={localSrcSet("/images/editorial/supplement-campaign-mobile-v12.webp")} sizes="calc(100vw - 24px)"/><img src="/images/editorial/supplement-campaign-desktop-v12.webp" alt="IQON GLP-1 Support and Creatine Monohydrate on a cool silver-blue surface with directional studio light" width={2172} height={724} loading="lazy"/></picture>
   <div className="product-campaign-copy"><p className="eyebrow">THE SUPPLEMENT COLLECTION</p><h2>A few essentials.<br/><span>A moment for you.</span></h2><Link className="button button-light" href="/collections/supplements">Explore supplements<ArrowUpRight size={16}/></Link></div>
  </section>;
 }

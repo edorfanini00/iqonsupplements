@@ -1,6 +1,10 @@
 // Rendered layout regressions for the public storefront: no horizontal page overflow on narrow
-// phones, readable footer links, hydrated H1 text that keeps a word space at each <br>, and the
-// guide → product → bag → checkout handoff (the synthetic checkout URL is aborted: no order exists).
+// phones, readable footer links and homepage muted text, hydrated H1 text that keeps a word space
+// at each <br>, the guide → product → bag → checkout handoff (the synthetic checkout URL is
+// aborted: no order exists), and homepage photographs whose srcset choice still covers each frame
+// at the screen's density (the eager, high-priority LCP hero included), and expanded Help and product
+// accordion answers (including the approved shipping copy) and corrected Help / supplement product
+// muted text at WCAG AA contrast.
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
 // catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
@@ -168,3 +172,154 @@ for (const device of VIEWPORTS) {
     }
   });
 }
+
+const LOW_CONTRAST_TEXT = [".department-switch a:not(.is-active)", ".skin-community-intro figcaption", ".skin-community-note .eyebrow", ".skin-community-note>p:not(.eyebrow)"];
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: homepage muted text meets WCAG AA 4.5:1`, async () => {
+    const {page, close} = await open(device, "/");
+    // Each visible element's text color against the nearest painted background behind it.
+    const items = await page.evaluate(selectors => selectors.flatMap(s => [...document.querySelectorAll(s)].filter(e => e.getClientRects().length).map(e => {
+      let background = "rgb(255, 255, 255)";
+      for (let a = e; a; a = a.parentElement) {const c = getComputedStyle(a).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+      return {s, text: e.textContent.trim(), color: getComputedStyle(e).color, background};
+    })), LOW_CONTRAST_TEXT);
+    for (const s of LOW_CONTRAST_TEXT) assert.ok(items.some(i => i.s === s), `${s} is not rendered`);
+    for (const i of items) assert.ok(contrast(i.color, i.background) >= 4.5, `${i.s} "${i.text}": ${i.color} on ${i.background} = ${contrast(i.color, i.background).toFixed(2)}:1`);
+    await close();
+  });
+
+  test(`${device.name}px: homepage photographs are right-sized without losing resolution`, async () => {
+    const {page, close} = await open(device, "/");
+    // Load every lazy image, then compare each chosen file's real pixels with what the frame needs.
+    await page.evaluate(() => document.querySelectorAll("img[loading=lazy]").forEach(img => {img.loading = "eager";}));
+    await page.waitForFunction(() => [...document.images].filter(i => i.currentSrc.startsWith(location.origin) && i.getClientRects().length).every(i => i.complete));
+    const images = await page.evaluate(async () => Promise.all([...document.images].filter(i => i.currentSrc.startsWith(location.origin) && i.getClientRects().length && i.closest("main")).map(async img => {
+      const file = new Image(); file.src = img.currentSrc; await file.decode();
+      const box = img.getBoundingClientRect();
+      const candidates = (img.parentElement.tagName === "PICTURE" && [...img.parentElement.querySelectorAll("source")].find(s => matchMedia(s.media).matches)?.srcset || img.srcset || "")
+        .split(",").map(c => c.trim().split(/\s+/)).filter(c => c[0]).map(([url, w]) => ({url: new URL(url, location.href).href, w: parseInt(w)}));
+      // object-fit: cover scales the file until it fills both box dimensions.
+      const cssPxPerFilePx = Math.max(box.width / file.naturalWidth, box.height / file.naturalHeight);
+      return {src: img.currentSrc.replace(location.origin, ""), lcp: img.closest(".campaign-hero") !== null, loading: img.getAttribute("loading"), fetchPriority: img.getAttribute("fetchpriority"),
+        density: 1 / cssPxPerFilePx, largest: !candidates.length || img.currentSrc === candidates.reduce((a, b) => b.w > a.w ? b : a).url,
+        candidates};
+    })));
+    const dpr = device.deviceScaleFactor || 1;
+    const hero = images.find(i => i.lcp && !i.src.includes("cdn.shopify"));
+    assert.ok(hero, "hero photograph missing");
+    assert.equal(hero.loading, null, "LCP hero must not be lazy-loaded");
+    assert.equal(hero.fetchPriority, "high");
+    for (const i of images) {
+      // A smaller file may be chosen only when it still covers the frame at this screen density.
+      if (!i.largest) assert.ok(i.density >= dpr * 0.98, `${i.src}: ${i.density.toFixed(2)} file px per CSS px < DPR ${dpr}`);
+      for (const c of i.candidates) {
+        const width = Number(c.url.match(/-(\d+)w\.webp$/)?.[1] ?? NaN);
+        if (!Number.isNaN(width)) assert.equal(width, c.w, `${c.url}: srcset descriptor ${c.w}w`);
+      }
+    }
+    if (device.isMobile) assert.match(hero.src, /iqon-coastal-mobile-v32-750w\.webp$/, "phones receive the 750px mobile hero");
+    await close();
+  });
+}
+
+const SHIPPING_ANSWER = "Shipping usually takes 3 to 5 days. Available shipping options and costs are shown at checkout.";
+const WHITE = "rgb(255, 255, 255)";
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: expanded Help and product accordion answers meet WCAG AA 4.5:1`, async () => {
+    for (const [url, accordion, shippingQuestion] of [["/help", ".help-wrap", "How long does shipping take?"], ["/products/creatine-monohydrate", ".product-accordion", "Shipping"]]) {
+      const {page, close} = await open(device, url);
+      const triggers = page.locator(`${accordion} [data-slot='accordion-trigger']`);
+      const count = await triggers.count();
+      assert.ok(count >= 3, `${url}: ${count} accordion items`);
+      const answers = [];
+      for (let i = 0; i < count; i++) {
+        const trigger = triggers.nth(i);
+        if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click();
+        // Each settled answer's text color against the nearest painted background (and plain white).
+        answers.push(await trigger.evaluate(async t => {
+          const content = t.closest("[data-slot='accordion-item']").querySelector("[data-slot='accordion-content']");
+          await new Promise(resolve => setTimeout(resolve, 400));
+          const text = [...content.querySelectorAll("*")].find(e => [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) || content;
+          let background = "rgb(255, 255, 255)";
+          for (let a = text; a; a = a.parentElement) {const c = getComputedStyle(a).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+          return {question: t.textContent.trim(), answer: content.textContent.trim(), height: content.getBoundingClientRect().height, color: getComputedStyle(text).color, background};
+        }));
+      }
+      const shipping = answers.find(a => a.question === shippingQuestion);
+      assert.ok(shipping?.answer.startsWith(SHIPPING_ANSWER), `${url}: shipping answer ${JSON.stringify(shipping)}`);
+      if (shipping) {
+        // Single-open accordions close Shipping while later answers are checked: reopen it for the capture.
+        const trigger = triggers.filter({hasText: shippingQuestion}).first();
+        if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click();
+        assert.equal(await trigger.getAttribute("aria-expanded"), "true", `${url}: Shipping answer is not open for the screenshot`);
+        const panel = trigger.locator("xpath=ancestor::*[@data-slot='accordion-item'][1]//*[@data-slot='accordion-content']");
+        await page.waitForFunction(el => el.getBoundingClientRect().height > 0, await panel.elementHandle());
+        assert.match(await panel.innerText(), /^Shipping usually takes 3 to 5 days\./);
+        await panel.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(400);
+        await page.screenshot({path: path.join(shots, `${device.name}_${url === "/help" ? "help" : "pdp"}_shipping_answer.png`)});
+      }
+      await close();
+      for (const a of answers) {
+        assert.ok(a.height > 0, `${url} "${a.question}": answer did not expand`);
+        for (const background of [a.background, WHITE]) assert.ok(contrast(a.color, background) >= 4.5, `${url} "${a.question}": ${a.color} on ${background} = ${contrast(a.color, background).toFixed(2)}:1`);
+      }
+    }
+  });
+}
+
+// Muted text corrected to WCAG AA on Help and orderable supplement product pages (flat painted panels only;
+// text over photography is excluded). Each selector must render at some width; every visible match must pass.
+const CORRECTED_TEXT = {
+  "/help": [".help-wrap .eyebrow", ".help-wrap>div>p:last-child"],
+  "/products/creatine-monohydrate": [".purchase-option small", ".sticky-purchase small", ".fact-kicker", ".fact-art-note", ".fact-art-value>span", ".section-heading .eyebrow",
+    ".supplement-pdp-story>.pdp-disclaimer", ".supplement-pdp-story .skin-kicker", ".supplement-pdp-story .skin-timing-label", ".supplement-pdp-story .skin-application-photo figcaption>span",
+    ".supplement-pdp-story .skin-step-top>span", ".supplement-pdp-story .supp-research-scope", ".supplement-pdp-story .skin-compare-table tr>th:first-child:not(:has(.sr-only))",
+    ".supplement-pdp-story .skin-compare-product p>span", ".supplement-pdp-story .skin-compare-table td"],
+  "/products/liver-support": [".supplement-pdp-story .skin-explore-hint", ".supplement-pdp-story .supp-fact-strip dt", ".supplement-pdp-story .supp-fact-strip dd>span",
+    ".supplement-pdp-story .skin-ingredient-summary", ".supplement-pdp-story .skin-ingredient-tags>span"],
+};
+const correctedSeen = new Set();
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: corrected Help and supplement product text meets WCAG AA 4.5:1`, async () => {
+    for (const [url, selectors] of Object.entries(CORRECTED_TEXT)) {
+      const {page, close} = await open(device, url);
+      // Scroll through so scroll-revealed elements (sticky purchase bar) are laid out.
+      await page.evaluate(async () => {for (let y = 0; y < document.body.scrollHeight; y += 600) {scrollTo(0, y); await new Promise(r => setTimeout(r, 50));}});
+      const items = await page.evaluate(selectors => selectors.flatMap(s => [...document.querySelectorAll(s)]
+        .filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== "hidden" && e.textContent.trim()).map(e => {
+          let background = "rgb(255, 255, 255)";
+          for (let a = e; a; a = a.parentElement) {const c = getComputedStyle(a).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+          return {s, text: e.textContent.trim().slice(0, 40), color: getComputedStyle(e).color, background};
+        })), selectors);
+      await close();
+      for (const i of items) {
+        correctedSeen.add(`${url} ${i.s}`);
+        assert.ok(contrast(i.color, i.background) >= 4.5, `${url} ${i.s} "${i.text}": ${i.color} on ${i.background} = ${contrast(i.color, i.background).toFixed(2)}:1`);
+      }
+    }
+  });
+}
+
+test("every corrected Help / supplement product selector was rendered and checked", () => {
+  const missing = Object.entries(CORRECTED_TEXT).flatMap(([url, selectors]) => selectors.map(s => `${url} ${s}`)).filter(k => !correctedSeen.has(k));
+  assert.deepEqual(missing, []);
+});
+
+test("every local srcset candidate on the homepage is served as WebP at its declared width", async () => {
+  const {page, close} = await open(VIEWPORTS[1], "/");
+  const candidates = await page.evaluate(() => [...new Set([...document.querySelectorAll("img[srcset], source[srcset]")].flatMap(e => e.srcset.split(",").map(c => c.trim().split(/\s+/)))
+    .filter(([url]) => url.startsWith("/")).map(c => c.join(" ")))].map(c => c.split(" ")));
+  assert.ok(candidates.length >= 10, JSON.stringify(candidates));
+  for (const [url, descriptor] of candidates) {
+    const response = await fetch(base + url);
+    assert.equal(response.status, 200, url);
+    assert.equal(response.headers.get("content-type"), "image/webp", url);
+    const width = await page.evaluate(async src => {const i = new Image(); i.src = src; await i.decode(); return i.naturalWidth;}, url);
+    assert.equal(`${width}w`, descriptor, url);
+  }
+  await close();
+});
