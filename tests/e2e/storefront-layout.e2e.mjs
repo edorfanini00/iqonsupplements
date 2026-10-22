@@ -77,6 +77,31 @@ const footerLinkColors = page => page.$$eval(".footer-main>div:not(.footer-brand
   text: a.textContent, color: getComputedStyle(a).color, background: getComputedStyle(a.closest(".store-footer")).backgroundColor})));
 
 for (const device of VIEWPORTS) {
+  test(`${device.name}px: label blend explanation stays visible after hydration with its FDA source`, async () => {
+    const url = "/journal/reading-a-supplement-label";
+    const raw = new JSDOM(await (await fetch(base + url)).text()).window.document;
+    const heading = "Does a 600 mg blend mean 200 mg of each ingredient?";
+    const rawSection = [...raw.querySelectorAll(".article-body > section")].find(s => s.querySelector("h2")?.textContent === heading);
+    assert.ok(rawSection, "blend explanation exists in raw server HTML");
+    const {page, close} = await open(device, url);
+    try {
+      const section = page.locator(".article-body > section").filter({has: page.getByRole("heading", {name: heading, exact: true})});
+      assert.equal(await section.count(), 1);
+      assert.deepEqual(await section.locator("p").allTextContents(), [...rawSection.querySelectorAll("p")].map(p => p.textContent), "hydration retains every paragraph");
+      assert.match(await section.innerText(), /hypothetical Supplement Facts panel/);
+      for (const element of await section.locator("h2, p").all()) {
+        await element.scrollIntoViewIfNeeded();
+        assert.ok(await element.isVisible());
+        const box = await element.boundingBox();
+        assert.ok(box.width > 0 && box.x >= 0 && box.x + box.width <= device.viewport.width, "copy fits the viewport");
+      }
+      await section.screenshot({path: path.join(shots, `${device.name}_label_blend.png`)});
+      const source = page.locator('.article-sources a[href="https://www.fda.gov/food/dietary-supplements-guidance-documents-regulatory-information/dietary-supplement-labeling-guide-chapter-iv-nutrition-labeling"]');
+      await source.scrollIntoViewIfNeeded();
+      assert.ok(await source.isVisible(), "FDA source remains accessible after hydration");
+    } finally {await close();}
+  });
+
   test(`${device.name}px: no horizontal page overflow`, async () => {
     for (const url of ROUTES) {
       const {page, close} = await open(device, url);

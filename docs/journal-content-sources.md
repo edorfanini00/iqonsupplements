@@ -10,6 +10,12 @@ Prepared 10 September 2026. `journal-v4.json` is a complete three-article array 
 
 The 60-capsule/two-capsule calculation is explicitly a generic arithmetic example. It is not an IQON serving instruction. Comparing cost per serving and keeping like-for-like comparison fields are practical editorial suggestions.
 
+### Proprietary blend clarification (22 October 2026)
+
+The label guide now answers whether a three-ingredient proprietary blend totaling 600 mg necessarily contains 200 mg of each ingredient. FDA Chapter IV, question 34, explains the combined weight and descending weight order for blend ingredients without established Daily Values, and requires ingredients with established Daily Values to be declared separately with individual weights. The equal-division warning and suggestion to record an undisclosed amount are practical deductions from those labeling rules. The example is explicitly hypothetical and makes no claim about an IQON formula, efficacy or quality; the existing FDA link remains in Further reading.
+
+This fills a specific gap in the guide's existing blend-total sentence. Reader-question research provides limited evidence of uncertainty about individual blend amounts, not search volume or proof that other guides omit the answer. The alternative mineral/source-compound distinction is outside this single-concept change. No ranking outcome, original research, or article update date is asserted.
+
 ## Finding your supplement format
 
 [NIH Office of Dietary Supplements: Dietary Supplements—What You Need to Know](https://ods.od.nih.gov/factsheets/WYNTK-Consumer/) confirms the broad format range and the importance of formula and serving information. The format comparisons are original practical observations about measuring, mixing, portability, swallowing, taste and texture. They make no relative absorption, efficacy, purity or formulation claims.

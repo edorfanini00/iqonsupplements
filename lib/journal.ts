@@ -32,6 +32,14 @@ export const journalArticles:JournalArticle[]=[
         ]
       },
       {
+        "heading": "Does a 600 mg blend mean 200 mg of each ingredient?",
+        "paragraphs": [
+          "No, a 600 mg proprietary blend with three ingredients does not necessarily contain 200 mg of each.",
+          "In a hypothetical Supplement Facts panel, “Proprietary Blend — 600 mg” is followed by ingredients A, B and C, with no Daily Values established. The 600 mg is their combined weight per serving. FDA requires these blend ingredients to appear in descending order by weight, but does not require their individual weights. Ingredients with established Daily Values must be listed separately with their own amounts.",
+          "Do not divide the total equally or infer exact amounts from the ingredient order. When comparing labels, look for a separately stated amount per serving for the ingredient you want to compare. If only the blend total is given, mark that ingredient's amount as undisclosed instead of guessing. See question 34 in FDA’s Reading Supplement Facts guide under Further reading."
+        ]
+      },
+      {
         "heading": "Meet the rest of the formula",
         "products": ["hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"],
         "paragraphs": [
