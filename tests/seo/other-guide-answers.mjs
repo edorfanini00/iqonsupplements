@@ -10,7 +10,7 @@ export const otherGuideAnswers = [
     source: "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
     sourceLabel: "NIH · What you need to know about supplements",
     paragraphs: 2,
-    required: [/^There is no universal yes\./, /specific supplement's label and directions/, /do not address opening it, ask the maker or a pharmacist before changing how you use it/, /already sold as a powder or chewable/, /preference/, /not an equivalent formula or dose/],
+    required: [/^It depends on the product\./, /Check its label and directions\./, /do not address opening it, ask the maker or a pharmacist before changing how you use it/, /already sold as a powder or chewable/, /preference/, /not an equivalent formula or dose/],
   },
   {
     slug: "a-simple-skincare-routine",

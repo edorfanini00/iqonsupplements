@@ -100,7 +100,7 @@ export const journalArticles:JournalArticle[]=[
       {
         "heading": "Can I open a capsule if it is hard to swallow?",
         "paragraphs": [
-          "There is no universal yes. Check that specific supplement's label and directions. If they do not address opening it, ask the maker or a pharmacist before changing how you use it.",
+          "It depends on the product. Check its label and directions. If they do not address opening it, ask the maker or a pharmacist before changing how you use it.",
           "A product already sold as a powder or chewable may suit your preference. It is a different product, not an equivalent formula or dose, so read its own ingredients and directions before choosing."
         ]
       },
