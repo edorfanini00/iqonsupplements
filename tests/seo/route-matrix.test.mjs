@@ -229,6 +229,28 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.ok(article.citation.length > 0 && article.citation.every(url => /^https:\/\//.test(url)));
     assert.equal(dom((await get(port, "/journal")).body).title, "Supplement & skincare guides | IQON");
   });
+  await t.test("label guide explains blend arithmetic in server HTML with its FDA source", async () => {
+    const response = await get(port, "/journal/reading-a-supplement-label");
+    assertIndexable(response, "/journal/reading-a-supplement-label");
+    const doc = dom(response.body);
+    const section = [...doc.querySelectorAll(".article-body > section")].find(s => s.querySelector("h2")?.textContent === "Does a 600 mg blend mean 200 mg of each ingredient?");
+    assert.ok(section, "question is in article HTML, not only serialized React data");
+    const paragraphs = [...section.querySelectorAll("p")].map(p => p.textContent);
+    assert.match(paragraphs[0], /^No, .*three ingredients does not necessarily contain 200 mg of each\./);
+    assert.match(paragraphs[1], /hypothetical Supplement Facts panel/);
+    assert.match(paragraphs[1], /600 mg is their combined weight per serving/);
+    assert.match(paragraphs[1], /descending order by weight, but does not require their individual weights/);
+    assert.match(paragraphs[1], /Ingredients with established Daily Values must be listed separately/);
+    assert.match(paragraphs[2], /Do not divide the total equally or infer exact amounts/);
+    assert.match(paragraphs[2], /amount as undisclosed instead of guessing/);
+    assert.match(paragraphs[2], /question 34/);
+    assert.match(paragraphs[2], /FDA's Dietary Supplement Labeling Guide, Chapter IV, linked under Further reading/);
+    assert.doesNotMatch(section.textContent, /[-\u2010-\u2015\u2018\u2019\u201c\u201d]/, "new section keeps dash-free copy and straight typography");
+    const fda = "https://www.fda.gov/food/dietary-supplements-guidance-documents-regulatory-information/dietary-supplement-labeling-guide-chapter-iv-nutrition-labeling";
+    assert.ok(doc.querySelector(`.article-sources a[href="${fda}"]`), "Further reading keeps the primary source");
+    assert.ok(jsonLd(response.body).find(item => item["@type"] === "Article").citation.includes(fda));
+    assert.equal(section.querySelector(".guide-products"), null, "hypothetical blend is not attached to an IQON product");
+  });
   await t.test("help and product pages state the owner's 3 to 5 day window; help adds Shop tracking", async () => {
     const answerOf = doc => [...doc.querySelectorAll("main [data-slot=accordion-item]")].find(item => /How long does shipping take/.test(item.textContent))?.querySelector("[data-slot=accordion-content]")?.textContent.trim();
     // Raw server HTML: the help answer is the shared statement plus the Shop tracking note, verbatim.
