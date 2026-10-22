@@ -208,4 +208,3 @@ html{scrollbar-gutter:stable}
 .help-policies h2.eyebrow{font-family:Inter,Arial,sans-serif;font-size:12px;letter-spacing:1.4px;line-height:1.6;margin-bottom:14px}
 .help-policies ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 24px}
 .help-policies a{display:inline-flex;align-items:center;min-height:32px;font-size:15px;color:#4f5b61;text-decoration:underline;text-underline-offset:3px}
-.help-policies p{margin-top:10px;font-size:13px;line-height:1.7;color:#4f5b61}

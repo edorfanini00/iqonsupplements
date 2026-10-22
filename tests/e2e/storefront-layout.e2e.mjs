@@ -6,7 +6,8 @@
 // accordion answers (including the approved shipping copy) and corrected Help / supplement product
 // muted text at WCAG AA contrast.
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
-// catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
+// catalog (tests/seo/fake-shopify-hook.mjs); browser external requests are aborted. The optional
+// FAKE_POLICIES=published mode reads only the five actual public policy JSON endpoints on the server. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
 //
 // Uses the pinned `playwright-core` dev dependency. Browsers are not fetched by `npm ci`, so on a
@@ -22,6 +23,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { JSDOM } from "jsdom";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const playwright = await import(process.env.PLAYWRIGHT_CORE ? pathToFileURL(path.join(process.env.PLAYWRIGHT_CORE, "index.js")).href : "playwright-core");
@@ -120,12 +122,42 @@ for (const device of VIEWPORTS) {
       await close();
       assert.equal(links.length, count, `${url} ${selector}: ${JSON.stringify(links)}`);
       for (const l of links) {
-        assert.match(l.href, /^https:\/\/nr9zd0-t5\.myshopify\.com\/policies\/[a-z-]+$/, l.text);
+        assert.match(l.href, /^\/policies\/[a-z-]+$/, l.text);
         assert.ok(l.width > 0 && l.right <= m.client, `${url} ${l.text}: hidden or off screen ${JSON.stringify(l)}`);
         if (selector !== ".subscription-terms a[href*='/policies/']") assert.ok(l.height >= 24, `${url} ${l.text}: ${l.height}px tall target`);
         assert.ok(contrast(l.color, l.background) >= 4.5, `${url} ${l.text}: ${l.color} on ${l.background} = ${contrast(l.color, l.background).toFixed(2)}:1`);
       }
       assert.ok(m.scroll <= m.client, `${url}: page scrolls sideways (${JSON.stringify(m)})`);
+    }
+  });
+
+  test(`${device.name}px: all five native policies render readable content without horizontal overflow`, async () => {
+    for (const slug of ["shipping-policy", "refund-policy", "subscription-policy", "terms-of-service", "contact-information"]) {
+      const {page, close} = await open(device, `/policies/${slug}`);
+      assert.equal(await page.locator("h1").count(), 1);
+      if (process.env.FAKE_POLICIES === "down") {
+        assert.ok(await page.locator(".policy-fallback").isVisible());
+        assert.equal(await page.locator(".policy-fallback a").getAttribute("href"), `https://nr9zd0-t5.myshopify.com/policies/${slug}`);
+        assert.match(await page.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
+        assert.equal(await page.locator("article.policy-body").count(), 0);
+      } else {
+        assert.ok(await page.locator("article.policy-body").isVisible());
+        assert.ok((await page.locator("article.policy-body").textContent()).length > 40);
+        assert.equal(await page.locator("article script, article img").count(), 0);
+        if (process.env.FAKE_POLICIES === "published") {
+          const source = await fetch(`https://nr9zd0-t5.myshopify.com/policies/${slug}.json`);
+          assert.equal(source.status, 200);
+          const {policy} = await source.json();
+          assert.equal(await page.locator("h1").textContent(), policy.title);
+          assert.equal(await page.locator("article.policy-body").textContent(), new JSDOM(policy.body).window.document.body.textContent);
+        }
+      }
+      const dimensions = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
+      assert.ok(dimensions.scroll <= dimensions.client, JSON.stringify(dimensions));
+      const [color, background] = await page.locator(".policy-body, .policy-fallback").evaluate(a => [getComputedStyle(a).color, getComputedStyle(document.body).backgroundColor]);
+      assert.ok(contrast(color, background) >= 4.5, `${slug}: ${color} on ${background}`);
+      await page.screenshot({path: path.join(shots, `${device.name}_${slug}.png`), fullPage: true});
+      await close();
     }
   });
 
@@ -299,7 +331,7 @@ for (const device of VIEWPORTS) {
 // Muted text corrected to WCAG AA on Help and orderable supplement product pages (flat painted panels only;
 // text over photography is excluded). Each selector must render at some width; every visible match must pass.
 const CORRECTED_TEXT = {
-  "/help": [".help-wrap .eyebrow", ".help-wrap>div>p:last-child", ".help-policies p"],
+  "/help": [".help-wrap .eyebrow", ".help-wrap>div>p:last-child"],
   "/products/creatine-monohydrate": [".purchase-option small", ".sticky-purchase small", ".fact-kicker", ".fact-art-note", ".fact-art-value>span", ".section-heading .eyebrow",
     ".supplement-pdp-story>.pdp-disclaimer", ".supplement-pdp-story .skin-kicker", ".supplement-pdp-story .skin-timing-label", ".supplement-pdp-story .skin-application-photo figcaption>span",
     ".supplement-pdp-story .skin-step-top>span", ".supplement-pdp-story .supp-research-scope", ".supplement-pdp-story .skin-compare-table tr>th:first-child:not(:has(.sr-only))",

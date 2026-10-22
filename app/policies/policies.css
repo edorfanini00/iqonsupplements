@@ -1,0 +1,18 @@
+.policy-page{max-width:1360px;margin:0 auto;padding-top:64px;padding-bottom:88px;color:#30302e}
+.policy-heading{margin-bottom:40px}
+.policy-heading .eyebrow{margin-bottom:20px}
+.policy-heading h1{font-size:clamp(34px,4vw,56px);font-weight:400;line-height:1.12;letter-spacing:-.035em;overflow-wrap:anywhere}
+.policy-layout{display:grid;grid-template-columns:minmax(0,760px) minmax(200px,1fr);gap:clamp(40px,7vw,112px)}
+.policy-body,.policy-fallback{min-width:0;font-size:16px;line-height:1.85;overflow-wrap:anywhere}
+.policy-body p,.policy-body ul,.policy-body ol,.policy-body blockquote,.policy-body div{margin:0 0 24px}
+.policy-body h2,.policy-body h3,.policy-body h4,.policy-body h5,.policy-body h6{font-size:24px;line-height:1.35;font-weight:500;margin:32px 0 16px}
+.policy-body em,.policy-body i{color:inherit;font-style:italic}
+.policy-body ul{list-style:disc;padding-left:24px}.policy-body ol{list-style:decimal;padding-left:24px}
+.policy-body blockquote{border-left:2px solid #b7b7af;padding-left:20px}
+.policy-page a{text-decoration:underline;text-underline-offset:4px}
+.policy-page a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.policy-nav{border-top:1px solid #b7b7af;padding-top:20px;align-self:start;font-size:14px}
+.policy-nav .eyebrow{margin-bottom:12px}.policy-nav ul{list-style:none;margin:0;padding:0}
+.policy-nav a{display:inline-block;padding:8px 0;line-height:1.5}.policy-nav [aria-current=page]{font-weight:600;text-decoration:none}
+.policy-nav .policy-help{margin-top:20px}.policy-fallback p{margin:0 0 20px}
+@media(max-width:760px){.policy-page{padding-top:36px;padding-bottom:48px}.policy-heading{margin-bottom:28px}.policy-layout{grid-template-columns:minmax(0,1fr);gap:36px}.policy-body,.policy-fallback{font-size:16px;line-height:1.8}.policy-body p{margin-bottom:22px}}
