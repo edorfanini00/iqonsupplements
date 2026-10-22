@@ -98,6 +98,13 @@ export const journalArticles:JournalArticle[]=[
         ]
       },
       {
+        "heading": "Can I open a capsule if it is hard to swallow?",
+        "paragraphs": [
+          "There is no universal yes. Check that specific supplement's label and directions. If they do not address opening it, ask the maker or a pharmacist before changing how you use it.",
+          "A product already sold as a powder or chewable may suit your preference. It is a different product, not an equivalent formula or dose, so read its own ingredients and directions before choosing."
+        ]
+      },
+      {
         "heading": "Sachets are easy to take along",
         "format": "Sachets",
         "paragraphs": [
@@ -147,6 +154,14 @@ export const journalArticles:JournalArticle[]=[
         ]
       },
       {
+        "heading": "How do I test a new skincare product?",
+        "paragraphs": [
+          "Try it on a small area before adding it to your routine. The American Academy of Dermatology recommends a spot about the size of a quarter on the underside of your arm or inner elbow. Apply your usual amount and thickness twice daily for 7 to 10 days.",
+          "For a product you normally leave on, keep it there for the usual length of time. For a cleanser you wash off, wait five minutes or as long as its label directs, then rinse.",
+          "If you notice a reaction, gently wash the product off and stop using it. If the reaction is severe or does not settle, consult a dermatologist. This check does not guarantee a product's safety, diagnose an allergy or show how well it works. See the AAD instructions under Further reading."
+        ]
+      },
+      {
         "heading": "Choose a moisturizer you like using",
         "paragraphs": [
           "Texture matters in a product you reach for regularly. A cream, lotion or gel can feel quite different on application, so consider both the skin types a product is designed for and the finish you prefer. Follow its directions for application. You might enjoy a richer-feeling layer in the evening and something that sits comfortably beneath your daytime products in the morning."
@@ -167,6 +182,10 @@ export const journalArticles:JournalArticle[]=[
       {
         "label": "American Academy of Dermatology · How to select sunscreen",
         "url": "https://www.aad.org/public/everyday-care/sun-protection/shade-clothing-sunscreen/how-to-select-sunscreen"
+      },
+      {
+        "label": "American Academy of Dermatology · How to test skin care products",
+        "url": "https://www.aad.org/public/everyday-care/skin-care-secrets/prevent-skin-problems/test-skin-care-products"
       }
     ]
   }

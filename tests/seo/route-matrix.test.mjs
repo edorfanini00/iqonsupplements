@@ -12,6 +12,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { JSDOM } from "jsdom";
+import { otherGuideAnswers, assertGuideAnswer } from "./other-guide-answers.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const WWW = "www.iqondaily.com";
@@ -251,6 +252,24 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.ok(jsonLd(response.body).find(item => item["@type"] === "Article").citation.includes(fda));
     assert.equal(section.querySelector(".guide-products"), null, "hypothetical blend is not attached to an IQON product");
   });
+  for (const answer of otherGuideAnswers) {
+    await t.test(`${answer.slug}: new answer and source render in indexable server HTML`, async () => {
+      const url = `/journal/${answer.slug}`;
+      const response = await get(port, url);
+      assertIndexable(response, url);
+      const doc = dom(response.body);
+      const section = [...doc.querySelectorAll(".article-body > section")].find(s => s.querySelector("h2")?.textContent === answer.heading);
+      assert.ok(section, "answer is visible HTML, not just React payload");
+      assert.equal(section.previousElementSibling.querySelector("h2").textContent, answer.after);
+      assertGuideAnswer(answer, [...section.querySelectorAll("p")].map(p => p.textContent));
+      assert.equal(section.querySelector(".guide-products"), null);
+      const source = doc.querySelector(`.article-sources a[href="${answer.source}"]`);
+      assert.ok(source);
+      assert.equal(source.textContent, `${answer.sourceLabel} ↗`);
+      assert.match(source.rel, /noopener/);
+      assert.ok(jsonLd(response.body).find(item => item["@type"] === "Article").citation.includes(answer.source));
+    });
+  }
   await t.test("help and product pages state the owner's 3 to 5 day window; help adds Shop tracking", async () => {
     const answerOf = doc => [...doc.querySelectorAll("main [data-slot=accordion-item]")].find(item => /How long does shipping take/.test(item.textContent))?.querySelector("[data-slot=accordion-content]")?.textContent.trim();
     // Raw server HTML: the help answer is the shared statement plus the Shop tracking note, verbatim.
@@ -315,7 +334,8 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.deepEqual(sectionLinks(format), {
       "Picture an ordinary day": [], "Powders make preparation part of the ritual": ["/products/creatine-monohydrate"],
       // NMN is a sold-out capsule; the generic Daily Travel Kit has no format; Keto-5 is an editorial placeholder.
-      "Capsules keep the process compact": ["/products/liver-support"], "Sachets are easy to take along": [], "Gummies put taste and texture first": [],
+      "Capsules keep the process compact": ["/products/liver-support"], "Can I open a capsule if it is hard to swallow?": [],
+      "Sachets are easy to take along": [], "Gummies put taste and texture first": [],
     });
     assert.match(format.querySelector('.guide-products a[href="/products/creatine-monohydrate"]').textContent, /Creatine Monohydrate.*281 g powder/);
     const label = dom((await get(port, "/journal/reading-a-supplement-label")).body);

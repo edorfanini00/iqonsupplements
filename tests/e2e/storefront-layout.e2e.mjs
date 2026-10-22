@@ -24,6 +24,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { JSDOM } from "jsdom";
+import { otherGuideAnswers, assertGuideAnswer } from "../seo/other-guide-answers.mjs";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const playwright = await import(process.env.PLAYWRIGHT_CORE ? pathToFileURL(path.join(process.env.PLAYWRIGHT_CORE, "index.js")).href : "playwright-core");
@@ -77,6 +78,50 @@ const footerLinkColors = page => page.$$eval(".footer-main>div:not(.footer-brand
   text: a.textContent, color: getComputedStyle(a).color, background: getComputedStyle(a.closest(".store-footer")).backgroundColor})));
 
 for (const device of VIEWPORTS) {
+  for (const answer of otherGuideAnswers) {
+    test(`${device.name}px: ${answer.slug} answer and source survive hydration without overflow`, async () => {
+      const url = `/journal/${answer.slug}`;
+      const raw = new JSDOM(await (await fetch(base + url)).text()).window.document;
+      const rawSection = [...raw.querySelectorAll(".article-body > section")].find(s => s.querySelector("h2")?.textContent === answer.heading);
+      assert.ok(rawSection);
+      const rawParagraphs = [...rawSection.querySelectorAll("p")].map(p => p.textContent);
+      assertGuideAnswer(answer, rawParagraphs);
+      const {page, close} = await open(device, url);
+      try {
+        const section = page.locator(".article-body > section").filter({has: page.getByRole("heading", {name: answer.heading, exact: true})});
+        assert.equal(await section.count(), 1);
+        assert.deepEqual(await section.locator("p").allTextContents(), rawParagraphs);
+        for (const element of await section.locator("h2, p").all()) {
+          await element.scrollIntoViewIfNeeded();
+          assert.ok(await element.isVisible());
+          const box = await element.boundingBox();
+          assert.ok(box.width > 0 && box.x >= 0 && box.x + box.width <= device.viewport.width);
+        }
+        assert.equal(await section.locator(".guide-products").count(), 0);
+        // Fit the entire answer beneath the sticky navigation for a readable crop. Width stays
+        // at the tested breakpoint; visibility/geometry above uses the original device height.
+        const answerBox = await section.boundingBox();
+        await page.setViewportSize({width: device.viewport.width, height: Math.max(device.viewport.height, Math.ceil(answerBox.height) + 320)});
+        await section.evaluate(s => s.scrollIntoView({block: "center"}));
+        await section.screenshot({path: path.join(shots, `${device.name}_${answer.shot}.png`)});
+        await page.setViewportSize(device.viewport);
+        const source = page.locator(`.article-sources a[href="${answer.source}"]`);
+        await source.scrollIntoViewIfNeeded();
+        assert.ok(await source.isVisible());
+        assert.equal(await source.innerText(), `${answer.sourceLabel} ↗`);
+        const sourceBox = await source.boundingBox();
+        assert.ok(sourceBox.x >= 0 && sourceBox.x + sourceBox.width <= device.viewport.width);
+        await page.locator(".article-sources").evaluate(s => s.scrollIntoView({block: "center"}));
+        await page.locator(".article-sources").screenshot({path: path.join(shots, `${device.name}_${answer.shot}_sources.png`)});
+        const size = await page.evaluate(() => ({inner: innerWidth, client: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, body: document.body.scrollWidth}));
+        assert.equal(size.inner, device.viewport.width);
+        assert.ok(size.scroll <= size.client && size.body <= size.client, JSON.stringify(size));
+        // Every existing product module is unchanged by hydration.
+        assert.deepEqual(await page.locator(".guide-products").allTextContents(), [...raw.querySelectorAll(".guide-products")].map(s => s.textContent));
+      } finally {await close();}
+    });
+  }
+
   test(`${device.name}px: label blend explanation stays visible after hydration with its FDA source`, async () => {
     const url = "/journal/reading-a-supplement-label";
     const raw = new JSDOM(await (await fetch(base + url)).text()).window.document;
