@@ -1,7 +1,9 @@
 // Loaded into `next start` with NODE_OPTIONS=--import for the SEO route matrix ONLY.
 // Answers Storefront catalog queries with synthetic products (FAKE_SHOPIFY=live), a successful
 // response with no products (FAKE_SHOPIFY=empty) or a store outage (FAKE_SHOPIFY=down), and refuses
-// every other external request. Cart reads, creates, adds and removes use an in-memory synthetic cart whose
+// every other external request. Policy JSON is synthetic unless FAKE_POLICIES=published explicitly
+// enables read-only HTTPS integration with the five fixed published policy endpoints.
+// Cart reads, creates, adds and removes use an in-memory synthetic cart whose
 // checkoutUrl is never fetched (browser tests abort it): this proves the storefront handoff, not Shopify checkout.
 // The NMN title is a deliberate XSS fixture and the cdn.shopify.com test images do not resolve: screenshots of this catalog are not production imagery.
 const money = amount => ({amount, currencyCode: "USD"});
@@ -53,6 +55,13 @@ function cartResponse(operation, variables) {
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (input, init) => {
   const url = String(typeof input === "string" || input instanceof URL ? input : input.url);
+  const policySlug = url.match(/^https:\/\/nr9zd0-t5\.myshopify\.com\/policies\/(shipping-policy|refund-policy|subscription-policy|terms-of-service|contact-information)\.json$/)?.[1];
+  if (policySlug) {
+    if (process.env.FAKE_POLICIES === "published") return realFetch(input, init);
+    if (process.env.FAKE_SHOPIFY === "down" || process.env.FAKE_POLICIES === "down") return new Response("unavailable", {status: 503});
+    const title = {"shipping-policy": "Shipping policy", "refund-policy": "Refund policy", "subscription-policy": "Cancellation policy", "terms-of-service": "Terms of service", "contact-information": "Contact information"}[policySlug];
+    return Response.json({policy: {handle: policySlug, title, body: `<p>Published synthetic ${policySlug} content.</p><h2>Details &amp; care</h2><p>Contact <a href="mailto:info@example.com">support</a>.</p><script>alert(1)</script><img src=x onerror=alert(1)>`}});
+  }
   if (/^https:\/\/[a-z0-9-]+\.myshopify\.com\/api\//.test(url)) {
     if (process.env.FAKE_SHOPIFY === "down") return new Response("unavailable", {status: 503});
     const {query} = JSON.parse(String(init?.body || "{}"));

@@ -64,6 +64,10 @@ function assertNoindex(r, url, {status = 200} = {}) {
   const meta = robotsMeta(r.body) || "";
   assert.ok(/noindex/.test(meta) || /noindex/.test(r.headers["x-robots-tag"] || ""), `${url} must be noindex (meta=${meta}, header=${r.headers["x-robots-tag"]})`);
 }
+const POLICY = slug => `/policies/${slug}`;
+// Shopify's own page titles; the subscription policy page is titled "Cancellation policy".
+const STORE_POLICY_LINKS = [["Shipping policy", POLICY("shipping-policy")], ["Refund policy", POLICY("refund-policy")], ["Cancellation policy", POLICY("subscription-policy")],
+  ["Terms of service", POLICY("terms-of-service")], ["Contact information", POLICY("contact-information")]];
 const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"];
 const dom = html => new JSDOM(html).window.document;
 /** In-page links whose target id is not in the server-rendered document. */
@@ -225,7 +229,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.ok(article.citation.length > 0 && article.citation.every(url => /^https:\/\//.test(url)));
     assert.equal(dom((await get(port, "/journal")).body).title, "Supplement & skincare guides | IQON");
   });
-  await t.test("help and product pages state the owner's 3 to 5 day window; help adds Shop tracking; no policy link", async () => {
+  await t.test("help and product pages state the owner's 3 to 5 day window; help adds Shop tracking", async () => {
     const answerOf = doc => [...doc.querySelectorAll("main [data-slot=accordion-item]")].find(item => /How long does shipping take/.test(item.textContent))?.querySelector("[data-slot=accordion-content]")?.textContent.trim();
     // Raw server HTML: the help answer is the shared statement plus the Shop tracking note, verbatim.
     assert.equal(answerOf(dom((await get(port, "/help")).body)), `${SHIPPING_NOTE} ${SHOP_TRACKING_NOTE}`);
@@ -248,8 +252,39 @@ test("production, live catalog, canonical and alias hosts", async t => {
     const skin = dom((await get(port, "/products/anti-aging-cleanser-with-peptides")).body);
     assert.equal(skin.querySelector(".add-to-bag-row, .sticky-purchase"), null, "no purchase affordance on coming-soon skincare");
     assert.ok(skin.querySelector(".skincare-launch-note button[disabled]")?.textContent.includes("Not available to order yet"));
-    // No conventional policy URL is linked until the merchant publishes one (they are 404 today).
-    for (const url of PUBLIC) assert.equal(dom((await get(port, url)).body).querySelector('a[href*="/policies/shipping"], a[href*="/policies/refund"], a[href*="/policies/terms"]'), null, url);
+  });
+  await t.test("first-party policies are linked from every footer, /help and subscription terms; native policy routes", async () => {
+    const links = (doc, selector) => [...doc.querySelectorAll(selector)].map(a => [a.textContent, a.getAttribute("href")]);
+    for (const url of PUBLIC) {
+      const doc = dom((await get(port, url)).body);
+      assert.equal(doc.querySelector("footer.store-footer nav.footer-policies").getAttribute("aria-label"), "Store policies", url);
+      assert.deepEqual(links(doc, "footer.store-footer .footer-policies a"), STORE_POLICY_LINKS, url);
+      assert.ok(doc.querySelector('footer.store-footer a[href="/account/privacy"]'), `${url}: footer Privacy link kept`);
+      assert.equal(doc.querySelector('footer .footer-policies a[href^="https:"]'), null, url);
+    }
+    for (const [title, path] of STORE_POLICY_LINKS) {
+      const r = await get(port, path); assertIndexable(r, path);
+      const doc = dom(r.body);
+      assert.deepEqual(h1s(doc), [title]);
+      assert.equal(doc.title, `${title} | IQON`);
+      assert.match(doc.querySelector("article.policy-body").textContent, new RegExp(`Published synthetic ${path.split("/").pop()} content`));
+      assert.equal(doc.querySelector("article script, article img"), null);
+      assert.equal(doc.querySelector('.policy-nav [aria-current="page"]').getAttribute("href"), path);
+      assertNoindex(await get(port, path, ALIASES[0]), path);
+    }
+    assertNoindex(await get(port, "/policies/not-a-policy"), "unknown policy", {status: 404});
+    assertNoindex(await get(port, "/policies/privacy-policy"), "privacy stays hosted", {status: 404});
+    const help = dom((await get(port, "/help")).body);
+    const helpPolicies = help.querySelector("main nav.help-policies");
+    assert.equal(helpPolicies.getAttribute("aria-labelledby"), "help-policies-title");
+    assert.equal(help.getElementById("help-policies-title").textContent, "STORE POLICIES");
+    assert.deepEqual(links(help, "main .help-policies a"), STORE_POLICY_LINKS);
+    assert.equal(helpPolicies.closest("[data-slot=accordion-content]"), null, "visible without opening an answer");
+    // Subscription terms link the cancellation policy; one-time-only and coming-soon products have no subscription terms.
+    const pdp = dom((await get(port, "/products/creatine-monohydrate")).body);
+    assert.deepEqual(links(pdp, ".subscription-terms a").at(-1), ["cancellation policy", POLICY("subscription-policy")]);
+    assert.equal(dom((await get(port, "/products/anti-aging-cleanser-with-peptides")).body).querySelector(".subscription-terms"), null);
+    assert.doesNotMatch(helpPolicies.textContent + help.querySelector("footer .footer-policies").textContent, /[\u2013\u2014]| - /, "no dashes in policy link copy");
   });
   await t.test("guides link only to orderable products, and those products link back", async () => {
     const sectionLinks = doc => Object.fromEntries([...doc.querySelectorAll(".article-body > section")].map(section =>
@@ -331,6 +366,15 @@ test("production, Shopify outage: shopping pages fail closed, static pages stay 
   const server = await startServer("down", {...live, FAKE_SHOPIFY: "down"});
   t.after(server.stop);
   for (const url of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements"]) assertNoindex(await get(server.port, url), url);
+  for (const [title, path] of STORE_POLICY_LINKS) {
+    const r = await get(server.port, path); assertNoindex(r, path);
+    assert.equal(canonical(r.body), `https://${WWW}${path}`);
+    const doc = dom(r.body);
+    assert.deepEqual(h1s(doc), [title]);
+    assert.equal(doc.querySelector("article.policy-body"), null);
+    assert.match(doc.querySelector(".policy-fallback").textContent, /couldn’t load this policy/);
+    assert.equal(doc.querySelector(".policy-fallback a").getAttribute("href"), `https://nr9zd0-t5.myshopify.com${path}`);
+  }
   const product = await get(server.port, "/products/creatine-monohydrate");
   assertNoindex(product, "product during outage");
   // Existing behavior: during an outage any product slug gets the 200 "back shortly" page (noindex), not a 404.
@@ -347,6 +391,8 @@ test("production without Shopify configuration: preview fixtures are never index
   const server = await startServer("unconfigured", {VERCEL_ENV: "production"});
   t.after(server.stop);
   for (const url of ["/", "/collections/all", "/products/creatine-monohydrate", "/help"]) assertNoindex(await get(server.port, url), url);
+  // Published policy JSON remains usable without any server-side Shopify credentials.
+  for (const [, path] of STORE_POLICY_LINKS) assertIndexable(await get(server.port, path), path);
   // Preview-fixture homepage modes render the same hero headings.
   for (const url of ["/", "/skincare"]) assert.deepEqual(h1s(dom((await get(server.port, url)).body)), [H1_TEXT[url]], url);
   assert.ok(!(await get(server.port, "/sitemap.xml")).body.includes("/products/"));
@@ -362,7 +408,7 @@ test("production without Shopify configuration: preview fixtures are never index
 test("preview deployment: nothing is indexable and robots.txt blocks crawling", async t => {
   const server = await startServer("preview", {...live, VERCEL_ENV: "preview"});
   t.after(server.stop);
-  for (const url of PUBLIC) assertNoindex(await get(server.port, url), url);
+  for (const url of [...PUBLIC, ...STORE_POLICY_LINKS.map(([, path]) => path)]) assertNoindex(await get(server.port, url), url);
   assert.match((await get(server.port, "/robots.txt")).body, /User-Agent: \*\nDisallow: \/\n/);
   assert.deepEqual(locs((await get(server.port, "/sitemap.xml")).body), []);
 });

@@ -6,7 +6,8 @@
 // accordion answers (including the approved shipping copy) and corrected Help / supplement product
 // muted text at WCAG AA contrast.
 // Runs the real production build (`npm run build:vercel`) under `next start` with the MOCK Shopify
-// catalog (tests/seo/fake-shopify-hook.mjs); every external request is aborted. Screenshots of this
+// catalog (tests/seo/fake-shopify-hook.mjs); browser external requests are aborted. The optional
+// FAKE_POLICIES=published mode reads only the five actual public policy JSON endpoints on the server. Screenshots of this
 // catalog are not production imagery. The server is started and stopped by this file.
 //
 // Uses the pinned `playwright-core` dev dependency. Browsers are not fetched by `npm ci`, so on a
@@ -22,6 +23,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { JSDOM } from "jsdom";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const playwright = await import(process.env.PLAYWRIGHT_CORE ? pathToFileURL(path.join(process.env.PLAYWRIGHT_CORE, "index.js")).href : "playwright-core");
@@ -101,6 +103,62 @@ for (const device of VIEWPORTS) {
       assert.ok(contrast(color, background) >= 4.5, `Contact us (${state}): ${color} on ${background}`);
     }
     await close();
+  });
+
+  test(`${device.name}px: store policy links are visible, readable and tappable in the footer, on /help and in subscription terms`, async () => {
+    for (const [url, selector, count] of [["/help", ".footer-policies a", 5], ["/help", ".help-policies a", 5], ["/products/creatine-monohydrate", ".subscription-terms a[href*='/policies/']", 1]]) {
+      const {page, close} = await open(device, url);
+      const first = page.locator(selector).first();
+      await first.scrollIntoViewIfNeeded();
+      const links = await page.$$eval(selector, as => as.map(a => {
+        let background = "rgb(255, 255, 255)";
+        for (let e = a; e; e = e.parentElement) {const c = getComputedStyle(e).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+        const box = a.getBoundingClientRect();
+        return {text: a.textContent, href: a.getAttribute("href"), color: getComputedStyle(a).color, background, width: box.width, height: box.height, right: box.right};
+      }));
+      const m = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
+      if (selector !== ".subscription-terms a[href*='/policies/']") await page.screenshot({path: path.join(shots, `${device.name}${selector.startsWith(".footer") ? "_footer" : "_help"}_policies.png`)});
+      else {await first.evaluate(a => a.closest(".subscription-details").scrollIntoView({block: "center"})); await page.screenshot({path: path.join(shots, `${device.name}_pdp_subscription_policy.png`)});}
+      await close();
+      assert.equal(links.length, count, `${url} ${selector}: ${JSON.stringify(links)}`);
+      for (const l of links) {
+        assert.match(l.href, /^\/policies\/[a-z-]+$/, l.text);
+        assert.ok(l.width > 0 && l.right <= m.client, `${url} ${l.text}: hidden or off screen ${JSON.stringify(l)}`);
+        if (selector !== ".subscription-terms a[href*='/policies/']") assert.ok(l.height >= 24, `${url} ${l.text}: ${l.height}px tall target`);
+        assert.ok(contrast(l.color, l.background) >= 4.5, `${url} ${l.text}: ${l.color} on ${l.background} = ${contrast(l.color, l.background).toFixed(2)}:1`);
+      }
+      assert.ok(m.scroll <= m.client, `${url}: page scrolls sideways (${JSON.stringify(m)})`);
+    }
+  });
+
+  test(`${device.name}px: all five native policies render readable content without horizontal overflow`, async () => {
+    for (const slug of ["shipping-policy", "refund-policy", "subscription-policy", "terms-of-service", "contact-information"]) {
+      const {page, close} = await open(device, `/policies/${slug}`);
+      assert.equal(await page.locator("h1").count(), 1);
+      if (process.env.FAKE_POLICIES === "down") {
+        assert.ok(await page.locator(".policy-fallback").isVisible());
+        assert.equal(await page.locator(".policy-fallback a").getAttribute("href"), `https://nr9zd0-t5.myshopify.com/policies/${slug}`);
+        assert.match(await page.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
+        assert.equal(await page.locator("article.policy-body").count(), 0);
+      } else {
+        assert.ok(await page.locator("article.policy-body").isVisible());
+        assert.ok((await page.locator("article.policy-body").textContent()).length > 40);
+        assert.equal(await page.locator("article script, article img").count(), 0);
+        if (process.env.FAKE_POLICIES === "published") {
+          const source = await fetch(`https://nr9zd0-t5.myshopify.com/policies/${slug}.json`);
+          assert.equal(source.status, 200);
+          const {policy} = await source.json();
+          assert.equal(await page.locator("h1").textContent(), policy.title);
+          assert.equal(await page.locator("article.policy-body").textContent(), new JSDOM(policy.body).window.document.body.textContent);
+        }
+      }
+      const dimensions = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
+      assert.ok(dimensions.scroll <= dimensions.client, JSON.stringify(dimensions));
+      const [color, background] = await page.locator(".policy-body, .policy-fallback").evaluate(a => [getComputedStyle(a).color, getComputedStyle(document.body).backgroundColor]);
+      assert.ok(contrast(color, background) >= 4.5, `${slug}: ${color} on ${background}`);
+      await page.screenshot({path: path.join(shots, `${device.name}_${slug}.png`), fullPage: true});
+      await close();
+    }
   });
 
   test(`${device.name}px: hydrated H1 text keeps word spaces at line breaks`, async () => {
