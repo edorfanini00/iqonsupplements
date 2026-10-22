@@ -1,11 +1,51 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { otherGuideAnswers, assertGuideAnswer } from "./other-guide-answers.mjs";
 import { isCanonicalProduction, isIndexable, isListedProduct, jsonLdScript, normalHost, pageMetadata, productJsonLd, robotsRules, sitemapPaths, articleJsonLd, journalArticleTitle, organizationJsonLd } from "../../lib/seo";
 import { DEFAULT_SUPPORT_EMAIL } from "../../lib/orders/emails/format";
 import { LEGACY_PRODUCT_REDIRECTS } from "../../lib/legacy-redirects";
 import type { Product, StoreCatalog } from "../../lib/catalog";
 import { journalArticles } from "../../lib/journal";
+
+for (const answer of otherGuideAnswers) {
+  test(`${answer.slug}: direct answer, placement and supporting source`, () => {
+    const article = journalArticles.find(a => a.slug === answer.slug)!;
+    const index = article.sections.findIndex(s => s.heading === answer.heading);
+    assert.ok(index > 0, "new answer exists");
+    assert.equal(article.sections[index - 1].heading, answer.after);
+    const section = article.sections[index];
+    assertGuideAnswer(answer, section.paragraphs);
+    assert.equal(section.format, undefined);
+    assert.equal(section.products, undefined);
+    assert.ok(article.sources?.some(s => s.url === answer.source && s.label === answer.sourceLabel));
+  });
+}
+
+test("complete existing journal articles remain identical outside the two answers and AAD citation", () => {
+  // SHA256(JSON.stringify(article)) from main 20828e514df5db135173bff5f2129d572c2a3280.
+  // Includes every original paragraph, metadata field, source and product/format association.
+  const baseline = [
+    "602d4a82cd4e5f2887a5e0673e29ea99141092a0284a9db708bf3c236a509f0d",
+    "d1126b51f0802805bfc479f6c9f8df2dc7107330344ea11ef80d030121f0ed6f",
+    "af41690108f5e7c5337d36387e90849f4207b36aa0669b267e04b04362fe7aa2",
+  ];
+  const preserved = journalArticles.map(article => {
+    const copy = structuredClone(article);
+    const answer = otherGuideAnswers.find(a => a.slug === copy.slug);
+    if (answer) {
+      assert.equal(copy.sections.filter(s => s.heading === answer.heading).length, 1);
+      copy.sections = copy.sections.filter(s => s.heading !== answer.heading);
+      if (copy.slug === "a-simple-skincare-routine") {
+        assert.equal(copy.sources!.filter(s => s.url === answer.source).length, 1);
+        copy.sources = copy.sources!.filter(s => s.url !== answer.source);
+      }
+    }
+    return createHash("sha256").update(JSON.stringify(copy)).digest("hex");
+  });
+  assert.deepEqual(preserved, baseline);
+});
 
 const listed: Product = {id: "creatine-monohydrate", name: "Creatine", category: "supplements", type: "Powder", number: "01", price: 39, size: "", descriptor: "", description: "d",
   image: "https://cdn.shopify.com/a.jpg", campaign: "", tone: "", ritual: "", currency: "USD", available: true,
