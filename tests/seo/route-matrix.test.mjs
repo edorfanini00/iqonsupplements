@@ -244,6 +244,8 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.match(paragraphs[2], /Do not divide the total equally or infer exact amounts/);
     assert.match(paragraphs[2], /amount as undisclosed instead of guessing/);
     assert.match(paragraphs[2], /question 34/);
+    assert.match(paragraphs[2], /FDA's Dietary Supplement Labeling Guide, Chapter IV, linked under Further reading/);
+    assert.doesNotMatch(section.textContent, /[-\u2010-\u2015\u2018\u2019\u201c\u201d]/, "new section keeps dash-free copy and straight typography");
     const fda = "https://www.fda.gov/food/dietary-supplements-guidance-documents-regulatory-information/dietary-supplement-labeling-guide-chapter-iv-nutrition-labeling";
     assert.ok(doc.querySelector(`.article-sources a[href="${fda}"]`), "Further reading keeps the primary source");
     assert.ok(jsonLd(response.body).find(item => item["@type"] === "Article").citation.includes(fda));
