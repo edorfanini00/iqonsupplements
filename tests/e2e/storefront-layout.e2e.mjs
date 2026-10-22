@@ -103,6 +103,32 @@ for (const device of VIEWPORTS) {
     await close();
   });
 
+  test(`${device.name}px: store policy links are visible, readable and tappable in the footer, on /help and in subscription terms`, async () => {
+    for (const [url, selector, count] of [["/help", ".footer-policies a", 5], ["/help", ".help-policies a", 5], ["/products/creatine-monohydrate", ".subscription-terms a[href*='/policies/']", 1]]) {
+      const {page, close} = await open(device, url);
+      const first = page.locator(selector).first();
+      await first.scrollIntoViewIfNeeded();
+      const links = await page.$$eval(selector, as => as.map(a => {
+        let background = "rgb(255, 255, 255)";
+        for (let e = a; e; e = e.parentElement) {const c = getComputedStyle(e).backgroundColor; if (c !== "transparent" && !/,\s*0\)$/.test(c)) {background = c; break;}}
+        const box = a.getBoundingClientRect();
+        return {text: a.textContent, href: a.getAttribute("href"), color: getComputedStyle(a).color, background, width: box.width, height: box.height, right: box.right};
+      }));
+      const m = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
+      if (selector !== ".subscription-terms a[href*='/policies/']") await page.screenshot({path: path.join(shots, `${device.name}${selector.startsWith(".footer") ? "_footer" : "_help"}_policies.png`)});
+      else {await first.evaluate(a => a.closest(".subscription-details").scrollIntoView({block: "center"})); await page.screenshot({path: path.join(shots, `${device.name}_pdp_subscription_policy.png`)});}
+      await close();
+      assert.equal(links.length, count, `${url} ${selector}: ${JSON.stringify(links)}`);
+      for (const l of links) {
+        assert.match(l.href, /^https:\/\/nr9zd0-t5\.myshopify\.com\/policies\/[a-z-]+$/, l.text);
+        assert.ok(l.width > 0 && l.right <= m.client, `${url} ${l.text}: hidden or off screen ${JSON.stringify(l)}`);
+        if (selector !== ".subscription-terms a[href*='/policies/']") assert.ok(l.height >= 24, `${url} ${l.text}: ${l.height}px tall target`);
+        assert.ok(contrast(l.color, l.background) >= 4.5, `${url} ${l.text}: ${l.color} on ${l.background} = ${contrast(l.color, l.background).toFixed(2)}:1`);
+      }
+      assert.ok(m.scroll <= m.client, `${url}: page scrolls sideways (${JSON.stringify(m)})`);
+    }
+  });
+
   test(`${device.name}px: hydrated H1 text keeps word spaces at line breaks`, async () => {
     for (const [url, h1] of Object.entries(H1_TEXT)) {
       const {page, close} = await open(device, url);
@@ -273,7 +299,7 @@ for (const device of VIEWPORTS) {
 // Muted text corrected to WCAG AA on Help and orderable supplement product pages (flat painted panels only;
 // text over photography is excluded). Each selector must render at some width; every visible match must pass.
 const CORRECTED_TEXT = {
-  "/help": [".help-wrap .eyebrow", ".help-wrap>div>p:last-child"],
+  "/help": [".help-wrap .eyebrow", ".help-wrap>div>p:last-child", ".help-policies p"],
   "/products/creatine-monohydrate": [".purchase-option small", ".sticky-purchase small", ".fact-kicker", ".fact-art-note", ".fact-art-value>span", ".section-heading .eyebrow",
     ".supplement-pdp-story>.pdp-disclaimer", ".supplement-pdp-story .skin-kicker", ".supplement-pdp-story .skin-timing-label", ".supplement-pdp-story .skin-application-photo figcaption>span",
     ".supplement-pdp-story .skin-step-top>span", ".supplement-pdp-story .supp-research-scope", ".supplement-pdp-story .skin-compare-table tr>th:first-child:not(:has(.sr-only))",

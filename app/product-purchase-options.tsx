@@ -3,6 +3,7 @@
 import { useId } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { money, type ProductSellingPlan, type Purchase } from "@/lib/catalog";
+import { STORE_POLICIES } from "@/lib/store-policies";
 
 function cadence(interval?: string, count?: number) {
   const unit = interval?.toLowerCase();
@@ -55,7 +56,7 @@ export function ProductPurchaseOptions({ purchase, setPurchase, plan, plans, set
             ? `${money(plan.price, plan.currency)} for ${plan.initialOrderCount === 1 ? "the first order" : plan.initialOrderCount ? `the first ${plan.initialOrderCount} orders` : "the initial billing period"}, then ${money(plan.recurringPrice!, plan.currency)} ${billingCopy}.`
             : `${money(plan.price, plan.currency)} ${billingCopy}.`}
             {!payPerDelivery && ` ${money(plan.perDeliveryPrice, plan.currency)} per delivery.`}
-            {" "}Renews and charges automatically. Skip or cancel anytime from your <a href="/account">account</a>. Shipping and taxes calculated at checkout.
+            {" "}Renews and charges automatically. Skip or cancel anytime from your <a href="/account">account</a>. Shipping and taxes calculated at checkout. See the <a href={STORE_POLICIES.subscription.href} rel="noopener">cancellation policy</a>.
           </p>
           {plan.description && <p className="subscription-description">{plan.description}</p>}
         </div>}
