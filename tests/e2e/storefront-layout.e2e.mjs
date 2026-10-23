@@ -147,6 +147,41 @@ for (const device of VIEWPORTS) {
     } finally {await close();}
   });
 
+  test(`${device.name}px: Help store answer survives hydration, opens and fits without overflow`, async () => {
+    const question = "Where can I buy IQON products?";
+    const raw = new JSDOM(await (await fetch(base + "/help")).text()).window.document;
+    const rawItem = [...raw.querySelectorAll(".help-wrap [data-slot='accordion-item']")].find(i => i.querySelector("[data-slot='accordion-trigger']")?.textContent.trim() === question);
+    const rawAnswer = rawItem?.querySelector("[data-slot='accordion-content']")?.textContent.trim();
+    assert.match(rawAnswer || "", /^IQON’s online store is www\.iqondaily\.com\. Browse current products in the supplements collection\./, "answer exists in raw server HTML");
+    const {page, close} = await open(device, "/help");
+    try {
+      const trigger = page.locator(".help-wrap [data-slot='accordion-trigger']").filter({hasText: question});
+      assert.equal(await trigger.count(), 1);
+      await trigger.scrollIntoViewIfNeeded();
+      await trigger.click();
+      assert.equal(await trigger.getAttribute("aria-expanded"), "true");
+      const panel = trigger.locator("xpath=ancestor::*[@data-slot='accordion-item'][1]//*[@data-slot='accordion-content']");
+      await page.waitForFunction(el => el.getBoundingClientRect().height > 0, await panel.elementHandle());
+      await page.waitForTimeout(400);
+      assert.equal((await panel.innerText()).trim(), rawAnswer, "hydrated answer matches the server HTML");
+      assert.ok(await panel.isVisible());
+      // Both links survive hydration with their targets and read as links (underlined), not plain text.
+      const links = await panel.locator("a").evaluateAll(as => as.map(a => ({text: a.textContent, href: a.getAttribute("href"), resolved: a.href, line: getComputedStyle(a).textDecorationLine, w: a.getBoundingClientRect().width})));
+      assert.deepEqual(links.map(l => [l.text, l.href]), [["www.iqondaily.com", "https://www.iqondaily.com/"], ["supplements collection", "/collections/supplements"]]);
+      assert.equal(links[1].resolved, base + "/collections/supplements");
+      assert.ok(links.every(l => l.line.includes("underline") && l.w > 0), JSON.stringify(links));
+      const box = await panel.boundingBox();
+      assert.ok(box.width > 0 && box.x >= 0 && box.x + box.width <= device.viewport.width, `answer fits the viewport ${JSON.stringify(box)}`);
+      const size = await page.evaluate(() => ({inner: innerWidth, client: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, body: document.body.scrollWidth}));
+      assert.equal(size.inner, device.viewport.width);
+      assert.ok(size.scroll <= size.client && size.body <= size.client, JSON.stringify(size));
+      assert.doesNotMatch(await page.locator("main").innerText(), /IQON\s+Daily/i);
+      await panel.evaluate(el => el.closest("[data-slot='accordion-item']").scrollIntoView({block: "center"}));
+      await page.waitForTimeout(200);
+      await page.screenshot({path: path.join(shots, `${device.name}_help_store_answer.png`)});
+    } finally {await close();}
+  });
+
   test(`${device.name}px: no horizontal page overflow`, async () => {
     for (const url of ROUTES) {
       const {page, close} = await open(device, url);
