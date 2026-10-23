@@ -71,6 +71,8 @@ const STORE_POLICY_LINKS = [["Shipping policy", POLICY("shipping-policy")], ["Re
   ["Terms of service", POLICY("terms-of-service")], ["Contact information", POLICY("contact-information")]];
 const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"];
 const dom = html => new JSDOM(html).window.document;
+const STORE_QUESTION = "Where can I buy IQON products?";
+const STORE_ANSWER = "IQON’s online store is www.iqondaily.com. Browse the supplements at www.iqondaily.com/collections/supplements, where each product page shows its current price and whether it can be ordered. IQON skincare is coming soon and is not available to order yet.";
 /** In-page links whose target id is not in the server-rendered document. */
 const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute("href")).filter(h => h.length > 1 && !doc.getElementById(decodeURIComponent(h.slice(1))));
 /** Exact H1 copy: every `<br>` line break must still read as two words in textContent. */
@@ -205,6 +207,30 @@ test("production, live catalog, canonical and alias hosts", async t => {
       assert.deepEqual(links.map(a => [a.getAttribute("href"), a.textContent]), [["mailto:info@iqonhealth.com", "Contact us"]], url);
     }
     assert.doesNotMatch((await get(port, "/help")).body, /tel:|within \d+ (hours|business days) of your email/i, "no phone or response-time promise");
+  });
+  await t.test("help names IQON's online store by its canonical domain, without an IQON Daily alias", async () => {
+    const r = await get(port, "/help"); const doc = dom(r.body);
+    const item = [...doc.querySelectorAll("main.help-wrap [data-slot=accordion-item]")].filter(i => i.querySelector("[data-slot=accordion-trigger]")?.textContent.trim() === STORE_QUESTION);
+    assert.equal(item.length, 1, "exactly one store question");
+    // Raw server HTML carries the whole answer, even while its panel is closed.
+    assert.equal(item[0].querySelector("[data-slot=accordion-content]").textContent.trim(), STORE_ANSWER);
+    // The long collection URL carries line-break opportunities so it cannot widen a 320 px page.
+    assert.equal(item[0].querySelectorAll("[data-slot=accordion-content] wbr").length, 2);
+    // The new answer is appended: existing questions keep their order and the first stays open.
+    const questions = [...doc.querySelectorAll("main.help-wrap [data-slot=accordion-trigger]")].map(t => t.textContent.trim());
+    assert.deepEqual(questions.slice(-2), ["What is IQON?", STORE_QUESTION]);
+    assert.equal(questions[0], "How do I place an order?");
+    assert.doesNotMatch(r.body, /IQON\s+Daily/i, "the domain is never presented as a brand name");
+    assert.doesNotMatch(STORE_ANSWER, /\b(only|exclusive(ly)?|official|retailers?|Amazon|in stores?|tested|clinically|best)\b/i, "no exclusivity, retail, testing or superiority claim");
+    assertIndexable(r, "/help");
+    const graph = jsonLd(r.body);
+    assert.ok(!graph.some(x => x["@type"] === "FAQPage"), "no FAQPage markup added");
+    const org = jsonLd((await get(port, "/")).body).find(x => x["@type"] === "Organization");
+    assert.equal(org.name, "IQON");
+    assert.equal(org.url, `https://${WWW}/`);
+    assert.ok(!("alternateName" in org), "no alternate brand name");
+    // The path the answer names is a real, indexable supplements collection.
+    assertIndexable(await get(port, "/collections/supplements"), "/collections/supplements");
   });
   await t.test("PDP section links point at sections that exist", async () => {
     // Generic Shopify product (no editorial productContent): no ingredient/routine jump links at all.
@@ -408,6 +434,7 @@ test("production, Shopify outage: shopping pages fail closed, static pages stay 
   const server = await startServer("down", {...live, FAKE_SHOPIFY: "down"});
   t.after(server.stop);
   for (const url of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements"]) assertNoindex(await get(server.port, url), url);
+  assert.ok(!(await get(server.port, "/help")).body.includes(STORE_QUESTION), "outage help does not point shoppers at an unavailable store");
   for (const [title, path] of STORE_POLICY_LINKS) {
     const r = await get(server.port, path); assertNoindex(r, path);
     assert.equal(canonical(r.body), `https://${WWW}${path}`);
@@ -445,6 +472,7 @@ test("production without Shopify configuration: preview fixtures are never index
   const previewHelp = (await get(server.port, "/help")).body;
   assert.ok(previewHelp.includes("Shipping usually takes 3 to 5 days. Shipping options and costs will be shown at checkout once orders open."));
   assert.doesNotMatch(previewHelp, /business days|through Shop/);
+  assert.ok(!previewHelp.includes(STORE_QUESTION), "preview help keeps its preview-specific questions");
 });
 
 test("preview deployment: nothing is indexable and robots.txt blocks crawling", async t => {
