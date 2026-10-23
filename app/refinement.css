@@ -192,6 +192,7 @@ html{scrollbar-gutter:stable}
 /* Support contact on /help. */
 .help-contact{margin-top:32px;font-style:normal;font-size:15px;line-height:1.8;color:#4f5b61}
 .help-contact a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.help-wrap [data-slot='accordion-content'] a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 /* Below ~380px the wordmark and tagline no longer fit side by side: wrap the tagline instead of widening the page. */
 @media(max-width:380px){.footer-main>.footer-brand{flex-wrap:wrap;gap:18px}}
 /* Generic PDP band: the 1920px-wide image must not size the single mobile column. */

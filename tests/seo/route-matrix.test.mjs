@@ -72,7 +72,7 @@ const STORE_POLICY_LINKS = [["Shipping policy", POLICY("shipping-policy")], ["Re
 const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"];
 const dom = html => new JSDOM(html).window.document;
 const STORE_QUESTION = "Where can I buy IQON products?";
-const STORE_ANSWER = "IQON’s online store is www.iqondaily.com. Browse the supplements at www.iqondaily.com/collections/supplements, where each product page shows its current price and whether it can be ordered. IQON skincare is coming soon and is not available to order yet.";
+const STORE_ANSWER = "IQON’s online store is www.iqondaily.com. Browse current products in the supplements collection. IQON skincare is coming soon and is not available to order yet.";
 /** In-page links whose target id is not in the server-rendered document. */
 const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute("href")).filter(h => h.length > 1 && !doc.getElementById(decodeURIComponent(h.slice(1))));
 /** Exact H1 copy: every `<br>` line break must still read as two words in textContent. */
@@ -213,9 +213,12 @@ test("production, live catalog, canonical and alias hosts", async t => {
     const item = [...doc.querySelectorAll("main.help-wrap [data-slot=accordion-item]")].filter(i => i.querySelector("[data-slot=accordion-trigger]")?.textContent.trim() === STORE_QUESTION);
     assert.equal(item.length, 1, "exactly one store question");
     // Raw server HTML carries the whole answer, even while its panel is closed.
-    assert.equal(item[0].querySelector("[data-slot=accordion-content]").textContent.trim(), STORE_ANSWER);
-    // The long collection URL carries line-break opportunities so it cannot widen a 320 px page.
-    assert.equal(item[0].querySelectorAll("[data-slot=accordion-content] wbr").length, 2);
+    const answer = item[0].querySelector("[data-slot=accordion-content]");
+    assert.equal(answer.textContent.trim(), STORE_ANSWER);
+    // The domain and the collection are links; the text never spells out a path or a bare URL.
+    assert.deepEqual([...answer.querySelectorAll("a")].map(a => [a.textContent, a.getAttribute("href")]),
+      [["www.iqondaily.com", `https://${WWW}/`], ["supplements collection", "/collections/supplements"]]);
+    assert.doesNotMatch(STORE_ANSWER, /https?:|\/collections|iqondaily\.com.*iqondaily\.com/, "no bare URL, path or repeated domain");
     // The new answer is appended: existing questions keep their order and the first stays open.
     const questions = [...doc.querySelectorAll("main.help-wrap [data-slot=accordion-trigger]")].map(t => t.textContent.trim());
     assert.deepEqual(questions.slice(-2), ["What is IQON?", STORE_QUESTION]);
