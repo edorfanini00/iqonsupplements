@@ -2,7 +2,7 @@
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { money } from "@/lib/catalog";
-import { BUNDLE_TIERS, tierUnitPrice } from "@/lib/bundle-offer";
+import { BUNDLE_EXCLUDED_NOTE, BUNDLE_TIERS, tierUnitPrice } from "@/lib/bundle-offer";
 
 /** Quick quantity choice for bundle eligible supplements. Selecting a tier sets the quantity to add. */
 export function ProductBundleOptions({ quantity, setQuantity, price, currency }: {
@@ -27,6 +27,6 @@ export function ProductBundleOptions({ quantity, setQuantity, price, currency }:
         <b>{money(option.unit, currency)}<small>each</small></b>
       </label>)}
     </RadioGroup>
-    <p className="bundle-terms">Mix and match any eligible IQON supplements: every eligible item in your bag counts toward the bundle. Savings apply automatically in your bag and at checkout, and can’t be combined with discount codes.</p>
+    <p className="bundle-terms">Mix and match any eligible IQON supplements: every eligible item in your bag counts toward the bundle. Savings apply automatically in your bag and at checkout, and can’t be combined with discount codes. {BUNDLE_EXCLUDED_NOTE}</p>
   </div>;
 }

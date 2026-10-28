@@ -42,6 +42,7 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   expect(three.closest("label")?.textContent).toContain("$36.73");
   expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
   expect(container.querySelector(".bundle-terms")?.textContent).toMatch(/Mix and match any eligible IQON supplements/);
+  expect(container.querySelector(".bundle-terms")?.textContent).toContain("Colon Gentle Cleanse is not part of the bundle offer.");
   fireEvent.click(three);
   await waitFor(()=>expect(three.getAttribute("aria-checked")).toBe("true"));
   expect(screen.getByLabelText("Quantity").textContent).toBe("3");
