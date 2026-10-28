@@ -542,3 +542,79 @@ test("every local srcset candidate on the homepage is served as WebP at its decl
   }
   await close();
 });
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: bag quantity controls remain reachable through every bundle tier`, async () => {
+    const {page, close} = await open(device, "/products/creatine-monohydrate");
+    const records = [];
+    const keyboard = [];
+    const bag = page.locator(".bag-sheet");
+    const quantity = bag.locator(".cart-line .quantity");
+    const waitForQuantity = async value => {
+      await page.waitForFunction(value => {
+        const quantity = document.querySelector(".bag-sheet .cart-line .quantity");
+        return quantity?.textContent.trim() === String(value) && !quantity.querySelector("button").disabled;
+      }, value);
+    };
+    const activate = async control => {
+      await control.scrollIntoViewIfNeeded();
+      const geometry = await control.evaluate(el => {
+        const box = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+        const lines = document.querySelector(".bag-lines");
+        const sheet = document.querySelector(".bag-sheet");
+        return {label: el.getAttribute("aria-label") || el.textContent, box: box.toJSON(),
+          hit: !!hit && el.contains(hit), viewport: {width: innerWidth, height: innerHeight},
+          lines: {height: lines.clientHeight, scrollHeight: lines.scrollHeight},
+          sheet: {height: sheet.clientHeight, scrollHeight: sheet.scrollHeight, scrollTop: sheet.scrollTop}};
+      });
+      records.push(geometry);
+      assert.ok(geometry.hit, `control is occluded: ${JSON.stringify(geometry)}`);
+      assert.ok(geometry.box.y >= 0 && geometry.box.bottom <= device.viewport.height, "control fits vertically");
+      assert.ok(geometry.box.x >= 0 && geometry.box.right <= device.viewport.width, "control fits horizontally");
+      if (device.hasTouch) await control.tap(); else await control.click();
+    };
+    try {
+      const add = page.locator(".add-to-bag-row button.button-dark");
+      await add.click();
+      await waitForQuantity(1);
+      // Native Tab navigation must scroll the sheet to each focused control.
+      await bag.locator(".cart-line > a").focus();
+      for (let i = 0; i < 12; i++) {
+        await page.keyboard.press("Tab");
+        const focused = await page.evaluate(() => {
+          const el = document.activeElement, box = el.getBoundingClientRect();
+          return {label: el.getAttribute("aria-label") || el.textContent.trim(), box: box.toJSON(),
+            hit: el.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2))};
+        });
+        keyboard.push(focused);
+        assert.ok(focused.hit, `focused control is occluded: ${JSON.stringify(focused)}`);
+        if (focused.label.startsWith("Secure checkout")) break;
+      }
+      const labels = keyboard.map(item => item.label);
+      const decrease = labels.findIndex(label => label.startsWith("Decrease"));
+      assert.ok(decrease >= 0);
+      assert.match(labels[decrease + 1], /^Increase/);
+      assert.match(labels[decrease + 2], /^Remove Creatine/);
+      assert.match(labels.at(-1), /^Secure checkout/);
+      let previous = 1;
+      for (const value of [2, 3, 4, 3, 2, 1]) {
+        await activate(quantity.getByRole("button", {name: value > previous ? /^Increase/ : /^Decrease/}));
+        await waitForQuantity(value);
+        previous = value;
+        await page.screenshot({path: path.join(shots, `${device.name}_bag_quantity_${records.length}_${value}.png`)});
+      }
+      // The explicit removal action and decrement-to-zero must both remain usable.
+      await activate(bag.getByRole("button", {name: /^Remove Creatine/}));
+      await bag.locator(".empty-bag").waitFor();
+      await bag.getByRole("button", {name: "Close", exact: true}).click();
+      await add.click();
+      await waitForQuantity(1);
+      await activate(quantity.getByRole("button", {name: /^Decrease/}));
+      await bag.locator(".empty-bag").waitFor();
+    } finally {
+      fs.writeFileSync(path.join(process.env.E2E_GEOMETRY || shots, `${device.name}_bag_geometry.json`), JSON.stringify({pointer: records, keyboard}, null, 2));
+      await close();
+    }
+  });
+}
