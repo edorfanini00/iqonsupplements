@@ -197,7 +197,7 @@ html{scrollbar-gutter:stable}
 @media(max-width:380px){.footer-main>.footer-brand{flex-wrap:wrap;gap:18px}}
 /* Generic PDP band: the 1920px-wide image must not size the single mobile column. */
 @media(max-width:760px){.pdp-editorial{grid-template-columns:minmax(0,1fr)}.pdp-editorial>img{width:100%}}
-/* 320px PDP: the sticky "Add subscription $00.00" bar was ~13px too wide. Tighten the button and let the product name side shrink instead of widening the page. */
+/* 320px PDP: the sticky "Add to bag $00.00" bar was ~13px too wide. Tighten the button and let the product name side shrink instead of widening the page. */
 @media(max-width:380px){.product-page .sticky-purchase>div{min-width:0;overflow:hidden}.product-page .sticky-purchase>.button{padding-inline:10px;gap:8px}}
 @media(max-width:370px){.product-page .sticky-purchase img{display:none}}
 /* Shopify-hosted store policies: a quiet row in the footer bottom bar and a short list under the /help contact. */

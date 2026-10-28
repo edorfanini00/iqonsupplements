@@ -502,38 +502,29 @@ body { background:#fafbfb; }
  .campaign-hero:not(.campaign-hero-skin) .campaign-image img { object-position:center top; }
 }
 
-/* Real Shopify subscription choices; pricing remains supplied by the store. */
+/* Bundle tiers: quantity quick select for eligible supplements. Savings come from Shopify automatic discounts. */
 .product-purchase-choices { margin-top:4px; }
-.subscription-saving { display:inline-block; margin-left:8px; padding:3px 6px; background:#dde4e7; color:#37434b; font-size:10px; font-weight:500; font-style:normal; letter-spacing:.02em; }
-.subscription-details { padding:16px; border:1px solid #46575e; border-top:0; background:#f6f7f7; }
-.subscription-schedule { display:flex; flex-direction:column; gap:8px; }
-.subscription-schedule label,.subscription-plan-name { font-size:12px; font-weight:500; }
-.subscription-schedule select { width:100%; min-height:44px; padding:10px 30px 10px 12px; border:1px solid #cbd0d2; border-radius:0; background:#fff; font:inherit; font-size:13px; color:inherit; }
-.subscription-terms,.subscription-description { margin:12px 0 0; font-size:12px; line-height:1.65; color:#61686d; }
+.bundle-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:4px 14px; margin:0 0 10px; font-size:12px; color:#3e4e54; }
+.bundle-heading strong { font-size:12px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; }
+.purchase-option.bundle-option>b { flex:0 0 auto; text-align:right; }
+.purchase-option.bundle-option>b small { display:block; margin-top:1px; font-size:11px; font-weight:400; color:#59666c; }
+.purchase-option.bundle-option.selected { border:1px solid #46575e; box-shadow:inset 3px 0 #46575e; background:#edf2f2; }
+.bundle-terms { margin:10px 0 0; font-size:12px; line-height:1.65; color:#61686d; }
+.add-to-bag-row .button s,.sticky-purchase .button s { margin-right:8px; font-weight:400; opacity:.7; }
+.bundle-nudge { margin:0 0 14px; padding:10px 12px; border:1px solid #c9d1d4; background:#f6f8f8; font-size:12px; line-height:1.5; color:#37434b; }
+.bag-summary>.bag-savings,.bag-savings { display:block; margin:0 0 10px; font-size:13px; }
+.bag-savings>div { display:flex; justify-content:space-between; gap:16px; margin:6px 0; }
+.bag-savings dd,.checkout-summary .bag-discount dd { margin:0; white-space:nowrap; }
+.bag-discount { color:#37434b; }
+.cart-line-bottom strong s { margin-right:6px; font-weight:400; color:#8a8b8c; }
 .product-page .skincare-launch-note { margin:4px 0 20px; padding:22px; background:#f0f2f3; border:1px solid #e2e5e7; }
 .product-page .skincare-launch-note .launch-status { margin:0 0 8px; color:#343d44; font-size:20px; font-family:var(--serif); }
 .product-page .skincare-launch-note>p:not(.launch-status) { margin:0 0 18px; font-size:14px; line-height:1.6; }
 .skincare-launch-note .button:disabled { opacity:1; background:#dfe3e5; color:#656e74; border-color:#dfe3e5; cursor:default; }
 .skincare-launch-note .under-link { margin-top:16px; font-size:12px; }
-@media(max-width:600px) { .subscription-saving { margin-left:0; margin-top:4px; display:table; } }
 
 /* Customer account entry points (header + mobile menu); the account area styles live in app/account/account.css. */
 .mobile-account-link{display:flex;justify-content:space-between;align-items:center;padding:18px 0;margin-top:6px;border-bottom:1px solid var(--line);font-size:18px}
-
-/* Subscription value stays visible next to the optional one time purchase. */
-.purchase-option.subscription-option { border-color:#a3adb0; background:#f5f7f7; align-items:center; }
-.purchase-option.subscription-option.selected { border:1px solid #46575e; box-shadow:inset 3px 0 #46575e; background:#edf2f2; }
-.purchase-option.subscription-option>span:first-of-type { min-width:0; }
-.purchase-option .subscription-price { flex:0 0 auto; text-align:right; }
-.subscription-price s { display:block; font-size:12px; color:#697276; }
-.subscription-price b { display:block; font-size:18px; font-weight:500; }
-.purchase-option .subscription-price small { color:#59666c; font-size:11px; }
-.subscription-option small { color:#526369; }
-.subscription-benefits { list-style:none; display:grid; gap:7px; margin:0; padding:0; font-size:12px; color:#3e4e54; }
-.subscription-benefits li::before { content:'✓'; margin-right:8px; }
-.subscription-schedule { margin-bottom:14px; }
-.subscription-terms a { text-decoration:underline; text-underline-offset:3px; }
-@media(max-width:450px) { .purchase-option.subscription-option { gap:9px; padding:14px 12px; } .subscription-option strong { font-size:13px; } }
 
 /* Buyer paths: collection format selection and guide links, guide → product links, product → guide links. */
 .catalog-selection { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px 40px; margin:-10px 0 34px; padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }

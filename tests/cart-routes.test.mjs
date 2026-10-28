@@ -44,8 +44,10 @@ const fixtureProducts = [
   {handle: "hydra-c-ferulic-serum", category: "skincare", price: 68, variantId: "gid://shopify/ProductVariant/3"},
 ];
 
-const plans = [{id:"gid://shopify/SellingPlan/10",name:"Deliver every month",price:26.10}, {id:"gid://shopify/SellingPlan/20",name:"Deliver every 2 months",price:27.55}];
-const planAllocation = plan => ({sellingPlan:{id:plan.id,name:plan.name,recurringDeliveries:true,options:[{name:"Delivery",value:plan.name}],priceAdjustments:[{orderCount:null}]},priceAdjustments:[{price:money(plan.price),compareAtPrice:money(29),perDeliveryPrice:money(plan.price)}]});
+// Mirrors the Shopify automatic bundle discounts: any mix of eligible units, best single tier.
+const ELIGIBLE = new Set(["creatine-monohydrate", "nmn"]);
+const TIERS = [{min: 3, rate: .25, title: "Bundle: Buy 3, save 25%"}, {min: 2, rate: .10, title: "Bundle: Buy 2, save 10%"}];
+const plan = {id: "gid://shopify/SellingPlan/10", name: "Deliver every month"};
 function fixture(t) {
   jar.clear(); cookieOptions.clear();
   const previous = {...process.env};
@@ -56,18 +58,26 @@ function fixture(t) {
     for (const key of ["SHOPIFY_STORE_DOMAIN", "SHOPIFY_STOREFRONT_PRIVATE_TOKEN", "SHOPIFY_API_VERSION"])
       previous[key] === undefined ? delete process.env[key] : process.env[key] = previous[key];
   });
-  const state = {cart: null, serial: 0, available: true, operations: [], partialError: false, requiresSellingPlan: false};
+  const state = {cart: null, serial: 0, available: true, operations: [], addedLines: [], partialError: false, requiresSellingPlan: false, bundles: false};
+  // SAVE10 is a product code; ORDER5 a $5 order (cart level) code. Codes do not combine with the bundle tiers.
   const recalculate = () => {
-    const discount = state.cart.discountCodes.some(code => code.code === "SAVE10");
+    const code = state.cart.discountCodes.some(code => code.code === "SAVE10");
+    const units = state.cart.lines.nodes.filter(line => ELIGIBLE.has(line.merchandise.product.handle)).reduce((n, line) => n + line.quantity, 0);
+    const tier = state.bundles && !code ? TIERS.find(t => units >= t.min) : undefined;
     let total = 0;
     for (const line of state.cart.lines.nodes) {
       const item = fixtureProducts.find(p => p.variantId === line.merchandise.id);
-      const selectedPlan = plans.find(p => p.id === line.sellingPlanAllocation?.sellingPlan.id);
-      const amount = (selectedPlan?.price ?? item.price) * line.quantity * (discount ? .9 : 1);
-      line.cost = {totalAmount: money(amount)}; total += amount;
+      const gross = Math.round(item.price * line.quantity * 100);
+      const rate = code ? .1 : tier && ELIGIBLE.has(item.handle) ? tier.rate : 0;
+      const saved = Math.round(gross * rate);
+      line.cost = {subtotalAmount: money(gross / 100), totalAmount: money((gross - saved) / 100)};
+      line.discountAllocations = saved ? [{discountedAmount: money(saved / 100), ...(code ? {code: "SAVE10"} : {title: tier.title})}] : [];
+      total += gross - saved;
     }
+    const order = state.cart.discountCodes.some(code => code.code === "ORDER5") && total >= 500 ? 500 : 0;
+    state.cart.discountAllocations = order ? [{discountedAmount: money(order / 100), code: "ORDER5"}] : [];
     state.cart.totalQuantity = state.cart.lines.nodes.reduce((sum, line) => sum + line.quantity, 0);
-    state.cart.cost = {subtotalAmount: money(total), totalAmount: money(total)};
+    state.cart.cost = {subtotalAmount: money(total / 100), totalAmount: money((total - order) / 100)};
   };
   t.mock.method(globalThis, "fetch", async (_url, options) => {
     const {query, variables} = JSON.parse(options.body);
@@ -77,7 +87,7 @@ function fixture(t) {
       pageInfo: {hasNextPage: false, endCursor: null}, nodes: fixtureProducts.map(p => ({
         handle: p.handle, title: p.handle, description: "Fixture", productType: "Fixture", tags: [`iqon-${p.category}`],
         availableForSale: state.available, requiresSellingPlan: state.requiresSellingPlan, images: {nodes: []},
-        variants: {pageInfo: {hasNextPage: false}, nodes: [{id: p.variantId, title: "Default Title", availableForSale: state.available, price: money(p.price), sellingPlanAllocations:{pageInfo:{hasNextPage:false},nodes:p===fixtureProducts[0]?plans.map(planAllocation):[]}}]},
+        variants: {pageInfo: {hasNextPage: false}, nodes: [{id: p.variantId, title: "Default Title", availableForSale: state.available, price: money(p.price)}]},
       })),
     }}});
     if (operation === "IQONCartRead") return Response.json({data: {cart: state.cart?.id === variables.id ? state.cart : null}});
@@ -89,11 +99,12 @@ function fixture(t) {
     if (operation === "IQONCartCreate" || operation === "IQONCartAdd") {
       mutation ||= "cartLinesAdd";
       for (const input of variables.input?.lines || variables.lines) {
-        const existing = state.cart.lines.nodes.find(line => line.merchandise.id === input.merchandiseId && line.sellingPlanAllocation?.sellingPlan.id === input.sellingPlanId);
+        state.addedLines.push(input);
+        const existing = state.cart.lines.nodes.find(line => line.merchandise.id === input.merchandiseId && !line.sellingPlanAllocation && !input.sellingPlanId);
         const item = fixtureProducts.find(p => p.variantId === input.merchandiseId);
         if (existing) existing.quantity += input.quantity;
-        else state.cart.lines.nodes.push({id: `line-${item.handle}-${input.sellingPlanId?.split("/").at(-1)||"once"}`, quantity: input.quantity,
-          sellingPlanAllocation:input.sellingPlanId ? planAllocation(plans.find(p=>p.id===input.sellingPlanId)) : null,
+        else state.cart.lines.nodes.push({id: `line-${item.handle}-${input.sellingPlanId ? "plan" : "once"}`, quantity: input.quantity,
+          sellingPlanAllocation: input.sellingPlanId ? {sellingPlan: {...plan, options: [{name: "Delivery", value: "Monthly"}]}} : null,
           merchandise: {id: item.variantId, title: "Default Title", product: {handle: item.handle, title: item.handle,tags:[`iqon-${item.category}`]}}});
       }
     } else if (operation === "IQONCartUpdate") {
@@ -104,7 +115,7 @@ function fixture(t) {
       state.cart.lines.nodes = state.cart.lines.nodes.filter(line => !variables.lineIds.includes(line.id));
     } else if (operation === "IQONCartDiscounts") {
       mutation = "cartDiscountCodesUpdate";
-      state.cart.discountCodes = variables.discountCodes.map(code => ({code, applicable: code === "SAVE10"}));
+      state.cart.discountCodes = variables.discountCodes.map(code => ({code, applicable: code === "SAVE10" || code === "ORDER5"}));
     }
     assert.ok(mutation, `Unhandled fixture operation: ${operation}`);
     recalculate();
@@ -188,35 +199,55 @@ test("cart and checkout reject cross-origin writes and unsafe checkout links", a
   assert.equal((await routes.checkoutResponse(request({}, "checkout"))).status, 502);
 });
 
-test("one-time and subscription lines remain distinct and use exact Shopify prices", async t => {
-  fixture(t);
-  await add(fixtureProducts[0]);
-  const subscribe=()=>routes.mutateCartResponse(request({action:"add",id:fixtureProducts[0].handle,variantId:fixtureProducts[0].variantId,quantity:1,purchase:"subscription",sellingPlanId:plans[0].id}));
-  let response=await subscribe();assert.equal(response.status,200);
-  let bag=await response.json();assert.equal(bag.items.length,2);assert.equal(bag.subtotal,55.1);
-  const line=bag.items.find(i=>i.purchase==="subscription");
-  assert.equal(line.sellingPlanId,plans[0].id);assert.equal(line.sellingPlanName,plans[0].name);assert.equal(line.amount,26.1);
-  bag=await (await subscribe()).json();assert.equal(bag.items.length,2);assert.equal(bag.subtotal,81.2);
-  bag=await (await routes.mutateCartResponse(request({action:"update",lineId:line.lineId,quantity:3}))).json();
-  assert.equal(bag.items.find(i=>i.lineId===line.lineId).sellingPlanId,plans[0].id);assert.equal(bag.subtotal,107.3);
-  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+test("new lines are one time only: no selling plan reaches Shopify, whatever the request says", async t => {
+  const state=fixture(t);
+  const base={action:"add",id:fixtureProducts[0].handle,variantId:fixtureProducts[0].variantId,quantity:1};
+  for (const input of [{...base,purchase:"subscription"},{...base,sellingPlanId:plan.id},{...base,purchase:"once",sellingPlanId:plan.id},{...base,sellingPlanId:"invalid"},{...base,purchase:"monthly"}]) {
+    const response=await routes.mutateCartResponse(request(input));
+    assert.equal(response.status,422,JSON.stringify(input));assert.match((await response.json()).error,/no longer offered/);
+  }
+  assert.equal(state.cart,null);assert.deepEqual(state.addedLines,[]);
+  assert.equal((await routes.mutateCartResponse(request({...base,purchase:"once"}))).status,200);
+  assert.equal((await add(fixtureProducts[1])).status,200);
+  assert.deepEqual(state.addedLines.map(line=>Object.keys(line).sort()),[["merchandiseId","quantity"],["merchandiseId","quantity"]]);
+  state.requiresSellingPlan=true;
+  assert.equal((await add(fixtureProducts[0])).status,422,"a subscription only product cannot be bought");
 });
 
-test("unavailable, cross-product and missing subscription plans are rejected", async t => {
-  const state=fixture(t);
-  const input={action:"add",id:fixtureProducts[0].handle,variantId:fixtureProducts[0].variantId,quantity:1,purchase:"subscription"};
-  assert.equal((await routes.mutateCartResponse(request(input))).status,422);
-  assert.equal((await routes.mutateCartResponse(request({...input,sellingPlanId:"invalid"}))).status,400);
-  assert.equal((await routes.mutateCartResponse(request({...input,sellingPlanId:"gid://shopify/SellingPlan/999"}))).status,422);
-  assert.equal((await routes.mutateCartResponse(request({...input,id:fixtureProducts[1].handle,variantId:fixtureProducts[1].variantId,sellingPlanId:plans[0].id}))).status,422);
-  state.requiresSellingPlan=true;
-  assert.equal((await add(fixtureProducts[0])).status,422);
-  assert.equal(state.cart,null);
+test("a subscription line from an older bag still shows as a subscription and can be changed or removed", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);
+  state.cart.lines.nodes.push({id:"old-plan-line",quantity:1,sellingPlanAllocation:{sellingPlan:{...plan,options:[{name:"Delivery",value:"Monthly"}]}},
+    merchandise:{id:fixtureProducts[1].variantId,title:"Default Title",product:{handle:"nmn",title:"nmn",tags:["iqon-supplements"]}}});
+  let bag=await (await routes.mutateCartResponse(request({action:"update",lineId:"old-plan-line",quantity:2}))).json();
+  const old=bag.items.find(item=>item.lineId==="old-plan-line");
+  assert.equal(old.purchase,"subscription");assert.equal(old.sellingPlanId,plan.id);assert.equal(old.quantity,2);
+  bag=await (await routes.mutateCartResponse(request({action:"update",lineId:"old-plan-line",quantity:0}))).json();
+  assert.deepEqual(bag.items.map(item=>item.purchase),["once"]);
+});
+
+test("bundle savings come from Shopify's allocations, mix and match, and reconcile to its cart cost", async t => {
+  const state=fixture(t);state.bundles=true;
+  let bag=await (await add(fixtureProducts[0])).json();
+  assert.equal(bag.subtotal,29);assert.deepEqual(bag.lineDiscounts,[]);assert.equal(bag.merchandise,29);
+  bag=await (await routes.mutateCartResponse(request({action:"update",lineId:bag.items[0].lineId,quantity:2}))).json();
+  assert.equal(bag.merchandise,58);assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 2, save 10%",amount:5.8}]);
+  assert.equal(bag.subtotal,52.2);assert.equal(bag.items[0].amount,52.2);assert.equal(bag.items[0].compareAmount,58);
+  bag=await (await add(fixtureProducts[1])).json();
+  // 2 creatine + 1 NMN: the 25% tier applies once, across both products, never stacked with 10%.
+  assert.equal(bag.merchandise,126);assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:31.5}]);
+  assert.equal(bag.subtotal,94.5);assert.equal(bag.total,94.5);assert.deepEqual(bag.orderDiscounts,[]);
+  assert.equal(Math.round(bag.merchandise*100)-Math.round(bag.lineDiscounts[0].amount*100),Math.round(bag.subtotal*100));
+  // A product code replaces the bundle tier rather than stacking with it.
+  bag=await (await routes.mutateCartResponse(request({action:"discount",discountCodes:["save10"]}))).json();
+  assert.deepEqual(bag.lineDiscounts,[{title:"SAVE10",amount:12.6}]);assert.equal(bag.subtotal,113.4);
+  // An order level code reduces the cart total, not the subtotal.
+  bag=await (await routes.mutateCartResponse(request({action:"discount",discountCodes:["ORDER5"]}))).json();
+  assert.deepEqual(bag.orderDiscounts,[{title:"ORDER5",amount:5}]);assert.equal(bag.subtotal,94.5);assert.equal(bag.total,89.5);
 });
 
 function insertOldSkincare(state) {
   const p=fixtureProducts[2];
-  state.cart.lines.nodes.push({id:"old-skincare-line",quantity:1,cost:{totalAmount:money(p.price)},merchandise:{id:p.variantId,title:"Default Title",product:{handle:p.handle,title:p.handle,tags:["iqon-skincare"]}}});
+  state.cart.lines.nodes.push({id:"old-skincare-line",quantity:1,cost:{subtotalAmount:money(p.price),totalAmount:money(p.price)},merchandise:{id:p.variantId,title:"Default Title",product:{handle:p.handle,title:p.handle,tags:["iqon-skincare"]}}});
   state.cart.totalQuantity++;
 }
 

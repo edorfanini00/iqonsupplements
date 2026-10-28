@@ -8,7 +8,8 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/
 import { StoreNavigation } from "./store-navigation";
 import { departmentHome } from "@/lib/departments";
 import type { Category } from "@/lib/catalog";
-import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Purchase, type Product, type StoreCatalog } from "@/lib/catalog";
+import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Product, type StoreCatalog } from "@/lib/catalog";
+import { bagSummary, bundleNudge, isBundleEligible, type DiscountLine } from "@/lib/bundle-offer";
 import { isComingSoon } from "@/lib/commerce-policy";
 import { DEFAULT_SUPPORT_EMAIL } from "@/lib/orders/emails/format";
 import { STORE_POLICY_LINKS } from "@/lib/store-policies";
@@ -17,7 +18,10 @@ import { trackCartAddition } from "@/lib/meta-pixel";
 import type { CartSnapshot } from "@/lib/shopify";
 import { shopifySrcSet } from "@/lib/responsive-images";
 
-type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,purchase?:Purchase,frequency?:string,variantId?:string,sellingPlanId?:string)=>void; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
+type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,variantId?:string)=>void; costs:BagCosts; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
+// Shopify's own figures for the bag: merchandise before product discounts, the discount allocations and its cart total.
+type BagCosts = {merchandise:number; lineDiscounts:DiscountLine[]; orderDiscounts:DiscountLine[]; total:number};
+const NO_COSTS:BagCosts = {merchandise:0,lineDiscounts:[],orderDiscounts:[],total:0};
 const StoreContext = createContext<StoreContextType | null>(null);
 export function useStore() {const value=useContext(StoreContext); if(!value) throw new Error("Store context missing"); return value;}
 // Use the supplied label artwork verbatim for the black header wordmark (lossless WebP of the PNG, pixel-identical).
@@ -42,10 +46,12 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const [shopSubtotal,setShopSubtotal]=useState(0);
   const [shopCurrency,setShopCurrency]=useState(catalog.currency);
   const [discountCodes,setDiscountCodes]=useState<CartSnapshot["discountCodes"]>([]);
+  const [costs,setCosts]=useState<BagCosts>(NO_COSTS);
   const live=mode==="live";
   const currency=live?shopCurrency:catalog.currency;
   const applySnapshot=(data:CartSnapshot)=>{
     setCart(data.items);setShopSubtotal(data.subtotal);setShopCurrency(data.currency);setDiscountCodes(data.discountCodes||[]);setError(data.notice||"");
+    setCosts({merchandise:data.merchandise??data.subtotal,lineDiscounts:data.lineDiscounts||[],orderDiscounts:data.orderDiscounts||[],total:data.total??data.subtotal});
   };
   async function requestCart(input?:Record<string,unknown>) {
     const response=await fetch("/api/cart",input?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(input),signal:AbortSignal.timeout(25000)}:{cache:"no-store",signal:AbortSignal.timeout(15000)});
@@ -77,19 +83,18 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     finally{lock.current=false;setBusy(false);}
   };
   const applyDiscounts=async(codes:string[])=>!!(await transact({action:"discount",discountCodes:codes}));
-  const add=(id:string,quantity=1,purchase:Purchase="once",frequency="once",variantId?:string,sellingPlanId?:string)=>{
-    const p=findProduct(id);if(!p||isComingSoon(p)||p.pricePending||p.available===false||mode==="unavailable")return;
+  // Every new line is a one time purchase: no selling plan is ever sent.
+  const add=(id:string,quantity=1,variantId?:string)=>{
+    const p=findProduct(id);if(!p||isComingSoon(p)||p.pricePending||p.available===false||p.requiresSellingPlan||mode==="unavailable")return;
     if(live){
-      if((p.variants&&p.variants.length>1&&!variantId)||(p.requiresSellingPlan&&!sellingPlanId)){router.push(`/products/${id}`);return;}
+      if(p.variants&&p.variants.length>1&&!variantId){router.push(`/products/${id}`);return;}
       const variant=p.variants?.find(v=>v.id===variantId)||p.variants?.find(v=>v.available);
       if(!variant||!p.available)return;
-      if(purchase==="subscription"&&!variant.sellingPlans?.some(plan=>plan.id===sellingPlanId))return;
-      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase,...(sellingPlanId?{sellingPlanId}:{})}).then(snapshot=>{
-        if(snapshot)trackCartAddition(snapshot.items,variant.id,quantity,sellingPlanId);
+      setBag(true);void transact({action:"add",id,quantity,variantId:variant.id,purchase:"once"}).then(snapshot=>{
+        if(snapshot)trackCartAddition(snapshot.items,variant.id,quantity);
       });return;
     }
-    if(purchase!=="once")return;
-    const item={id,quantity:Math.max(1,Math.min(20,Math.floor(quantity))),purchase,frequency:purchase==="once"?"once":frequency};
+    const item={id,quantity:Math.max(1,Math.min(20,Math.floor(quantity))),purchase:"once" as const,frequency:"once"};
     setCart(current=>{const key=lineKey(item);const exists=current.some(i=>lineKey(i)===key);return exists?current.map(i=>lineKey(i)===key?{...i,quantity:Math.min(20,i.quantity+item.quantity)}:i):[...current,item];});setBag(true);
   };
   const update=(key:string,quantity:number)=>{
@@ -105,7 +110,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       window.location.assign(data.checkoutUrl);
     }catch(e){setError(e instanceof Error?e.message:"Checkout is temporarily unavailable.");lock.current=false;setBusy(false);}
   };
-  const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count};
+  const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count,costs:live?costs:NO_COSTS};
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
   if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}><Suspense fallback={null}><StorefrontMetaPixel/></Suspense>{children}</StoreContext.Provider>;
   return <StoreContext.Provider value={value}>
@@ -115,7 +120,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
     {children}
     <Footer/>
-    <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<button className="button button-dark full-width" disabled={busy||!hydrated} onClick={()=>void checkout()}>Secure checkout <ArrowRight size={18}/></button>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
+    <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<BundleNudge/><BagSavings/><div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><OrderSavings/><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<button className="button button-dark full-width" disabled={busy||!hydrated} onClick={()=>void checkout()}>Secure checkout <ArrowRight size={18}/></button>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
     <Sheet open={search} onOpenChange={setSearch}><SheetContent side="top" className="search-sheet"><SheetTitle>Find your essential.</SheetTitle><SheetDescription>Search the IQON collection</SheetDescription><div className="search-field"><Search size={22}/><input aria-label="Search the collection" placeholder="Search products, formats, collections…" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={18}/></button>}</div><div className="search-results">{results.map(p=><Link href={`/products/${p.id}`} key={p.id} onClick={()=>setSearch(false)}><img src={p.image} alt={p.name}/><span>{p.name}<small>{p.type} · {productPrice(p)}</small></span><ArrowRight size={18}/></Link>)}{!results.length&&<p className="no-results">No products match “{query}”. Try “collagen”, “creatine” or “skincare”.</p>}</div></SheetContent></Sheet>
 
   </StoreContext.Provider>;
@@ -133,6 +138,27 @@ export function DiscountCodes() {
  </div>;
 }
 
+// Next bundle tier for the eligible supplements in the bag. Hidden while a discount code is entered,
+// because bundle savings do not combine with codes.
+export function BundleNudge() {
+ const {cart,mode,discountCodes}=useStore();
+ if(mode!=="live"||discountCodes.length)return null;
+ const message=bundleNudge(cart.filter(item=>item.purchase==="once"&&isBundleEligible(item.id)).reduce((n,item)=>n+item.quantity,0));
+ return message?<p className="bundle-nudge" role="status">{message}</p>:null;
+}
+// Shopify's product discount allocations (bundle tiers), shown only when they reconcile to its subtotal.
+export function BagSavings() {
+ const {costs,subtotal,currency}=useStore();
+ if(!bagSummary({...costs,subtotal}).showLineDiscounts)return null;
+ return <dl className="bag-savings"><div><dt>Products</dt><dd>{money(costs.merchandise,currency)}</dd></div>{costs.lineDiscounts.map(line=><div key={line.title} className="bag-discount"><dt>{line.title}</dt><dd>−{money(line.amount,currency)}</dd></div>)}</dl>;
+}
+// Order level code discounts reduce Shopify's cart total below the subtotal.
+export function OrderSavings() {
+ const {costs,subtotal,currency}=useStore();
+ if(!bagSummary({...costs,subtotal}).showOrderDiscounts)return null;
+ return <dl className="bag-savings">{costs.orderDiscounts.map(line=><div key={line.title} className="bag-discount"><dt>{line.title}</dt><dd>−{money(line.amount,currency)}</dd></div>)}<div><dt>Total before shipping and tax</dt><dd>{money(costs.total,currency)}</dd></div></dl>;
+}
+
 export function CartConnectionNotice() {
  const {ready,error,busy,retryCart}=useStore();
  if(ready||!error)return null;
@@ -142,7 +168,7 @@ export function CartConnectionNotice() {
 export function CartLine({item}:{item:CartItem}) {
  const {update,products,busy}=useStore();const p=products.find(p=>p.id===item.id);const name=item.name||p?.name||"Product";
  const image=p?.image.startsWith("/images/skincare/products/")?p.image:item.image||p?.image;const total=item.amount??(p?unitPrice(p,item.purchase)*item.quantity:0);
- return <article className="cart-line"><Link href={`/products/${item.id}`}>{image&&<img src={image} alt={name}/>}</Link><div className="cart-line-info"><Link href={`/products/${item.id}`}><h3>{name}</h3></Link><p>{item.variantTitle&&item.variantTitle!=="Default Title"?item.variantTitle:p?.size}</p><small>{item.purchase==="subscription"?`Subscription · ${item.sellingPlanName||item.frequency}`:"One-time purchase"}</small><div className="cart-line-bottom"><Quantity value={item.quantity} setValue={n=>update(lineKey(item),n)} min={0} label={name} disabled={busy}/><strong>{money(total,item.currency||p?.currency)}</strong></div><button className="remove-item" disabled={busy} onClick={()=>update(lineKey(item),0)}>Remove {name}</button></div></article>;
+ return <article className="cart-line"><Link href={`/products/${item.id}`}>{image&&<img src={image} alt={name}/>}</Link><div className="cart-line-info"><Link href={`/products/${item.id}`}><h3>{name}</h3></Link><p>{item.variantTitle&&item.variantTitle!=="Default Title"?item.variantTitle:p?.size}</p><small>{item.purchase==="subscription"?`Subscription · ${item.sellingPlanName||item.frequency}`:"One time purchase"}</small><div className="cart-line-bottom"><Quantity value={item.quantity} setValue={n=>update(lineKey(item),n)} min={0} label={name} disabled={busy}/><strong>{item.compareAmount!==undefined&&item.compareAmount>total&&<s>{money(item.compareAmount,item.currency||p?.currency)}</s>}{money(total,item.currency||p?.currency)}</strong></div><button className="remove-item" disabled={busy} onClick={()=>update(lineKey(item),0)}>Remove {name}</button></div></article>;
 }
 export function Quantity({value,setValue,min=1,label="product",disabled=false}:{value:number;setValue:(n:number)=>void;min?:number;label?:string;disabled?:boolean}) {return <div className="quantity"><button aria-label={`Decrease ${label} quantity`} disabled={disabled||value<=min} onClick={()=>setValue(value-1)}><Minus size={15}/></button><span aria-live="polite">{value}</span><button aria-label={`Increase ${label} quantity`} disabled={disabled||value>=20} onClick={()=>setValue(value+1)}><Plus size={15}/></button></div>;}
 export function ProductCard({product:p,compact=false}:{product:Product;compact?:boolean}) {

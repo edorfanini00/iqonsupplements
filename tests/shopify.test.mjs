@@ -77,22 +77,29 @@ test("cart writes reject foreign origins, non-JSON bodies, and malformed quantit
   assert.equal(validQuantity(20),20);assert.equal(validQuantity(0,true),0);
 });
 
-const subscriptionAllocation = {sellingPlan:{id:"gid://shopify/SellingPlan/1",name:"Every month",recurringDeliveries:true,billingPolicy:{interval:"MONTH",intervalCount:1},deliveryPolicy:{interval:"MONTH",intervalCount:1},options:[{name:"Delivery",value:"Monthly"}],priceAdjustments:[{orderCount:3}]},priceAdjustments:[{price:{amount:"40.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"40.00",currencyCode:"EUR"}},{price:{amount:"42.00",currencyCode:"EUR"},compareAtPrice:{amount:"45.75",currencyCode:"EUR"},perDeliveryPrice:{amount:"42.00",currencyCode:"EUR"}}]};
-const withPlans = allocations => ({...product,requiresSellingPlan:true,variants:{pageInfo:{hasNextPage:false},nodes:[{...product.variants.nodes[1],sellingPlanAllocations:{pageInfo:{hasNextPage:false},nodes:allocations}}]}});
-test("subscriptions retain exact Shopify pricing phases and allow required recurring purchases",()=>{
-  const p=mapProduct(withPlans([subscriptionAllocation]),0);
-  assert.equal(p.available,true);
-  assert.equal(p.variants[0].sellingPlans[0].price,40);
-  assert.equal(p.variants[0].sellingPlans[0].billingInterval,"MONTH");
-  assert.equal(p.variants[0].sellingPlans[0].billingIntervalCount,1);
-  assert.equal(p.variants[0].sellingPlans[0].deliveryInterval,"MONTH");
-  assert.equal(p.variants[0].sellingPlans[0].deliveryIntervalCount,1);
-  assert.equal(p.variants[0].sellingPlans[0].recurringPrice,42);
-  assert.equal(p.variants[0].sellingPlans[0].initialOrderCount,3);
-  assert.equal(p.variants[0].sellingPlans[0].compareAtPrice,45.75);
+const subscriptionAllocation = {sellingPlan:{id:"gid://shopify/SellingPlan/1",name:"Every month",recurringDeliveries:true,options:[{name:"Delivery",value:"Monthly"}]},priceAdjustments:[{price:{amount:"40.00",currencyCode:"EUR"}}]};
+const withPlans = (allocations, requiresSellingPlan=true) => ({...product,requiresSellingPlan,variants:{pageInfo:{hasNextPage:false},nodes:[{...product.variants.nodes[1],sellingPlanAllocations:{pageInfo:{hasNextPage:false},nodes:allocations}}]}});
+test("subscriptions are retired: selling plans never reach the storefront and subscription only products cannot be bought",()=>{
+  const required=mapProduct(withPlans([subscriptionAllocation]),0);
+  assert.equal(required.available,false);assert.equal("sellingPlans" in required.variants[0],false);
+  const optional=mapProduct(withPlans([subscriptionAllocation],false),0);
+  assert.equal(optional.available,true);assert.equal(optional.price,45.75);assert.ok(!JSON.stringify(optional).includes("gid://shopify/SellingPlan"));
 });
-test("preorders are excluded and skincare stays unavailable even with a live Shopify listing",()=>{
-  assert.equal(mapProduct(withPlans([{...subscriptionAllocation,sellingPlan:{...subscriptionAllocation.sellingPlan,recurringDeliveries:false}}]),0).available,false);
-  const p=mapProduct({...withPlans([subscriptionAllocation]),tags:["iqon-skincare"]},0);
-  assert.equal(p.available,false);assert.deepEqual(p.variants[0].sellingPlans,[]);
+test("skincare stays unavailable even with a live Shopify listing",()=>{
+  const p=mapProduct({...withPlans([subscriptionAllocation],false),tags:["iqon-skincare"]},0);
+  assert.equal(p.available,false);
+});
+test("bundle discount allocations are summed per discount and keep Shopify's line amounts",()=>{
+  const m=(amount)=>({amount,currencyCode:"USD"});
+  const line=(id,qty,sub,total,allocations)=>({id,quantity:qty,cost:{subtotalAmount:m(sub),totalAmount:m(total)},discountAllocations:allocations,merchandise:{id:`v-${id}`,title:"Default Title",product:{handle:id,title:id}}});
+  const cart={id:"gid://shopify/Cart/x?key=secret",checkoutUrl:"https://x.myshopify.com/c",totalQuantity:3,
+    cost:{subtotalAmount:m("110.18"),totalAmount:m("110.18")},discountAllocations:[],
+    lines:{pageInfo:{hasNextPage:false},nodes:[line("creatine-monohydrate",2,"97.94","73.45",[{discountedAmount:m("24.49"),title:"Bundle: Buy 3, save 25%"}]),
+      line("colostrum-powder",1,"42.17","31.63",[{discountedAmount:m("10.54"),title:"Bundle: Buy 3, save 25%"}]),line("colon-gentle-cleanse",1,"66.84","66.84",[])]}};
+  const out=publicCart(cart);
+  assert.equal(out.merchandise,206.95);assert.deepEqual(out.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:35.03}]);
+  assert.equal(out.items[0].amount,73.45);assert.equal(out.items[0].compareAmount,97.94);assert.equal("compareAmount" in out.items[2],false);
+  assert.deepEqual(out.orderDiscounts,[]);assert.equal(out.total,110.18);
+  const coded=publicCart({...cart,discountAllocations:[{discountedAmount:m("5.00"),code:"CREATOR"}],cost:{...cart.cost,totalAmount:m("105.18")}});
+  assert.deepEqual(coded.orderDiscounts,[{title:"CREATOR",amount:5}]);assert.equal(coded.total,105.18);
 });

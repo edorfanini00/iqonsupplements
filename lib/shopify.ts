@@ -31,36 +31,19 @@ export async function shopifyRequest<T>(config:ShopifyConfig, query:string, vari
 }
 
 type ShopifyMoney={amount:string;currencyCode:string};
-type ShopifyPlanAllocation={
-  sellingPlan:{id:string;name:string;description?:string|null;recurringDeliveries:boolean;billingPolicy?:{interval?:string;intervalCount?:number}|null;deliveryPolicy?:{interval?:string;intervalCount?:number}|null;options:{name:string;value:string}[];priceAdjustments?:{orderCount:number|null}[]};
-  priceAdjustments:{price:ShopifyMoney;compareAtPrice:ShopifyMoney;perDeliveryPrice:ShopifyMoney}[];
-};
 export type ShopifyProduct = {
   handle:string; title:string; description:string; productType:string; tags:string[];
   availableForSale:boolean; requiresSellingPlan:boolean;
   images:{nodes:{url:string;altText:string|null}[]};
-  variants:{pageInfo:{hasNextPage:boolean};nodes:{id:string;title:string;availableForSale:boolean;price:ShopifyMoney;sellingPlanAllocations?:{pageInfo:{hasNextPage:boolean};nodes:ShopifyPlanAllocation[]}}[]};
+  variants:{pageInfo:{hasNextPage:boolean};nodes:{id:string;title:string;availableForSale:boolean;price:ShopifyMoney}[]};
 };
 export function mapProduct(p:ShopifyProduct, index:number):Product|null {
   // Explicit merchandising tags prevent unrelated products entering this catalog.
   const category=p.tags.includes("iqon-supplements")?"supplements":p.tags.includes("iqon-skincare")?"skincare":null;
   if(!category) return null;
   if(p.variants.pageInfo.hasNextPage) throw new CommerceError("This product’s options are temporarily unavailable.");
-  const variants=p.variants.nodes.map(v=>{
-    if(v.sellingPlanAllocations?.pageInfo.hasNextPage) throw new CommerceError("This product’s subscription options are temporarily unavailable.");
-    const sellingPlans=category==="supplements"?(v.sellingPlanAllocations?.nodes||[]).filter(a=>a.sellingPlan.recurringDeliveries).flatMap(a=>{
-      const first=a.priceAdjustments[0];
-      if(!first||!Number.isFinite(Number(first.price.amount))||Number(first.price.amount)<0||first.price.currencyCode!==v.price.currencyCode) return [];
-      const next=a.priceAdjustments[1];
-      return [{id:a.sellingPlan.id,name:a.sellingPlan.name,description:a.sellingPlan.description,options:a.sellingPlan.options,
-        billingInterval:a.sellingPlan.billingPolicy?.interval,billingIntervalCount:a.sellingPlan.billingPolicy?.intervalCount,
-        deliveryInterval:a.sellingPlan.deliveryPolicy?.interval,deliveryIntervalCount:a.sellingPlan.deliveryPolicy?.intervalCount,
-        price:Number(first.price.amount),currency:first.price.currencyCode,compareAtPrice:Number(first.compareAtPrice.amount),perDeliveryPrice:Number(first.perDeliveryPrice.amount),
-        ...(next?{recurringPrice:Number(next.price.amount),initialOrderCount:a.sellingPlan.priceAdjustments?.[0]?.orderCount}:{}),
-      }];
-    }):[];
-    return {id:v.id,title:v.title,price:Number(v.price.amount),currency:v.price.currencyCode,available:v.availableForSale,sellingPlans};
-  });
+  // One time purchases only: selling plans are not read, so no subscription can be offered.
+  const variants=p.variants.nodes.map(v=>({id:v.id,title:v.title,price:Number(v.price.amount),currency:v.price.currencyCode,available:v.availableForSale}));
   const first=variants.find(v=>v.available) || variants[0];
   if(!first || !Number.isFinite(first.price)) return null;
   const images=p.images.nodes.filter(i=>i.url.startsWith("https://")).map(i=>({src:i.url,alt:i.altText||p.title}));
@@ -70,25 +53,44 @@ export function mapProduct(p:ShopifyProduct, index:number):Product|null {
     price:first.price,currency:first.currency,size:first.title==="Default Title"?"":first.title,
     descriptor:"",description:p.description,image,campaign:images[1]?.src||image,tone:"silver",ritual:"",
     images:images.length?images:[{src:image,alt:"IQON material study; product photograph coming soon"}],variants,
-    available:!isComingSoon({category})&&p.availableForSale&&variants.some(v=>v.available&&(!p.requiresSellingPlan||v.sellingPlans.length>0)),requiresSellingPlan:p.requiresSellingPlan};
+    available:!isComingSoon({category})&&p.availableForSale&&!p.requiresSellingPlan&&variants.some(v=>v.available),requiresSellingPlan:p.requiresSellingPlan};
 }
+type ShopifyDiscountAllocation={discountedAmount:ShopifyMoney;title?:string;code?:string};
 export type ShopifyCart = {
   id:string; checkoutUrl:string; totalQuantity:number;
   discountCodes?:{code:string;applicable:boolean}[];
+  discountAllocations?:ShopifyDiscountAllocation[];
   cost:{subtotalAmount:{amount:string;currencyCode:string};totalAmount:{amount:string;currencyCode:string}};
-  lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{totalAmount:ShopifyMoney};sellingPlanAllocation?:{sellingPlan:{id:string;name:string;options:{name:string;value:string}[]}}|null;merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string;tags?:string[]}}}[]};
+  lines:{pageInfo:{hasNextPage:boolean};nodes:{id:string;quantity:number;cost:{subtotalAmount?:ShopifyMoney;totalAmount:ShopifyMoney};discountAllocations?:ShopifyDiscountAllocation[];sellingPlanAllocation?:{sellingPlan:{id:string;name:string;options:{name:string;value:string}[]}}|null;merchandise:{id:string;title:string;image?:{url:string}|null;product:{handle:string;title:string;tags?:string[]}}}[]};
 };
-export type CartSnapshot = {items:CartItem[];subtotal:number;currency:string;count:number;discountCodes:{code:string;applicable:boolean}[];notice?:string};
+type DiscountLine={title:string;amount:number};
+export type CartSnapshot = {items:CartItem[];subtotal:number;currency:string;count:number;discountCodes:{code:string;applicable:boolean}[];
+  /** Shopify's line amounts before product discounts, its product and order discount allocations, and its cart total. */
+  merchandise:number;lineDiscounts:DiscountLine[];orderDiscounts:DiscountLine[];total:number;notice?:string};
+// Sums Shopify's allocations per discount (automatic title or entered code), in cents.
+function discountLines(allocations:ShopifyDiscountAllocation[]):DiscountLine[] {
+  const totals=new Map<string,number>();
+  for(const a of allocations){
+    const title=a.title||a.code||"Discount"; const amount=Math.round(Number(a.discountedAmount.amount)*100);
+    if(Number.isFinite(amount)&&amount>0) totals.set(title,(totals.get(title)||0)+amount);
+  }
+  return [...totals].map(([title,amount])=>({title,amount:amount/100}));
+}
 export function publicCart(cart:ShopifyCart|null):CartSnapshot {
-  if(!cart) return {items:[],subtotal:0,currency:"USD",count:0,discountCodes:[]};
+  if(!cart) return {items:[],subtotal:0,currency:"USD",count:0,discountCodes:[],merchandise:0,lineDiscounts:[],orderDiscounts:[],total:0};
   if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.");
+  const lineSubtotal=(line:ShopifyCart["lines"]["nodes"][number])=>Number((line.cost.subtotalAmount||line.cost.totalAmount).amount);
   return {items:cart.lines.nodes.map(line=>({id:line.merchandise.product.handle,lineId:line.id,
     variantId:line.merchandise.id,variantTitle:line.merchandise.title,name:line.merchandise.product.title,
     image:line.merchandise.image?.url,quantity:line.quantity,purchase:line.sellingPlanAllocation?"subscription":"once",frequency:line.sellingPlanAllocation?.sellingPlan.options.map(o=>o.value).join(" / ")||"once",
     ...(line.sellingPlanAllocation?{sellingPlanId:line.sellingPlanAllocation.sellingPlan.id,sellingPlanName:line.sellingPlanAllocation.sellingPlan.name}:{}),
-    amount:Number(line.cost.totalAmount.amount),currency:line.cost.totalAmount.currencyCode})),
+    amount:Number(line.cost.totalAmount.amount),...(lineSubtotal(line)>Number(line.cost.totalAmount.amount)?{compareAmount:lineSubtotal(line)}:{}),currency:line.cost.totalAmount.currencyCode})),
     subtotal:Number(cart.cost.subtotalAmount.amount),currency:cart.cost.subtotalAmount.currencyCode,count:cart.totalQuantity,
-    discountCodes:cart.discountCodes||[]};
+    discountCodes:cart.discountCodes||[],
+    merchandise:Math.round(cart.lines.nodes.reduce((sum,line)=>sum+Math.round(lineSubtotal(line)*100),0))/100,
+    lineDiscounts:discountLines(cart.lines.nodes.flatMap(line=>line.discountAllocations||[])),
+    orderDiscounts:discountLines(cart.discountAllocations||[]),
+    total:Number(cart.cost.totalAmount.amount)};
 }
 export function sameOrigin(request:Request) {
   if(request.headers.get("origin")!==new URL(request.url).origin) throw new CommerceError("Please refresh the page and try again.",403);
