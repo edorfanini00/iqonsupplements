@@ -210,8 +210,8 @@ for (const device of VIEWPORTS) {
     await close();
   });
 
-  test(`${device.name}px: store policy links are visible, readable and tappable in the footer, on /help and in subscription terms`, async () => {
-    for (const [url, selector, count] of [["/help", ".footer-policies a", 5], ["/help", ".help-policies a", 5], ["/products/creatine-monohydrate", ".subscription-terms a[href*='/policies/']", 1]]) {
+  test(`${device.name}px: store policy links are visible, readable and tappable in the footer and on /help`, async () => {
+    for (const [url, selector, count] of [["/help", ".footer-policies a", 5], ["/help", ".help-policies a", 5], ["/products/creatine-monohydrate", ".footer-policies a", 5]]) {
       const {page, close} = await open(device, url);
       const first = page.locator(selector).first();
       await first.scrollIntoViewIfNeeded();
@@ -222,14 +222,13 @@ for (const device of VIEWPORTS) {
         return {text: a.textContent, href: a.getAttribute("href"), color: getComputedStyle(a).color, background, width: box.width, height: box.height, right: box.right};
       }));
       const m = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
-      if (selector !== ".subscription-terms a[href*='/policies/']") await page.screenshot({path: path.join(shots, `${device.name}${selector.startsWith(".footer") ? "_footer" : "_help"}_policies.png`)});
-      else {await first.evaluate(a => a.closest(".subscription-details").scrollIntoView({block: "center"})); await page.screenshot({path: path.join(shots, `${device.name}_pdp_subscription_policy.png`)});}
+      await page.screenshot({path: path.join(shots, `${device.name}${url.startsWith("/products") ? "_pdp" : ""}${selector.startsWith(".footer") ? "_footer" : "_help"}_policies.png`)});
       await close();
       assert.equal(links.length, count, `${url} ${selector}: ${JSON.stringify(links)}`);
       for (const l of links) {
         assert.match(l.href, /^\/policies\/[a-z-]+$/, l.text);
         assert.ok(l.width > 0 && l.right <= m.client, `${url} ${l.text}: hidden or off screen ${JSON.stringify(l)}`);
-        if (selector !== ".subscription-terms a[href*='/policies/']") assert.ok(l.height >= 24, `${url} ${l.text}: ${l.height}px tall target`);
+        assert.ok(l.height >= 24, `${url} ${l.text}: ${l.height}px tall target`);
         assert.ok(contrast(l.color, l.background) >= 4.5, `${url} ${l.text}: ${l.color} on ${l.background} = ${contrast(l.color, l.background).toFixed(2)}:1`);
       }
       assert.ok(m.scroll <= m.client, `${url}: page scrolls sideways (${JSON.stringify(m)})`);
@@ -315,6 +314,63 @@ for (const device of VIEWPORTS) {
     const [handoff] = await Promise.all([page.waitForRequest(r => r.url().startsWith("https://iqon-test.myshopify.com/cart/c/")), checkout.click()]);
     assert.match(handoff.url(), /^https:\/\/iqon-test\.myshopify\.com\/cart\/c\/synthetic-\d+\?key=synthetic$/);
     await close();
+  });
+
+  test(`${device.name}px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout`, async () => {
+    const {page, close} = await open(device, "/products/creatine-monohydrate");
+    const noOverflow = async label => {
+      const m = await page.evaluate(() => ({scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth}));
+      assert.ok(m.scroll <= m.client, `${label}: page scrolls sideways (${JSON.stringify(m)})`);
+    };
+    const main = await page.evaluate(() => document.querySelector("main").innerText);
+    assert.doesNotMatch(main, /subscri|skip or cancel|every month/i, "no subscription copy on the product page");
+    assert.doesNotMatch(main, /[\u2013\u2014]/, "no dashes in product page copy");
+    const tiers = page.locator(".bundle-choices");
+    await tiers.scrollIntoViewIfNeeded();
+    assert.match(await tiers.innerText(), /Buy 2, save 10% · Buy 3\+, save 25%/);
+    assert.deepEqual(await page.$$eval(".bundle-option", rows => rows.map(r => r.innerText.replace(/\s+/g, " ").trim())),
+      ["Buy 1 One time purchase $39 each", "Buy 2 Save 10% on each $35.10 each", "Buy 3+ Save 25% on each $29.25 each"]);
+    await page.locator(".bundle-option", {hasText: "Buy 3+"}).click();
+    const add = page.locator(".add-to-bag-row button.button-dark");
+    await page.waitForFunction(() => /\$87\.75/.test(document.querySelector(".add-to-bag-row button.button-dark")?.textContent || ""));
+    await noOverflow("pdp tiers");
+    await tiers.evaluate(el => el.scrollIntoView({block: "center"}));
+    await page.screenshot({path: path.join(shots, `${device.name}_pdp_bundle_tiers.png`)});
+    await page.waitForFunction(() => !document.querySelector(".add-to-bag-row button.button-dark")?.disabled);
+    const [cartRequest] = await Promise.all([page.waitForRequest(r => r.url().endsWith("/api/cart") && r.method() === "POST"), add.click()]);
+    const body = JSON.parse(cartRequest.postData());
+    assert.deepEqual([body.quantity, body.purchase, "sellingPlanId" in body], [3, "once", false]);
+    await page.waitForFunction(() => /Bundle: Buy 3, save 25%/.test(document.querySelector(".bag-sheet")?.textContent || ""));
+    const bag = await page.locator(".bag-summary").innerText();
+    // Fake Shopify cart: 3 × $39 = $117, 25% = $29.25, subtotal $87.75.
+    assert.match(bag, /Products\s*\$117/); assert.match(bag, /Bundle: Buy 3, save 25%\s*−\$29\.25/); assert.match(bag, /Subtotal\s*\$87\.75/);
+    assert.equal(await page.locator(".bag-sheet .bundle-nudge").count(), 0, "top tier reached: no nudge");
+    await page.screenshot({path: path.join(shots, `${device.name}_bag_bundle_25.png`)});
+    // Down to one unit: the 10% tier is next.
+    await page.locator(".bag-sheet .cart-line button[aria-label^='Decrease']").click();
+    await page.waitForFunction(() => /Bundle: Buy 2, save 10%/.test(document.querySelector(".bag-sheet")?.textContent || ""));
+    assert.match(await page.locator(".bag-sheet .bundle-nudge").innerText(), /Add 1 more eligible supplement to save 25%\./);
+    await page.locator(".bag-sheet .cart-line button[aria-label^='Decrease']").click();
+    await page.waitForFunction(() => /Add 1 more eligible supplement to save 10%\./.test(document.querySelector(".bag-sheet")?.textContent || ""));
+    assert.equal(await page.locator(".bag-sheet .bag-savings").count(), 0, "no savings row below the first tier");
+    await page.screenshot({path: path.join(shots, `${device.name}_bag_bundle_nudge.png`)});
+    // Mix and match: a different eligible product reaches the 10% tier.
+    await page.goto(base + "/products/liver-support"); await page.waitForFunction(() => !document.querySelector(".add-to-bag-row button.button-dark")?.disabled);
+    await page.locator(".add-to-bag-row button.button-dark").click();
+    await page.waitForFunction(() => /Bundle: Buy 2, save 10%/.test(document.querySelector(".bag-sheet")?.textContent || ""));
+    await page.goto(base + "/checkout"); await page.waitForFunction(() => /Bundle: Buy 2, save 10%/.test(document.querySelector(".checkout-summary")?.textContent || ""));
+    const summary = await page.locator(".checkout-summary").innerText();
+    // $39 + $45 = $84, 10% = $3.90 + $4.50, subtotal $75.60.
+    assert.match(summary, /Products \(2\)\s*\$84/); assert.match(summary, /Bundle: Buy 2, save 10%\s*−\$8\.40/); assert.match(summary, /Subtotal\s*\$75\.60/);
+    assert.match(summary, /Add 1 more eligible supplement to save 25%\./);
+    await noOverflow("checkout");
+    await page.screenshot({path: path.join(shots, `${device.name}_checkout_bundle.png`), fullPage: true});
+    await close();
+    // A supplement outside the offer shows no tiers and never claims savings.
+    const other = await open(device, "/products/daily-travel-kit");
+    assert.equal(await other.page.locator(".bundle-choices").count(), 0);
+    assert.doesNotMatch(await other.page.evaluate(() => document.querySelector("main").innerText), /save 10%|save 25%|Bundle/);
+    await other.close();
   });
 
   test(`${device.name}px: hydrated product pages show the shipping window only where the product is orderable`, async () => {
@@ -486,3 +542,79 @@ test("every local srcset candidate on the homepage is served as WebP at its decl
   }
   await close();
 });
+
+for (const device of VIEWPORTS) {
+  test(`${device.name}px: bag quantity controls remain reachable through every bundle tier`, async () => {
+    const {page, close} = await open(device, "/products/creatine-monohydrate");
+    const records = [];
+    const keyboard = [];
+    const bag = page.locator(".bag-sheet");
+    const quantity = bag.locator(".cart-line .quantity");
+    const waitForQuantity = async value => {
+      await page.waitForFunction(value => {
+        const quantity = document.querySelector(".bag-sheet .cart-line .quantity");
+        return quantity?.textContent.trim() === String(value) && !quantity.querySelector("button").disabled;
+      }, value);
+    };
+    const activate = async control => {
+      await control.scrollIntoViewIfNeeded();
+      const geometry = await control.evaluate(el => {
+        const box = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+        const lines = document.querySelector(".bag-lines");
+        const sheet = document.querySelector(".bag-sheet");
+        return {label: el.getAttribute("aria-label") || el.textContent, box: box.toJSON(),
+          hit: !!hit && el.contains(hit), viewport: {width: innerWidth, height: innerHeight},
+          lines: {height: lines.clientHeight, scrollHeight: lines.scrollHeight},
+          sheet: {height: sheet.clientHeight, scrollHeight: sheet.scrollHeight, scrollTop: sheet.scrollTop}};
+      });
+      records.push(geometry);
+      assert.ok(geometry.hit, `control is occluded: ${JSON.stringify(geometry)}`);
+      assert.ok(geometry.box.y >= 0 && geometry.box.bottom <= device.viewport.height, "control fits vertically");
+      assert.ok(geometry.box.x >= 0 && geometry.box.right <= device.viewport.width, "control fits horizontally");
+      if (device.hasTouch) await control.tap(); else await control.click();
+    };
+    try {
+      const add = page.locator(".add-to-bag-row button.button-dark");
+      await add.click();
+      await waitForQuantity(1);
+      // Native Tab navigation must scroll the sheet to each focused control.
+      await bag.locator(".cart-line > a").focus();
+      for (let i = 0; i < 12; i++) {
+        await page.keyboard.press("Tab");
+        const focused = await page.evaluate(() => {
+          const el = document.activeElement, box = el.getBoundingClientRect();
+          return {label: el.getAttribute("aria-label") || el.textContent.trim(), box: box.toJSON(),
+            hit: el.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2))};
+        });
+        keyboard.push(focused);
+        assert.ok(focused.hit, `focused control is occluded: ${JSON.stringify(focused)}`);
+        if (focused.label.startsWith("Secure checkout")) break;
+      }
+      const labels = keyboard.map(item => item.label);
+      const decrease = labels.findIndex(label => label.startsWith("Decrease"));
+      assert.ok(decrease >= 0);
+      assert.match(labels[decrease + 1], /^Increase/);
+      assert.match(labels[decrease + 2], /^Remove Creatine/);
+      assert.match(labels.at(-1), /^Secure checkout/);
+      let previous = 1;
+      for (const value of [2, 3, 4, 3, 2, 1]) {
+        await activate(quantity.getByRole("button", {name: value > previous ? /^Increase/ : /^Decrease/}));
+        await waitForQuantity(value);
+        previous = value;
+        await page.screenshot({path: path.join(shots, `${device.name}_bag_quantity_${records.length}_${value}.png`)});
+      }
+      // The explicit removal action and decrement-to-zero must both remain usable.
+      await activate(bag.getByRole("button", {name: /^Remove Creatine/}));
+      await bag.locator(".empty-bag").waitFor();
+      await bag.getByRole("button", {name: "Close", exact: true}).click();
+      await add.click();
+      await waitForQuantity(1);
+      await activate(quantity.getByRole("button", {name: /^Decrease/}));
+      await bag.locator(".empty-bag").waitFor();
+    } finally {
+      fs.writeFileSync(path.join(process.env.E2E_GEOMETRY || shots, `${device.name}_bag_geometry.json`), JSON.stringify({pointer: records, keyboard}, null, 2));
+      await close();
+    }
+  });
+}

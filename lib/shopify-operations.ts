@@ -7,28 +7,22 @@ export const CATALOG_QUERY = `query IQONCatalog($after: String) {
       images(first: 10) { nodes { url altText } }
       variants(first: 100) {
         pageInfo { hasNextPage }
-        nodes { id title availableForSale price { amount currencyCode }
-          sellingPlanAllocations(first: 50) {
-            pageInfo { hasNextPage }
-            nodes {
-              sellingPlan { id name description recurringDeliveries billingPolicy { ... on SellingPlanRecurringBillingPolicy { interval intervalCount } } deliveryPolicy { ... on SellingPlanRecurringDeliveryPolicy { interval intervalCount } } options { name value } priceAdjustments { orderCount } }
-              priceAdjustments { price { amount currencyCode } compareAtPrice { amount currencyCode } perDeliveryPrice { amount currencyCode } }
-            }
-          }
-        }
+        nodes { id title availableForSale price { amount currencyCode } }
       }
     }
   }
 }`;
 
-const CART_FRAGMENT = `fragment IQONCart on Cart {
+const CART_FRAGMENT_BODY = `fragment IQONCart on Cart {
   id checkoutUrl totalQuantity
   discountCodes { code applicable }
   cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
+  discountAllocations { ...IQONDiscount }
   lines(first: 100) {
     pageInfo { hasNextPage }
     nodes {
-      id quantity cost { totalAmount { amount currencyCode } }
+      id quantity cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
+      discountAllocations { ...IQONDiscount }
       sellingPlanAllocation { sellingPlan { id name options { name value } } }
       merchandise { ... on ProductVariant {
         id title image { url altText }
@@ -36,6 +30,13 @@ const CART_FRAGMENT = `fragment IQONCart on Cart {
       } }
     }
   }
+}`;
+// Bundle savings are Shopify automatic discounts; entered codes report their code.
+const DISCOUNT_FRAGMENT = `fragment IQONDiscount on CartDiscountAllocation {
+  discountedAmount { amount currencyCode }
+  ... on CartAutomaticDiscountAllocation { title }
+  ... on CartCodeDiscountAllocation { code }
+  ... on CartCustomDiscountAllocation { title }
 }`;
 const CART_QUERY_BODY = `query IQONCartRead($id: ID!) { cart(id: $id) { ...IQONCart } }`;
 const CREATE_BODY = `mutation IQONCartCreate($input: CartInput!) {
@@ -53,10 +54,11 @@ const REMOVE_BODY = `mutation IQONCartRemove($cartId: ID!, $lineIds: [ID!]!) {
 const DISCOUNT_BODY = `mutation IQONCartDiscounts($cartId: ID!, $discountCodes: [String!]!) {
   cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) { cart { ...IQONCart } userErrors { field message } }
 }`;
+const CART_FRAGMENT = CART_FRAGMENT_BODY + "\n" + DISCOUNT_FRAGMENT;
 export const CART_QUERY = CART_QUERY_BODY + CART_FRAGMENT;
 export const CART_CREATE = CREATE_BODY + CART_FRAGMENT;
 export const CART_ADD = ADD_BODY + CART_FRAGMENT;
 export const CART_UPDATE = UPDATE_BODY + CART_FRAGMENT;
 export const CART_REMOVE = REMOVE_BODY + CART_FRAGMENT;
 export const CART_DISCOUNTS = DISCOUNT_BODY + CART_FRAGMENT;
-export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CART_FRAGMENT].join("\n");
+export const ALL_OPERATIONS = [CATALOG_QUERY, CART_QUERY_BODY, CREATE_BODY, ADD_BODY, UPDATE_BODY, REMOVE_BODY, DISCOUNT_BODY, CART_FRAGMENT_BODY, DISCOUNT_FRAGMENT].join("\n");

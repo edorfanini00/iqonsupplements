@@ -171,21 +171,23 @@ test("production, live catalog, canonical and alias hosts", async t => {
     const [product, crumbs] = jsonLd(r.body);
     assert.equal(product["@type"], "Product");
     assert.equal(product.offers.price, "39.00");
-    // Subscription is selected by default (headline shows $33.15); the offer is the visible one-time option.
-    assert.match(r.body, /<strong>One time purchase<\/strong>.*?<\/span><b>\$39<\/b>/, "visible one-time price");
-    assert.match(r.body, /\$33\.15/, "subscription price is visible too");
-    assert.notEqual(product.offers.price, "33.15");
+    // One time purchase is the only purchase; bundle tier prices are visible but the offer stays the one time price.
+    assert.match(r.body, /One time purchase<\/small><\/span><b>\$39<small>each<\/small><\/b>/, "visible one-time price");
+    assert.match(r.body, /\$35\.10<small>each/, "Buy 2 tier price is visible");
+    assert.match(r.body, /\$29\.25<small>each/, "Buy 3+ tier price is visible");
+    assert.doesNotMatch(r.body, /Subscribe|subscription-terms|Add subscription/, "no subscription offer");
+    assert.notEqual(product.offers.price, "29.25");
     assert.equal(product.offers.availability, "https://schema.org/InStock");
     assert.deepEqual(crumbs.itemListElement.map(i => i.name), ["IQON", "supplements", "Creatine Monohydrate"]);
     assert.ok(!/aggregateRating|"review"|gtin/.test(JSON.stringify(product)));
     // No verifiable one-time offer: breadcrumb only, never an offer-less Product item.
-    for (const [url, category] of [["/products/anti-aging-cleanser-with-peptides", "skincare"], ["/products/liver-support", "supplements"]]) {
+    for (const [url, category] of [["/products/anti-aging-cleanser-with-peptides", "skincare"]]) {
       const page = await get(port, url);
       assertIndexable(page, url);
       assert.deepEqual(jsonLd(page.body).map(x => x["@type"]), ["BreadcrumbList"], url);
       assert.equal(jsonLd(page.body)[0].itemListElement[1].name, category);
     }
-    assert.doesNotMatch((await get(port, "/products/liver-support")).body, /One time purchase/, "subscription-only page shows no one-time price");
+    assert.equal(jsonLd((await get(port, "/products/liver-support")).body)[0].offers.price, "45.00", "one time offer");
     const sold = await get(port, "/products/nmn");
     assert.equal(jsonLd(sold.body)[0].offers.availability, "https://schema.org/OutOfStock");
     assert.doesNotMatch(sold.body, /<\/script><script>alert/, "catalog text cannot break out of JSON-LD");
@@ -350,10 +352,10 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.equal(help.getElementById("help-policies-title").textContent, "STORE POLICIES");
     assert.deepEqual(links(help, "main .help-policies a"), STORE_POLICY_LINKS);
     assert.equal(helpPolicies.closest("[data-slot=accordion-content]"), null, "visible without opening an answer");
-    // Subscription terms link the cancellation policy; one-time-only and coming-soon products have no subscription terms.
+    // Subscriptions are no longer offered on product pages; existing subscribers keep the cancellation policy in every footer.
     const pdp = dom((await get(port, "/products/creatine-monohydrate")).body);
-    assert.deepEqual(links(pdp, ".subscription-terms a").at(-1), ["cancellation policy", POLICY("subscription-policy")]);
-    assert.equal(dom((await get(port, "/products/anti-aging-cleanser-with-peptides")).body).querySelector(".subscription-terms"), null);
+    assert.equal(pdp.querySelector(".subscription-terms"), null);
+    assert.ok(links(pdp, "footer .footer-policies a").some(([text, href]) => text === "Cancellation policy" && href === POLICY("subscription-policy")));
     assert.doesNotMatch(helpPolicies.textContent + help.querySelector("footer .footer-policies").textContent, /[\u2013\u2014]| - /, "no dashes in policy link copy");
   });
   await t.test("guides link only to orderable products, and those products link back", async () => {
@@ -375,7 +377,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
     for (const href of ["/products/creatine-monohydrate", "/products/liver-support"]) {
       const r = await get(port, href);
       assertIndexable(r, href);
-      assert.match(dom(r.body).querySelector(".add-to-bag-row button.button-dark").textContent, /^Add (subscription|to bag)/, `${href} is orderable`);
+      assert.match(dom(r.body).querySelector(".add-to-bag-row button.button-dark").textContent, /^Add to bag/, `${href} is orderable`);
     }
     const guides = async url => [...dom((await get(port, url)).body).querySelectorAll(".product-guides a")].map(a => a.getAttribute("href"));
     assert.deepEqual(await guides("/products/creatine-monohydrate"), ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format"]);

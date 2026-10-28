@@ -3,26 +3,26 @@
 // response with no products (FAKE_SHOPIFY=empty) or a store outage (FAKE_SHOPIFY=down), and refuses
 // every other external request. Policy JSON is synthetic unless FAKE_POLICIES=published explicitly
 // enables read-only HTTPS integration with the five fixed published policy endpoints.
-// Cart reads, creates, adds and removes use an in-memory synthetic cart whose
+// Cart reads, creates, adds, updates and removes use an in-memory synthetic cart whose
 // checkoutUrl is never fetched (browser tests abort it): this proves the storefront handoff, not Shopify checkout.
+// Bundle tiers are emulated like the Shopify automatic discounts: any mix of eligible units, best tier only,
+// reported as line discount allocations with the discount title. The Daily Travel Kit is not eligible.
 // The NMN title is a deliberate XSS fixture and the cdn.shopify.com test images do not resolve: screenshots of this catalog are not production imagery.
 const money = amount => ({amount, currencyCode: "USD"});
-const monthly = (price, compareAt) => ({sellingPlan: {id: "gid://shopify/SellingPlan/1", name: "Delivered monthly", recurringDeliveries: true,
-  billingPolicy: {interval: "MONTH", intervalCount: 1}, deliveryPolicy: {interval: "MONTH", intervalCount: 1}, options: [{name: "Delivery", value: "Monthly"}], priceAdjustments: [{orderCount: null}]},
-  priceAdjustments: [{price: money(price), compareAtPrice: money(compareAt), perDeliveryPrice: money(price)}]});
-const variant = (id, price, available = true, plans = []) => ({id: `gid://shopify/ProductVariant/${id}`, title: "Default Title", availableForSale: available,
-  price: money(price), sellingPlanAllocations: {pageInfo: {hasNextPage: false}, nodes: plans}});
+const variant = (id, price, available = true) => ({id: `gid://shopify/ProductVariant/${id}`, title: "Default Title", availableForSale: available, price: money(price)});
+const ELIGIBLE = new Set(["creatine-monohydrate", "liver-support", "nmn"]);
+const TIERS = [{min: 3, rate: 25, title: "Bundle: Buy 3, save 25%"}, {min: 2, rate: 10, title: "Bundle: Buy 2, save 10%"}];
 const product = (handle, title, tag, v, extra = {}) => ({handle, title, description: `${title} synthetic test description.`, productType: "", tags: [tag],
   availableForSale: v.availableForSale, requiresSellingPlan: false, images: {nodes: [{url: `https://cdn.shopify.com/test/${handle}.jpg`, altText: `${title} packaging`}]},
   variants: {pageInfo: {hasNextPage: false}, nodes: [v]}, ...extra});
 const catalog = [
-  // Subscription is the default selection on the page; the one-time price is the offer.
-  product("creatine-monohydrate", "Creatine Monohydrate", "iqon-supplements", variant(1, "39.00", true, [monthly("33.15", "39.00")]), {productType: "Powder"}),
-  product("liver-support", "Liver Support", "iqon-supplements", variant(4, "45.00", true, [monthly("38.25", "45.00")]), {requiresSellingPlan: true, productType: "Capsules"}),
+  // One time purchases only; both are bundle eligible.
+  product("creatine-monohydrate", "Creatine Monohydrate", "iqon-supplements", variant(1, "39.00"), {productType: "Powder"}),
+  product("liver-support", "Liver Support", "iqon-supplements", variant(4, "45.00"), {productType: "Capsules"}),
   // Sold out: never linked from guides as a next purchase step.
   product("nmn", "NMN </script><script>alert(1)</script>", "iqon-supplements", variant(2, "59.50", false), {productType: "Capsules"}),
   product("anti-aging-cleanser-with-peptides", "Anti-Aging Cleanser", "iqon-skincare", variant(3, "48.00")),
-  // A tagged Shopify product with no editorial productContent: rendered by the generic PDP.
+  // A tagged Shopify product with no editorial productContent: rendered by the generic PDP. Not bundle eligible.
   product("daily-travel-kit", "Daily Travel Kit", "iqon-supplements", variant(8, "25.00")),
   // Handles that next.config permanently redirects: never sitemap entries.
   product("gentle-cleanser", "Gentle Cleanser", "iqon-skincare", variant(5, "30.00")),
@@ -32,23 +32,34 @@ const catalog = [
 const carts = new Map();
 const variantProduct = id => catalog.find(p => p.variants.nodes.some(v => v.id === id));
 function cartShape(id, lines) {
+  const units = lines.filter(line => ELIGIBLE.has(variantProduct(line.merchandiseId).handle)).reduce((n, line) => n + line.quantity, 0);
+  const tier = TIERS.find(t => units >= t.min);
   const nodes = lines.map((line, i) => {
     const p = variantProduct(line.merchandiseId); const v = p.variants.nodes.find(x => x.id === line.merchandiseId);
-    const plan = line.sellingPlanId && v.sellingPlanAllocations.nodes.find(a => a.sellingPlan.id === line.sellingPlanId);
-    const unit = plan ? plan.priceAdjustments[0].price.amount : v.price.amount;
-    return {id: `gid://shopify/CartLine/${i + 1}`, quantity: line.quantity, cost: {totalAmount: money((Number(unit) * line.quantity).toFixed(2))},
-      sellingPlanAllocation: plan ? {sellingPlan: {id: plan.sellingPlan.id, name: plan.sellingPlan.name, options: plan.sellingPlan.options}} : null,
+    const gross = Math.round(Number(v.price.amount) * 100) * line.quantity;
+    const saved = tier && ELIGIBLE.has(p.handle) ? Math.floor(Math.round(Number(v.price.amount) * 100) * tier.rate / 100) * line.quantity : 0;
+    return {id: `gid://shopify/CartLine/${i + 1}`, quantity: line.quantity, cost: {subtotalAmount: money((gross / 100).toFixed(2)), totalAmount: money(((gross - saved) / 100).toFixed(2))},
+      discountAllocations: saved ? [{discountedAmount: money((saved / 100).toFixed(2)), title: tier.title}] : [], sellingPlanAllocation: null,
       merchandise: {id: v.id, title: v.title, image: p.images.nodes[0], product: {handle: p.handle, title: p.title, tags: p.tags}}};
   });
   const subtotal = money(nodes.reduce((sum, l) => sum + Number(l.cost.totalAmount.amount), 0).toFixed(2));
   return {id, checkoutUrl: `https://iqon-test.myshopify.com/cart/c/${encodeURIComponent(id.split("/").pop())}?key=synthetic`, totalQuantity: lines.reduce((n, l) => n + l.quantity, 0),
-    discountCodes: [], cost: {subtotalAmount: subtotal, totalAmount: subtotal}, lines: {pageInfo: {hasNextPage: false}, nodes}};
+    discountCodes: [], discountAllocations: [], cost: {subtotalAmount: subtotal, totalAmount: subtotal}, lines: {pageInfo: {hasNextPage: false}, nodes}};
 }
 function cartResponse(operation, variables) {
   const payload = id => ({cart: cartShape(id, carts.get(id)), userErrors: [], warnings: []});
   if (operation === "Read") return {cart: carts.has(variables.id) ? cartShape(variables.id, carts.get(variables.id)) : null};
   if (operation === "Create") {const id = `gid://shopify/Cart/synthetic-${carts.size + 1}`; carts.set(id, variables.input.lines.map(l => ({...l}))); return {cartCreate: payload(id)};}
-  if (operation === "Add") {carts.get(variables.cartId).push(...variables.lines.map(l => ({...l}))); return {cartLinesAdd: payload(variables.cartId)};}
+  if (operation === "Add") {
+    const lines = carts.get(variables.cartId);
+    for (const l of variables.lines) {const same = lines.find(x => x.merchandiseId === l.merchandiseId); if (same) same.quantity += l.quantity; else lines.push({...l});}
+    return {cartLinesAdd: payload(variables.cartId)};
+  }
+  if (operation === "Update") {
+    const lines = carts.get(variables.cartId);
+    for (const u of variables.lines) lines[Number(u.id.split("/").pop()) - 1].quantity = u.quantity;
+    return {cartLinesUpdate: payload(variables.cartId)};
+  }
   carts.set(variables.cartId, carts.get(variables.cartId).filter((_, i) => !variables.lineIds.includes(`gid://shopify/CartLine/${i + 1}`)));
   return {cartLinesRemove: payload(variables.cartId)};
 }
@@ -66,7 +77,7 @@ globalThis.fetch = async (input, init) => {
     if (process.env.FAKE_SHOPIFY === "down") return new Response("unavailable", {status: 503});
     const {query} = JSON.parse(String(init?.body || "{}"));
     const {variables = {}} = JSON.parse(String(init?.body || "{}"));
-    const cartOperation = query?.match(/IQONCart(Read|Create|Add|Remove)\b/)?.[1];
+    const cartOperation = query?.match(/IQONCart(Read|Create|Add|Update|Remove)\b/)?.[1];
     if (cartOperation) return Response.json({data: cartResponse(cartOperation, variables)});
     if (query?.includes("IQONCatalog")) return Response.json({data: {products: {pageInfo: {hasNextPage: false, endCursor: null}, nodes: process.env.FAKE_SHOPIFY === "empty" ? [] : catalog}}});
     return Response.json({errors: [{message: "MOCK: unsupported operation"}]});

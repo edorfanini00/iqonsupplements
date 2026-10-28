@@ -96,14 +96,12 @@ export async function mutateCartResponse(request:Request) {
       const variant=product?.variants?.find(v=>v.id===input.variantId);
       if(product&&isComingSoon(product)) throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422,publicCart(current));
       if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);
-      if(input.sellingPlanId!==undefined&&(typeof input.sellingPlanId!=="string"||!/^gid:\/\/shopify\/SellingPlan\/\d+$/.test(input.sellingPlanId))) throw new CommerceError("Choose an available subscription plan.",400);
-      const plan=input.sellingPlanId?variant.sellingPlans?.find(plan=>plan.id===input.sellingPlanId):undefined;
-      if(input.sellingPlanId&&!plan) throw new CommerceError("This subscription is not available for the selected option.",422);
-      if((product.requiresSellingPlan||input.purchase==="subscription")&&!plan) throw new CommerceError("Choose a subscription plan before adding this product.",422);
-      const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&(l.sellingPlanAllocation?.sellingPlan.id||undefined)===plan?.id);
+      // Subscriptions are retired: a new line is always a one time purchase and never carries a selling plan.
+      if(input.sellingPlanId!==undefined||(input.purchase!==undefined&&input.purchase!=="once")) throw new CommerceError("Subscriptions are no longer offered. Choose a one time purchase.",422,publicCart(current));
+      const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&!l.sellingPlanAllocation);
       if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);
       if(!existing && current && current.lines.nodes.length>=99) throw new CommerceError("Your bag is full. Please complete this order first.",422);
-      const lines=[{merchandiseId:variant.id,quantity,...(plan?{sellingPlanId:plan.id}:{})}];
+      const lines=[{merchandiseId:variant.id,quantity}];
       result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
     } else if(input.action==="update") {
       const quantity=validQuantity(input.quantity,true);
