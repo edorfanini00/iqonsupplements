@@ -37,7 +37,7 @@ function cartShape(id, lines) {
   const nodes = lines.map((line, i) => {
     const p = variantProduct(line.merchandiseId); const v = p.variants.nodes.find(x => x.id === line.merchandiseId);
     const gross = Math.round(Number(v.price.amount) * 100) * line.quantity;
-    const saved = tier && ELIGIBLE.has(p.handle) ? Math.round(gross * tier.rate / 100) : 0;
+    const saved = tier && ELIGIBLE.has(p.handle) ? Math.floor(Math.round(Number(v.price.amount) * 100) * tier.rate / 100) * line.quantity : 0;
     return {id: `gid://shopify/CartLine/${i + 1}`, quantity: line.quantity, cost: {subtotalAmount: money((gross / 100).toFixed(2)), totalAmount: money(((gross - saved) / 100).toFixed(2))},
       discountAllocations: saved ? [{discountedAmount: money((saved / 100).toFixed(2)), title: tier.title}] : [], sellingPlanAllocation: null,
       merchandise: {id: v.id, title: v.title, image: p.images.nodes[0], product: {handle: p.handle, title: p.title, tags: p.tags}}};

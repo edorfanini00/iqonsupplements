@@ -27,21 +27,21 @@ export function bundleTier(units: number): BundleTier | undefined {
 }
 
 const cents = (amount: number) => Math.round(amount * 100);
+const unitDiscountCents = (price: number, percent: number) => Math.floor(cents(price) * percent / 100);
 
-/** Per unit price at a tier, rounded to the cent. */
+/** Shopify truncates the percentage discount to whole cents per unit. */
 export function tierUnitPrice(price: number, percent: number) {
-  return Math.round(cents(price) * (100 - percent) / 100) / 100;
+  return (cents(price) - unitDiscountCents(price, percent)) / 100;
 }
 
 /**
- * Estimated total for `quantity` units of one product added on their own: the line amount
- * less its tier percentage, rounded to the cent. Units already in the bag can only raise the
- * tier, so this never promises more than the bag will show.
+ * Estimated total for `quantity` units of one product added on their own: Shopify's
+ * whole-cent unit discount multiplied by quantity. The actual bag remains authoritative.
  */
 export function bundleEstimate(price: number, quantity: number) {
   const gross = cents(price) * quantity;
   const percent = bundleTier(quantity)?.percent ?? 0;
-  const saved = Math.round(gross * percent / 100);
+  const saved = unitDiscountCents(price, percent) * quantity;
   return {gross: gross / 100, saved: saved / 100, total: (gross - saved) / 100, percent};
 }
 

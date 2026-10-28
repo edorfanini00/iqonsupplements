@@ -72,7 +72,7 @@ function fixture(t, {plannedPolicy = false} = {}) {
     if (plannedPolicy) {
       const savings = (rate, qualifies) => state.cart.lines.nodes.reduce((sum,line) => {
         const item = fixtureProducts.find(p => p.variantId === line.merchandise.id);
-        return sum + (qualifies(line) ? Math.round(item.price * line.quantity * 100 * rate) : 0);
+        return sum + (qualifies(line) ? Math.floor(Math.round(item.price * 100) * (rate * 100) / 100) * line.quantity : 0);
       }, 0);
       // On ties this fixture chooses the code; only the single best saving is allocated.
       code = code && savings(.1, () => true) >= savings(tier?.rate || 0, eligible);
@@ -84,7 +84,7 @@ function fixture(t, {plannedPolicy = false} = {}) {
       const item = fixtureProducts.find(p => p.variantId === line.merchandise.id);
       const gross = Math.round(item.price * line.quantity * 100);
       const rate = code ? .1 : tier && eligible(line) ? tier.rate : 0;
-      const saved = Math.round(gross * rate);
+      const saved = plannedPolicy ? Math.floor(Math.round(item.price * 100) * (rate * 100) / 100) * line.quantity : Math.round(gross * rate);
       line.cost = {subtotalAmount: money(gross / 100), totalAmount: money((gross - saved) / 100)};
       line.discountAllocations = saved ? [{discountedAmount: money(saved / 100), ...(code ? {code: plannedPolicy ? "CREATOR10" : "SAVE10"} : {title: tier.title})}] : [];
       total += gross - saved;

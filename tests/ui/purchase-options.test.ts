@@ -38,7 +38,7 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   expect(group.contains(one)&&group.contains(three)).toBe(true);
   expect(one.getAttribute("aria-checked")).toBe("true");
   expect(one.closest("label")?.textContent).toContain("$48.97");
-  expect(two.closest("label")?.textContent).toContain("$44.07");
+  expect(two.closest("label")?.textContent).toContain("$44.08");
   expect(three.closest("label")?.textContent).toContain("$36.73");
   expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
   expect(container.querySelector(".bundle-terms")?.textContent).toMatch(/Mix and match any eligible IQON supplements/);
@@ -46,12 +46,12 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   fireEvent.click(three);
   await waitFor(()=>expect(three.getAttribute("aria-checked")).toBe("true"));
   expect(screen.getByLabelText("Quantity").textContent).toBe("3");
-  expect(addButtons()[0].textContent).toContain("$110.18");
+  expect(addButtons()[0].textContent).toContain("$110.19");
   expect(addButtons()[0].querySelector("s")?.textContent).toBe("$146.91");
   fireEvent.click(addButtons()[0]);
   expect(store.add).toHaveBeenLastCalledWith(creatine.id,3,variant.id);
   fireEvent.click(two);
-  await waitFor(()=>expect(addButtons()[0].textContent).toContain("$88.15"));
+  await waitFor(()=>expect(addButtons()[0].textContent).toContain("$88.16"));
   expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
 });
 
@@ -59,7 +59,7 @@ it("keeps the 3+ tier selected when the stepper goes past three and returns to o
   render(React.createElement(ProductPage,{product:creatine}));
   React.act(()=>quantity.set!(5));
   await waitFor(()=>expect(screen.getByRole("radio",{name:/^Buy 3\+/}).getAttribute("aria-checked")).toBe("true"));
-  expect(addButtons()[0].textContent).toContain("$183.64");
+  expect(addButtons()[0].textContent).toContain("$183.65");
   React.act(()=>quantity.set!(1));
   await waitFor(()=>expect(screen.getByRole("radio",{name:/^Buy 1/}).getAttribute("aria-checked")).toBe("true"));
   expect(addButtons()[0].textContent).toContain("$48.97");
