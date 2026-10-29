@@ -19,10 +19,10 @@ test("nudges name the next tier and stop once the top tier is reached", () => {
   assert.equal(bundleNudge(9), null);
 });
 
-test("eligibility: ten supplements that passed the margin gate; Colon Gentle Cleanse and skincare excluded", () => {
-  assert.equal(BUNDLE_ELIGIBLE_HANDLES.length, 10);
+test("eligibility: all eleven approved supplements including Cleanse; skincare remains excluded", () => {
+  assert.equal(BUNDLE_ELIGIBLE_HANDLES.length, 11);
   for (const handle of ["creatine-monohydrate", "hydrolyzed-collagen-peptides", "colostrum-powder"]) assert.ok(isBundleEligible(handle));
-  assert.equal(isBundleEligible("colon-gentle-cleanse"), false);
+  assert.equal(isBundleEligible("colon-gentle-cleanse"), true);
   for (const p of products.filter(p => p.category === "skincare")) assert.equal(isBundleEligible(p.id), false, p.id);
   const supplements = new Set(products.filter(p => p.category === "supplements").map(p => p.id));
   for (const handle of BUNDLE_ELIGIBLE_HANDLES) assert.ok(supplements.has(handle), `${handle} is a real supplement handle`);
@@ -32,6 +32,8 @@ test("per unit prices match Shopify's whole-cent discount truncation", () => {
   assert.equal(tierUnitPrice(48.97, 10), 44.08);
   assert.equal(tierUnitPrice(48.97, 25), 36.73);
   assert.equal(tierUnitPrice(65.64, 25), 49.23);
+  assert.equal(tierUnitPrice(66.84, 10), 60.16);
+  assert.equal(tierUnitPrice(66.84, 25), 50.13);
 });
 
 test("single product estimates multiply the truncated unit discount by quantity", () => {

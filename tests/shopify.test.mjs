@@ -95,7 +95,7 @@ test("bundle discount allocations are summed per discount and keep Shopify's lin
   const cart={id:"gid://shopify/Cart/x?key=secret",checkoutUrl:"https://x.myshopify.com/c",totalQuantity:3,
     cost:{subtotalAmount:m("110.18"),totalAmount:m("110.18")},discountAllocations:[],
     lines:{pageInfo:{hasNextPage:false},nodes:[line("creatine-monohydrate",2,"97.94","73.45",[{discountedAmount:m("24.49"),title:"Bundle: Buy 3, save 25%"}]),
-      line("colostrum-powder",1,"42.17","31.63",[{discountedAmount:m("10.54"),title:"Bundle: Buy 3, save 25%"}]),line("colon-gentle-cleanse",1,"66.84","66.84",[])]}};
+      line("colostrum-powder",1,"42.17","31.63",[{discountedAmount:m("10.54"),title:"Bundle: Buy 3, save 25%"}]),line("unapproved-test-supplement",1,"66.84","66.84",[])]}};
   const out=publicCart(cart);
   assert.equal(out.merchandise,206.95);assert.deepEqual(out.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:35.03}]);
   assert.equal(out.items[0].amount,73.45);assert.equal(out.items[0].compareAmount,97.94);assert.equal("compareAmount" in out.items[2],false);

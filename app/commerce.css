@@ -554,8 +554,19 @@ body { background:#fafbfb; }
  .guide-products a { font-size:15px; }
 }
 
-/* Let discounted line totals wrap below quantity controls instead of clipping cents. */
+/* Keep quantity controls separate from a stable, right-aligned line total stack. */
 .cart-line-info{min-width:0}
-.cart-line-bottom{flex-wrap:wrap}
-.cart-line-bottom strong{margin-left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 6px}
-.cart-line-bottom strong s{margin-right:0;white-space:nowrap}
+.cart-line-bottom{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:end;gap:12px}
+.checkout-lines .cart-line-bottom{max-width:none}
+.cart-line-bottom .bag-price{display:grid;grid-template-rows:1em auto;justify-items:end;align-content:end;gap:4px;margin:0;text-align:right;font-variant-numeric:tabular-nums;line-height:1.25;white-space:nowrap}
+.cart-line-bottom .bag-price s{grid-row:1;margin:0;font-size:12px;line-height:1}
+.cart-line-bottom .bag-price>span{grid-row:2}
+.bag-savings>div{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline}
+.bag-savings dd,.bag-summary strong,.checkout-summary dd{text-align:right;font-variant-numeric:tabular-nums}
+.bag-summary{padding-inline:27px}
+@media(max-width:480px){
+ .bag-lines{padding-inline:20px}
+ .bag-summary{padding-inline:20px}
+ .bag-sheet .cart-line,.checkout-lines .cart-line{grid-template-columns:64px minmax(0,1fr);gap:14px}
+ .bag-sheet .cart-line-bottom{gap:8px}
+}

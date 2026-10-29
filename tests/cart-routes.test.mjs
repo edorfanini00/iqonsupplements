@@ -46,7 +46,7 @@ const fixtureProducts = [
 ];
 
 // Synthetic amounts only, not verification of live Shopify configuration.
-const ELIGIBLE = new Set(["creatine-monohydrate", "nmn"]);
+const ELIGIBLE = new Set(["creatine-monohydrate", "nmn", "colon-gentle-cleanse"]);
 const TIERS = [{min: 3, rate: .25, title: "Bundle: Buy 3, save 25%"}, {min: 2, rate: .10, title: "Bundle: Buy 2, save 10%"}];
 const plan = {id: "gid://shopify/SellingPlan/10", name: "Deliver every month"};
 function fixture(t, {plannedPolicy = false} = {}) {
@@ -280,24 +280,25 @@ test("planned synthetic policy selects the best single tier or noncombining crea
   }
 });
 
-test("planned synthetic bundle qualification excludes Colon and uses only the highest eligible tier", async t => {
+test("planned synthetic bundle qualification includes Cleanse and uses only the highest eligible tier", async t => {
   const state=fixture(t,{plannedPolicy:true});state.bundles=true;
   let bag=await (await add(fixtureProducts[3])).json();
   bag=await (await routes.mutateCartResponse(request({action:"update",lineId:bag.items[0].lineId,quantity:3}))).json();
-  assert.deepEqual(bag.lineDiscounts,[]);assert.equal(bag.subtotal,180);
+  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:45}]);assert.equal(bag.subtotal,135);
   bag=await (await add(fixtureProducts[0])).json();
-  assert.deepEqual(bag.lineDiscounts,[]);assert.equal(bag.subtotal,209);
+  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:52.25}]);assert.equal(bag.subtotal,156.75);
   bag=await (await add(fixtureProducts[1])).json();
-  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 2, save 10%",amount:9.7}]);
-  assert.equal(bag.subtotal,267.3);
+  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:69.25}]);
+  assert.equal(bag.subtotal,207.75);
   bag=await (await add(fixtureProducts[0])).json();
-  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:31.5}]);
-  assert.equal(bag.subtotal,274.5);assert.equal(bag.items.find(i=>i.id==="colon-gentle-cleanse").amount,180);
-  // Even a larger code saving never stacks with either automatic tier.
+  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:76.5}]);
+  assert.equal(bag.subtotal,229.5);assert.equal(bag.items.find(i=>i.id==="colon-gentle-cleanse").amount,135);
+  // The now-eligible Cleanse also keeps the stronger bundle instead of stacking a code.
   bag=await (await routes.mutateCartResponse(request({action:"update",lineId:bag.items[0].lineId,quantity:4}))).json();
   bag=await (await routes.mutateCartResponse(request({action:"discount",discountCodes:["CREATOR10"]}))).json();
-  assert.deepEqual(bag.lineDiscounts,[{title:"CREATOR10",amount:36.6}]);
-  assert.deepEqual(bag.orderDiscounts,[]);assert.equal(bag.subtotal,329.4);assert.equal(bag.total,329.4);
+  assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:91.5}]);
+  assert.deepEqual(bag.discountCodes,[{code:"CREATOR10",applicable:false}]);
+  assert.deepEqual(bag.orderDiscounts,[]);assert.equal(bag.subtotal,274.5);assert.equal(bag.total,274.5);
 });
 
 function insertOldSkincare(state) {

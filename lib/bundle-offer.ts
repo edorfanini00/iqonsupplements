@@ -3,15 +3,13 @@
 // any mix of the eligible products below. This module only presents the offer: the bag
 // always shows Shopify's own discount allocations and cart cost, never a client total.
 //
-// Eligible products are the ones approved in the 28 Oct 2026 internal margin review; Colon
-// Gentle Cleanse is not part of the offer. Keep this list identical to the products selected
-// on both Shopify discounts.
+// The current supplement catalog is approved for both tiers, including Colon Gentle
+// Cleanse (owner approval 29 Oct 2026). Keep this list identical to the products
+// selected on both Shopify discounts; activate backend eligibility before releasing UI.
 export const BUNDLE_ELIGIBLE_HANDLES: readonly string[] = [
   "creatine-monohydrate", "hydrolyzed-collagen-peptides", "collagen-peptides-chocolate", "colostrum-powder",
-  "nmn", "glp-1-support", "hair-skin-nails-gummies", "resveratrol", "liver-support", "keto-5",
+  "colon-gentle-cleanse", "nmn", "glp-1-support", "hair-skin-nails-gummies", "resveratrol", "liver-support", "keto-5",
 ];
-
-export const BUNDLE_EXCLUDED_NOTE = "Colon Gentle Cleanse is not part of the bundle offer.";
 
 export type BundleTier = {minQuantity: number; percent: number; title: string};
 export const BUNDLE_TIERS: readonly BundleTier[] = [
