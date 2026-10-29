@@ -34,18 +34,17 @@ export function CustomerReviews({productId,productName,category,designPreview=fa
  return <section className="customer-reviews section-pad" id="reviews" aria-labelledby="reviews-heading">
   <div className="section-heading">
    <div><p className="eyebrow">THE IQON COMMUNITY</p><h2 id="reviews-heading">Customer reviews.</h2></div>
-   <div className="review-summary">
+   {average!==undefined&&<div className="review-summary">
     <RatingStars rating={average} sample={isSample}/>
     <span className="review-count">{countLabel}</span>
-   </div>
+   </div>}
   </div>
   {average!==undefined&&<p className="review-average">{average.toFixed(1)} / 5{!isSample&&<span>From {reviews.length} customer reviews</span>}</p>}
   {reviews.length>0?<div className="review-grid">{reviews.map(review=><article key={review.id}>
    <RatingStars rating={review.rating}/><h3>{review.title}</h3><p>{review.text}</p>
    <footer><span>{review.author}{review.verifiedPurchase&&<small>Verified purchase</small>}</span><time dateTime={review.date}>{new Date(review.date).toLocaleDateString("en-US",{month:"short",year:"numeric",timeZone:"UTC"})}</time></footer>
-  </article>)}</div>:isSample?<p className="review-preview-note">Customer reviews will appear here after the collection launches.</p>:<div className="reviews-awaiting">
-   <span className="review-outline" aria-hidden="true"><Star size={30} strokeWidth={1}/></span>
-   <div><h3>{productName?`Be the first to share your experience with ${productName}.`:"Every experience starts somewhere."}</h3><p>There are no customer reviews yet. Reviews will appear here after the collection launches.</p></div>
+  </article>)}</div>:isSample?<p className="review-preview-note">Customer reviews will appear here after the collection launches.</p>:<div className="reviews-awaiting reviews-empty">
+   <p>There are no customer reviews{productName?` for ${productName}`:""} yet.</p>
   </div>}
  </section>;
 }
