@@ -1,4 +1,4 @@
-/* Purchase-first product pages (three targeted supplement handles): a short shipping/returns line under the purchase button and,
+/* Purchase-first product pages (all products except coming soon): a short shipping/returns line under the purchase button and,
    on phones, title → price → purchase decision before the gallery. Their DOM is summary/purchase panel → gallery →
    details panel, so keyboard order follows that flow; desktop keeps its two-column composition by grid placement. */
 .purchase-assurance{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:7px;font-size:12px;line-height:1.55;color:#536168}

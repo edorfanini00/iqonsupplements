@@ -4,6 +4,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { ProductPage } from "../../app/shop-pages";
 import { products, productPrice } from "../../lib/catalog";
+import { BUNDLE_ELIGIBLE_HANDLES } from "../../lib/bundle-offer";
 import { dailyProductPrice } from "../../app/product-essentials";
 
 const store=vi.hoisted(()=>({add:vi.fn(),products:[] as unknown[],mode:"live",busy:false,ready:true}));
@@ -42,7 +43,7 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   expect(three.closest("label")?.textContent).toContain("$36.73");
   expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
   expect(container.querySelector(".bundle-terms")?.textContent).toMatch(/Mix and match any eligible IQON supplements/);
-  expect(container.querySelector(".bundle-terms")?.textContent).toContain("Colon Gentle Cleanse is not part of the bundle offer.");
+  expect(container.querySelector(".bundle-terms")?.textContent).not.toContain("Colon Gentle Cleanse is not");
   fireEvent.click(three);
   await waitFor(()=>expect(three.getAttribute("aria-checked")).toBe("true"));
   expect(screen.getByLabelText("Quantity").textContent).toBe("3");
@@ -66,14 +67,14 @@ it("keeps the 3+ tier selected when the stepper goes past three and returns to o
   expect(addButtons()[0].querySelector("s")).toBeNull();
 });
 
-it("shows no bundle tiers or savings on a product outside the offer",()=>{
+it("includes Colon Gentle Cleanse in the approved bundle tiers",()=>{
   const cleanse={...products.find(p=>p.id==="colon-gentle-cleanse")!,available:true,price:66.84,currency:"USD",variants:[{...variant,price:66.84}]};
   const {container}=render(React.createElement(ProductPage,{product:cleanse}));
-  expect(screen.queryByRole("radiogroup",{name:"Bundle quantity"})).toBeNull();
-  expect(container.textContent).not.toMatch(/save 10%|save 25%|Bundle/);
-  React.act(()=>quantity.set!(3));
-  expect(addButtons()[0].textContent).toContain("$200.52");
-  expect(addButtons()[0].querySelector("s")).toBeNull();
+  expect(screen.getByRole("radiogroup",{name:"Bundle quantity"})).toBeTruthy();
+  fireEvent.click(screen.getByRole("radio",{name:/^Buy 3/}));
+  expect(addButtons()[0].textContent).toContain("$150.39");
+  expect(addButtons()[0].querySelector("s")?.textContent).toBe("$200.52");
+  expect(container.textContent).not.toContain("not part of the bundle offer");
 });
 
 it("a subscription only product cannot be added",()=>{
@@ -104,4 +105,32 @@ it("variants: switching options keeps one time pricing from the selected variant
   expect(screen.getByRole("radio",{name:/^Buy 2/}).closest("label")?.textContent).toContain("$54");
   fireEvent.click(addButtons()[0]);
   expect(store.add).toHaveBeenLastCalledWith(product.id,1,product.variants[1].id);
+});
+
+for(const handle of BUNDLE_ELIGIBLE_HANDLES)it(`${handle}: purchase-first layout and all approved bundle choices`,()=>{
+ const product={...products.find(p=>p.id===handle)!,available:true,variants:[variant]};
+ const {container}=render(React.createElement(ProductPage,{product}));
+ expect(container.querySelector(".purchase-first #overview>:first-child")?.className).toBe("purchase-panel");
+ expect(screen.getAllByRole("radio")).toHaveLength(3);
+ fireEvent.click(screen.getByRole("radio",{name:/^Buy 2/}));
+ fireEvent.click(addButtons()[0]);
+ expect(store.add).toHaveBeenLastCalledWith(handle,2,variant.id);
+});
+it("does not offer quantity choices for sold-out products or variants",()=>{
+ for(const product of [{...creatine,available:false},{...creatine,variants:[{...variant,available:false}]}]){
+  render(React.createElement(ProductPage,{product}));
+  expect(screen.queryByRole("radiogroup")).toBeNull();
+  expect(screen.getAllByRole("button",{name:/Currently unavailable/})[0].hasAttribute("disabled")).toBe(true);
+  cleanup();
+ }
+});
+it("keeps unapproved future products at full price while providing quantity choices",()=>{
+ const product={...creatine,id:"daily-travel-kit",name:"Daily Travel Kit"};
+ const {container}=render(React.createElement(ProductPage,{product}));
+ expect(screen.getByRole("radiogroup",{name:"Purchase quantity"})).toBeTruthy();
+ expect(container.querySelector(".bundle-heading")?.textContent).toBe("Choose quantity");
+ fireEvent.click(screen.getByRole("radio",{name:/^Buy 3/}));
+ expect(addButtons()[0].textContent).toContain("$146.91");
+ expect(addButtons()[0].querySelector("s")).toBeNull();
+ expect(container.textContent).toContain("Each quantity is charged at the regular price.");
 });

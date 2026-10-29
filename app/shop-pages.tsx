@@ -46,7 +46,7 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  useEffect(()=>{
   if(live&&variantId&&!comingSoon)trackViewContent({variantId,name:p.name,price,currency});
  },[live,variantId,comingSoon,p.name,price,currency]);
- const purchaseFirst=["creatine-monohydrate","hydrolyzed-collagen-peptides","colostrum-powder"].includes(p.id);
+ const purchaseFirst=!comingSoon;
  const inlineCta=useRef<HTMLDivElement>(null);
  const [inlineCtaInView,setInlineCtaInView]=useState(true);
  useEffect(()=>{
@@ -61,7 +61,7 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  const addLabel=<>{!available?"Currently unavailable":busy?"Updating…":"Add to bag"} <span>{estimate.saved>0&&<s>{money(estimate.gross,currency)}</s>}{money(estimate.total,currency)}</span></>;
  const gallery=<ProductGallery key={p.id} product={p}/>;
  const panelTop=<><div className="product-summary"><p className="eyebrow">{p.category.toUpperCase()} / {p.type.toUpperCase()}</p><div className="product-title-row"><h1>{p.name}</h1><span className={comingSoon?"price-pending":""}>{comingSoon?"Coming soon":money(price,currency)}</span></div>{<p className="product-size">{variant?.title&&variant.title!=="Default Title"?variant.title:packageContents(p)}{p.ritual&&<> <span>·</span> {p.ritual}</>}</p>}</div><ProductReviewLink productId={p.id} designPreview={designPreview&&mode==="preview"}/>{content&&<p className="product-summary-description">{productVisuals[p.id]?.lead || content.description}</p>}{content&&<ul className="product-highlights">{content.highlights.map(highlight=><li key={highlight}><Check size={15}/><span>{highlight}</span></li>)}</ul>}<ProductEssentials product={p} price={price} currency={currency}/>{!comingSoon&&p.variants&&p.variants.length>1?<div className="product-variant-picker"><label htmlFor="product-variant">Select option</label><select id="product-variant" value={variantId} onChange={e=>setVariantId(e.target.value)}>{p.variants.map(v=><option key={v.id} value={v.id}>{v.title}{!v.available?" — Sold out":""}</option>)}</select></div>:p.size&&<div className="product-format"><span>FORMAT</span><strong>{p.size}</strong><Check size={15}/></div>}{!comingSoon&&<>
- {bundle&&available&&<ProductBundleOptions quantity={quantity} setQuantity={setQuantity} price={price} currency={currency}/>}
+ {available&&<ProductBundleOptions quantity={quantity} setQuantity={setQuantity} price={price} currency={currency} bundleEligible={bundle}/>}
  <CartConnectionNotice/>
  <div className="add-to-bag-row" ref={inlineCta}><Quantity value={quantity} setValue={setQuantity} label={p.name} disabled={busy||!available}/><button className="button button-dark" disabled={busy||!ready||!available} onClick={addSelection}>{addLabel}</button></div>
  {!live&&<p className="product-preview-note">Orders will open shortly.</p>}

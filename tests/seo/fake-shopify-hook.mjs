@@ -39,7 +39,7 @@ if (process.env.FAKE_CATALOG === "purchase-clarity") {
     ["colon-gentle-cleanse","Colon Gentle Cleanse",14,"66.84"],
   ]) {
     catalog.push(product(handle,title,"iqon-supplements",variant(id,price),{productType:"Powder"}));
-    if (handle !== "colon-gentle-cleanse") ELIGIBLE.add(handle);
+    ELIGIBLE.add(handle);
   }
 }
 const carts = new Map();

@@ -27,7 +27,7 @@ if(!process.env.QA_BASE&&!real){
 console.log(`Data source: ${real?'real Shopify catalog/cart':'synthetic catalog/cart'}; external tracking blocked.`);
 const browser=await chromium.launch();
 test.after(async()=>{await browser.close();server?.kill('SIGTERM');});
-const handles=['creatine-monohydrate','hydrolyzed-collagen-peptides','colostrum-powder'];
+const handles=process.env.QA_CATALOG ? JSON.parse(fs.readFileSync(process.env.QA_CATALOG)).products.filter(p=>p.category==='supplements'&&p.available&&!p.requiresSellingPlan).map(p=>p.handle) : ['creatine-monohydrate','hydrolyzed-collagen-peptides','colostrum-powder','colon-gentle-cleanse'];
 const widths=[320,390,430,1440];
 async function open(width,handle){
  const context=await browser.newContext({viewport:{width,height:width===320?740:width===1440?900:844},reducedMotion:'reduce'});
@@ -39,12 +39,21 @@ async function open(width,handle){
  return {page,context};
 }
 async function noOverflow(page){assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page must not overflow');}
-async function rowFits(page){
- const geometry=await page.locator('.bag-sheet .cart-line').evaluate(el=>{
+async function rowFits(page,selector='.bag-sheet .cart-line'){
+ const geometry=await page.locator(selector).evaluate(el=>{
   const row=el.getBoundingClientRect();
   return [...el.querySelectorAll('.quantity,strong,strong s,.remove-item')].map(e=>{const r=e.getBoundingClientRect();return {text:e.textContent,left:r.left,right:r.right,rowLeft:row.left,rowRight:row.right,width:r.width,scroll:e.scrollWidth,client:e.clientWidth}});
  });
  for(const r of geometry)assert.ok(r.left>=r.rowLeft-1&&r.right<=r.rowRight+1&&r.scroll<=r.client+1,JSON.stringify(r));
+ const alignment=await page.locator(selector).evaluate(el=>{
+  const rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,bottom:r.bottom}};
+  return {row:rect(el),quantity:rect(el.querySelector('.quantity')),price:rect(el.querySelector('.bag-price')),current:rect(el.querySelector('.bag-price>span')),old:el.querySelector('.bag-price s')?rect(el.querySelector('.bag-price s')):null};
+ });
+ assert.ok(Math.abs(alignment.price.right-alignment.row.right)<1,'line price aligns to the row edge');
+ assert.ok(alignment.quantity.right+7<=alignment.price.left,'quantity has its own column');
+ assert.ok(Math.abs(alignment.quantity.bottom-alignment.current.bottom)<2,'quantity and current amount share a baseline');
+ if(alignment.old)assert.ok(Math.abs(alignment.old.right-alignment.current.right)<1,'old and current amounts share the right edge');
+
 }
 for(const width of widths){
  for(const handle of handles){
@@ -108,12 +117,40 @@ for(const width of widths){
    }finally{await context.close()}
   });
  }
- test(`${width}: control product retains gallery-first DOM`,async()=>{
+ test(`${width}: additional eligible product uses purchase-first DOM`,async()=>{
   const {page,context}=await open(width,'collagen-peptides-chocolate');try{
-   assert.equal(await page.locator('.purchase-first,.purchase-assurance').count(),0);
-   assert.match(await page.locator('#overview> :first-child').getAttribute('class'),/product-visual-gallery/);
+   assert.equal(await page.locator('.purchase-first').count(),1);
+   assert.equal(await page.getByRole('radio').count(),3);
+   assert.match(await page.locator('#overview> :first-child').getAttribute('class'),/purchase-panel/);
    await page.screenshot({path:path.join(shots,`${width}_control.png`)});
   }finally{await context.close()}
+ });
+ test(`${width}: mixed lines align on the review page`,async()=>{
+  const {page,context}=await open(width,'collagen-peptides-chocolate');
+  try{
+   await page.getByRole('radio',{name:/^Buy 2/}).click();
+   await page.locator('.add-to-bag-row .button').click();
+   await page.locator('.bag-sheet .cart-line').waitFor();
+   await page.locator('.bag-sheet .quantity button:enabled').first().waitFor();
+   await page.keyboard.press('Escape');
+   await page.goto(`${base}/products/${real?'colon-gentle-cleanse':'daily-travel-kit'}`);
+   await page.locator('.add-to-bag-row .button:enabled').click();
+   await page.locator('.bag-sheet .cart-line').nth(1).waitFor();
+   await page.locator('.bag-sheet .quantity button:enabled').first().waitFor();
+   await page.keyboard.press('Escape');await page.goto(`${base}/checkout`);
+   await page.locator('.checkout-lines .cart-line').nth(1).waitFor();
+   for(let i=1;i<=2;i++)await rowFits(page,`.checkout-lines .cart-line:nth-child(${i})`);
+   assert.equal(await page.locator('.checkout-lines .bag-price s').count(),real?2:1);
+   await noOverflow(page);
+   await page.screenshot({path:path.join(shots,`${width}_mixed_review.png`),fullPage:true});
+  }finally{
+   const cart=await(await context.request.get(`${base}/api/cart`)).json();
+   for(const item of [...(cart.items||[])].reverse()){
+    const response=await context.request.post(`${base}/api/cart`,{headers:{Origin:base,'Content-Type':'application/json'},data:{action:'update',lineId:item.lineId,quantity:0}});
+    assert.equal(response.status(),200,'clean up owned mixed cart');
+   }
+   await context.close();
+  }
  });
  test(`${width}: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans`,async()=>{
   const {page,context}=await open(width,'creatine-monohydrate');try{
