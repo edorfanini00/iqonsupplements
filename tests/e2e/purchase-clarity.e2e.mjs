@@ -9,6 +9,7 @@ import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {chromium} from 'playwright-core';
+import {checkBundleKeyboard} from './bundle-keyboard.mjs';
 const real=process.env.QA_REAL==='1';
 const port=Number(process.env.E2E_PORT||3981);
 const base=process.env.QA_BASE||(real?'http://localhost:3980':`http://localhost:${port}`);
@@ -103,11 +104,7 @@ for(const width of widths){
     assert.deepEqual(zones,['purchase','gallery','details']);
     fs.writeFileSync(path.join(shots,`${width}_${handle}_focus.json`),JSON.stringify(trace,null,2));
     await page.screenshot({path:path.join(shots,`${width}_${handle}_focus.png`)});
-    // Radio group also supports arrow navigation and updates both totals.
-    await page.getByRole('radio',{name:/^Buy 1/}).focus();await page.keyboard.down('ArrowDown');
-    await page.waitForFunction(()=>document.querySelector('.add-to-bag-row .quantity span')?.textContent==='2');
-    await page.keyboard.up('ArrowDown');
-    assert.equal(await page.getByRole('radio',{name:/^Buy 2/}).getAttribute('aria-checked'),'true');
+    await checkBundleKeyboard(page,{loaded:width===390,evidence:path.join(shots,`${width}_${handle}_keyboard.json`)});
    }finally{await context.close()}
   });
  }
