@@ -1,0 +1,35 @@
+/* Purchase-first product pages (three targeted supplement handles): a short shipping/returns line under the purchase button and,
+   on phones, title → price → purchase decision before the gallery. Their DOM is summary/purchase panel → gallery →
+   details panel, so keyboard order follows that flow; desktop keeps its two-column composition by grid placement. */
+.purchase-assurance{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:7px;font-size:12px;line-height:1.55;color:#536168}
+.purchase-assurance li{display:flex;gap:9px;align-items:flex-start;min-width:0}
+.purchase-assurance li>span{min-width:0;overflow-wrap:break-word}
+.purchase-assurance svg{flex-shrink:0;margin-top:2px;color:#617777}
+.purchase-assurance a{color:#26343a;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+/* Keyboard focus scrolls controls clear of the sticky purchase bar. */
+html:has(.product-page.purchase-first){scroll-padding-bottom:104px}
+/* Customer reviews with nothing published: one quiet line, no empty stars. */
+.reviews-awaiting.reviews-empty{padding:24px 0}
+.reviews-empty p{margin:0}
+@media(min-width:761px){
+ /* Gallery left across all rows; purchase panel then details on the right; the empty last row absorbs a taller gallery. */
+ .product-page.purchase-first .product-detail{grid-template-rows:auto auto 1fr;row-gap:0!important}
+ .product-page.purchase-first .product-detail>.product-visual-gallery{grid-column:1;grid-row:1 / 4}
+ .product-page.purchase-first .product-detail>.purchase-panel{grid-column:2;grid-row:1;position:static}
+ .product-page.purchase-first .product-detail>.purchase-panel-details{grid-row:2}
+}
+@media(max-width:760px){
+ /* Panels are display:contents here. Non-focusable product notes sit under the gallery; controls keep DOM order. */
+ .product-page.purchase-first .purchase-panel>*{order:1}
+ .product-page.purchase-first .purchase-panel>.product-summary{order:-2}
+ .product-page.purchase-first .product-visual-gallery,.product-page.purchase-first .product-gallery{order:0;margin-top:26px}
+ .product-page.purchase-first .purchase-panel>:is(.product-review-link,.product-variant-picker,.product-format,.product-purchase-choices,.commerce-message,.add-to-bag-row,.product-preview-note,.purchase-assurance){order:-1}
+ .purchase-assurance{font-size:13px}
+ /* One visible purchase button: the bar returns once the in-page button scrolls away. */
+ .product-page.purchase-first .sticky-purchase.inline-cta-in-view{visibility:hidden}
+}
+/* Phones: the bar is one full-width button so bundle totals have room at narrow widths. */
+@media(max-width:760px){
+ .product-page.purchase-first .sticky-purchase>div{display:none}
+ .product-page.purchase-first .sticky-purchase>.button{flex:1;justify-content:space-between}
+}

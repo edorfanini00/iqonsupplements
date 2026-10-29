@@ -29,6 +29,19 @@ const catalog = [
   product("peptide-serum", "Peptide Serum", "iqon-skincare", variant(6, "60.00")),
   product("barrier-cream", "Barrier Cream", "iqon-skincare", variant(7, "55.00")),
 ];
+// Opt-in realistic monetary widths for purchase-clarity checks; default SEO/layout fixtures stay unchanged.
+if (process.env.FAKE_CATALOG === "purchase-clarity") {
+  catalog[0].variants.nodes[0].price = money("48.97");
+  for (const [handle,title,id,price] of [
+    ["hydrolyzed-collagen-peptides","Hydrolyzed Collagen Peptides",11,"65.64"],
+    ["colostrum-powder","Colostrum Powder",12,"42.17"],
+    ["collagen-peptides-chocolate","Grass-Fed Collagen Peptides",13,"70.84"],
+    ["colon-gentle-cleanse","Colon Gentle Cleanse",14,"66.84"],
+  ]) {
+    catalog.push(product(handle,title,"iqon-supplements",variant(id,price),{productType:"Powder"}));
+    if (handle !== "colon-gentle-cleanse") ELIGIBLE.add(handle);
+  }
+}
 const carts = new Map();
 const variantProduct = id => catalog.find(p => p.variants.nodes.some(v => v.id === id));
 function cartShape(id, lines) {
