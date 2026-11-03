@@ -49,7 +49,7 @@ export const productVisuals: Record<string, ProductVisual> = {
       { title: "One total", body: "The IgG is included within the colostrum amount. It is not another 575 mg added on top." }], ritualTitle: "Cold mix. Freshly prepared."
   },
   "gut-health": {
-    headline: "Daily support for your gut.", lead: "Inulin prebiotic fiber, a 1 billion CFU probiotic and DigeZyme® digestive enzymes in a two capsule formula. Prebiotic fiber and probiotics for gut health.*",
+    headline: "Daily support for your gut.*", lead: "Inulin prebiotic fiber, a 1 billion CFU probiotic and DigeZyme® digestive enzymes in a two capsule formula. Prebiotic fiber and probiotics for gut health.*",
     benefitTitle: "A considered gut health blend.", benefits: ["Supports digestive comfort*", "Prebiotic inulin with a probiotic", "Two capsules daily with water"],
     fact: { value: "1B", label: "CFU of L. acidophilus per serving.", body: "Lactobacillus acidophilus LA85, counted at the time of manufacture, with 200 mg inulin." },
     whyTitle: "Fiber and bacteria, side by side.", whyBody: "Probiotics are live bacteria. Prebiotics are fibers those bacteria can use. This formula pairs both, then adds digestive enzymes and organic apple cider vinegar powder, so every ingredient has a clear role.*",

@@ -54,7 +54,7 @@ export const supplementDetails: Record<string, SupplementDetails> = {
     cautions: [standardCaution], storage, dietary: [],
   },
   "gut-health": {
-    country: "USA", contents: "60 capsules", netWeight: "58 g", grossWeight: "91 g",
+    country: "USA", contents: "60 capsules", netWeight: "58 g", grossWeight: "73 g",
     ingredients: "Organic Apple Cider Vinegar Powder (fruit) (1,000 mg), Inulin (Helianthus tuberosus, Jerusalem artichoke root) (200 mg), DigeZyme® (100 mg), Lactobacillus acidophilus LA85 (10 mg, 1 Billion CFU at time of manufacture). Other ingredients: HPMC (vegetable capsule), Brown Rice Flour, Magnesium Stearate, Olive Oil, Silicon Dioxide.",
     amounts: [
       {ingredient: "Organic Apple Cider Vinegar Powder", amount: "1,000 mg", detail: "Per two capsule serving."},
@@ -65,7 +65,7 @@ export const supplementDetails: Record<string, SupplementDetails> = {
     directions: ["As a dietary supplement, adults take two (2) capsules daily. For best results, take with 6 to 8 oz (177 to 237 ml) of water, or as directed by a healthcare professional."],
     cautions: [shortCaution], storage,
     notes: ["Made in a UL certified cGMP, FDA registered facility in the USA and third party tested in an ISO/IEC 17025 accredited laboratory."],
-    dietary: ["Vegetarian", "Vegan friendly", "Gluten-free", "Allergen-free", "Non-GMO"],
+    dietary: ["Vegetarian", "Vegan friendly", "Gluten-free", "Non-GMO"],
   },
   "nmn": {
     country: "USA", contents: "30 capsules", netWeight: "36 g", grossWeight: "45 g",

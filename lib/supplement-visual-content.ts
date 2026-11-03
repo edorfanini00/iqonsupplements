@@ -56,9 +56,9 @@ export const supplementVisualContent:Record<string,SupplementVisualContent>={
     routineTitle:"One scoop. Freshly mixed.",timing:"COLD DRINK / WITHIN 10 MINUTES",routineNote:"Derived from milk. Consider milk allergy before choosing this formula. Use cold water or a favorite beverage and consume promptly.",stepIcons:["measure","drop","clock"]
   },
   "gut-health":{
-    eyebrow:"GUT HEALTH / PREBIOTIC + PROBIOTIC",title:"Support for your gut, every day.",
+    eyebrow:"GUT HEALTH / PREBIOTIC + PROBIOTIC",title:"Support for your gut, every day.*",
     introduction:"Inulin prebiotic fiber, Lactobacillus acidophilus and DigeZyme® digestive enzymes, with organic apple cider vinegar powder. Two capsules a day to support digestive comfort.*",
-    photoLabel:"THE CAPSULE FORMAT",photoCaption:"Two capsules / with water",imageAlt:"Ivory two-piece capsules on a cool gray stone surface beside a glass of water",
+    photoLabel:"THE CAPSULE FORMAT",photoCaption:"Two capsules / with water",imageAlt:"Illustrative capsules on a gray stone surface beside glasses of water",
     benefits:[{title:"Prebiotic fiber",body:"200 mg inulin from Jerusalem artichoke root.",icon:"leaf"},{title:"Probiotic",body:"1 billion CFU of L. acidophilus LA85 at manufacture.",icon:"flask"},{title:"Digestive enzymes",body:"100 mg DigeZyme® to support digestive comfort.*",icon:"layers"},{title:"Two daily capsules",body:"60 capsules provide 30 days at suggested use.",icon:"capsule"}],
     formulaTitle:"Explore the parts of the formula.",ingredients:[illustration("psyllium-fiber","Prebiotic fiber / schematic","200 mg inulin, a soluble fiber that gut bacteria can use.",["INULIN","200 mg"],"Inulin"),illustration("bacillus","Lactobacillus acidophilus / schematic","A named probiotic strain, 1 billion CFU at the time of manufacture.",["LA85","1 BILLION CFU"],"Probiotic"),illustration("digestive-blend","DigeZyme® + apple cider vinegar","100 mg digestive enzymes and 1,000 mg organic apple cider vinegar powder.",["DIGEZYME®","ORGANIC ACV"],"Enzymes + ACV")],
     facts:[{value:"1B CFU",label:"L. acidophilus LA85",detail:"Counted at the time of manufacture."},{value:"200 mg",label:"Inulin",detail:"Prebiotic fiber per serving."},{value:"60",label:"Capsules per bottle",detail:"Two capsules daily with water."}],

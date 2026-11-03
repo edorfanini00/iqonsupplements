@@ -118,6 +118,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
     const gut = await get(port, "/products/gut-health");
     assertNoindex(gut, "Gut Health before Shopify publishes it");
     assert.match(gut.body, /Gut Health/);
+    assert.equal(dom(gut.body).title, "Gut Health | IQON", "product titles use the site separator, not a dash");
     assert.doesNotMatch(gut.body, /Colon|colon-gentle-cleanse|[Ss]achet/, "no retired product on the replacement page");
     for (const path of ["/", "/collections/all", "/collections/supplements", "/collections/supplements?format=capsules"])
       assert.doesNotMatch((await get(port, path)).body, /Colon Gentle|colon-gentle-cleanse|[Ss]achet/, `${path} never shows the retired product`);
