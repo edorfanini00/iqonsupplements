@@ -30,6 +30,7 @@ const imports = {
   "./merchandise": withPolicy("../lib/merchandise.ts"),
   "./shopify-operations": dataUrl(compile("../lib/shopify-operations.ts")),
   "./shopify": withPolicy("../lib/shopify.ts"),
+  "./legacy-redirects": redirectsUrl,
 };
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);
@@ -319,6 +320,60 @@ test("retired Colon Gentle Cleanse stays out of the catalog and cannot be added 
   const response=await add(fixtureProducts[4]);
   assert.equal(response.status,422);
   assert.equal(state.addedLines.length,0);
+});
+
+function insertOldColon(state) {
+  const p=fixtureProducts[4];
+  state.cart.lines.nodes.push({id:"old-colon-line",quantity:1,cost:{subtotalAmount:money(p.price),totalAmount:money(p.price)},merchandise:{id:p.variantId,title:"Default Title",product:{handle:p.handle,title:"Colon Gentle Cleanse",tags:["iqon-supplements"]}}});
+  state.cart.totalQuantity++;
+}
+const retiredNotice=/^Colon Gentle Cleanse has been discontinued and was removed from your bag\. Gut Health replaces it\.$/;
+
+test("loading an old bag removes retired Colon Gentle Cleanse with a notice and preserves other supplements", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldColon(state);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);assert.equal(bag.subtotal,29);
+  assert.match(bag.notice,retiredNotice);assert.doesNotMatch(bag.notice,/[\u2013\u2014]| - /);
+  assert.ok(state.operations.includes("IQONCartRemove"));
+  assert.equal(state.cart.lines.nodes.some(l=>l.merchandise.product.handle==="colon-gentle-cleanse"),false);
+  const again=await (await routes.getCartResponse()).json();
+  assert.equal(again.notice,undefined);
+});
+
+test("a retired Colon line cannot have its quantity changed", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldColon(state);
+  const response=await routes.mutateCartResponse(request({action:"update",lineId:"old-colon-line",quantity:3}));
+  assert.equal(response.status,422);
+  const data=await response.json();
+  assert.match(data.error,retiredNotice);assert.deepEqual(data.cart.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.equal(state.operations.includes("IQONCartUpdate"),false);
+  assert.equal(state.cart.lines.nodes.some(l=>l.id==="old-colon-line"),false);
+});
+
+test("checkout removes a retired Colon line and requires review before handing off to Shopify", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldColon(state);
+  const response=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(response.status,422);
+  const data=await response.json();
+  assert.match(data.error,/^Colon Gentle Cleanse has been discontinued/);assert.ok(!data.checkoutUrl);
+  assert.deepEqual(data.cart.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+});
+
+test("a bag holding only a retired Colon line is emptied and cannot check out", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);
+  state.cart.lines.nodes=[];state.cart.totalQuantity=0;insertOldColon(state);
+  const first=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(first.status,422);assert.equal((await first.json()).cart.items.length,0);
+  const second=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(second.status,422);assert.match((await second.json()).error,/empty/i);
+});
+
+test("an old bag with skincare and Colon removes both and shows both notices", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldSkincare(state);insertOldColon(state);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.match(bag.notice,/coming soon/i);assert.match(bag.notice,/Colon Gentle Cleanse has been discontinued/);
 });
 
 test("skincare cannot be added, even when Shopify reports available stock", async t => {

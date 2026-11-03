@@ -5,6 +5,7 @@ import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
 import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
+import { isRetiredProductHandle } from "./legacy-redirects";
 
 // Standard server environment variables work on Vercel and on the retained
 // Worker target with nodejs_compat_populate_process_env enabled.
@@ -66,16 +67,25 @@ function fail(error:unknown) {
 function blockedSkincareLines(cart:ShopifyCart) {
   return cart.lines.nodes.filter(line=>SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p))));
 }
-async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<{cart:ShopifyCart|null;removed:boolean}> {
-  if(!cart)return {cart:null,removed:false};
-  const blocked=blockedSkincareLines(cart);
-  if(!blocked.length)return {cart,removed:false};
+// Retired supplements (still published in Shopify) can linger in bags created before they were retired.
+function retiredLines(cart:ShopifyCart) {
+  return cart.lines.nodes.filter(line=>isRetiredProductHandle(line.merchandise.product.handle));
+}
+type Refreshed={cart:ShopifyCart|null;removed:boolean;removedLineIds:string[];notices:string[]};
+async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<Refreshed> {
+  if(!cart)return {cart:null,removed:false,removedLineIds:[],notices:[]};
+  const skincare=blockedSkincareLines(cart);
+  const retired=retiredLines(cart).filter(line=>!skincare.includes(line));
+  const blocked=[...skincare,...retired];
+  if(!blocked.length)return {cart,removed:false,removedLineIds:[],notices:[]};
   const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
-  return {cart:result.cart,removed:true};
+  const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];
+  return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};
 }
 const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
+const retiredNotice="Colon Gentle Cleanse has been discontinued and was removed from your bag. Gut Health replaces it.";
 export async function getCartResponse() {
-  try {const {cart,removed}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:skincareNotice}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
+  try {const {cart,removed,notices}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:notices.join(" ")}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
 }
 export async function mutateCartResponse(request:Request) {
   try {
@@ -105,6 +115,7 @@ export async function mutateCartResponse(request:Request) {
       result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
     } else if(input.action==="update") {
       const quantity=validQuantity(input.quantity,true);
+      if(typeof input.lineId==="string"&&refreshed.removedLineIds.includes(input.lineId)) throw new CommerceError(refreshed.notices.join(" "),422,publicCart(current));
       if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));
       result=quantity?await mutate(CART_UPDATE,{cartId:current.id,lines:[{id:input.lineId,quantity}]}):await mutate(CART_REMOVE,{cartId:current.id,lineIds:[input.lineId]});
     } else if(input.action==="discount") {
@@ -115,7 +126,7 @@ export async function mutateCartResponse(request:Request) {
     current=result.cart!;
     await setCartId(current.id,request);
     const snapshot=publicCart(current);
-    const notices=[...(refreshed.removed?[skincareNotice]:[]),...(result.warnings?.map(w=>w.message)||[])];
+    const notices=[...refreshed.notices,...(result.warnings?.map(w=>w.message)||[])];
     if(notices.length) snapshot.notice=notices.join(" ");
     return Response.json(snapshot,{headers:responseHeaders});
   } catch(error) {return fail(error);}
@@ -126,7 +137,7 @@ export async function checkoutResponse(request:Request) {
     // Refresh immediately before handing the buyer to Shopify's hosted checkout.
     const refreshed=await removeUpcomingProducts(await readCart());
     const cart=refreshed.cart;
-    if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));
+    if(refreshed.removed) throw new CommerceError(`${refreshed.notices.join(" ")} Please review your bag before checking out.`,422,publicCart(cart));
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
     if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
     const url=new URL(cart.checkoutUrl);
