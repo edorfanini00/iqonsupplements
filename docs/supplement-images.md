@@ -66,4 +66,4 @@ Gut Health imagery was produced locally from the final IQON label artwork (`IQON
 - `supplement-materials-v1/gut-health.webp`: mirrored copy of the generic Keto-5 capsule material photograph (no packaging shown). The actual Gut Health capsule appearance has not been photographed.
 - `email/products/gut-health.jpg`: 240×300 email thumbnail from the pack shot.
 
-The group scenes (`20_group_all_row`, `21_group_capsules_row`, `22_group_powders_row` and others) are unchanged and may still show the Colon Gentle Cleanse jar; they must be rebuilt or replaced in a separate, owner-approved image pass.
+Of the group scenes, only `20_group_all_row` showed the Colon Gentle Cleanse jar. Because it is the default share image and appears in the Explore menu and affiliate page, the jar was removed by cutting its column band out of the source pixels, crossfading the 12px seam in the white gap and extending the seamless background equally at both edges (same 2400×1018 size; no product was redrawn). The row now shows the other ten products and does not yet include Gut Health; a new lineup photograph is needed for that. All other group scenes are unchanged.
