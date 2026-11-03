@@ -68,12 +68,12 @@ it("keeps the 3+ tier selected when the stepper goes past three and returns to o
 });
 
 it("includes Gut Health in the approved bundle tiers",()=>{
-  const gut={...products.find(p=>p.id==="gut-health")!,available:true,price:30.64,currency:"USD",variants:[{...variant,price:30.64}]};
+  const gut={...products.find(p=>p.id==="gut-health")!,available:true,price:29.99,currency:"USD",variants:[{...variant,price:29.99}]};
   const {container}=render(React.createElement(ProductPage,{product:gut}));
   expect(screen.getByRole("radiogroup",{name:"Bundle quantity"})).toBeTruthy();
   fireEvent.click(screen.getByRole("radio",{name:/^Buy 3/}));
-  expect(addButtons()[0].textContent).toContain("$68.94");
-  expect(addButtons()[0].querySelector("s")?.textContent).toBe("$91.92");
+  expect(addButtons()[0].textContent).toContain("$67.50");
+  expect(addButtons()[0].querySelector("s")?.textContent).toBe("$89.97");
   expect(container.textContent).not.toContain("not part of the bundle offer");
 });
 

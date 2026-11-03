@@ -42,7 +42,7 @@ Colon Gentle Cleanse was retired by the owner and replaced by the Supliful "Gut 
 
 Gut Health facts come from the final IQON label artwork (`IQON_Gut_Health_Label.pdf`, proof PNG) and the supplier page <https://supliful.com/catalog/gut-health-capsules>, which agree: 60 capsules, two capsules daily (30 servings), organic apple cider vinegar powder 1,000 mg, inulin (Jerusalem artichoke root) 200 mg, DigeZyme® 100 mg, Lactobacillus acidophilus LA85 10 mg (1 billion CFU at the time of manufacture); other ingredients HPMC capsule, brown rice flour, magnesium stearate, olive oil, silicon dioxide. Supplier dietary claims: gluten free, vegetarian, allergen free, non GMO, vegan friendly. Net weight 58 g (supplier); approx. 90.72 g packed container (owner brief). Manufacturing and testing (owner brief): UL certified cGMP, FDA registered US facility; third party ISO/IEC 17025 testing (COA Gut_Health_COA_1253-5040235_18022026).
 
-Copy is structure/function only ("supports digestive comfort", "prebiotic fiber and probiotics for gut health") with the asterisk and FDA disclaimer the site already uses. No research sources were added for this product, so no education block cites studies; no disease, treatment, cleanse or laxative claim is made. Price 30.64 mirrors Liver Support (same bottle format) and is pending owner confirmation.
+Copy is structure/function only ("supports digestive comfort", "prebiotic fiber and probiotics for gut health") with the asterisk and FDA disclaimer the site already uses. No research sources were added for this product, so no education block cites studies; no disease, treatment, cleanse or laxative claim is made. Price 29.99 is owner-confirmed.
 
 ## Other background checks
 

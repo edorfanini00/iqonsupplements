@@ -38,7 +38,7 @@ if (process.env.FAKE_CATALOG === "purchase-clarity") {
     ["hydrolyzed-collagen-peptides","Hydrolyzed Collagen Peptides",11,"65.64"],
     ["colostrum-powder","Colostrum Powder",12,"42.17"],
     ["collagen-peptides-chocolate","Grass-Fed Collagen Peptides",13,"70.84"],
-    ["gut-health","Gut Health",14,"30.64","Capsules"],
+    ["gut-health","Gut Health",14,"29.99","Capsules"],
   ]) {
     catalog.push(product(handle,title,"iqon-supplements",variant(id,price),{productType:type||"Powder"}));
     ELIGIBLE.add(handle);

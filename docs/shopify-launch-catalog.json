@@ -128,15 +128,15 @@
       "handle": "gut-health",
       "name": "Gut Health",
       "category": "supplements",
-      "productId": null,
-      "variantId": null,
-      "sku": "IQON-GUT-HEALTH",
+      "productId": "gid://shopify/Product/10538185916711",
+      "variantId": "gid://shopify/ProductVariant/52521709666599",
+      "sku": "EDOAR-GH-BB70",
       "size": "60 capsules",
-      "proposedPrice": "30.64",
+      "proposedPrice": "29.99",
       "proposedSubscriptionPrice": null,
       "subscriptionStatus": "not enabled",
-      "status": "PENDING_SUPLIFUL_PUSH",
-      "note": "Replaces Colon Gentle Cleanse (retired 3 November 2026; it stays in Shopify but the storefront hides it and redirects its URL here). Shopify ids and media are assigned when the product is pushed from Supliful. Price mirrors Liver Support and is pending owner confirmation.",
+      "status": "ACTIVE",
+      "note": "Replaces Colon Gentle Cleanse (retired 3 November 2026; it stays in Shopify but the storefront hides it and redirects its URL here). Pushed from Supliful; price 29.99 is owner-confirmed. Media file ids are assigned when the IQON pack shots are uploaded.",
       "inventoryPolicy": "DENY",
       "inventoryQuantityAtImport": 0,
       "media": [
@@ -153,7 +153,7 @@
           "url": null
         }
       ],
-      "approvedPrice": "30.64"
+      "approvedPrice": "29.99"
     },
     {
       "handle": "keto-5",
