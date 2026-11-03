@@ -54,7 +54,7 @@ Audited all 11 primary supplement photographs and the three existing skincare im
 Eight generated alternatives were rejected for backdrop, scale or tiny-letter drift. None was installed. Chosen corrections retain the source labels, geometry, image dimensions, crop and reflections. No new photographic detail is claimed: residual source softness and NMN's different camera perspective remain. The existing 9% inset remains. All hero, group, alternate and lifestyle assets are unchanged in this follow-up.
 
 
-## Gut Health replaces Colon Gentle Cleanse — November 3, 2026
+## Gut Health replaces Colon Gentle Cleanse (November 3, 2026)
 
 Colon Gentle Cleanse was retired and its site imagery removed (`04_pack_colon_cleanse`, `15_hero_colon_sachet`, its editorial scene and material photograph, and `sachet-macro`). The order email thumbnail `email/products/colon-gentle-cleanse.jpg` is kept so emails already sent keep their image.
 
