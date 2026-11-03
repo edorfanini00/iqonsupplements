@@ -43,7 +43,7 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   expect(three.closest("label")?.textContent).toContain("$36.73");
   expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
   expect(container.querySelector(".bundle-terms")?.textContent).toMatch(/Mix and match any eligible IQON supplements/);
-  expect(container.querySelector(".bundle-terms")?.textContent).not.toContain("Colon Gentle Cleanse is not");
+  expect(container.querySelector(".bundle-terms")?.textContent).not.toContain("Gut Health is not");
   fireEvent.click(three);
   await waitFor(()=>expect(three.getAttribute("aria-checked")).toBe("true"));
   expect(screen.getByLabelText("Quantity").textContent).toBe("3");
@@ -67,13 +67,13 @@ it("keeps the 3+ tier selected when the stepper goes past three and returns to o
   expect(addButtons()[0].querySelector("s")).toBeNull();
 });
 
-it("includes Colon Gentle Cleanse in the approved bundle tiers",()=>{
-  const cleanse={...products.find(p=>p.id==="colon-gentle-cleanse")!,available:true,price:66.84,currency:"USD",variants:[{...variant,price:66.84}]};
-  const {container}=render(React.createElement(ProductPage,{product:cleanse}));
+it("includes Gut Health in the approved bundle tiers",()=>{
+  const gut={...products.find(p=>p.id==="gut-health")!,available:true,price:30.64,currency:"USD",variants:[{...variant,price:30.64}]};
+  const {container}=render(React.createElement(ProductPage,{product:gut}));
   expect(screen.getByRole("radiogroup",{name:"Bundle quantity"})).toBeTruthy();
   fireEvent.click(screen.getByRole("radio",{name:/^Buy 3/}));
-  expect(addButtons()[0].textContent).toContain("$150.39");
-  expect(addButtons()[0].querySelector("s")?.textContent).toBe("$200.52");
+  expect(addButtons()[0].textContent).toContain("$68.94");
+  expect(addButtons()[0].querySelector("s")?.textContent).toBe("$91.92");
   expect(container.textContent).not.toContain("not part of the bundle offer");
 });
 

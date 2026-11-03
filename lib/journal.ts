@@ -105,13 +105,6 @@ export const journalArticles:JournalArticle[]=[
         ]
       },
       {
-        "heading": "Sachets are easy to take along",
-        "format": "Sachets",
-        "paragraphs": [
-          "Individual packets make it convenient to carry a few sachets without the full outer container. They can suit a trip, an office drawer or a bag, within the product's storage requirements. Preparation varies: a packet may still call for water, a cup or another step. Consider that whole process when comparing convenience. Keep the product name and directions available, especially when leaving the outer packaging at home."
-        ]
-      },
-      {
         "heading": "Gummies put taste and texture first",
         "format": "Gummies",
         "paragraphs": [

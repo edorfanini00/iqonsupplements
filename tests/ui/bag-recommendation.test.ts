@@ -11,13 +11,13 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 
 const product=(id:string):Product=>({...products.find(p=>p.id===id)!,available:true,
   variants:[{id:`variant-${id}`,title:"Default Title",available:true,price:30,currency:"USD"}]});
-// Colon is approved for bundles and is the first eligible catalog recommendation.
-const colon=product("colon-gentle-cleanse"),creatine=product("creatine-monohydrate"),liver=product("liver-support");
-const unapproved:Product={...colon,id:"unapproved-test-supplement",name:"Unapproved Test Supplement",
-  variants:[{...colon.variants![0],id:"variant-unapproved-test-supplement"}]};
+// Gut Health is approved for bundles and is the first eligible catalog recommendation.
+const gut=product("gut-health"),creatine=product("creatine-monohydrate"),liver=product("liver-support");
+const unapproved:Product={...gut,id:"unapproved-test-supplement",name:"Unapproved Test Supplement",
+  variants:[{...gut.variants![0],id:"variant-unapproved-test-supplement"}]};
 const item=(id:string,quantity=1):CartItem=>({id,lineId:`line-${id}`,quantity,purchase:"once",frequency:"once"});
 function OpenBag(){const store=useStore();return React.createElement("button",{disabled:!store.ready,onClick:store.openBag},"Open test bag");}
-async function setup(items=[item(creatine.id)],discountCodes:{code:string;applicable:boolean}[]=[],catalog=[colon,creatine,liver]){
+async function setup(items=[item(creatine.id)],discountCodes:{code:string;applicable:boolean}[]=[],catalog=[gut,creatine,liver]){
   const calls:Record<string,unknown>[]=[];
   vi.stubGlobal("fetch",vi.fn(async(_url,init)=>{
     if(init?.body){
@@ -37,13 +37,13 @@ async function setup(items=[item(creatine.id)],discountCodes:{code:string;applic
 const recommendation=()=>document.querySelector(".bag-recommend")!;
 const nudge=()=>document.querySelector(".bag-sheet .bundle-nudge");
 
-it("recommends eligible Colon to advance the active bundle tier and preserves quantity controls",async()=>{
+it("recommends eligible Gut Health to advance the active bundle tier and preserves quantity controls",async()=>{
   const calls=await setup();
   expect(nudge()?.textContent).toContain("save 10%");
-  expect(recommendation().textContent).toContain("Colon Gentle Cleanse");
-  fireEvent.click(screen.getByRole("button",{name:"Add Colon Gentle Cleanse to bag"}));
+  expect(recommendation().textContent).toContain("Gut Health");
+  fireEvent.click(screen.getByRole("button",{name:"Add Gut Health to bag"}));
   await waitFor(()=>expect(nudge()?.textContent).toContain("save 25%"));
-  expect(calls[0]).toEqual({action:"add",id:colon.id,quantity:1,variantId:`variant-${colon.id}`,purchase:"once"});
+  expect(calls[0]).toEqual({action:"add",id:gut.id,quantity:1,variantId:`variant-${gut.id}`,purchase:"once"});
   const increase=screen.getByRole("button",{name:"Increase Creatine Monohydrate quantity"});
   await waitFor(()=>expect(increase.hasAttribute("disabled")).toBe(false));
   fireEvent.click(increase);
@@ -64,7 +64,7 @@ it.each([
 ] as const)("preserves normal recommendations with no nudge: %s",async(_label,items,codes)=>{
   await setup([...items],[...codes]);
   expect(nudge()).toBeNull();
-  expect(recommendation().textContent).toContain("Colon Gentle Cleanse");
+  expect(recommendation().textContent).toContain("Gut Health");
 });
 
 it("never recommends unapproved, unavailable or subscription-only products for an active nudge",async()=>{

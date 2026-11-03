@@ -9,7 +9,7 @@ Prepared 10 September 2026. Draft copy is in `product-copy.json`.
 - Render source links and the ingredient-research scope with each education block. The biological explanations in the adjacent story and FAQs refer to those same sources.
 - Product facts come from the supplied IQON catalog and content files: names, formats, counts, net weights, flavors and grass-fed label descriptions. No IQON efficacy study, ingredient quantity, complete formula, purity, certification, sourcing location, serving size or use frequency was established.
 - The three skincare entries remain expressly labeled concepts. Their sizes and routine positions come from the existing preview; no peptide, ceramide, cleansing-performance or skin-type claim was added.
-- Keto-5, GLP-1 Support, Liver Support, Colon Gentle Cleanse and Hair, Skin & Nails have no confirmed active ingredient list. Their copy therefore stays with the known identity, practical format and the product-specific questions a customer would reasonably ask. More benefit-led copy requires the actual formulas.
+- Keto-5, GLP-1 Support, Liver Support and Hair, Skin & Nails have no confirmed active ingredient list. Their copy therefore stays with the known identity, practical format and the product-specific questions a customer would reasonably ask. More benefit-led copy requires the actual formulas.
 - No adjacent research-use peptides were researched or introduced. No repository, checkout, pricing or live product content was changed.
 
 ## Ingredient sources
@@ -35,6 +35,14 @@ Prepared 10 September 2026. Draft copy is in `product-copy.json`.
 ### Resveratrol
 
 [Timmers et al., Cell Metabolism (2011)](https://pubmed.ncbi.nlm.nih.gov/22055504/) reports an original crossover trial in men with obesity. [Yoshino et al., Cell Metabolism (2012)](https://pubmed.ncbi.nlm.nih.gov/23102619/) reports no improvement in metabolic function in nonobese women with normal glucose tolerance. They provide concrete contrasting examples for why population and study design matter. No product effect, longevity outcome, source or trans-resveratrol specification is inferred.
+
+### Gut Health (replaced Colon Gentle Cleanse, 3 November 2026)
+
+Colon Gentle Cleanse was retired by the owner and replaced by the Supliful "Gut Health" capsules under handle `gut-health`. Its copy, details and imagery were removed from the site; `/products/colon-gentle-cleanse` permanently redirects to `/products/gut-health`, and the still-published Shopify product is excluded from the storefront catalog (`RETIRED_PRODUCT_HANDLES` in `lib/legacy-redirects.ts`).
+
+Gut Health facts come from the final IQON label artwork (`IQON_Gut_Health_Label.pdf`, proof PNG) and the supplier page <https://supliful.com/catalog/gut-health-capsules>, which agree: 60 capsules, two capsules daily (30 servings), organic apple cider vinegar powder 1,000 mg, inulin (Jerusalem artichoke root) 200 mg, DigeZyme® 100 mg, Lactobacillus acidophilus LA85 10 mg (1 billion CFU at the time of manufacture); other ingredients HPMC capsule, brown rice flour, magnesium stearate, olive oil, silicon dioxide. Supplier dietary claims: gluten free, vegetarian, allergen free, non GMO, vegan friendly. Net weight 58 g (supplier); approx. 90.72 g packed container (owner brief). Manufacturing and testing (owner brief): UL certified cGMP, FDA registered US facility; third party ISO/IEC 17025 testing (COA Gut_Health_COA_1253-5040235_18022026).
+
+Copy is structure/function only ("supports digestive comfort", "prebiotic fiber and probiotics for gut health") with the asterisk and FDA disclaimer the site already uses. No research sources were added for this product, so no education block cites studies; no disease, treatment, cleanse or laxative claim is made. Price 30.64 mirrors Liver Support (same bottle format) and is pending owner confirmation.
 
 ## Other background checks
 

@@ -1,5 +1,6 @@
 import type { CartItem, Product } from "./catalog";
 import { isComingSoon } from "./commerce-policy";
+import { isRetiredProductHandle } from "./legacy-redirects";
 
 export type ShopifyConfig = {domain:string; token:string; version:string};
 export class CommerceError extends Error {
@@ -40,7 +41,7 @@ export type ShopifyProduct = {
 export function mapProduct(p:ShopifyProduct, index:number):Product|null {
   // Explicit merchandising tags prevent unrelated products entering this catalog.
   const category=p.tags.includes("iqon-supplements")?"supplements":p.tags.includes("iqon-skincare")?"skincare":null;
-  if(!category) return null;
+  if(!category || isRetiredProductHandle(p.handle)) return null;
   if(p.variants.pageInfo.hasNextPage) throw new CommerceError("This product’s options are temporarily unavailable.");
   // One time purchases only: selling plans are not read, so no subscription can be offered.
   const variants=p.variants.nodes.map(v=>({id:v.id,title:v.title,price:Number(v.price.amount),currency:v.price.currencyCode,available:v.availableForSale}));

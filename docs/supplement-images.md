@@ -12,7 +12,7 @@ No prices or inventory were supplied. These records display Coming soon and cann
 | Hydrolyzed Collagen Peptides | 280 g | hydrolyzed-collagen-peptides | 01_pack_collagen_no_flavor.webp, 23_group_beauty_trio.webp, 22_group_powders_row.webp |
 | Grass-Fed Collagen Peptides | 378 g · Chocolate | collagen-peptides-chocolate | 02_pack_collagen_chocolate.webp, 13_hero_collagen_choc_scoop.webp, 22_group_powders_row.webp |
 | Colostrum Powder | 69 g | colostrum-powder | 03_pack_colostrum_powder.webp, 16_hero_colostrum_open.webp, 23_group_beauty_trio.webp |
-| Colon Gentle Cleanse | 30 sachets | colon-gentle-cleanse | 04_pack_colon_cleanse.webp, 15_hero_colon_sachet.webp, 20_group_all_row.webp |
+| Gut Health | 60 capsules | gut-health | 04_pack_gut_health.webp, 15_hero_gut_health_label.webp |
 | Keto-5 | 60 capsules | keto-5 | 05_pack_keto5.webp, 19_hero_glp1_keto_pair.webp, 25_group_metabolic_trio.webp |
 | GLP-1 Support | 60 capsules | glp-1-support | 06_pack_glp1_support.webp, 19_hero_glp1_keto_pair.webp, 25_group_metabolic_trio.webp |
 | Liver Support | 60 capsules | liver-support | 07_pack_liver_support.webp, 11_hero_liver_capsules.webp, 25_group_metabolic_trio.webp |
@@ -52,3 +52,18 @@ Product card and portrait gallery frames use the packshot’s actual 145:180 asp
 Audited all 11 primary supplement photographs and the three existing skincare images at catalog-card size. Retained seven supplement primaries and all skincare originals. Applied conservative source-pixel tonal and edge-clarity corrections to primary files 00 (creatine), 05 (Keto-5), 08 (NMN) and 09 (resveratrol), using Higgsfield's media sandbox. The unflavored collagen primary remains the lighting reference.
 
 Eight generated alternatives were rejected for backdrop, scale or tiny-letter drift. None was installed. Chosen corrections retain the source labels, geometry, image dimensions, crop and reflections. No new photographic detail is claimed: residual source softness and NMN's different camera perspective remain. The existing 9% inset remains. All hero, group, alternate and lifestyle assets are unchanged in this follow-up.
+
+
+## Gut Health replaces Colon Gentle Cleanse — November 3, 2026
+
+Colon Gentle Cleanse was retired and its site imagery removed (`04_pack_colon_cleanse`, `15_hero_colon_sachet`, its editorial scene and material photograph, and `sachet-macro`). The order email thumbnail `email/products/colon-gentle-cleanse.jpg` is kept so emails already sent keep their image.
+
+Gut Health imagery was produced locally from the final IQON label artwork (`IQON supplement labels/final/Gut Health/IQON_Gut_Health_Label.pdf` and proof PNG) without generative services: the Liver Support studio bottle (`07_pack_liver_support.webp`, the same capsule bottle format) supplied the bottle, light and background, and its label area was replaced with the Gut Health front panel, warped to the cylinder and relit from the original shading. The script is kept with the PR evidence (`make_packshot.py`). It is a faithful composite, not a photograph of a physical Gut Health bottle; replace it with studio photography when available.
+
+- `04_pack_gut_health.webp`: primary pack shot.
+- `15_hero_gut_health_label.webp`: label detail with the Supplement Facts panel.
+- `product-editorial/gut-health.webp`: Liver Support editorial scene with the Gut Health label composited onto the bottle.
+- `supplement-materials-v1/gut-health.webp`: mirrored copy of the generic Keto-5 capsule material photograph (no packaging shown). The actual Gut Health capsule appearance has not been photographed.
+- `email/products/gut-health.jpg`: 240×300 email thumbnail from the pack shot.
+
+The group scenes (`20_group_all_row`, `21_group_capsules_row`, `22_group_powders_row` and others) are unchanged and may still show the Colon Gentle Cleanse jar; they must be rebuilt or replaced in a separate, owner-approved image pass.

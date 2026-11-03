@@ -53,13 +53,19 @@ export const supplementDetails: Record<string, SupplementDetails> = {
     directions: ["Take one (1) veggie capsule twice a day as a dietary supplement. For best results, take 20–30 minutes before a meal, or as directed by your healthcare professional."],
     cautions: [standardCaution], storage, dietary: [],
   },
-  "colon-gentle-cleanse": {
-    country: "Latvia", contents: "30 sachets", netWeight: "90 g", grossWeight: "159 g",
-    ingredients: "Psyllium husk (Plantago ovata) seed powder, Tamarind (Tamarindus indica) fruit extract, Digestive Enzyme blend from fermented cereals (amylase, lactase, lipase, cellulase), Ginger root (Zingiber officinale Roscoe).",
-    directions: ["Take one sachet once or twice a day, separate from meals. Pour the contents into a glass filled with non-carbonated water (6.76 fl oz / 200 ml), stir well, and drink immediately.", "Take no earlier than 2 hours after medication."],
-    cautions: ["Not recommended for anyone with sensitivity to the components or for children under 12. Do not exceed the recommended daily dose. This dietary supplement must not be used as a substitute for a complete diet. Consult your doctor before use."],
-    notes: ["A change to a jelly-like consistency is characteristic of the preparation and does not affect product quality."],
-    storage: "", dietary: [],
+  "gut-health": {
+    country: "USA", contents: "60 capsules", netWeight: "58 g", grossWeight: "91 g",
+    ingredients: "Organic Apple Cider Vinegar Powder (fruit) (1,000 mg), Inulin (Helianthus tuberosus, Jerusalem artichoke root) (200 mg), DigeZyme® (100 mg), Lactobacillus acidophilus LA85 (10 mg, 1 Billion CFU at time of manufacture). Other ingredients: HPMC (vegetable capsule), Brown Rice Flour, Magnesium Stearate, Olive Oil, Silicon Dioxide.",
+    amounts: [
+      {ingredient: "Organic Apple Cider Vinegar Powder", amount: "1,000 mg", detail: "Per two capsule serving."},
+      {ingredient: "Inulin (Jerusalem artichoke root)", amount: "200 mg", detail: "Prebiotic fiber."},
+      {ingredient: "DigeZyme®", amount: "100 mg", detail: "Digestive enzyme blend."},
+      {ingredient: "Lactobacillus acidophilus LA85", amount: "10 mg", detail: "1 Billion CFU at the time of manufacture."},
+    ],
+    directions: ["As a dietary supplement, adults take two (2) capsules daily. For best results, take with 6 to 8 oz (177 to 237 ml) of water, or as directed by a healthcare professional."],
+    cautions: [shortCaution], storage,
+    notes: ["Made in a UL certified cGMP, FDA registered facility in the USA and third party tested in an ISO/IEC 17025 accredited laboratory."],
+    dietary: ["Vegetarian", "Vegan friendly", "Gluten-free", "Allergen-free", "Non-GMO"],
   },
   "nmn": {
     country: "USA", contents: "30 capsules", netWeight: "36 g", grossWeight: "45 g",

@@ -9,7 +9,6 @@ export const previewReviewSummaries: Record<string, PreviewReviewSummary> = {
   "hydrolyzed-collagen-peptides": { rating:4.8, count:350 },
   "collagen-peptides-chocolate": { rating:4.7, count:250 },
   "colostrum-powder": { rating:4.9, count:200 },
-  "colon-gentle-cleanse": { rating:4.6, count:150 },
   "keto-5": { rating:4.6, count:175 },
   "glp-1-support": { rating:4.8, count:300 },
   "liver-support": { rating:4.7, count:225 },
