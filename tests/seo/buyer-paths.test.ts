@@ -76,9 +76,9 @@ test("product pages link back to exactly the guides that link to them", () => {
 });
 
 test("format selection lists only formats that can be ordered now", () => {
-  assert.deepEqual(orderableFormats(live, "live"), ["Powder", "Capsules", "Sachets", "Gummies"]);
+  assert.deepEqual(orderableFormats(live, "live"), ["Powder", "Capsules", "Gummies"]);
   assert.deepEqual(orderableFormats(live, "preview"), []);
-  assert.deepEqual(orderableFormats(live.map(p => p.type === "Gummies" ? {...p, available: false} : p), "live"), ["Powder", "Capsules", "Sachets"]);
+  assert.deepEqual(orderableFormats(live.map(p => p.type === "Gummies" ? {...p, available: false} : p), "live"), ["Powder", "Capsules"]);
 });
 
 test("the shipping statement is the owner's 3 to 5 day window, with checkout-calculated options", () => {

@@ -27,7 +27,7 @@ if(!process.env.QA_BASE&&!real){
 console.log(`Data source: ${real?'real Shopify catalog/cart':'synthetic catalog/cart'}; external tracking blocked.`);
 const browser=await chromium.launch();
 test.after(async()=>{await browser.close();server?.kill('SIGTERM');});
-const handles=process.env.QA_CATALOG ? JSON.parse(fs.readFileSync(process.env.QA_CATALOG)).products.filter(p=>p.category==='supplements'&&p.available&&!p.requiresSellingPlan).map(p=>p.handle) : ['creatine-monohydrate','hydrolyzed-collagen-peptides','colostrum-powder','colon-gentle-cleanse'];
+const handles=process.env.QA_CATALOG ? JSON.parse(fs.readFileSync(process.env.QA_CATALOG)).products.filter(p=>p.category==='supplements'&&p.available&&!p.requiresSellingPlan).map(p=>p.handle) : ['creatine-monohydrate','hydrolyzed-collagen-peptides','colostrum-powder','gut-health'];
 const widths=[320,390,430,1440];
 async function open(width,handle){
  const context=await browser.newContext({viewport:{width,height:width===320?740:width===1440?900:844},reducedMotion:'reduce'});
@@ -133,7 +133,7 @@ for(const width of widths){
    await page.locator('.bag-sheet .cart-line').waitFor();
    await page.locator('.bag-sheet .quantity button:enabled').first().waitFor();
    await page.keyboard.press('Escape');
-   await page.goto(`${base}/products/${real?'colon-gentle-cleanse':'daily-travel-kit'}`);
+   await page.goto(`${base}/products/${real?'hydrolyzed-collagen-peptides':'daily-travel-kit'}`);
    await page.locator('.add-to-bag-row .button:enabled').click();
    await page.locator('.bag-sheet .cart-line').nth(1).waitFor();
    await page.locator('.bag-sheet .quantity button:enabled').first().waitFor();

@@ -28,9 +28,9 @@ export const galleryGuides: Record<string, GalleryGuide> = {
     eyebrow: "KEEP IT COLD", title: "Freshly mixed.\nSimply prepared.", design: "mix", main: "1", unit: "scoop",
     items: [{value:"6–8 oz",label:"Cold liquid"},{value:"10 min",label:"Consume within"}], note: "Bovine colostrum is milk-derived. Review the ingredient statement for suitability."
   },
-  "colon-gentle-cleanse": {
-    eyebrow: "THE FIBER FORMULA", title: "Fiber, with\nsupporting ingredients.", design: "amounts", main: "Psyllium", unit: "husk seed powder",
-    items: [{value:"4 enzymes",label:"Amylase · lactase · lipase · cellulase"},{value:"2 botanicals",label:"Ginger root · tamarind fruit"}], note: "Use with the full 200 mL of water. Stir and drink immediately. Never take dry."
+  "gut-health": {
+    eyebrow: "SELECTED LABEL AMOUNTS", title: "See what\ngoes into your serving.", design: "amounts", main: "1B CFU", unit: "L. acidophilus LA85",
+    items: [{value:"200 mg",label:"Inulin · prebiotic fiber"},{value:"100 mg",label:"DigeZyme® · digestive enzymes"}], note: "Two capsules daily with water. Also contains 1,000 mg organic apple cider vinegar powder."
   },
   "keto-5": {
     eyebrow: "THE CAPSULE ROUTINE", title: "A measured step\nin your day.", design: "capsule", main: "1", unit: "capsule, twice daily",
@@ -91,7 +91,6 @@ export const galleryPhotographs: Record<string, {src:string; alt:string}> = {
   "creatine-monohydrate": {src:"/images/supplements/12_hero_creatine_scoop.webp",alt:"IQON Creatine Monohydrate jar, open with its scoop"},
   "collagen-peptides-chocolate": {src:"/images/supplements/13_hero_collagen_choc_scoop.webp",alt:"IQON Chocolate Collagen Peptides with a scoop of powder"},
   "colostrum-powder": {src:"/images/supplements/16_hero_colostrum_open.webp",alt:"Open IQON Colostrum Powder jar and scoop"},
-  "colon-gentle-cleanse": {src:"/images/supplements/15_hero_colon_sachet.webp",alt:"IQON Colon Gentle Cleanse with its individual sachet format"},
   "liver-support": {src:"/images/supplements/11_hero_liver_capsules.webp",alt:"IQON Liver Support bottle and capsules"},
   "resveratrol": {src:"/images/supplements/18_hero_resveratrol_hardshadow.webp",alt:"IQON Resveratrol bottle in directional studio light"},
   "hair-skin-nails-gummies": {src:"/images/supplements/14_hero_gummies_falling.webp",alt:"IQON Hair, Skin and Nails Gummies bottle showing the chewable format"}

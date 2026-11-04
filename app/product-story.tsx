@@ -34,7 +34,7 @@ export function comparisonFor(product: Product, products: Product[]) {
             ? ["glp-1-support", "liver-support", "keto-5"]
             : product.id === "hair-skin-nails-gummies"
               ? ["hair-skin-nails-gummies", "hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"]
-              : ["colon-gentle-cleanse", "colostrum-powder", "glp-1-support"];
+              : ["gut-health", "glp-1-support", "liver-support"];
   return [product.id, ...choices.filter(id => id !== product.id)]
     .map(id => products.find(p => p.id === id))
     .filter((p): p is Product => Boolean(p)).slice(0, 3);

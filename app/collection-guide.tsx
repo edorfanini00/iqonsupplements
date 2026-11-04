@@ -7,8 +7,7 @@ import type { Category } from "@/lib/catalog";
 
 const formats=[
   {type:"Powder",title:"Powders",text:"Creatine, collagen and colostrum. Compare the ingredient, pack size and flavor.",id:"creatine-monohydrate"},
-  {type:"Capsules",title:"Capsules",text:"Individual capsules in a bottle. Explore the range and compare the count in each pack.",id:"nmn"},
-  {type:"Sachets",title:"Sachets",text:"Individually packed sachets, gathered in a resealable jar.",id:"colon-gentle-cleanse"},
+  {type:"Capsules",title:"Capsules",text:"Individual capsules in a bottle, from NMN to Gut Health. Compare the count in each pack.",id:"nmn"},
   {type:"Gummies",title:"Gummies",text:"A chewable format. Discover the passion fruit expression in the collection.",id:"hair-skin-nails-gummies"},
 ];
 const steps=[

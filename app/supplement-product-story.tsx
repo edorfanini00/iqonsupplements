@@ -38,7 +38,7 @@ export function SupplementProductStory({product:p,comparison}:{product:Product;c
     <section id="product-routine" className="skin-story-section skin-story-routine" aria-labelledby="routine-heading">
       <header className="skin-application-heading"><div><p className="skin-kicker">YOUR DAILY ROUTINE</p><h2 id="routine-heading">{visual.routineTitle}</h2></div><span className="skin-timing-label"><Clock3 size={18} strokeWidth={1.2} aria-hidden="true"/>{visual.timing}</span></header>
       <div className="skin-application-board">
-        <figure className="skin-application-photo"><img src={p.image} alt={`${p.name} — IQON packaging`} width={320} height={400} loading="lazy" decoding="async"/><figcaption><strong>{p.name}</strong><span>{details.contents}</span></figcaption></figure>
+        <figure className="skin-application-photo"><img src={p.image} alt={`${p.name}, IQON packaging`} width={320} height={400} loading="lazy" decoding="async"/><figcaption><strong>{p.name}</strong><span>{details.contents}</span></figcaption></figure>
         <ol className="skin-application-steps">{copy.routine!.steps.map((step,i)=>{const Icon=icons[visual.stepIcons[i]];return <li key={step.title}><div className="skin-step-top"><span>0{i+1}</span><Icon size={38} strokeWidth={1} aria-hidden="true"/></div><h3>{step.title}</h3><p>{step.body}</p></li>;})}</ol>
       </div>
       <div className="skin-application-details"><p><strong>Keep in mind</strong>{visual.routineNote}</p><Accordion type="single" collapsible><AccordionItem value="directions"><AccordionTrigger>Read the complete directions & care</AccordionTrigger><AccordionContent><SupplementDirections details={details}/></AccordionContent></AccordionItem></Accordion></div>

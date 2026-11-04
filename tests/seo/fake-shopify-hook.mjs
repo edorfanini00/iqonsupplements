@@ -28,17 +28,19 @@ const catalog = [
   product("gentle-cleanser", "Gentle Cleanser", "iqon-skincare", variant(5, "30.00")),
   product("peptide-serum", "Peptide Serum", "iqon-skincare", variant(6, "60.00")),
   product("barrier-cream", "Barrier Cream", "iqon-skincare", variant(7, "55.00")),
+  // Retired supplement still published in Shopify: never listed, linked or sold; its URL redirects to Gut Health.
+  product("colon-gentle-cleanse", "Colon Gentle Cleanse", "iqon-supplements", variant(9, "66.84"), {productType: "Sachets"}),
 ];
 // Opt-in realistic monetary widths for purchase-clarity checks; default SEO/layout fixtures stay unchanged.
 if (process.env.FAKE_CATALOG === "purchase-clarity") {
   catalog[0].variants.nodes[0].price = money("48.97");
-  for (const [handle,title,id,price] of [
+  for (const [handle,title,id,price,type] of [
     ["hydrolyzed-collagen-peptides","Hydrolyzed Collagen Peptides",11,"65.64"],
     ["colostrum-powder","Colostrum Powder",12,"42.17"],
     ["collagen-peptides-chocolate","Grass-Fed Collagen Peptides",13,"70.84"],
-    ["colon-gentle-cleanse","Colon Gentle Cleanse",14,"66.84"],
+    ["gut-health","Gut Health",14,"29.99","Capsules"],
   ]) {
-    catalog.push(product(handle,title,"iqon-supplements",variant(id,price),{productType:"Powder"}));
+    catalog.push(product(handle,title,"iqon-supplements",variant(id,price),{productType:type||"Powder"}));
     ELIGIBLE.add(handle);
   }
 }

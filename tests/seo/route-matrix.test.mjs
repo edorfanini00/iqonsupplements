@@ -114,6 +114,14 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assertNoindex(await get(port, "/reviews"), "/reviews");
     assertNoindex(await get(port, "/reviews?collection=skincare"), "/reviews?collection");
     assertNoindex(await get(port, "/products/keto-5"), "editorial-only product");
+    // Gut Health is not in Shopify yet: an editorial placeholder that cannot be bought, until a gut-health product is published.
+    const gut = await get(port, "/products/gut-health");
+    assertNoindex(gut, "Gut Health before Shopify publishes it");
+    assert.match(gut.body, /Gut Health/);
+    assert.equal(dom(gut.body).title, "Gut Health | IQON", "product titles use the site separator, not a dash");
+    assert.doesNotMatch(gut.body, /Colon|colon-gentle-cleanse|[Ss]achet/, "no retired product on the replacement page");
+    for (const path of ["/", "/collections/all", "/collections/supplements", "/collections/supplements?format=capsules"])
+      assert.doesNotMatch((await get(port, path)).body, /Colon Gentle|colon-gentle-cleanse|[Ss]achet/, `${path} never shows the retired product`);
     assertNoindex(await get(port, "/products/not-a-product"), "missing product", {status: 404});
     assertNoindex(await get(port, "/journal/not-an-article"), "missing article", {status: 404});
     assertNoindex(await get(port, "/collections/nope"), "missing collection", {status: 404});
@@ -149,8 +157,9 @@ test("production, live catalog, canonical and alias hosts", async t => {
       assert.ok(urls.includes(`https://${WWW}${page === "/" ? "/" : page}`), page);
     assert.deepEqual(urls.filter(u => u.includes("/products/")).map(u => new URL(u).pathname).sort(),
       ["/products/anti-aging-cleanser-with-peptides", "/products/creatine-monohydrate", "/products/daily-travel-kit", "/products/liver-support", "/products/nmn"]);
-    for (const handle of ["gentle-cleanser", "peptide-serum", "barrier-cream"]) {
+    for (const handle of ["gentle-cleanser", "peptide-serum", "barrier-cream", "colon-gentle-cleanse"]) {
       assert.equal((await get(port, `/products/${handle}`)).status, 308, `${handle} redirects`);
+      if (handle === "colon-gentle-cleanse") assert.equal((await get(port, `/products/${handle}`)).headers.location, "/products/gut-health");
       assert.ok(!urls.some(u => u.endsWith(`/products/${handle}`)), `${handle} not in sitemap`);
     }
     assert.ok(!urls.some(u => /keto-5|\/reviews|\/checkout|\/account|\/affiliates|\/api\/|\?/.test(u)), urls.join("\n"));
@@ -366,7 +375,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
       "Picture an ordinary day": [], "Powders make preparation part of the ritual": ["/products/creatine-monohydrate"],
       // NMN is a sold-out capsule; the generic Daily Travel Kit has no format; Keto-5 is an editorial placeholder.
       "Capsules keep the process compact": ["/products/liver-support"], "Can I open a capsule if it is hard to swallow?": [],
-      "Sachets are easy to take along": [], "Gummies put taste and texture first": [],
+      "Gummies put taste and texture first": [],
     });
     assert.match(format.querySelector('.guide-products a[href="/products/creatine-monohydrate"]').textContent, /Creatine Monohydrate.*281 g powder/);
     const label = dom((await get(port, "/journal/reading-a-supplement-label")).body);

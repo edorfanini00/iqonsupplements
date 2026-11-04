@@ -125,34 +125,35 @@
       "approvedPrice": "49.00"
     },
     {
-      "handle": "colon-gentle-cleanse",
-      "name": "Colon Gentle Cleanse",
+      "handle": "gut-health",
+      "name": "Gut Health",
       "category": "supplements",
-      "productId": "gid://shopify/Product/10392975638823",
-      "variantId": "gid://shopify/ProductVariant/52051064455463",
-      "sku": "IQON-COLON-GENTLE-CLEANSE",
-      "size": "30 sachets",
-      "proposedPrice": "29.00",
+      "productId": "gid://shopify/Product/10538185916711",
+      "variantId": "gid://shopify/ProductVariant/52521709666599",
+      "sku": "EDOAR-GH-BB70",
+      "size": "60 capsules",
+      "proposedPrice": "29.99",
       "proposedSubscriptionPrice": null,
       "subscriptionStatus": "not enabled",
-      "status": "DRAFT",
+      "status": "ACTIVE",
+      "note": "Replaces Colon Gentle Cleanse (retired 3 November 2026; it stays in Shopify but the storefront hides it and redirects its URL here). Pushed from Supliful; price 29.99 is owner-confirmed. Media file ids are assigned when the IQON pack shots are uploaded.",
       "inventoryPolicy": "DENY",
       "inventoryQuantityAtImport": 0,
       "media": [
         {
-          "alt": "IQON Colon Gentle Cleanse packaging",
-          "source": "/images/supplements/04_pack_colon_cleanse.webp",
-          "fileId": "gid://shopify/MediaImage/45558611050791",
-          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colon-gentle-cleanse.webp?v=1789080271"
+          "alt": "IQON Gut Health packaging",
+          "source": "/images/supplements/04_pack_gut_health.webp",
+          "fileId": null,
+          "url": null
         },
         {
-          "alt": "IQON Colon Gentle Cleanse product detail",
-          "source": "/images/supplements/15_hero_colon_sachet.webp",
-          "fileId": "gid://shopify/MediaImage/45558611935527",
-          "url": "https://cdn.shopify.com/s/files/1/1003/8624/2855/files/iqon-colon-gentle-cleanse-detail.webp?v=1789080281"
+          "alt": "IQON Gut Health product detail",
+          "source": "/images/supplements/15_hero_gut_health_label.webp",
+          "fileId": null,
+          "url": null
         }
       ],
-      "approvedPrice": "29.00"
+      "approvedPrice": "29.99"
     },
     {
       "handle": "keto-5",

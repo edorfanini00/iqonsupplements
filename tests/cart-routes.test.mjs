@@ -20,7 +20,8 @@ const bindingsUrl = dataUrl(`
 `);
 const { jar, cookieOptions } = await import(bindingsUrl);
 const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
-const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)));
+const redirectsUrl = dataUrl(compile("../lib/legacy-redirects.ts"));
+const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)).replace('"./legacy-redirects"', JSON.stringify(redirectsUrl)));
 const imports = {
   "./commerce-policy": policyUrl,
   react: dataUrl("export const cache = fn => fn;"),
@@ -29,6 +30,7 @@ const imports = {
   "./merchandise": withPolicy("../lib/merchandise.ts"),
   "./shopify-operations": dataUrl(compile("../lib/shopify-operations.ts")),
   "./shopify": withPolicy("../lib/shopify.ts"),
+  "./legacy-redirects": redirectsUrl,
 };
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);
@@ -42,11 +44,13 @@ const fixtureProducts = [
   {handle: "creatine-monohydrate", category: "supplements", price: 29, variantId: "gid://shopify/ProductVariant/1"},
   {handle: "nmn", category: "supplements", price: 68, variantId: "gid://shopify/ProductVariant/2"},
   {handle: "hydra-c-ferulic-serum", category: "skincare", price: 68, variantId: "gid://shopify/ProductVariant/3"},
-  {handle: "colon-gentle-cleanse", category: "supplements", price: 60, variantId: "gid://shopify/ProductVariant/4"},
+  {handle: "gut-health", category: "supplements", price: 60, variantId: "gid://shopify/ProductVariant/4"},
+  // Retired and replaced by Gut Health, but still published in Shopify.
+  {handle: "colon-gentle-cleanse", category: "supplements", price: 66.84, variantId: "gid://shopify/ProductVariant/5"},
 ];
 
 // Synthetic amounts only, not verification of live Shopify configuration.
-const ELIGIBLE = new Set(["creatine-monohydrate", "nmn", "colon-gentle-cleanse"]);
+const ELIGIBLE = new Set(["creatine-monohydrate", "nmn", "gut-health"]);
 const TIERS = [{min: 3, rate: .25, title: "Bundle: Buy 3, save 25%"}, {min: 2, rate: .10, title: "Bundle: Buy 2, save 10%"}];
 const plan = {id: "gid://shopify/SellingPlan/10", name: "Deliver every month"};
 function fixture(t, {plannedPolicy = false} = {}) {
@@ -280,7 +284,7 @@ test("planned synthetic policy selects the best single tier or noncombining crea
   }
 });
 
-test("planned synthetic bundle qualification includes Cleanse and uses only the highest eligible tier", async t => {
+test("planned synthetic bundle qualification includes Gut Health and uses only the highest eligible tier", async t => {
   const state=fixture(t,{plannedPolicy:true});state.bundles=true;
   let bag=await (await add(fixtureProducts[3])).json();
   bag=await (await routes.mutateCartResponse(request({action:"update",lineId:bag.items[0].lineId,quantity:3}))).json();
@@ -292,8 +296,8 @@ test("planned synthetic bundle qualification includes Cleanse and uses only the 
   assert.equal(bag.subtotal,207.75);
   bag=await (await add(fixtureProducts[0])).json();
   assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:76.5}]);
-  assert.equal(bag.subtotal,229.5);assert.equal(bag.items.find(i=>i.id==="colon-gentle-cleanse").amount,135);
-  // The now-eligible Cleanse also keeps the stronger bundle instead of stacking a code.
+  assert.equal(bag.subtotal,229.5);assert.equal(bag.items.find(i=>i.id==="gut-health").amount,135);
+  // Eligible Gut Health also keeps the stronger bundle instead of stacking a code.
   bag=await (await routes.mutateCartResponse(request({action:"update",lineId:bag.items[0].lineId,quantity:4}))).json();
   bag=await (await routes.mutateCartResponse(request({action:"discount",discountCodes:["CREATOR10"]}))).json();
   assert.deepEqual(bag.lineDiscounts,[{title:"Bundle: Buy 3, save 25%",amount:91.5}]);
@@ -306,6 +310,71 @@ function insertOldSkincare(state) {
   state.cart.lines.nodes.push({id:"old-skincare-line",quantity:1,cost:{subtotalAmount:money(p.price),totalAmount:money(p.price)},merchandise:{id:p.variantId,title:"Default Title",product:{handle:p.handle,title:p.handle,tags:["iqon-skincare"]}}});
   state.cart.totalQuantity++;
 }
+
+test("retired Colon Gentle Cleanse stays out of the catalog and cannot be added while still published in Shopify", async t => {
+  const state=fixture(t);
+  const catalog=await routes.getStoreCatalog();
+  assert.equal(catalog.mode,"live");
+  assert.ok(catalog.products.some(p=>p.id==="gut-health"));
+  assert.equal(catalog.products.some(p=>p.id==="colon-gentle-cleanse"),false);
+  const response=await add(fixtureProducts[4]);
+  assert.equal(response.status,422);
+  assert.equal(state.addedLines.length,0);
+});
+
+function insertOldColon(state) {
+  const p=fixtureProducts[4];
+  state.cart.lines.nodes.push({id:"old-colon-line",quantity:1,cost:{subtotalAmount:money(p.price),totalAmount:money(p.price)},merchandise:{id:p.variantId,title:"Default Title",product:{handle:p.handle,title:"Colon Gentle Cleanse",tags:["iqon-supplements"]}}});
+  state.cart.totalQuantity++;
+}
+const retiredNotice=/^Colon Gentle Cleanse has been discontinued and was removed from your bag\. Gut Health replaces it\.$/;
+
+test("loading an old bag removes retired Colon Gentle Cleanse with a notice and preserves other supplements", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldColon(state);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);assert.equal(bag.subtotal,29);
+  assert.match(bag.notice,retiredNotice);assert.doesNotMatch(bag.notice,/[\u2013\u2014]| - /);
+  assert.ok(state.operations.includes("IQONCartRemove"));
+  assert.equal(state.cart.lines.nodes.some(l=>l.merchandise.product.handle==="colon-gentle-cleanse"),false);
+  const again=await (await routes.getCartResponse()).json();
+  assert.equal(again.notice,undefined);
+});
+
+test("a retired Colon line cannot have its quantity changed", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldColon(state);
+  const response=await routes.mutateCartResponse(request({action:"update",lineId:"old-colon-line",quantity:3}));
+  assert.equal(response.status,422);
+  const data=await response.json();
+  assert.match(data.error,retiredNotice);assert.deepEqual(data.cart.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.equal(state.operations.includes("IQONCartUpdate"),false);
+  assert.equal(state.cart.lines.nodes.some(l=>l.id==="old-colon-line"),false);
+});
+
+test("checkout removes a retired Colon line and requires review before handing off to Shopify", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldColon(state);
+  const response=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(response.status,422);
+  const data=await response.json();
+  assert.match(data.error,/^Colon Gentle Cleanse has been discontinued/);assert.ok(!data.checkoutUrl);
+  assert.deepEqual(data.cart.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+});
+
+test("a bag holding only a retired Colon line is emptied and cannot check out", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);
+  state.cart.lines.nodes=[];state.cart.totalQuantity=0;insertOldColon(state);
+  const first=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(first.status,422);assert.equal((await first.json()).cart.items.length,0);
+  const second=await routes.checkoutResponse(request({},"checkout"));
+  assert.equal(second.status,422);assert.match((await second.json()).error,/empty/i);
+});
+
+test("an old bag with skincare and Colon removes both and shows both notices", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertOldSkincare(state);insertOldColon(state);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.match(bag.notice,/coming soon/i);assert.match(bag.notice,/Colon Gentle Cleanse has been discontinued/);
+});
 
 test("skincare cannot be added, even when Shopify reports available stock", async t => {
   fixture(t);

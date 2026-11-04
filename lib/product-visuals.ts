@@ -48,15 +48,15 @@ export const productVisuals: Record<string, ProductVisual> = {
       { title: "Immunoglobulin G", body: "IgG is a naturally present protein. At 25%, the serving provides 575 mg." },
       { title: "One total", body: "The IgG is included within the colostrum amount. It is not another 575 mg added on top." }], ritualTitle: "Cold mix. Freshly prepared."
   },
-  "colon-gentle-cleanse": {
-    headline: "Make room for fiber.", lead: "Psyllium husk, ginger, tamarind and four digestive enzymes in individual sachets. A measured step for your daily routine.",
-    benefitTitle: "A more practical fiber ritual.", benefits: ["Psyllium-based formula", "Four named digestive enzymes", "30 individually portioned sachets"],
-    fact: { value: "30", label: "sachets. Ready to mix.", body: "One sachet in 200 mL of still water. Stir well and drink immediately, following the label directions." },
-    whyTitle: "Fiber works with water.", whyBody: "Psyllium absorbs water, which is why the preparation gradually becomes gel-like. Individual sachets keep measuring simple; using the full amount of water and drinking promptly are part of the routine.",
-    mechanismTitle: "A closer look at the blend.", mechanism: [
-      { title: "Plant fiber", body: "Psyllium husk is the water-absorbing fiber at the center of the formula." },
-      { title: "Four enzymes", body: "The blend names amylase, lactase, lipase and cellulase." },
-      { title: "Botanical finish", body: "Ginger root and tamarind fruit extract complete the ingredient list." }], ritualTitle: "Measure. Mix. Drink promptly."
+  "gut-health": {
+    headline: "Daily support for your gut.*", lead: "Inulin prebiotic fiber, a 1 billion CFU probiotic and DigeZyme® digestive enzymes in a two capsule formula. Prebiotic fiber and probiotics for gut health.*",
+    benefitTitle: "A considered gut health blend.", benefits: ["Supports digestive comfort*", "Prebiotic inulin with a probiotic", "Two capsules daily with water"],
+    fact: { value: "1B", label: "CFU of L. acidophilus per serving.", body: "Lactobacillus acidophilus LA85, counted at the time of manufacture, with 200 mg inulin." },
+    whyTitle: "Fiber and bacteria, side by side.", whyBody: "Probiotics are live bacteria. Prebiotics are fibers those bacteria can use. This formula pairs both, then adds digestive enzymes and organic apple cider vinegar powder, so every ingredient has a clear role.*",
+    mechanismTitle: "Three ways to read the ingredient list.", mechanism: [
+      { title: "Prebiotic fiber", body: "Inulin from Jerusalem artichoke root, 200 mg per serving." },
+      { title: "Probiotic", body: "Lactobacillus acidophilus LA85 at 1 billion CFU at the time of manufacture." },
+      { title: "Enzymes & ACV", body: "100 mg DigeZyme® and 1,000 mg organic apple cider vinegar powder." }], ritualTitle: "Two capsules. A familiar moment."
   },
   "keto-5": {
     headline: "Five ingredients. One focused blend.", lead: "Raspberry ketone, green tea, caffeine, green coffee bean and garcinia in a vegetable capsule. A simple format with every blend ingredient named.",

@@ -3,12 +3,12 @@
 // any mix of the eligible products below. This module only presents the offer: the bag
 // always shows Shopify's own discount allocations and cart cost, never a client total.
 //
-// The current supplement catalog is approved for both tiers, including Colon Gentle
-// Cleanse (owner approval 29 Oct 2026). Keep this list identical to the products
-// selected on both Shopify discounts; activate backend eligibility before releasing UI.
+// The current supplement catalog is approved for both tiers. Gut Health replaces the retired
+// Colon Gentle Cleanse in the approved set (owner decision 3 Nov 2026). Keep this list identical
+// to the products selected on both Shopify discounts; activate backend eligibility before releasing UI.
 export const BUNDLE_ELIGIBLE_HANDLES: readonly string[] = [
   "creatine-monohydrate", "hydrolyzed-collagen-peptides", "collagen-peptides-chocolate", "colostrum-powder",
-  "colon-gentle-cleanse", "nmn", "glp-1-support", "hair-skin-nails-gummies", "resveratrol", "liver-support", "keto-5",
+  "gut-health", "nmn", "glp-1-support", "hair-skin-nails-gummies", "resveratrol", "liver-support", "keto-5",
 ];
 
 export type BundleTier = {minQuantity: number; percent: number; title: string};

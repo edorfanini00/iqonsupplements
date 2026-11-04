@@ -636,158 +636,161 @@
       "difference": "25% IgG · milk-derived"
     }
   },
-  "colon-gentle-cleanse": {
-    "descriptor": "Fiber and digestive ingredients, ready to mix.",
-    "description": "A powder blend of psyllium husk, tamarind, digestive enzymes and ginger root. Made in Latvia, with 30 individual sachets per pack.",
+  "gut-health": {
+    "descriptor": "Prebiotic fiber, a probiotic and digestive enzymes.",
+    "description": "A capsule blend of organic apple cider vinegar, inulin prebiotic fiber, DigeZyme® digestive enzymes and Lactobacillus acidophilus. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
-      "Psyllium husk with ginger and tamarind",
-      "Digestive enzyme blend",
-      "30 sachets · 90 g"
+      "Supports digestive comfort*",
+      "1 billion CFU probiotic with inulin",
+      "60 capsules · Two capsules daily"
     ],
-    "title": "A simpler way to make room for fiber.",
-    "story": "Psyllium husk seed powder is combined with tamarind fruit extract, ginger root and a digestive enzyme blend from fermented cereals. The enzymes listed are amylase, lactase, lipase and cellulase. Each sachet is mixed into still water and consumed immediately; the preparation can develop a characteristic jelly-like consistency.",
+    "title": "Four ingredients for a steady gut routine.",
+    "story": "Gut Health pairs inulin, a prebiotic fiber from Jerusalem artichoke root, with Lactobacillus acidophilus LA85 at 1 billion CFU at the time of manufacture. DigeZyme® digestive enzymes and organic apple cider vinegar powder complete the formula. The adult directions specify two capsules daily with water.",
     "facts": [
       {
-        "label": "Format",
-        "value": "30 sachets",
-        "detail": "Individual powder portions."
+        "label": "Probiotic",
+        "value": "1 billion CFU",
+        "detail": "Lactobacillus acidophilus LA85."
       },
       {
-        "label": "Key ingredient",
-        "value": "Psyllium husk",
-        "detail": "Combined with botanicals and enzymes."
+        "label": "Prebiotic",
+        "value": "200 mg inulin",
+        "detail": "From Jerusalem artichoke root."
       },
       {
-        "label": "Made in",
-        "value": "Latvia",
-        "detail": "90 g net weight."
+        "label": "Pack count",
+        "value": "60 capsules",
+        "detail": "Made in the USA."
       }
     ],
     "faqs": [
       {
-        "question": "What is in the enzyme blend?",
-        "answer": "The blend from fermented cereals lists amylase, lactase, lipase and cellulase."
+        "question": "What is in each serving?",
+        "answer": "Two capsules provide 1,000 mg organic apple cider vinegar powder, 200 mg inulin, 100 mg DigeZyme® and 10 mg Lactobacillus acidophilus LA85, which is 1 billion CFU at the time of manufacture."
       },
       {
-        "question": "How do I prepare a sachet?",
-        "answer": "Pour one sachet into 200 ml of non-carbonated water, stir well and drink immediately. The directions specify one sachet once or twice daily, separate from meals."
+        "question": "What is the difference between a prebiotic and a probiotic?",
+        "answer": "A probiotic is a live microorganism, here Lactobacillus acidophilus. A prebiotic is a fiber such as inulin that the bacteria in your gut can use. This formula includes one of each."
       },
       {
-        "question": "What should I know before using it?",
-        "answer": "The directions specify at least two hours after medication and recommend consulting your doctor before use. It is not recommended for children under 12 or anyone sensitive to the components. Read the complete warnings before use."
+        "question": "How is it taken?",
+        "answer": "Adults take two capsules daily with 6 to 8 oz of water, or as directed by a healthcare professional. Read the complete cautions before use."
       },
       {
-        "question": "Why does it become thicker?",
-        "answer": "Psyllium absorbs water. A jelly-like consistency is expected for this preparation; stir well and drink immediately."
+        "question": "Is it suitable for a vegetarian or vegan routine?",
+        "answer": "The supplier lists the formula as vegetarian, vegan friendly, gluten free and non GMO, in a vegetable (HPMC) capsule. Check the full label if you have specific dietary needs."
       },
       {
-        "question": "Does a cleanse replace meals?",
-        "answer": "No. This supplement is not a substitute for food or a complete diet. Follow the directions and do not exceed the recommended daily amount."
+        "question": "Is this a treatment for a digestive condition?",
+        "answer": "No. This is a dietary supplement, not a treatment for any digestive condition or a substitute for medical care. Speak with your doctor about ongoing digestive symptoms."
       }
     ],
     "benefits": [
       {
-        "title": "Psyllium-based formula",
-        "body": "Psyllium husk is a water-absorbing fiber, combined here with botanicals and digestive enzymes."
+        "title": "Prebiotic and probiotic",
+        "body": "Inulin fiber and Lactobacillus acidophilus are paired in a single daily capsule routine."
       },
       {
-        "title": "Four named enzymes",
-        "body": "Amylase, lactase, lipase and cellulase are included in the enzyme blend."
+        "title": "Digestive enzymes",
+        "body": "DigeZyme® adds a digestive enzyme blend to support digestive comfort.*"
       },
       {
-        "title": "Individually portioned",
-        "body": "Thirty sachets make the powder easy to measure, pack and prepare."
+        "title": "Simple daily use",
+        "body": "Two capsules with water. Sixty capsules provide a 30 day supply at the suggested use."
       }
     ],
     "ingredients": [
       {
-        "name": "Psyllium husk",
-        "role": "Fiber",
-        "detail": "Psyllium is a plant fiber that absorbs water and becomes gel-like. That behavior is why preparation matters: mix with the full 200 mL of water and drink immediately."
+        "name": "Inulin",
+        "role": "Prebiotic fiber",
+        "detail": "Inulin is a soluble fiber, sourced here from Jerusalem artichoke root. As a prebiotic, it is a fiber the bacteria in your gut can use. Each serving provides 200 mg.",
+        "amount": "200 mg"
       },
       {
-        "name": "Digestive enzyme blend",
-        "role": "Four enzymes",
-        "detail": "Four enzymes are named in the blend: amylase, lactase, lipase and cellulase. The formula combines this fermented-cereal enzyme blend with psyllium and botanicals."
+        "name": "Lactobacillus acidophilus LA85",
+        "role": "Probiotic",
+        "detail": "A named probiotic strain supplied at 1 billion colony forming units (CFU) per serving at the time of manufacture. Store in a cool, dry place.",
+        "amount": "1 billion CFU"
       },
       {
-        "name": "Ginger & tamarind",
-        "role": "Botanical ingredients",
-        "detail": "Ginger root and tamarind fruit extract add the botanical component to the psyllium-based formula. See the full ingredient statement and follow the preparation directions."
+        "name": "DigeZyme® & apple cider vinegar",
+        "role": "Enzymes and fruit powder",
+        "detail": "DigeZyme® is a branded multi enzyme blend, included at 100 mg. Organic apple cider vinegar powder, at 1,000 mg, is the largest ingredient by weight."
       }
     ],
     "routine": {
       "title": "Make it part of your day.",
       "steps": [
         {
-          "title": "Mix",
-          "body": "Pour one sachet into 200 ml of still water."
+          "title": "Review the label",
+          "body": "Check suitability with your healthcare professional, particularly if you are pregnant, nursing or have a medical condition."
         },
         {
-          "title": "Drink immediately",
-          "body": "Stir thoroughly and drink straight away; a jelly-like consistency can develop."
+          "title": "Take with water",
+          "body": "Adults take two capsules daily with 6 to 8 oz of water."
         },
         {
-          "title": "Space it carefully",
-          "body": "Use once or twice daily, separate from meals and at least two hours after medication, following the label."
+          "title": "Keep it consistent",
+          "body": "Take it at a similar time each day alongside a balanced diet. Store in a cool, dry place."
         }
       ]
     },
     "fit": [
       {
-        "label": "Format",
-        "value": "30 sachets"
+        "label": "Daily use",
+        "value": "2 capsules"
       },
       {
-        "label": "Preparation",
-        "value": "200 ml water"
+        "label": "Supply",
+        "value": "30 days"
       },
       {
-        "label": "Key ingredient",
-        "value": "Psyllium husk"
+        "label": "Probiotic",
+        "value": "1 billion CFU"
       }
     ],
     "expectations": {
       "title": "What should I expect?",
-      "body": "The mixture thickens as it takes up water. Stir into the full amount of water and drink immediately, following the label instead of preparing it far in advance."
+      "body": "A simple two capsule routine that fits alongside your meals and fiber intake. It is not a laxative or a treatment for any digestive condition."
     },
     "essentials": [
       {
         "label": "Contents",
-        "value": "30 sachets"
-      },
-      {
-        "label": "Mix with",
-        "value": "200 mL water"
+        "value": "60 capsules"
       },
       {
         "label": "Suggested use",
-        "value": "1–2 daily"
+        "value": "2 daily"
+      },
+      {
+        "label": "Supply",
+        "value": "30 days"
       }
     ],
     "guide": {
-      "title": "A little structure for your daily fiber.",
-      "introduction": "Individual sachets make the preparation easy to repeat at home or away.",
+      "title": "Prebiotic, probiotic, enzymes. One daily habit.",
+      "introduction": "Inulin, Lactobacillus acidophilus, DigeZyme® and organic apple cider vinegar in two capsules.",
       "details": [
         {
           "title": "A good fit if…",
-          "body": "You prefer a powder sachet that combines psyllium husk with ginger, tamarind and digestive enzymes."
+          "body": "You want a capsule that brings prebiotic fiber, a probiotic and digestive enzymes together, without powders to mix."
         },
         {
           "title": "What to expect",
-          "body": "The mixture thickens as it takes up water. Stir into the full amount of water and drink immediately, following the label instead of preparing it far in advance."
+          "body": "A two capsule daily routine with water. One bottle contains 30 days at the suggested use."
         },
         {
           "title": "Worth knowing",
-          "body": "Do not swallow the powder dry. The label directs use separate from meals and at least two hours after medication."
+          "body": "The 1 billion CFU count is measured at the time of manufacture. Keep the bottle closed and store it in a cool, dry place."
         }
       ]
     },
     "comparison": {
-      "focus": "A psyllium-based routine",
-      "routine": "1–2 sachets daily",
-      "difference": "Psyllium, botanicals & enzymes"
-    }
+      "focus": "A prebiotic and probiotic routine",
+      "routine": "2 capsules daily",
+      "difference": "Prebiotic, probiotic & enzymes"
+    },
+    "supplyDays": 30
   },
   "keto-5": {
     "descriptor": "Five ingredients. A clear view of the blend.",

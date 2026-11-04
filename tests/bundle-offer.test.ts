@@ -19,10 +19,11 @@ test("nudges name the next tier and stop once the top tier is reached", () => {
   assert.equal(bundleNudge(9), null);
 });
 
-test("eligibility: all eleven approved supplements including Cleanse; skincare remains excluded", () => {
+test("eligibility: all eleven approved supplements including Gut Health; retired Colon and skincare remain excluded", () => {
   assert.equal(BUNDLE_ELIGIBLE_HANDLES.length, 11);
   for (const handle of ["creatine-monohydrate", "hydrolyzed-collagen-peptides", "colostrum-powder"]) assert.ok(isBundleEligible(handle));
-  assert.equal(isBundleEligible("colon-gentle-cleanse"), true);
+  assert.equal(isBundleEligible("gut-health"), true);
+  assert.equal(isBundleEligible("colon-gentle-cleanse"), false);
   for (const p of products.filter(p => p.category === "skincare")) assert.equal(isBundleEligible(p.id), false, p.id);
   const supplements = new Set(products.filter(p => p.category === "supplements").map(p => p.id));
   for (const handle of BUNDLE_ELIGIBLE_HANDLES) assert.ok(supplements.has(handle), `${handle} is a real supplement handle`);

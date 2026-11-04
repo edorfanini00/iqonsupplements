@@ -26,9 +26,10 @@ for (const answer of otherGuideAnswers) {
 test("complete existing journal articles remain identical outside the two answers and AAD citation", () => {
   // SHA256(JSON.stringify(article)) from main 20828e514df5db135173bff5f2129d572c2a3280.
   // Includes every original paragraph, metadata field, source and product/format association.
+  // The format guide's hash is from 3 November 2026: its Sachets section was removed with the retired Colon Gentle Cleanse.
   const baseline = [
     "602d4a82cd4e5f2887a5e0673e29ea99141092a0284a9db708bf3c236a509f0d",
-    "d1126b51f0802805bfc479f6c9f8df2dc7107330344ea11ef80d030121f0ed6f",
+    "f98e29a2d9ebe7eef2b28df934c58548bfd59f8eb96a9e3b8e41997196e6e3d0",
     "af41690108f5e7c5337d36387e90849f4207b36aa0669b267e04b04362fe7aa2",
   ];
   const preserved = journalArticles.map(article => {
