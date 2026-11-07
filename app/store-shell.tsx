@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Suspense, createContext, useContext, useEffect, useId, useMemo, useState, useRef, type ReactNode } from "react";
+import { Suspense, useCallback, createContext, useContext, useEffect, useId, useMemo, useState, useRef, type ReactNode, type SyntheticEvent } from "react";
 import { ArrowRight, Minus, Plus, Search, ShoppingBag, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { StoreNavigation } from "./store-navigation";
@@ -13,12 +13,15 @@ import { bagSummary, bundleNudge, isBundleEligible, type DiscountLine } from "@/
 import { isComingSoon } from "@/lib/commerce-policy";
 import { DEFAULT_SUPPORT_EMAIL } from "@/lib/orders/emails/format";
 import { STORE_POLICY_LINKS } from "@/lib/store-policies";
+import { GoogleAttribution } from "./google-attribution";
+import { nativeConsent, type VisitorConsent } from "@/lib/shopify-consent";
+import { attributionReady, needsCheckoutReview, validateNativeCheckoutUrl } from "@/lib/google-attribution";
 import { StorefrontMetaPixel } from "./meta-pixel";
 import { trackCartAddition } from "@/lib/meta-pixel";
 import type { CartSnapshot } from "@/lib/shopify";
 import { shopifySrcSet } from "@/lib/responsive-images";
 
-type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; checkout:()=>void; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,variantId?:string)=>void; costs:BagCosts; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
+type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; prepareCheckout:(consent:VisitorConsent,signal:AbortSignal)=>Promise<string>; cartRevision:number; checkoutCurrent:(revision:number)=>boolean; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,variantId?:string)=>void; costs:BagCosts; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 // Shopify's own figures for the bag: merchandise before product discounts, the discount allocations and its cart total.
 type BagCosts = {merchandise:number; lineDiscounts:DiscountLine[]; orderDiscounts:DiscountLine[]; total:number};
 const NO_COSTS:BagCosts = {merchandise:0,lineDiscounts:[],orderDiscounts:[],total:0};
@@ -42,6 +45,8 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const [query,setQuery]=useState("");
   const [busy,setBusy]=useState(false);
   const lock=useRef(false);
+  const cartRevision=useRef(0);
+  const [revision,setRevision]=useState(0);
   const [error,setError]=useState("");
   const [shopSubtotal,setShopSubtotal]=useState(0);
   const [shopCurrency,setShopCurrency]=useState(catalog.currency);
@@ -49,10 +54,11 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const [costs,setCosts]=useState<BagCosts>(NO_COSTS);
   const live=mode==="live";
   const currency=live?shopCurrency:catalog.currency;
-  const applySnapshot=(data:CartSnapshot)=>{
+  const applySnapshot=useCallback((data:CartSnapshot)=>{
+    cartRevision.current++;setRevision(n=>n+1);
     setCart(data.items);setShopSubtotal(data.subtotal);setShopCurrency(data.currency);setDiscountCodes(data.discountCodes||[]);setError(data.notice||"");
     setCosts({merchandise:data.merchandise??data.subtotal,lineDiscounts:data.lineDiscounts||[],orderDiscounts:data.orderDiscounts||[],total:data.total??data.subtotal});
-  };
+  },[]);
   async function requestCart(input?:Record<string,unknown>) {
     const response=await fetch("/api/cart",input?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(input),signal:AbortSignal.timeout(25000)}:{cache:"no-store",signal:AbortSignal.timeout(15000)});
     const data=await response.json();
@@ -63,7 +69,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   }
   const retryCart=async()=>{
     if(lock.current)return;
-    lock.current=true;setBusy(true);setError("");
+    lock.current=true;cartRevision.current++;setRevision(n=>n+1);setBusy(true);setError("");
     try {await requestCart();setHydrated(true);}catch(e){setError(e instanceof Error?e.message:"Your bag is temporarily unavailable.");}
     finally {lock.current=false;setBusy(false);}
   };
@@ -79,7 +85,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const activeBundleNudge=cartBundleNudge({cart,mode,discountCodes});
   const transact=async(input:Record<string,unknown>)=>{
     if(lock.current||!hydrated)return false;
-    lock.current=true;setBusy(true);setError("");
+    lock.current=true;cartRevision.current++;setRevision(n=>n+1);setBusy(true);setError("");
     try {return await requestCart(input);}catch(e){setError(e instanceof Error?e.message:"We couldn’t update your bag. Please try again.");return false;}
     finally{lock.current=false;setBusy(false);}
   };
@@ -102,26 +108,33 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     if(live){void transact({action:"update",lineId:key,quantity});return;}
     setCart(current=>current.map(i=>lineKey(i)===key?{...i,quantity:Math.min(20,Math.max(0,Math.floor(quantity)))}:i).filter(i=>i.quantity>0));
   };
-  const checkout=async()=>{
-    if(!live||lock.current||!hydrated)return;
-    lock.current=true;setBusy(true);setError("");
-    try{
-      const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}",signal:AbortSignal.timeout(15000)});
-      const data=await response.json();if(data.cart)applySnapshot(data.cart);if(!response.ok)throw new Error(data.error||"Checkout is temporarily unavailable.");
-      window.location.assign(data.checkoutUrl);
-    }catch(e){setError(e instanceof Error?e.message:"Checkout is temporarily unavailable.");lock.current=false;setBusy(false);}
-  };
-  const value={department,products,mode,currency,busy,ready:hydrated,error,checkout,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count,costs:live?costs:NO_COSTS};
+  const prepareCheckout=useCallback(async(visitorConsent:VisitorConsent,signal:AbortSignal)=>{
+    const version=cartRevision.current;
+    const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorConsent}),signal:AbortSignal.any([signal,AbortSignal.timeout(15000)])});
+    const data=await response.json();
+    if(signal.aborted||version!==cartRevision.current)throw new Error("Your bag changed. Please try again.");
+    if(data.cart)applySnapshot(data.cart);
+    if(!response.ok){
+      const message=data.error||"Checkout is temporarily unavailable.";
+      if(data.cart)setError(message);
+      throw new Error(message);
+    }
+    await attributionReady();
+    if(signal.aborted||version!==cartRevision.current||JSON.stringify(visitorConsent)!==JSON.stringify(nativeConsent()))throw new Error("Your preferences or bag changed. Please try again.");
+    return validateNativeCheckoutUrl(data.checkoutUrl);
+  },[applySnapshot]);
+  const checkoutCurrent=(revision:number)=>revision===cartRevision.current&&!lock.current;
+  const value={department,products,mode,currency,busy,ready:hydrated,error,prepareCheckout,cartRevision:revision,checkoutCurrent,retryCart,discountCodes,applyDiscounts,cart,add,update,openBag:()=>setBag(true),closeBag:()=>setBag(false),subtotal,count,costs:live?costs:NO_COSTS};
   const results=products.filter(p=>`${p.name} ${p.type} ${p.category}`.toLowerCase().includes(query.toLowerCase().trim()));
-  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}><Suspense fallback={null}><StorefrontMetaPixel/></Suspense>{children}</StoreContext.Provider>;
+  if (/^\/affiliates\/(dashboard|admin|shop-manager)(\/|$)/.test(pathname)) return <StoreContext.Provider value={value}><Suspense fallback={null}><StorefrontMetaPixel/>{live&&<GoogleAttribution/>}</Suspense>{children}</StoreContext.Provider>;
   return <StoreContext.Provider value={value}>
-    <Suspense fallback={null}><StorefrontMetaPixel/></Suspense>
+    <Suspense fallback={null}><StorefrontMetaPixel/>{live&&<GoogleAttribution/>}</Suspense>
     <a className="skip-link" href="#main">Skip to content</a>
     {mode==="preview"&&<div className="preview-ribbon">STORE PREVIEW <span className="preview-review-notice">Illustrative ratings &amp; review counts</span><span>Orders are not enabled yet</span></div>}{mode==="unavailable"&&<div className="preview-ribbon" role="status">The collection is temporarily unavailable. Please try again shortly.</div>}
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
     {children}
     <Footer/>
-    <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&(!activeBundleNudge||isBundleEligible(p.id))&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<BundleNudge/><BagSavings/><div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><OrderSavings/><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<button className="button button-dark full-width" disabled={busy||!hydrated} onClick={()=>void checkout()}>Secure checkout <ArrowRight size={18}/></button>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
+    <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&(!activeBundleNudge||isBundleEligible(p.id))&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<BundleNudge/><BagSavings/><div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><OrderSavings/><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<CheckoutLink active={bag}>Secure checkout <ArrowRight size={18}/></CheckoutLink>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
     <Sheet open={search} onOpenChange={setSearch}><SheetContent side="top" className="search-sheet"><SheetTitle>Find your essential.</SheetTitle><SheetDescription>Search the IQON collection</SheetDescription><div className="search-field"><Search size={22}/><input aria-label="Search the collection" placeholder="Search products, formats, collections…" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={18}/></button>}</div><div className="search-results">{results.map(p=><Link href={`/products/${p.id}`} key={p.id} onClick={()=>setSearch(false)}><img src={p.image} alt={p.name}/><span>{p.name}<small>{p.type} · {productPrice(p)}</small></span><ArrowRight size={18}/></Link>)}{!results.length&&<p className="no-results">No products match “{query}”. Try “collagen”, “creatine” or “skincare”.</p>}</div></SheetContent></Sheet>
 
   </StoreContext.Provider>;
@@ -184,4 +197,43 @@ export function ProductCard({product:p,compact=false}:{product:Product;compact?:
   {isComingSoon(p)||p.pricePending||p.available===false||p.requiresSellingPlan?<Link className="button button-dark product-card-action" aria-label={`View product: ${p.name}`} href={`/products/${p.id}`}>View product<ArrowRight size={18}/></Link>:<button className="button button-dark product-card-action" disabled={busy||!ready} aria-label={p.variants&&p.variants.length>1?`Choose options for ${p.name}`:`Add to bag: ${p.name}`} onClick={()=>add(p.id)}>{p.variants&&p.variants.length>1?"Choose options":"Add to bag"}<Plus size={18}/></button>}
  </article>;
 }
-function Footer(){const {mode,currency,department}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><a href={`mailto:${DEFAULT_SUPPORT_EMAIL}`}>Contact us</a><Link href="/account/privacy" prefetch={false}>Privacy</Link><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span><nav className="footer-policies" aria-label="Store policies">{STORE_POLICY_LINKS.map(policy=><a key={policy.href} href={policy.href}>{policy.label}</a>)}</nav>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
+function Footer(){const {mode,currency,department}=useStore();return <footer className="store-footer"><div className="footer-main"><div className="footer-brand"><Link href={departmentHome(department)} aria-label="IQON home"><Wordmark large/></Link><p>A considered approach to<br/>the everyday.</p></div><div><p className="eyebrow">DISCOVER</p><Link href="/collections/supplements">Supplements</Link><Link href="/collections/skincare">Skincare</Link><Link href="/collections/all">Shop all</Link></div><div><p className="eyebrow">IQON</p><Link href="/approach">Our approach</Link><Link href="/journal">Latest News</Link><Link href="/reviews">Customer reviews</Link><Link href="/affiliates">Affiliates</Link><Link href="/help">Questions & care</Link><a href={`mailto:${DEFAULT_SUPPORT_EMAIL}`}>Contact us</a><Link href="/account/privacy" prefetch={false}>Privacy</Link><a href="#shopifyReshowConsentBanner">Cookie preferences</a><Link href="/checkout">Your bag</Link></div><div className="footer-note"><p className="eyebrow">THE NEXT CHAPTER</p><p>Supplements and skincare.<br/>One point of view.</p><span>Precision. Clarity. Care.</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} IQON</span><nav className="footer-policies" aria-label="Store policies">{STORE_POLICY_LINKS.map(policy=><a key={policy.href} href={policy.href}>{policy.label}</a>)}</nav>{mode==="preview"&&<p>Prices in USD. Orders will open shortly.</p>}<span>{currency}</span></div></footer>;}
+
+// Prepare while the bag/review is visible, then let a genuine link activation
+// run Google's documented cross-domain linker. No handcrafted _gl or cookies.
+export function CheckoutLink({active,children}:{active:boolean;children:ReactNode}){
+  const {prepareCheckout,cartRevision,checkoutCurrent,busy,ready}=useStore();
+  const [generation,refresh]=useState(0);
+  const [prepared,setPrepared]=useState<{url:string;consent:VisitorConsent;revision:number;key:string}|null>(null);
+  const [failure,setFailure]=useState<{message:string;key:string}|null>(null);
+  const key=`${cartRevision}:${generation}:${active}:${busy}:${ready}`;
+  useEffect(()=>{
+    const invalidate=()=>{setPrepared(null);refresh(n=>n+1);};
+    for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.addEventListener(name,invalidate);
+    window.addEventListener("focus",invalidate);
+    window.addEventListener("pageshow",invalidate);
+    return ()=>{
+      for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.removeEventListener(name,invalidate);
+      window.removeEventListener("focus",invalidate);window.removeEventListener("pageshow",invalidate);
+    };
+  },[]);
+  useEffect(()=>{
+    if(!active||busy||!ready)return;
+    const controller=new AbortController(),consent=nativeConsent();
+    void prepareCheckout(consent,controller.signal).then(url=>{
+      if(!controller.signal.aborted)setPrepared({url,consent,revision:cartRevision,key});
+    }).catch(error=>{if(!controller.signal.aborted)setFailure({message:error instanceof Error?error.message:"Checkout is temporarily unavailable.",key});});
+    return ()=>controller.abort();
+  },[active,busy,ready,cartRevision,key,prepareCheckout]);
+  const valid=!!prepared&&prepared.key===key&&!busy&&ready&&prepared.revision===cartRevision;
+  const message=failure?.key===key?failure.message:"";
+  const guard=(event:SyntheticEvent<HTMLAnchorElement>)=>{
+    if(!prepared||!checkoutCurrent(prepared.revision)||JSON.stringify(prepared.consent)!==JSON.stringify(nativeConsent())){
+      // Clear the DOM href before Google's pointer listener sees a stale URL.
+      event.currentTarget.removeAttribute("href");event.preventDefault();event.stopPropagation();setPrepared(null);refresh(n=>n+1);
+    }
+  };
+  if(!valid)return <>{message&&<p role="alert" className="commerce-message">{message}</p>}<button className="button button-dark full-width" disabled={!message} onClick={()=>refresh(n=>n+1)}>{message?"Retry checkout":"Preparing checkout…"}</button></>;
+  return <a className="button button-dark full-width" href={needsCheckoutReview()?"/checkout":prepared.url} referrerPolicy="no-referrer"
+    onPointerDownCapture={guard} onKeyDownCapture={guard} onClick={guard} onAuxClick={guard} onContextMenu={guard}>{children}</a>;
+}

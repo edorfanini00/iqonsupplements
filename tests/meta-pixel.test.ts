@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import { beforeEach, test } from "node:test";
-import { initializePixel, isStorefrontPath, productPayload, resetProductView, trackCartAddition, trackPageView, trackViewContent } from "../lib/meta-pixel";
+import { initializePixel, isStorefrontPath, productPayload, resetProductView, syncPixelConsent, trackCartAddition, trackPageView, trackViewContent } from "../lib/meta-pixel";
 import type { CartItem } from "../lib/catalog";
 
 const calls: unknown[][] = [];
-const browser = {navigator: {globalPrivacyControl: false}, location: {pathname: "/", search: ""}, fbq: (...args: unknown[]) => calls.push(args)};
+const consent={marketing:true,sale:true,status:'loaded'};
+const native={get consentStatus(){return consent.status},marketingAllowed:()=>consent.marketing,saleOfDataAllowed:()=>consent.sale,analyticsProcessingAllowed:()=>false,preferencesProcessingAllowed:()=>true};
+const browser = {Shopify:{customerPrivacy:native},navigator: {globalPrivacyControl: false}, location: {pathname: "/", search: ""}, fbq: (...args: unknown[]) => calls.push(args)};
 Object.defineProperty(globalThis, "window", {value: browser, configurable: true});
+Object.defineProperty(globalThis,"navigator",{value:browser.navigator,configurable:true});
 const product = {variantId: "gid://shopify/ProductVariant/52086268985639", name: "Creatine", price: 39.99, currency: "USD"};
 beforeEach(() => {
+  consent.marketing=true;consent.sale=true;consent.status="loaded";
   browser.location.pathname = "/account";
   trackPageView("/account");
   browser.location.pathname = "/";
@@ -90,4 +94,21 @@ test("subscription additions match their selling plan and use its actual price",
   const plan = "gid://shopify/SellingPlan/456";
   trackCartAddition([line(), line({sellingPlanId: plan, amount: 50})], product.variantId, 2, plan);
   assert.deepEqual(events("AddToCart")[0]?.[2], productPayload({...product, price: 25, quantity: 2}));
+});
+
+for(const state of [{status:'loading',marketing:true,sale:true},{status:'loaded',marketing:false,sale:true},{status:'loaded',marketing:true,sale:false}])test(`native consent blocks every entrypoint: ${JSON.stringify(state)}`,()=>{
+  Object.assign(consent,state);
+  assert.equal(initializePixel(),false);trackPageView('/');trackViewContent(product);trackCartAddition([line()],product.variantId,1);
+  assert.equal(calls.filter(call=>call[0]!=='consent').length,0);
+});
+test('withdrawal discards unsent events, revokes Meta and permits fresh consented events after resumption',()=>{
+  trackPageView('/');trackViewContent(product);
+  const queue=[['trackSingle','1006368245818889','AddToCart']];Object.assign(browser.fbq,{queue});
+  consent.marketing=false;consent.sale=false;
+  assert.equal(syncPixelConsent(),true);assert.equal(queue.length,0);assert.deepEqual(calls.at(-1),['consent','revoke']);
+  calls.length=0;trackPageView('/');trackViewContent(product);trackCartAddition([line()],product.variantId,1);
+  assert.equal(calls.filter(call=>call[0]==='trackSingle').length,0);
+  consent.marketing=true;consent.sale=true;
+  trackPageView('/');trackViewContent(product);trackCartAddition([line()],product.variantId,1);
+  assert.equal(events('PageView').length,1);assert.equal(events('ViewContent').length,1);assert.equal(events('AddToCart').length,1);
 });

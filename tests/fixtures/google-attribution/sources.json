@@ -1,0 +1,36 @@
+{
+  "retrieved": "2026-11-07",
+  "note": "Public runtime snapshots, used only by network-intercepted offline browser tests. Google tag includes parent-configured domain rules. Native app is unmodified. No actual conversions sent. Refreshed after parent disabled UPD capabilities and optional auto-events.",
+  "files": [
+    {
+      "file": "google-tag.js.gz",
+      "source": "https://www.googletagmanager.com/gtag/js?id=AW-18501766604",
+      "sha256": "67edffcb7912be065a4de6cb1e3f12e25614e35d5163356d7d999c3e3cb76c5c"
+    },
+    {
+      "file": "native-pixel.js.gz",
+      "source": "parent saved checkout pixel 3101458727",
+      "sha256": "88f7c196f563b9a96c167a697712a79faf894f555edc53a5c244273de7df6e9c"
+    },
+    {
+      "file": "native-banner.js.gz",
+      "source": "https://cdn.shopify.com/shopifycloud/privacy-banner/storefront-banner.js",
+      "sha256": "c8d12d01ba0e2f81d699a83c08720f2aec90927c5ef65aaa1bbe0dd9e6f3c9e1"
+    },
+    {
+      "file": "native-consent.js.gz",
+      "source": "https://cdn.shopify.com/shopifycloud/consent-tracking-api/v0.2/consent-tracking-api.js",
+      "sha256": "3b597d5d8e66c799f844ac5bc748549bf06090bb63b0ba540c2ef958f11496c8"
+    },
+    {
+      "file": "standard-events.js.gz",
+      "source": "https://cdn.shopify.com/storefront/standard-events.js",
+      "sha256": "adff22682d096037de4659b01c07410d79bb32bc061f7f58ef190ff91ff2e283"
+    },
+    {
+      "file": "standard-actions.js.gz",
+      "source": "https://cdn.shopify.com/storefront/standard-actions.js",
+      "sha256": "f3477cc15f0e2a60c9965aa59deb5e3b389d5bbcce1df0d1459ff0fa52b453b9"
+    }
+  ]
+}

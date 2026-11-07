@@ -23,6 +23,7 @@ const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
 const redirectsUrl = dataUrl(compile("../lib/legacy-redirects.ts"));
 const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)).replace('"./legacy-redirects"', JSON.stringify(redirectsUrl)));
 const imports = {
+  "./shopify-consent": dataUrl(compile("../lib/shopify-consent.ts")),
   "./commerce-policy": policyUrl,
   react: dataUrl("export const cache = fn => fn;"),
   "next/headers": bindingsUrl,
@@ -102,6 +103,7 @@ function fixture(t, {plannedPolicy = false} = {}) {
     const {query, variables} = JSON.parse(options.body);
     const operation = query.match(/(?:query|mutation) (\w+)/)[1];
     state.operations.push(operation);
+    if(operation === "IQONCheckoutConsent")state.consent=variables.visitorConsent;
     if (operation === "IQONCatalog") return Response.json({data: {products: {
       pageInfo: {hasNextPage: false, endCursor: null}, nodes: fixtureProducts.map(p => ({
         handle: p.handle, title: p.handle, description: "Fixture", productType: "Fixture", tags: [`iqon-${p.category}`],
@@ -109,7 +111,7 @@ function fixture(t, {plannedPolicy = false} = {}) {
         variants: {pageInfo: {hasNextPage: false}, nodes: [{id: p.variantId, title: "Default Title", availableForSale: state.available, price: money(p.price)}]},
       })),
     }}});
-    if (operation === "IQONCartRead") return Response.json({data: {cart: state.cart?.id === variables.id ? state.cart : null}});
+    if (operation === "IQONCartRead" || operation === "IQONCheckoutConsent") return Response.json({data: {cart: state.cart?.id === variables.id ? state.cart : null}});
     let mutation;
     if (operation === "IQONCartCreate") {
       state.cart = {id: `gid://shopify/Cart/test-${++state.serial}?key=test-only-secret`, checkoutUrl: "https://iqon-test.myshopify.com/checkouts/test-only", discountCodes: [], lines: {pageInfo: {hasNextPage: false}, nodes: []}};
@@ -395,4 +397,22 @@ test("checkout removes old skincare and requires review before handing off to Sh
   assert.equal(response.status,422);
   const data=await response.json();assert.equal(data.cart.items.length,1);assert.ok(!data.checkoutUrl);
   assert.equal((await routes.checkoutResponse(request({},"checkout"))).status,200);
+});
+
+
+test("checkout passes fresh purpose consent to Shopify, never click IDs or customer data",async t=>{
+  const state=fixture(t);await add(fixtureProducts[0]);
+  const granted={analytics:false,marketing:true,preferences:true,saleOfData:true};
+  state.cart.checkoutUrl+="?_cs=shopify-encoded&key=preserved";
+  const first=await routes.checkoutResponse(request({visitorConsent:granted,gclid:"must-not-forward",email:"test@example.invalid"},"checkout"));
+  assert.equal(first.status,200);assert.deepEqual(state.consent,granted);
+  assert.equal((await first.json()).checkoutUrl,state.cart.checkoutUrl);
+  const refused={analytics:false,marketing:false,preferences:false,saleOfData:false};
+  assert.equal((await routes.checkoutResponse(request({visitorConsent:refused},"checkout"))).status,200);
+  assert.deepEqual(state.consent,refused);
+  const gpc=request({visitorConsent:granted},"checkout");gpc.headers.set("Sec-GPC","1");
+  assert.equal((await routes.checkoutResponse(gpc)).status,200);
+  assert.deepEqual(state.consent,{...granted,marketing:false,saleOfData:false});
+  for(const visitorConsent of [null,[],{marketing:true},{...granted,marketing:"true"},{...granted,email:"bad"}])
+    assert.equal((await routes.checkoutResponse(request({visitorConsent},"checkout"))).status,400);
 });
