@@ -229,7 +229,7 @@
  .product-page .product-switcher{padding:3px 15px}
  .product-page .product-detail{padding:18px 0 32px!important;display:flex!important;flex-direction:column;gap:0!important}
  .product-page .purchase-panel{display:contents;position:static}
- .product-page .product-visual-gallery{order:-1;width:100%;margin:0 0 24px;min-width:0}
+ .product-page .product-visual-gallery{width:100%;margin:0 0 24px;min-width:0}
  .product-visual-grid{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 20px;scroll-padding-left:20px;position:relative}
  .product-visual-grid::-webkit-scrollbar{display:none}
  .visual-gallery-item{flex:0 0 88%;scroll-snap-align:start;aspect-ratio:4/5}
