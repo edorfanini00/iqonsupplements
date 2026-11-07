@@ -18,6 +18,7 @@ export function commandComplete(kind:CommandKind,data:Json):boolean {
  // identity or notification tasks remain unresolved. Payout above is explicitly
  // a ledger-record acknowledgement, not a bank transfer/email delivery claim.
  if(tasks.some(t=>t.state!=='confirmed'))return false;
+ if(kind==='commission-settings'&&tasks.length===0&&data.nativeBodyRateSave?.authority==='native-dashboard-body-rate-v1'&&data.nativeBodyRateSave.version===data.command.version&&['supplementsCommissionRate','skincareCommissionRate'].every(k=>data.affiliate?.[k]===null||typeof data.affiliate?.[k]==='number'&&Number.isFinite(data.affiliate[k])&&data.affiliate[k]>=0&&data.affiliate[k]<=100))return true;
  if(kind==='signup')return tasks.some(t=>t.store==='identity'&&t.operation==='signup'&&t.state==='confirmed');
  return ['woo','shopify'].every(store=>tasks.some(t=>t.store===store&&t.operation==='public-code'&&t.state==='confirmed'));
 }
@@ -66,7 +67,14 @@ export function createCommandClient(options:{storage:StorageLike;fetch:(url:stri
       || kind==='signup'&&[400,413,422].includes(response.status)&&(data.errorDetail??data.error)?.code==='VALIDATION_ERROR');
     if(definitive){records=read(actor);if(records[id]?.envelope.commandId===saved.envelope.commandId){records[`archive:${saved.envelope.commandId}`]={...saved,state:'rejected-no-commit',rejected:true,archived:true};delete records[id];write(actor,records);}}
     else if(!matching&&[400,409,413,422].includes(response.status)&&['VALIDATION_ERROR','CONFLICT','VERSION_CONFLICT'].includes((data.errorDetail??data.error)?.code)){saved.rejected=true;records=read(actor);records[id]=saved;write(actor,records);}
-    if(response.ok&&matching&&commandComplete(kind,data))return result(data,response.status,true);
+    if(response.ok&&matching&&commandComplete(kind,data)){
+     if(kind==='commission-settings'&&data.nativeBodyRateSave?.authority==='native-dashboard-body-rate-v1'&&data.outbox?.length===0){
+      // Keep the completed receipt, release the edit slot only after a readable
+      // matching acknowledgement. Unknown/lost responses retain the same key.
+      records=read(actor);if(records[id]?.envelope.commandId===saved.envelope.commandId){records[`archive:${saved.envelope.commandId}`]={...saved,archived:true};delete records[id];write(actor,records);}
+     }
+     return result(data,response.status,true);
+    }
     return result({...data,error:matching?`Command ${receipt.state ?? 'pending'} (${saved.envelope.commandId}). Not confirmed complete. Provider work may still be pending or blocked; use Command recovery to check or retry this same attempt.`:typeof data.error==='string'?data.error:typeof data.error?.message==='string'?data.error.message:`Outcome unknown (${saved.envelope.commandId}). Keep and retry this exact saved attempt; no success has been confirmed.`},response.status);
    }catch{return result({error:`Outcome unknown (${saved.envelope.commandId}). The exact attempt is saved. Retry it rather than creating another operation.`});}
   };

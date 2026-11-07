@@ -48,9 +48,10 @@ it("keeps successful category data independent when original Overview fails and 
     return Response.json({version:1,provider:'shopify',period:{start:q.get('start'),end:q.get('end'),timezone:'America/New_York'},categories:Object.fromEntries(['supplements','skincare','unclassified'].map(k=>[k,{storeRevenue:metric,attributedRevenue:{state:'unavailable',reason:'CANONICAL_ATTRIBUTION_UNAVAILABLE',currencies:null,orderCount:null}}]))});
   });
   render(React.createElement(Overview));
-  month('September 2026');await screen.findAllByText('USD 222.00');
-  month('August 2026');await screen.findAllByText('USD 111.00');
-  expect(screen.queryByText('USD 222.00')).toBeNull();
+  fireEvent.click(screen.getByRole('button', {name:'Supp & Skincare'}));
+  month('September 2026');await screen.findAllByText('$444.00');
+  month('August 2026');await screen.findAllByText('$222.00');
+  expect(screen.queryByText('$444.00')).toBeNull();
   const q=new URL(categoryCalls.at(-1)!,'https://local.test').searchParams;
   expect(q.get('start')).toBe('2026-08-01T04:00:00.000Z');expect(q.get('end')).toBe('2026-09-01T04:00:00.000Z');
   expect(screen.queryByText('$905.00')).toBeNull();

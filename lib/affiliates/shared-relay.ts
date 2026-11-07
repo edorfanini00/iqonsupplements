@@ -113,6 +113,7 @@ export async function relayAffiliateRequest(request: Request, options: {env?:Env
     } catch { /* Invalid server configuration grants no additional origin. */ }
   }
   if (incoming.origin !== config.portal && incoming.origin !== previewOrigin) return fail(403);
+  if (categoryRead && request.headers.has('origin') && request.headers.get('origin') !== incoming.origin) return fail(403);
   // Same-origin browser GET fetches omit Origin. Only the exact refresh route
   // may use Fetch Metadata instead; navigation, prefetch and cross-site reads
   // remain forbidden, and the native UUID check below still applies.

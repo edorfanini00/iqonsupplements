@@ -18,3 +18,8 @@ describe('canonical category cards independent of original Overview',()=>{
  it('does not fabricate a currency for empty data, and rejects wrong period',async()=>{vi.stubGlobal('fetch',vi.fn(async(input:string)=>{const u=new URL(input,'https://body.test');const r=report(u.searchParams.get('start')!,u.searchParams.get('end')!);for(const v of Object.values(r.categories) as any[]){v.storeRevenue.currencies=[];v.storeRevenue.orderCount=0;}return Response.json(r);}));await mount();expect(host.textContent).toContain('No matching orders');expect(host.textContent).not.toContain('$0');});
  it('does not fetch unsupported all-time range or leak a stale success',async()=>{fetchReport();await mount('all');expect(fetch).not.toHaveBeenCalled();expect(host.textContent).toContain('Choose a period of at most 366 days');});
 });
+
+it.each([[1,1,'Some commissions pending configuration','5.67'],[1,0,'Commission unconfigured — sales recorded',null],[0,1,'Commission: USD 0.00','0.00']])('distinguishes mixed, unset and configured zero commission (%s/%s)',async(pending,configured,label,amount)=>{
+ vi.stubGlobal('fetch',vi.fn(async(input:string)=>{const u=new URL(input,'https://body.test');return Response.json({...report(u.searchParams.get('start')!,u.searchParams.get('end')!,'81.00',false),commissions:{supplements:{pendingOrderCount:pending,configuredOrderCount:configured,earned:amount===null?[]:[{currency:'USD',amount}]}}});}));
+ await mount('m:2026-08','affiliate');expect(host.textContent).toContain(label);if(amount!==null)expect(host.textContent).toContain('Commission: USD '+amount);if(configured)expect(host.textContent).not.toContain('Commission unconfigured');
+});
