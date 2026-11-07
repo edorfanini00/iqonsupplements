@@ -202,6 +202,25 @@ export default function AdminOverviewPage() {
     setShopifyRevenue(null);
     if (isInitial) setLoading(true);
     else setRefreshing(true);
+    const shopifyTask=(async()=>{
+      // Fetch Shopify category revenue (supplements + skincare) independently.
+      try {
+        const range = resolveRange(p);
+        const catParams = new URLSearchParams({
+          start: range.start.toISOString(),
+          end: new Date(range.end.getTime() + 1).toISOString(),
+        });
+        const catRes = await fetch(`/api/affiliates/category-revenue?${catParams}`, {credentials:'include',cache:'no-store',signal:controller.signal});
+        if(!catRes.ok)throw Error('Shopify unavailable');
+        const catData=await catRes.json();
+        const metrics=['supplements','skincare'].map(key=>catData?.categories?.[key]?.storeRevenue);
+        if(catData?.version!==1||metrics.some(m=>m?.state!=='available'||!Array.isArray(m.currencies)||m.currencies.some((c:{currency:string;amount:string})=>c.currency!=='USD'||!Number.isFinite(Number(c.amount)))))throw Error('Shopify unavailable');
+        const sum=metrics.reduce((total,m)=>total+m.currencies.reduce((n:number,c:{amount:string})=>n+Number(c.amount),0),0);
+        if(!controller.signal.aborted)setShopifyRevenue(sum);
+      } catch {
+        if(!controller.signal.aborted)setShopifyRevenue(null);
+      }
+    })();
     try {
       const res = await fetch(`/api/affiliates/admin/dashboard?range=${encodeURIComponent(p)}`, {
         credentials: "include",
@@ -223,45 +242,13 @@ export default function AdminOverviewPage() {
         setAppRevenue(typeof data.appRevenue === "number" ? data.appRevenue : null);
         setAppRevenueSeries(data.appRevenueSeries ?? []);
       }
-      // Fetch Shopify category revenue (supplements + skincare) independently.
-      try {
-        const range = resolveRange(p);
-        const catParams = new URLSearchParams({
-          start: range.start.toISOString(),
-          end: new Date(range.end.getTime() + 1).toISOString(),
-        });
-        const catRes = await fetch(`/api/affiliates/category-revenue?${catParams}`, {
-          credentials: "include",
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        if (catRes.ok) {
-          const catData = await catRes.json();
-          if (!controller.signal.aborted && catData?.version === 1 && catData?.categories) {
-            let sum = 0;
-            let hasAny = false;
-            for (const catKey of ["supplements", "skincare"] as const) {
-              const storeMetric = catData.categories[catKey]?.storeRevenue;
-              if (storeMetric?.state === "available" && Array.isArray(storeMetric.currencies)) {
-                for (const entry of storeMetric.currencies) {
-                  if (entry.currency === "USD") {
-                    sum += parseFloat(entry.amount) || 0;
-                    hasAny = true;
-                  }
-                }
-              }
-            }
-            if (!controller.signal.aborted) setShopifyRevenue(hasAny ? sum : null);
-          }
-        }
-      } catch {
-        // Shopify categories unavailable — leave shopifyRevenue as null.
-      }
+
     } catch (error) {
       if (!controller.signal.aborted) {
         setLoadError(error instanceof Error ? error.message : "Unable to load this period. Please try again.");
       }
     } finally {
+      await shopifyTask;
       if (!controller.signal.aborted) {
         setLoading(false);
         setRefreshing(false);
@@ -425,7 +412,7 @@ export default function AdminOverviewPage() {
           }}
         />
         <div className="relative grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8">
-          <div>
+          <div className="min-w-0">
             {(() => {
               const storeRevenue = storeStats
                 ? storeStats.totalRevenue
@@ -433,10 +420,10 @@ export default function AdminOverviewPage() {
                   ? stats.totalRevenue
                   : null;
               const heroValue =
-                storeRevenue == null
-                  ? null
-                  : revenueView === "shopify"
-                    ? shopifyRevenue
+                revenueView === "shopify"
+                  ? shopifyRevenue
+                  : storeRevenue == null
+                    ? null
                     : appRevenue == null
                       ? storeRevenue
                       : revenueView === "store"
@@ -460,7 +447,7 @@ export default function AdminOverviewPage() {
                     {heroLabel} · {rangeLabel(preset)}
                   </p>
                   <Link
-                    href={`/affiliates/admin/orders?range=${encodeURIComponent(preset)}`}
+                    href={`/affiliates/admin/orders?range=${encodeURIComponent(preset)}${revenueView === "shopify" ? "&source=shopify" : ""}`}
                     title={`View the orders behind this number (${rangeLabel(preset)})`}
                     className="group/revenue inline-flex items-baseline gap-3 font-sans font-medium tracking-tight text-white leading-none mt-3 transition-opacity hover:opacity-85"
                     style={{
@@ -470,9 +457,9 @@ export default function AdminOverviewPage() {
                     {heroValue != null ? formatCurrency(heroValue) : "—"}
                     <ArrowRight className="h-[0.5em] w-[0.5em] opacity-0 -translate-x-1 group-hover/revenue:opacity-70 group-hover/revenue:translate-x-0 transition-all" />
                   </Link>
-                  {(appRevenue != null || shopifyRevenue != null) && (
+                  {revenueView === "shopify" && <p className="mt-3 text-xs text-white/70">{shopifyRevenue == null ? "Shopify revenue unavailable for this period. Open Shopify orders for source details." : "Shopify merchandise after line refunds · excludes shipping and tax. Separate from peptide and app revenue."}</p>}
                     <div className="mt-4 flex flex-wrap items-center gap-3">
-                      <div className="inline-flex items-center rounded-full bg-white/5 border border-white/15 p-1 gap-1">
+                      <div className="inline-flex max-w-full flex-wrap items-center rounded-full bg-white/5 border border-white/15 p-1 gap-1">
                         {(
                           [
                             ["combined", "Combined"],
@@ -482,6 +469,7 @@ export default function AdminOverviewPage() {
                         ).map(([id, label]) => (
                           <button
                             key={id}
+                            aria-pressed={revenueView === id}
                             onClick={() => setRevenueView(id)}
                             className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] font-sans transition-colors ${
                               revenueView === id
@@ -492,8 +480,8 @@ export default function AdminOverviewPage() {
                             {label}
                           </button>
                         ))}
-                        {shopifyRevenue != null && (
                           <button
+                            aria-pressed={revenueView === "shopify"}
                             onClick={() => setRevenueView("shopify")}
                             className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] font-sans transition-colors ${
                               revenueView === "shopify"
@@ -503,7 +491,6 @@ export default function AdminOverviewPage() {
                           >
                             Supp &amp; Skincare
                           </button>
-                        )}
                       </div>
                       {revenueView === "combined" && storeRevenue != null && appRevenue != null && (
                         <p className="text-[11px] font-sans text-white/60 flex flex-wrap gap-x-4 gap-y-1">
@@ -522,12 +509,11 @@ export default function AdminOverviewPage() {
                         </p>
                       )}
                     </div>
-                  )}
                 </>
               );
             })()}
             <p className="text-white/55 text-sm mt-3 max-w-md">
-              {storeStats && stats
+              {revenueView === "shopify" ? "Other dashboard metrics show the existing peptide/app ledger." : storeStats && stats
                 ? `Across ${storeStats.totalOrders} paid ${
                     storeStats.totalOrders === 1 ? "order" : "orders"
                   } (processing + completed). ${formatCurrency(
@@ -643,7 +629,7 @@ export default function AdminOverviewPage() {
               </span>
             }
           />
-          {loading && chartOrders.length === 0 ? (
+          {revenueView === "shopify" ? <p className="text-sm py-10 opacity-70">Shopify totals use order-created dates. Open Shopify orders to inspect each sale; affiliate commission charts remain separate.</p> : loading && chartOrders.length === 0 ? (
             <ChartSkeleton />
           ) : (
             <AreaChart
@@ -659,9 +645,7 @@ export default function AdminOverviewPage() {
                     ? "Peptides revenue"
                     : revenueView === "app"
                       ? "App revenue"
-                      : revenueView === "shopify"
-                        ? "Supp & Skincare revenue"
-                        : "Combined revenue"
+                      : "Combined revenue"
               }
               formatValue={(n) => `$${Math.round(n).toLocaleString()}`}
             />

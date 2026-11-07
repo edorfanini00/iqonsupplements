@@ -1,4 +1,5 @@
 "use client";
+import {SupplementsCode} from "@/components/affiliates/SupplementsCode";
 import {nonproviderMutationFetch} from "@/lib/affiliates/nonprovider-mutation-fetch";
 // BODY CATEGORY ADDITION
 import { CategoryRevenue } from "@/components/affiliates/shared/CategoryRevenue";
@@ -342,6 +343,8 @@ export default function AffiliateOverviewPage() {
           </div>
         </div>
       </section>
+
+      <SupplementsCode />
 
       <MonthlyRankCard />
 
