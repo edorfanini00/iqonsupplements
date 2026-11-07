@@ -2,6 +2,10 @@
 
 This release adds Shopify store orders to the native admin Orders source picker and repairs the existing Shopify revenue reader. Shopify merchandise totals remain separate from peptide/app revenue and the affiliate commission ledger. The reader uses the existing renewable OAuth adapter, retains static-token-only installations, and reports unavailable sources explicitly.
 
+Admin order totals are labeled as order prices including shipping/tax before returns, never captured payments; unpaid and partially paid rows remain visible but excluded from merchandise revenue. Refunds remain separate.
+
+Admin orders retain exact provider discount codes and expose a verified canonical owner or an explicit unresolved/conflicting state. The same Shopify-only resolver now joins confirmed Daily receipts to the existing ownership and ingestion boundaries. It requires the claimed code, canonical owner, pinned provider ID, first confirmation and policy effective date no later than the order, eligible canonical identity, and unambiguous ownership. Peptide renames preserve the Daily identity; late confirmation never adopts an earlier sale. Legacy public-code ownership still uses its existing dated proof. Subsequent conflicting provider observations block later order-time resolution without rewriting earlier proof. No cross-store Daily alias is created. Ownership proof is separate from every existing explicit category agreement, product scope, effective-date and finance activation gate; this release does not enable future-sales ledger/reconciliation/cron processing.
+
 Affiliate dashboards on Health and Body show a separate supplements card. A code becomes copyable only after a canonical receipt and fresh Shopify ownership/policy readback agree. Existing peptide codes and commission terms are unchanged. Body relays all new reads to Health; it owns no second ledger.
 
 ## Final owner-approved policy
@@ -27,7 +31,7 @@ Both existing PRODUCT bundles must allow `orderDiscounts:true` while keeping `pr
 
 ## Retry and rollback
 
-Receipt admission commits `uncertain` before provider I/O. Lost/failed responses are resolved by fresh readback; an absent provider object after uncertainty does not authorize another create. Concurrent calls send at most one create. Occupied or drifted codes are never overwritten by this path. Preserve every receipt/event and the batch JSONL. Manual recovery of a proven-not-applied uncertain attempt requires separately reviewed append-only operator tooling; this candidate intentionally has no uncertainty reset/delete shortcut.
+Receipt admission commits `uncertain` before provider I/O. Lost/failed responses are resolved by fresh readback; an absent provider object after uncertainty does not authorize another create. Concurrent calls send at most one create. Confirmation reconciles against the locked canonical provider ID; a replacement object yields a conflict event/result and failed batch count, while retaining the original provider ID and first confirmation timestamp. Occupied or drifted codes are never overwritten by this path. Preserve every receipt/event and the batch JSONL. Manual recovery of a proven-not-applied uncertain attempt requires separately reviewed append-only operator tooling; this candidate intentionally has no uncertainty reset/delete shortcut.
 
 To stop new admissions, disable the dedicated release configuration. This hides unverified codes but does not revoke discounts already issued on Shopify; provider expiration requires separate authorization and exact ownership readback. Keep the additive tables/history on rollback. Reporting can roll back independently without changing orders or ledger rows.
 
