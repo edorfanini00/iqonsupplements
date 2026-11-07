@@ -5,16 +5,18 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
 import { initializePixel, pixelAllowed, resetProductView, syncPixelConsent, trackPageView } from "@/lib/meta-pixel";
 
+import {NATIVE_CONSENT_INVALIDATED,nativeConsentInvalidated,refreshNativeConsent} from "@/lib/shopify-consent";
+
 const subscribe = (notify:()=>void) => {
   let unloading=false;
   const update=()=>{
     const unload=syncPixelConsent();notify();
-    if(unload&&!unloading){unloading=true;window.location.reload();}
+    if(unload&&!unloading&&!nativeConsentInvalidated()){unloading=true;refreshNativeConsent();}
   };
-  for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.addEventListener(name,update);
+  for(const name of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED])document.addEventListener(name,update);
   for(const name of ["focus","pageshow"])window.addEventListener(name,update);
   return ()=>{
-    for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.removeEventListener(name,update);
+    for(const name of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED])document.removeEventListener(name,update);
     for(const name of ["focus","pageshow"])window.removeEventListener(name,update);
   };
 };

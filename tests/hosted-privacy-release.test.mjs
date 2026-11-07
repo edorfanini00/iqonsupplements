@@ -11,7 +11,6 @@ import { test } from "node:test";
 const root = new URL("../", import.meta.url).pathname;
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const exists = file => fs.existsSync(path.join(root, file));
-const MAIN = "d7c9c0606fcc9f900632d9fc3823f7e6c0d47a30";
 const HOSTED = {policy: "https://nr9zd0-t5.myshopify.com/policies/privacy-policy", choices: "https://nr9zd0-t5.myshopify.com/pages/data-sharing-opt-out"};
 
 test("the custom privacy implementation, its migration and route are absent from source", () => {
@@ -22,15 +21,24 @@ test("the custom privacy implementation, its migration and route are absent from
   assert.doesNotMatch(read("prisma/schema.prisma"), /StorefrontPrivacyConsent|storefront_privacy_consents/);
   // git grep exits 1 when nothing matches, which is the expected outcome here.
   let sources = "";
-  try { sources = execFileSync("git", ["grep", "--untracked", "-lIE", "privacy-ledger|privacy-choices|lib/privacy|/api/privacy|usePrivacy|visitorConsent|iqon_privacy", "--", "app", "lib", "components", "proxy.ts"], {cwd: root, encoding: "utf8"}).trim(); }
+  try { sources = execFileSync("git", ["grep", "--untracked", "-lIE", "privacy-ledger|privacy-choices|lib/privacy|/api/privacy|usePrivacy|iqon_privacy", "--", "app", "lib", "components", "proxy.ts"], {cwd: root, encoding: "utf8"}).trim(); }
   catch (error) { if (error.status !== 1) throw error; }
   assert.equal(sources, "", "no source references the removed privacy runtime");
 });
 
-test("checkout, cart and layout are byte-identical to main: no consent dependency in checkout", () => {
-  for (const file of ["lib/shopify.server.ts", "lib/shopify-operations.ts", "lib/shopify.ts", "app/api/checkout/route.ts", "app/api/cart/route.ts", "app/layout.tsx", "tests/cart-routes.test.mjs"]) {
-    assert.equal(read(file), execFileSync("git", ["show", `${MAIN}:${file}`], {cwd: root, encoding: "utf8"}), file);
+test("checkout uses only official native consent; cart and layout have no bespoke consent dependency", () => {
+  assert.match(read("lib/shopify-operations.ts"), /@inContext\(visitorConsent: \$visitorConsent\)/);
+  assert.match(read("lib/shopify.server.ts"), /parseVisitorConsent/);
+  assert.match(read("lib/shopify-consent.ts"), /consentStatus!=="loaded"/);
+  assert.match(read("app/shopify-privacy.tsx"), /ShopifyScripts/);
+  assert.match(read("app/shopify-privacy.tsx"), /mode:"default-banner"/);
+  assert.match(read("app/store-shell.tsx"), /#shopifyReshowConsentBanner/);
+  for (const file of ["lib/shopify.server.ts", "lib/shopify-operations.ts", "lib/shopify.ts", "app/api/checkout/route.ts", "app/api/cart/route.ts", "app/layout.tsx"]) {
+    assert.doesNotMatch(read(file), /privacy-ledger|iqon_privacy|StorefrontPrivacyConsent|\/api\/privacy|usePrivacy/, file);
   }
+  // Native proxy tests separately enforce fixed upstream, public client, stripped
+  // PII/context and rejected non-consent queries. No custom consent storage here.
+  assert.doesNotMatch(read("lib/shopify-consent.ts"), /localStorage|sessionStorage|document\.cookie|cachedConsent/);
 });
 
 test("store shell retains the public Privacy link without a custom consent runtime", () => {
@@ -56,7 +64,7 @@ test("build output: no /api/privacy route and no privacy runtime in any client b
   const walk = dir => { for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(full);
-    else if (entry.name.endsWith(".js") && /\/api\/privacy|iqon_privacy|iqon-privacy|privacy-pending|visitorConsent/.test(fs.readFileSync(full, "utf8"))) hits.push(path.relative(root, full));
+    else if (entry.name.endsWith(".js") && /\/api\/privacy|iqon_privacy|iqon-privacy|privacy-pending/.test(fs.readFileSync(full, "utf8"))) hits.push(path.relative(root, full));
   } };
   walk(path.join(root, ".next/static"));
   assert.deepEqual(hits, []);

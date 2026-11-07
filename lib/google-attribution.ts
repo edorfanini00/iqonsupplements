@@ -1,4 +1,4 @@
-import {nativeConsent,nativeConsentReady} from "./shopify-consent";
+import {nativeConsent,nativeConsentReady,nativeConsentInvalidated,refreshNativeConsent,NATIVE_CONSENT_INVALIDATED} from "./shopify-consent";
 export const ADS_TAG="AW-18501766604";
 export const CHECKOUT_HOST="nr9zd0-t5.myshopify.com";
 // The previously reviewed advertised product allowlist. No new product scope.
@@ -7,6 +7,7 @@ const IDS=new Set(["gclid","gbraid","wbraid"]);
 const DENIED={ad_storage:"denied",ad_user_data:"denied",analytics_storage:"denied",ad_personalization:"denied"};
 declare global {interface Window {dataLayer?:IArguments[];gtag?:(...args:unknown[])=>void;}}
 let loaded=false;
+let vendorLoaded=false;
 let leaving=false;
 let ready:Promise<void>|undefined;
 const google=(...args:unknown[])=>window.gtag?.(...args);
@@ -22,7 +23,8 @@ export function safeAttributionUrl(url:URL){
 function hasClickCookie(){return /(?:^|;\s*)_gcl_(aw|gb|gs|au)=/.test(document.cookie);}
 function permitted(){const consent=nativeConsent();return consent.marketing&&consent.saleOfData;}
 function currentSafe(){return location.hostname==="www.iqondaily.com"&&safeAttributionUrl(new URL(location.href));}
-function clearGoogleCookies(){
+function clearGoogleStorage(){
+  try {localStorage.removeItem("_gcl_ls");} catch { /* Storage may be unavailable. */ }
   // Only our Google measurement cookies. Shopify consent cookies are never edited.
   for(const part of document.cookie.split(";")){
     const name=part.trim().split("=")[0];if(!/^_gcl_[a-z0-9_]+$/.test(name))continue;
@@ -30,15 +32,25 @@ function clearGoogleCookies(){
       document.cookie=`${name}=; Max-Age=0; Path=/; Secure; SameSite=Lax${domain}`;
   }
 }
+function denyAttribution(){
+  // Only discard our unconsumed queue. Leave a running vendor's queue intact.
+  if(!vendorLoaded&&Array.isArray(window.dataLayer))window.dataLayer.length=0;
+  google("consent","update",DENIED);
+}
 function leave(url=location.href){
   if(leaving)return;leaving=true;
-  google("consent","update",DENIED);
-  if(url===location.href)location.reload();else location.assign(url);
+  denyAttribution();
+  if(url===location.href)refreshNativeConsent();else location.assign(url);
 }
 export function syncAttribution(){
   if(typeof window==="undefined"||leaving)return;
+  if(nativeConsentInvalidated()){
+    // Dispose pending grants/config before a delayed vendor loader can drain them.
+    denyAttribution();
+    return; // Resume/reload is handled at document or shopping boundaries.
+  }
   if(!permitted()){
-    if(loaded||nativeConsentReady()||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true)clearGoogleCookies();
+    if(loaded||nativeConsentReady()||(navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true)clearGoogleStorage();
     if(loaded)leave();
     return;
   }
@@ -73,7 +85,7 @@ export function syncAttribution(){
   ready=new Promise(resolve=>{
     const script=document.createElement("script");script.async=true;script.referrerPolicy="no-referrer";
     script.src=`https://www.googletagmanager.com/gtag/js?id=${ADS_TAG}`;
-    script.onload=()=>google("get",ADS_TAG,"gclid",()=>resolve());script.onerror=()=>resolve();document.head.appendChild(script);
+    script.onload=()=>{vendorLoaded=true;if(permitted())google("get",ADS_TAG,"gclid",()=>resolve());else resolve();};script.onerror=()=>resolve();document.head.appendChild(script);
     // Checkout must remain available when an extension blocks the tag.
     setTimeout(resolve,1500);
   });
@@ -100,7 +112,7 @@ export function installAttributionGuards(){
   }
   const recheck=()=>syncAttribution();
   for(const event of ["popstate","hashchange","pageshow","focus"]){window.addEventListener(event,recheck);cleanup.push(()=>window.removeEventListener(event,recheck));}
-  for(const event of ["consentTrackingApiLoaded","visitorConsentCollected"]){document.addEventListener(event,recheck);cleanup.push(()=>document.removeEventListener(event,recheck));}
+  for(const event of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED]){document.addEventListener(event,recheck);cleanup.push(()=>document.removeEventListener(event,recheck));}
   syncAttribution();
   return ()=>cleanup.reverse().forEach(fn=>fn());
 }

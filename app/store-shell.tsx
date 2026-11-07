@@ -14,7 +14,7 @@ import { isComingSoon } from "@/lib/commerce-policy";
 import { DEFAULT_SUPPORT_EMAIL } from "@/lib/orders/emails/format";
 import { STORE_POLICY_LINKS } from "@/lib/store-policies";
 import { GoogleAttribution } from "./google-attribution";
-import { nativeConsent, type VisitorConsent } from "@/lib/shopify-consent";
+import { nativeConsent, nativeConsentRevision, holdNativeRefreshForCart, NATIVE_CONSENT_INVALIDATED, NATIVE_CONSENT_RELOADING, type VisitorConsent } from "@/lib/shopify-consent";
 import { attributionReady, needsCheckoutReview, validateNativeCheckoutUrl } from "@/lib/google-attribution";
 import { StorefrontMetaPixel } from "./meta-pixel";
 import { trackCartAddition } from "@/lib/meta-pixel";
@@ -79,15 +79,27 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     setHydrated(true);
   },[mode]);
   useEffect(()=>{if(hydrated&&mode==="preview")try{localStorage.setItem("iqon-store-bag-v2",JSON.stringify(cart));}catch{}},[cart,hydrated,mode]);
-  useEffect(()=>{setBag(false);setSearch(false);},[pathname]);
+  useEffect(()=>{
+    // Preserve only the drawer's UI across a native freshness reload. This holds
+    // no consent/cart payload, and Next's own history state is left intact.
+    const reopen=history.state?.iqonReopenBag===true;
+    if(reopen){const state={...history.state};delete state.iqonReopenBag;history.replaceState(state,"");}
+    setBag(reopen);setSearch(false);
+  },[pathname]);
+  useEffect(()=>{
+    const remember=()=>{if(bag)history.replaceState({...history.state,iqonReopenBag:true},"");};
+    document.addEventListener(NATIVE_CONSENT_RELOADING,remember);
+    return ()=>document.removeEventListener(NATIVE_CONSENT_RELOADING,remember);
+  },[bag]);
   const subtotal=useMemo(()=>live?shopSubtotal:cart.reduce((sum,item)=>{const p=findProduct(item.id);return sum+(p?unitPrice(p,item.purchase)*item.quantity:0);},0),[cart,products,live,shopSubtotal]);
   const count=cart.reduce((sum,item)=>sum+item.quantity,0);
   const activeBundleNudge=cartBundleNudge({cart,mode,discountCodes});
   const transact=async(input:Record<string,unknown>)=>{
     if(lock.current||!hydrated)return false;
+    const releaseRefresh=holdNativeRefreshForCart();
     lock.current=true;cartRevision.current++;setRevision(n=>n+1);setBusy(true);setError("");
     try {return await requestCart(input);}catch(e){setError(e instanceof Error?e.message:"We couldn’t update your bag. Please try again.");return false;}
-    finally{lock.current=false;setBusy(false);}
+    finally{lock.current=false;setBusy(false);releaseRefresh();}
   };
   const applyDiscounts=async(codes:string[])=>!!(await transact({action:"discount",discountCodes:codes}));
   // Every new line is a one time purchase: no selling plan is ever sent.
@@ -109,10 +121,10 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     setCart(current=>current.map(i=>lineKey(i)===key?{...i,quantity:Math.min(20,Math.max(0,Math.floor(quantity)))}:i).filter(i=>i.quantity>0));
   };
   const prepareCheckout=useCallback(async(visitorConsent:VisitorConsent,signal:AbortSignal)=>{
-    const version=cartRevision.current;
+    const version=cartRevision.current,consentVersion=nativeConsentRevision();
     const response=await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({visitorConsent}),signal:AbortSignal.any([signal,AbortSignal.timeout(15000)])});
     const data=await response.json();
-    if(signal.aborted||version!==cartRevision.current)throw new Error("Your bag changed. Please try again.");
+    if(signal.aborted||version!==cartRevision.current||consentVersion!==nativeConsentRevision())throw new Error("Your bag changed. Please try again.");
     if(data.cart)applySnapshot(data.cart);
     if(!response.ok){
       const message=data.error||"Checkout is temporarily unavailable.";
@@ -120,7 +132,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
       throw new Error(message);
     }
     await attributionReady();
-    if(signal.aborted||version!==cartRevision.current||JSON.stringify(visitorConsent)!==JSON.stringify(nativeConsent()))throw new Error("Your preferences or bag changed. Please try again.");
+    if(signal.aborted||version!==cartRevision.current||consentVersion!==nativeConsentRevision()||JSON.stringify(visitorConsent)!==JSON.stringify(nativeConsent()))throw new Error("Your preferences or bag changed. Please try again.");
     return validateNativeCheckoutUrl(data.checkoutUrl);
   },[applySnapshot]);
   const checkoutCurrent=(revision:number)=>revision===cartRevision.current&&!lock.current;
@@ -204,36 +216,39 @@ function Footer(){const {mode,currency,department}=useStore();return <footer cla
 export function CheckoutLink({active,children}:{active:boolean;children:ReactNode}){
   const {prepareCheckout,cartRevision,checkoutCurrent,busy,ready}=useStore();
   const [generation,refresh]=useState(0);
-  const [prepared,setPrepared]=useState<{url:string;consent:VisitorConsent;revision:number;key:string}|null>(null);
+  const [prepared,setPrepared]=useState<{url:string;consent:VisitorConsent;consentVersion:number;revision:number;key:string}|null>(null);
   const [failure,setFailure]=useState<{message:string;key:string}|null>(null);
+  const preparation=useRef<AbortController|null>(null);
+  const anchor=useRef<HTMLAnchorElement|null>(null);
   const key=`${cartRevision}:${generation}:${active}:${busy}:${ready}`;
   useEffect(()=>{
-    const invalidate=()=>{setPrepared(null);refresh(n=>n+1);};
-    for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.addEventListener(name,invalidate);
+    const invalidate=()=>{preparation.current?.abort();anchor.current?.removeAttribute("href");setPrepared(null);refresh(n=>n+1);};
+    for(const name of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED])document.addEventListener(name,invalidate);
     window.addEventListener("focus",invalidate);
     window.addEventListener("pageshow",invalidate);
     return ()=>{
-      for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.removeEventListener(name,invalidate);
+      for(const name of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED])document.removeEventListener(name,invalidate);
       window.removeEventListener("focus",invalidate);window.removeEventListener("pageshow",invalidate);
     };
   },[]);
   useEffect(()=>{
     if(!active||busy||!ready)return;
-    const controller=new AbortController(),consent=nativeConsent();
+    const controller=new AbortController(),consent=nativeConsent(),consentVersion=nativeConsentRevision();
+    preparation.current=controller;
     void prepareCheckout(consent,controller.signal).then(url=>{
-      if(!controller.signal.aborted)setPrepared({url,consent,revision:cartRevision,key});
+      if(!controller.signal.aborted&&consentVersion===nativeConsentRevision())setPrepared({url,consent,consentVersion,revision:cartRevision,key});
     }).catch(error=>{if(!controller.signal.aborted)setFailure({message:error instanceof Error?error.message:"Checkout is temporarily unavailable.",key});});
     return ()=>controller.abort();
   },[active,busy,ready,cartRevision,key,prepareCheckout]);
   const valid=!!prepared&&prepared.key===key&&!busy&&ready&&prepared.revision===cartRevision;
   const message=failure?.key===key?failure.message:"";
   const guard=(event:SyntheticEvent<HTMLAnchorElement>)=>{
-    if(!prepared||!checkoutCurrent(prepared.revision)||JSON.stringify(prepared.consent)!==JSON.stringify(nativeConsent())){
+    if(!prepared||prepared.consentVersion!==nativeConsentRevision()||!checkoutCurrent(prepared.revision)||JSON.stringify(prepared.consent)!==JSON.stringify(nativeConsent())){
       // Clear the DOM href before Google's pointer listener sees a stale URL.
       event.currentTarget.removeAttribute("href");event.preventDefault();event.stopPropagation();setPrepared(null);refresh(n=>n+1);
     }
   };
   if(!valid)return <>{message&&<p role="alert" className="commerce-message">{message}</p>}<button className="button button-dark full-width" disabled={!message} onClick={()=>refresh(n=>n+1)}>{message?"Retry checkout":"Preparing checkout…"}</button></>;
-  return <a className="button button-dark full-width" href={needsCheckoutReview()?"/checkout":prepared.url} referrerPolicy="no-referrer"
+  return <a ref={anchor} className="button button-dark full-width" href={needsCheckoutReview()?"/checkout":prepared.url} referrerPolicy="no-referrer"
     onPointerDownCapture={guard} onKeyDownCapture={guard} onClick={guard} onAuxClick={guard} onContextMenu={guard}>{children}</a>;
 }
