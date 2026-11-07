@@ -21,9 +21,17 @@ html:has(.product-page.purchase-first){scroll-padding-bottom:104px}
  .product-page.purchase-first .product-detail>.purchase-panel-summary{grid-row:1}
  .product-page.purchase-first .product-detail>.purchase-panel-info{grid-row:2}
  .product-page.purchase-first .product-detail>.purchase-panel-buy{grid-row:3}
- /* The product notes and the purchase controls are separate grid items, so their adjacent
-    margins no longer collapse. Drop the first control's top margin to keep today's spacing. */
- .product-page.purchase-first .product-detail>.purchase-panel-buy>:first-child{margin-top:0}
+ /* Separate grid items cannot collapse adjacent margins. Overlap only the smaller of
+    the original trailing/leading margins; skip the hidden format block. Keep the
+    remaining 6px for a 24px variant picker after 18px essentials, and retain the full
+    control margin on generic products with no preceding notes or empty size line. */
+ .product-page.purchase-first .product-detail{--purchase-trailing-margin:0px}
+ .product-page.purchase-first .product-detail:has(>.purchase-panel-info:empty):has(>.purchase-panel-summary .product-size:empty){--purchase-trailing-margin:12px}
+ .product-page.purchase-first .product-detail:has(>.purchase-panel-info>.product-essentials){--purchase-trailing-margin:18px}
+ .product-page.purchase-first .purchase-panel-buy:has(>.product-purchase-choices:nth-child(1 of :not(.product-format))){--purchase-leading-margin:4px}
+ .product-page.purchase-first .purchase-panel-buy:has(>.add-to-bag-row:nth-child(1 of :not(.product-format))){--purchase-leading-margin:12px}
+ .product-page.purchase-first .purchase-panel-buy:has(>.product-variant-picker:first-child){--purchase-leading-margin:1.5rem}
+ .product-page.purchase-first .product-detail>.purchase-panel-buy{margin-top:calc(-1 * min(var(--purchase-trailing-margin),var(--purchase-leading-margin,0px)))}
  .product-page.purchase-first .product-detail>.purchase-panel-details{grid-row:4}
 }
 @media(max-width:760px){
