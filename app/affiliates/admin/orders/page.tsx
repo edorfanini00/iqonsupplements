@@ -1,4 +1,5 @@
 "use client";
+import {ShopifyOrders} from "@/components/affiliates/ShopifyOrders";
 import {providerMutationFetch} from '@/lib/affiliates/provider-mutation-fetch';
 import { useLatestRead } from "@/lib/affiliates/use-latest-read";
 
@@ -112,6 +113,7 @@ function AdminOrdersPageInner() {
   const initialPreset: Preset =
     isPresetRange(rangeParam) || isMonthToken(rangeParam) ? rangeParam : "30d";
 
+  const [source,setSource]=useState<"peptides"|"shopify">(searchParams.get("source")==="shopify"?"shopify":"peptides");
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [affiliateOptions, setAffiliateOptions] = useState<AffiliateOption[]>([]);
   const [truncated, setTruncated] = useState(false);
@@ -303,6 +305,8 @@ function AdminOrdersPageInner() {
     return { revenue, fromAffiliates, count: filtered.length };
   }, [filtered]);
 
+  const sourcePicker=<div className="flex flex-wrap gap-2 mb-6" aria-label="Order source">{([['peptides','Peptides · WooCommerce'],['shopify','Supplements · Shopify']] as const).map(([id,label])=><button key={id} aria-pressed={source===id} onClick={()=>setSource(id)} className={`rounded-full border px-4 py-2 text-xs ${source===id?'bg-[#12201C] text-white':'bg-white/50'}`}>{label}</button>)}</div>;
+  if(source==='shopify')return <><PageHeader eyebrow="Orders" title="Shopify orders" description="IQON Daily store orders, separate from peptide sales and affiliate commissions." actions={<RangePicker value={preset} onChange={setPreset}/>}/>{sourcePicker}<ShopifyOrders preset={preset}/></>;
   return (
     <>
       {readError && <p role="alert">{readError} <button type="button" onClick={() => load(preset)}>Retry</button></p>}
@@ -313,6 +317,7 @@ function AdminOrdersPageInner() {
         actions={<RangePicker value={preset} onChange={setPreset} />}
       />
 
+      {sourcePicker}
       {/* Summary line */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
         <div className="glass-surface rounded-lg p-5">
