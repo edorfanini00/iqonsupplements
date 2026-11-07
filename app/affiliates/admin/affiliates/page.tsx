@@ -56,6 +56,8 @@ interface AffiliateRow {
   commissionRate: number;
   recurringCommissionRate: number;
   couponRate: number;
+  supplementsCommissionRate: number | null;
+  skincareCommissionRate: number | null;
   referrerId: string | null;
   referralCommissionRate: number | null;
   bonusThreshold: number | null;
@@ -351,6 +353,11 @@ function AffiliateDetailDrawer({
     affiliate.recurringCommissionRate
   );
   const [couponRate, setCouponRate] = useState(affiliate.couponRate);
+  const [bodyRateChanged,setBodyRateChanged] = useState(false);
+  const [bodyCommissionRate, setBodyCommissionRate] = useState<string>(
+    affiliate.supplementsCommissionRate != null ? String(affiliate.supplementsCommissionRate) :
+    affiliate.skincareCommissionRate != null ? String(affiliate.skincareCommissionRate) : ""
+  );
   const [promoCode, setPromoCode] = useState(affiliate.promoCode);
   const [couponWarning, setCouponWarning] = useState<string | null>(null);
   const [referrerId, setReferrerId] = useState(affiliate.referrerId ?? "");
@@ -407,14 +414,18 @@ function AffiliateDetailDrawer({
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          bankInfo: bank,
+          bankInfo: affiliate.bankInfo || Object.values(bank).some(Boolean) ? bank : undefined,
           status,
           commissionRate,
           recurringCommissionRate,
           couponRate,
+          ...(bodyRateChanged ? {
+            supplementsCommissionRate: bodyCommissionRate !== "" ? Number(bodyCommissionRate) : null,
+            skincareCommissionRate: bodyCommissionRate !== "" ? Number(bodyCommissionRate) : null,
+          } : {}),
           promoCode: newCode,
           referrerId: referrerId || null,
-          referralCommissionRate: referralRate,
+          referralCommissionRate: referralRate !== (affiliate.referralCommissionRate ?? 5) || referrerId !== (affiliate.referrerId ?? "") ? referralRate : affiliate.referralCommissionRate,
           bonusThreshold: Number(bonusThreshold) > 0 ? Number(bonusThreshold) : null,
           bonusRate: Number(bonusThreshold) > 0 ? Number(bonusRate) : null,
         }),
@@ -726,6 +737,27 @@ function AffiliateDetailDrawer({
                   value={recurringCommissionRate}
                   onChange={(e) =>
                     setRecurringCommissionRate(Number(e.target.value) || 0)
+                  }
+                  className={bankInputClass}
+                />
+              </label>
+            </div>
+            <p className="text-[10px] uppercase tracking-[0.18em] font-sans text-[#64717a] mt-6 mb-2">
+              Body rates (Shopify)
+            </p>
+            <div className="grid grid-cols-2 gap-x-5 gap-y-2">
+              <label className="block">
+                <span className="text-xs text-[#64717a]">Supp &amp; Skincare %</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={bodyCommissionRate}
+                  onChange={(e) => {setBodyCommissionRate(e.target.value);setBodyRateChanged(true);}}
+                  placeholder={
+                    affiliate.supplementsCommissionRate != null ? String(affiliate.supplementsCommissionRate) :
+                    affiliate.skincareCommissionRate != null ? String(affiliate.skincareCommissionRate) : "Not set (—)"
                   }
                   className={bankInputClass}
                 />

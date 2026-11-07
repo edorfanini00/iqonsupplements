@@ -8,7 +8,7 @@ import {resolveRange,rangeLabel} from '@/lib/affiliates/time-series';
 
 type Metric={state:'available'|'unavailable';reason:string|null;currencies:null|Array<{currency:string;amount:string}>;orderCount:number|null};
 type Category={attributedRevenue:Metric;storeRevenue?:Metric};
-type Report={version:1;provider:'shopify';period:{start:string;end:string;timezone:string};coverage?:{complete:boolean;reason:string|null;completeThrough?:string|null};categories:Record<'supplements'|'skincare'|'unclassified',Category>};
+type Report={commissions?:Record<string,{state:string;pendingOrderCount:number;configuredOrderCount?:number;earned?:{currency:string;amount:string}[]}>;version:1;provider:'shopify';period:{start:string;end:string;timezone:string};coverage?:{complete:boolean;reason:string|null;completeThrough?:string|null};categories:Record<'supplements'|'skincare'|'unclassified',Category>};
 const categories=['supplements','skincare','unclassified'] as const;
 const names={supplements:'Supplements',skincare:'Skincare',unclassified:'Unclassified'};
 function metricValid(value:unknown):value is Metric {
@@ -62,7 +62,7 @@ export function CategoryRevenue({preset,audience}:{preset:string;audience:'admin
    <div className={`grid grid-cols-1 ${audience==='admin'?'md:grid-cols-2':'md:grid-cols-3'} gap-3 md:gap-4`}>
     {categories.map(k=><div key={k} className="contents">
      {audience==='admin'&&<StatCard icon={ShoppingBag} label={`${names[k]} store revenue`} value={loading?'—':valueOf(report?.categories[k].storeRevenue)} hint={loading?'Loading selected period…':hintOf(report?.categories[k].storeRevenue,false)}/>}
-     <StatCard icon={DollarSign} label={`${names[k]} attributed revenue`} value={loading?'—':valueOf(report?.categories[k].attributedRevenue)} hint={loading?'Loading selected period…':hintOf(report?.categories[k].attributedRevenue,true)}/>
+     <StatCard icon={DollarSign} label={`${names[k]} attributed revenue`} value={loading?'—':valueOf(report?.categories[k].attributedRevenue)} hint={loading?'Loading selected period…':`${hintOf(report?.categories[k].attributedRevenue,true)}${report?.commissions?.[k]?.pendingOrderCount ? (report?.commissions?.[k]?.configuredOrderCount ? ' · Some commissions pending configuration' : ' · Commission unconfigured — sales recorded') : ''}${report?.commissions?.[k]?.earned?.length ? ' · Commission: '+report.commissions[k].earned!.map(m=>`${m.currency} ${m.amount}`).join(' · ') : ''}`}/>
     </div>)}
    </div>
    {audience==='admin'&&report?.coverage&&!report.coverage.complete&&<p className="text-xs text-[#64717a] mt-3">Coverage: {report.coverage.reason?.replaceAll('_',' ').toLowerCase()??'incomplete'}{report.coverage.completeThrough?` · observed through ${report.coverage.completeThrough}`:''}.</p>}
