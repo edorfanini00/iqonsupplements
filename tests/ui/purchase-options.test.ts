@@ -11,7 +11,7 @@ const store=vi.hoisted(()=>({add:vi.fn(),products:[] as unknown[],mode:"live",bu
 const quantity=vi.hoisted(()=>({set:undefined as undefined|((n:number)=>void)}));
 vi.mock("../../app/store-shell",()=>({useStore:()=>store,CartConnectionNotice:()=>null,
   Quantity:({value,setValue}:{value:number;setValue:(n:number)=>void})=>{quantity.set=setValue;return React.createElement("output",{"aria-label":"Quantity"},value);}}));
-vi.mock("../../app/product-gallery",()=>({ProductGallery:()=>null}));
+vi.mock("../../app/product-gallery",()=>({ProductGallery:()=>React.createElement("div",{className:"product-visual-gallery"})}));
 vi.mock("../../app/product-story",()=>({ProductStory:()=>null}));
 vi.mock("../../app/product-navigation",()=>({ProductSwitcher:()=>null}));
 vi.mock("../../app/product-rail",()=>({ProductRail:()=>null}));
@@ -107,14 +107,48 @@ it("variants: switching options keeps one time pricing from the selected variant
   expect(store.add).toHaveBeenLastCalledWith(product.id,1,product.variants[1].id);
 });
 
-for(const handle of BUNDLE_ELIGIBLE_HANDLES)it(`${handle}: purchase-first layout and all approved bundle choices`,()=>{
+for(const handle of BUNDLE_ELIGIBLE_HANDLES)it(`${handle}: gallery-first layout and all approved bundle choices`,()=>{
  const product={...products.find(p=>p.id===handle)!,available:true,variants:[variant]};
  const {container}=render(React.createElement(ProductPage,{product}));
- expect(container.querySelector(".purchase-first #overview>:first-child")?.className).toBe("purchase-panel");
+ const overview=container.querySelector(".purchase-first #overview")!;
+ expect([...overview.children].map(el=>el.className)).toEqual([
+  "product-visual-gallery",
+  "purchase-panel purchase-panel-summary",
+  "purchase-panel purchase-panel-buy",
+  "purchase-panel purchase-panel-info",
+  "purchase-panel purchase-panel-details",
+ ]);
+ // The gallery precedes every purchase control in the rendered DOM, so keyboard order matches.
+ const gallery=overview.querySelector(".product-visual-gallery")!;
+ const controls=overview.querySelectorAll(".bundle-choices [role=radio],.add-to-bag-row button,.product-variant-picker select");
+ expect(controls.length).toBeGreaterThan(0);
+ for(const control of controls)expect(gallery.compareDocumentPosition(control)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
  expect(screen.getAllByRole("radio")).toHaveLength(3);
  fireEvent.click(screen.getByRole("radio",{name:/^Buy 2/}));
  fireEvent.click(addButtons()[0]);
  expect(store.add).toHaveBeenLastCalledWith(handle,2,variant.id);
+});
+it("orders the phone page gallery, name and price, purchase controls, product notes, then details",()=>{
+ const {container}=render(React.createElement(ProductPage,{product:creatine}));
+ const overview=container.querySelector(".purchase-first #overview")!;
+ const gallery=overview.querySelector(".product-visual-gallery")!;
+ const summary=overview.querySelector(".purchase-panel-summary")!;
+ const buy=overview.querySelector(".purchase-panel-buy")!;
+ const info=overview.querySelector(".purchase-panel-info")!;
+ const details=overview.querySelector(".purchase-panel-details")!;
+ expect(summary.textContent).toContain("Creatine Monohydrate");
+ expect(summary.textContent).toContain("$48.97");
+ expect(buy.querySelector(".bundle-choices")).toBeTruthy();
+ expect(buy.querySelector(".add-to-bag-row")).toBeTruthy();
+ expect(buy.querySelector(".purchase-assurance")).toBeTruthy();
+ expect(info.querySelector(".product-summary-description")).toBeTruthy();
+ expect(info.querySelector(".product-highlights")).toBeTruthy();
+ expect(info.querySelector(".product-essentials")).toBeTruthy();
+ expect(details.querySelector(".product-accordion")).toBeTruthy();
+ const sequence=[gallery,summary,buy,info,details];
+ for(let i=1;i<sequence.length;i++)expect(sequence[i-1].compareDocumentPosition(sequence[i])&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ // Product notes follow the purchase controls, not the title.
+ expect(buy.compareDocumentPosition(info.querySelector(".product-summary-description")!)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 it("does not offer quantity choices for sold-out products or variants",()=>{
  for(const product of [{...creatine,available:false},{...creatine,variants:[{...variant,available:false}]}]){

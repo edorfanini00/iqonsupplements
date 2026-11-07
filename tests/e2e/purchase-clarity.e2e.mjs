@@ -57,15 +57,27 @@ async function rowFits(page,selector='.bag-sheet .cart-line'){
 }
 for(const width of widths){
  for(const handle of handles){
-  test(`${width} ${handle}: purchase precedes gallery, keyboard order, policy links, images and totals`,async()=>{
+  test(`${width} ${handle}: gallery precedes purchase, keyboard order, policy links, images and totals`,async()=>{
    const {page,context}=await open(width,handle);
    try{
     const structure=await page.locator('#overview').evaluate(el=>[...el.children].map(e=>e.className));
-    assert.match(structure[0],/purchase-panel/);assert.match(structure[1],/product-visual-gallery/);assert.match(structure[2],/purchase-panel-details/);
+    assert.match(structure[0],/product-visual-gallery/);
+    assert.match(structure[1],/purchase-panel-summary/);
+    assert.match(structure[2],/purchase-panel-buy/);
+    assert.match(structure[3],/purchase-panel-info/);
+    assert.match(structure[4],/purchase-panel-details/);
     const gallery=await page.locator('.product-visual-gallery').boundingBox();
+    const priceBox=await page.locator('.product-title-row>span').boundingBox();
     const cta=await page.locator('.add-to-bag-row').boundingBox();
-    if(width<761)assert.ok(cta.y+cta.height<=gallery.y,'phone purchase action must precede gallery');
-    else assert.ok(gallery.x<cta.x,'desktop keeps gallery on left');
+    const notes=await page.locator('.product-summary-description').boundingBox();
+    if(width<761){
+     assert.ok(gallery.y<priceBox.y,'phone gallery precedes the price');
+     assert.ok(priceBox.y<cta.y,'phone price precedes the purchase action');
+     assert.ok(cta.y+cta.height<=notes.y,'phone purchase action precedes the product notes');
+    }else{
+     assert.ok(gallery.x<cta.x,'desktop keeps gallery on left');
+     assert.ok(notes.y<cta.y,'desktop keeps the product notes above the purchase action');
+    }
     assert.deepEqual(await page.locator('.purchase-assurance a').evaluateAll(as=>as.map(a=>a.getAttribute('href'))),['/policies/shipping-policy','/policies/refund-policy']);
     assert.doesNotMatch(await page.locator('#overview').innerText(),/subscription|per month|renews/i);
     assert.equal(await page.locator('#reviews .review-stars').count(),0);
@@ -110,18 +122,18 @@ for(const width of widths){
     }
     assert.ok(foundDetails,'keyboard reaches details');
     const zones=trace.map(t=>t.zone).filter((z,i,a)=>i===0||z!==a[i-1]);
-    assert.deepEqual(zones,['purchase','gallery','details']);
+    assert.deepEqual(zones,['gallery','purchase','details']);
     fs.writeFileSync(path.join(shots,`${width}_${handle}_focus.json`),JSON.stringify(trace,null,2));
     await page.screenshot({path:path.join(shots,`${width}_${handle}_focus.png`)});
     await checkBundleKeyboard(page,{loaded:width===390,evidence:path.join(shots,`${width}_${handle}_keyboard.json`)});
    }finally{await context.close()}
   });
  }
- test(`${width}: additional eligible product uses purchase-first DOM`,async()=>{
+ test(`${width}: additional eligible product uses gallery-first DOM`,async()=>{
   const {page,context}=await open(width,'collagen-peptides-chocolate');try{
    assert.equal(await page.locator('.purchase-first').count(),1);
    assert.equal(await page.getByRole('radio').count(),3);
-   assert.match(await page.locator('#overview> :first-child').getAttribute('class'),/purchase-panel/);
+   assert.match(await page.locator('#overview> :first-child').getAttribute('class'),/product-visual-gallery/);
    await page.screenshot({path:path.join(shots,`${width}_control.png`)});
   }finally{await context.close()}
  });
