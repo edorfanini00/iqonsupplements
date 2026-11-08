@@ -59,3 +59,14 @@ it('keeps a filter intersection distinct from an empty or unavailable catalog',(
  expect(screen.getByText('We’ll be back shortly.')).toBeTruthy();expect(screen.queryByRole('button',{name:'Show all products'})).toBeNull();
  state.mode='live';view.rerender(React.createElement(CollectionPage,{category:'supplements'}));expect(screen.getByText('More to come.')).toBeTruthy();
 });
+it('uses the existing introduction for focus copy and places both guides after products in DOM order',()=>{
+ setup({initialFocus:'training'});
+ const intro=screen.getByText('Creatine for repeated, high-intensity efforts.');
+ expect(intro.parentElement?.classList.contains('catalog-heading')).toBe(true);
+ const product=screen.getByTestId('product');
+ for(const name of ['Find a format that fits','Read the label with confidence']){
+  const link=screen.getByRole('link',{name});
+  expect(product.compareDocumentPosition(link)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(link.closest('.catalog-selection')).toBeNull();
+ }
+});

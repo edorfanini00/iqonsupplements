@@ -1,0 +1,13 @@
+{
+  "baseline": "51b384407d033c4c0c7072d3a958413cd0be8acf",
+  "priorEvidenceFiles": 4304,
+  "priorEvidenceChanges": [],
+  "baselineSourceFiles": 859,
+  "sourceChanges": [
+    "app/collection-focus.css",
+    "app/collection-page.tsx",
+    "tests/e2e/collection-focus.e2e.mjs",
+    "tests/ui/collection-focus.test.ts"
+  ],
+  "unchangedSourceFiles": 855
+}
