@@ -1,0 +1,151 @@
+{
+  "application_head": "4b5dd2a1fb3b9c28872fb10c381d541f8a86be21",
+  "main": "a4c4b12d8d29608adecfea48609a00db298b7ff7",
+  "native_browser_and_worker_test_head": "c75345e",
+  "native_source_identical_at_final_head": true,
+  "note": "All final UI/media/geometry/SEO/core/root/build/types results use final application head. Native/browser/account checks ran on the merge; subsequent app change is only opening-highlight copy. Suite counts overlap. Do not sum reruns.",
+  "results": {
+    "units-content-final": {
+      "log": "logs/units-content-final.log",
+      "tests": 63,
+      "pass": 63,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "google": {
+      "log": "logs/google.log",
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "freshness": {
+      "log": "logs/freshness.log",
+      "tests": 15,
+      "pass": 15,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "persistence": {
+      "log": "logs/persistence.log",
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "visual-final": {
+      "log": "logs/visual-final.log",
+      "tests": 43,
+      "pass": 43,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "commerce-final": {
+      "log": "logs/commerce-final.log",
+      "tests": 33,
+      "pass": 33,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "geometry-final": {
+      "log": "logs/geometry-final.log",
+      "tests": 60,
+      "pass": 60,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "seo-final": {
+      "log": "logs/seo-final.log",
+      "tests": 26,
+      "pass": 26,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "root-final": {
+      "log": "logs/root-final.log",
+      "tests": 60,
+      "pass": 58,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "account-units": {
+      "log": "logs/account-units.log",
+      "tests": 69,
+      "pass": 67,
+      "fail": 0,
+      "cancelled": 2,
+      "skipped": 0,
+      "todo": 0
+    },
+    "account-browser": {
+      "log": "logs/account-browser.log",
+      "tests": 16,
+      "pass": 15,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "newmain-root": {
+      "log": "logs/newmain-root.log",
+      "tests": 46,
+      "pass": 39,
+      "fail": 7,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "newmain-account-units": {
+      "log": "logs/newmain-account-units.log",
+      "tests": 69,
+      "pass": 67,
+      "fail": 0,
+      "cancelled": 2,
+      "skipped": 0,
+      "todo": 0
+    },
+    "newmain-account-browser": {
+      "log": "logs/newmain-account-browser.log",
+      "tests": 16,
+      "pass": 15,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "newmain-seo": {
+      "log": "logs/newmain-seo.log",
+      "tests": 26,
+      "pass": 24,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "storefront-ui-content-final": {
+      "log": "logs/storefront-ui-content-final.log",
+      "test_files": 9,
+      "tests": 72,
+      "pass": 72,
+      "fail": 0
+    }
+  }
+}
