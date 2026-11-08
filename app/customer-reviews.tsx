@@ -1,7 +1,6 @@
 import { ArrowUpRight, Star } from "lucide-react";
 import { customerReviews, type CustomerReview } from "@/lib/reviews";
 import { products, type Category } from "@/lib/catalog";
-import { previewReviewSummaries } from "@/lib/review-design-preview";
 
 function RatingStars({rating,sample=false}:{rating?:number;sample?:boolean}) {
  const value=Math.max(0,Math.min(5,rating??0));
@@ -10,16 +9,14 @@ function RatingStars({rating,sample=false}:{rating?:number;sample?:boolean}) {
  </span>;
 }
 
-function reviewSummary(reviews:CustomerReview[],productId?:string,designPreview=false) {
- const sample=designPreview&&reviews.length===0&&productId?previewReviewSummaries[productId]:undefined;
- const average=reviews.length?reviews.reduce((sum,review)=>sum+review.rating,0)/reviews.length:sample?.rating;
- const count=reviews.length||sample?.count||0;
- return {average,isSample:!!sample,countLabel:`${count}${sample?"+":""} ${count===1?"review":"reviews"}`};
+function reviewSummary(reviews:CustomerReview[]) {
+ const average=reviews.length?reviews.reduce((sum,review)=>sum+review.rating,0)/reviews.length:undefined;
+ return {average,isSample:false,countLabel:`${reviews.length} ${reviews.length===1?"review":"reviews"}`};
 }
 
-export function ProductReviewLink({productId,designPreview=false}:{productId:string;designPreview?:boolean}) {
+export function ProductReviewLink({productId}:{productId:string;designPreview?:boolean}) {
  const reviews=customerReviews.filter(review=>review.productId===productId);
- const {average,isSample,countLabel}=reviewSummary(reviews,productId,designPreview);
+ const {average,isSample,countLabel}=reviewSummary(reviews);
  if(average===undefined)return null;
  return <a href="#reviews" className="product-review-link">
   <RatingStars rating={average} sample={isSample}/>
@@ -28,9 +25,10 @@ export function ProductReviewLink({productId,designPreview=false}:{productId:str
  </a>;
 }
 
-export function CustomerReviews({productId,productName,category,designPreview=false}:{productId?:string;productName?:string;category?:Category;designPreview?:boolean}) {
+export function CustomerReviews({productId,productName,category}:{productId?:string;productName?:string;category?:Category;designPreview?:boolean}) {
  const reviews=customerReviews.filter(r=>(!productId||r.productId===productId)&&(!category||products.some(p=>p.id===r.productId&&p.category===category)));
- const {average,isSample,countLabel}=reviewSummary(reviews,productId,designPreview);
+ const {average,isSample,countLabel}=reviewSummary(reviews);
+ if(!reviews.length)return <section className="customer-reviews reviews-compact section-pad" id="reviews" aria-label="Customer reviews"><h2>Customer reviews</h2><p>There are no customer reviews{productName?` for ${productName}`:""} yet.</p></section>;
  return <section className="customer-reviews section-pad" id="reviews" aria-labelledby="reviews-heading">
   <div className="section-heading">
    <div><p className="eyebrow">THE IQON COMMUNITY</p><h2 id="reviews-heading">Customer reviews.</h2></div>

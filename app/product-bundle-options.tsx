@@ -59,6 +59,6 @@ export function ProductBundleOptions({ quantity, setQuantity, price, currency, b
         <b>{money(option.unit, currency)}<small>each</small></b>
       </label>)}
     </RadioGroup>
-    {bundleEligible ? <p className="bundle-terms">Mix and match any eligible IQON supplements: every eligible item in your bag counts toward the bundle. Savings apply automatically in your bag and at checkout, and can’t be combined with discount codes.</p> : <p className="bundle-terms">This product is not part of the bundle offer. Each quantity is charged at the regular price.</p>}
+    {bundleEligible ? <p className="bundle-terms">Mix eligible supplements. Save 10% on 2 or 25% on 3 or more. Applied automatically in your bag and at checkout. Cannot be combined with discount codes.</p> : <p className="bundle-terms">This product is not part of the bundle offer. Each quantity is charged at the regular price.</p>}
   </div>;
 }

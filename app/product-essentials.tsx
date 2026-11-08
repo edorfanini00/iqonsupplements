@@ -1,10 +1,12 @@
 import { isComingSoon } from "@/lib/commerce-policy";
 import { money, type Product } from "@/lib/catalog";
+import { servingPrice, verifiedPackLabel, verifiedLabels } from "@/lib/verified-labels";
 import { productContent } from "@/lib/product-content";
 
 /** Only known, label-derived supply durations can produce a daily price. */
 export function dailyProductPrice(product: Product, price = product.price, currency = product.currency) {
   const days = productContent[product.id]?.supplyDays;
+  if (verifiedLabels[product.id] && !verifiedPackLabel(product)) return null;
   if (isComingSoon(product) || product.pricePending || !days || days <= 0 || !Number.isFinite(price) || price <= 0) return null;
   // A different pack or variant can have a different supply duration.
   if (product.variants && product.variants.length > 1) return null;
@@ -17,10 +19,14 @@ export function ProductEssentials({ product, price, currency }: {
   const content = productContent[product.id];
   if (!content?.essentials) return null;
   const dailyPrice = dailyProductPrice(product, price, currency);
+  const label = verifiedPackLabel(product);
+  if (verifiedLabels[product.id] && !label) return null;
+  const perServing = servingPrice(product, price, currency);
   return <div className="product-essentials">
-    <dl aria-label="The essentials">{content.essentials.map(item => <div key={item.label}>
+    <dl aria-label="The essentials">{(label ? [{label:"Serving size",value:label.serving},{label:"Per container",value:`${label.servings} servings`}] : content.essentials).map(item => <div key={item.label}>
       <dt>{item.label}</dt><dd>{item.value}</dd>
     </div>)}</dl>
-    {dailyPrice && <p><span>{dailyPrice} / day</span> at suggested use · {content.supplyDays}-day bottle</p>}
+    {perServing && <p><span>{perServing} / serving</span> at the single jar price{label?.durationNote && <> · {label.durationNote}</>}</p>}
+    {!perServing && dailyPrice && <p><span>{dailyPrice} / day</span> at suggested use · {content.supplyDays}-day bottle</p>}
   </div>;
 }

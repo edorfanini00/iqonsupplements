@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { verifiedPackLabel } from "@/lib/verified-labels";
 import { ArrowRight, ArrowUpRight, BookOpen, Pill, Clock3, Droplets, Dumbbell, FlaskConical, Layers2, Leaf, Ruler, Sparkles, Waves } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { type Product, productPrice } from "@/lib/catalog";
 import { productContent } from "@/lib/product-content";
 import { supplementDetails, supplementDisclaimer } from "@/lib/supplement-details";
+import { researchReading } from "@/lib/research-reading";
 import { supplementVisualContent } from "@/lib/supplement-visual-content";
 import { SupplementIngredientExplorer } from "./supplement-ingredient-explorer";
 import { SupplementDirections, SupplementFormula } from "./supplement-information";
@@ -16,6 +18,8 @@ export function SupplementProductStory({product:p,comparison}:{product:Product;c
   const details=supplementDetails[p.id];
   if(!visual||!copy||!details) return null;
   const research=copy.education;
+  const reading=researchReading[p.id];
+
   return <div className="product-experience supplement-pdp-story skin-visual-story">
     <nav className="pdp-section-nav" aria-label="Product information"><a href="#product-benefits">The benefits</a><a href="#product-formula">Inside the formula</a><a href="#product-routine">Your routine</a>{research&&<a href="#ingredient-science">The research</a>}<a href="#compare">Find your fit</a><a href="#product-questions">FAQs</a><a href="#reviews">Reviews</a></nav>
 
@@ -32,22 +36,24 @@ export function SupplementProductStory({product:p,comparison}:{product:Product;c
       <header className="skin-section-title"><p className="skin-kicker">INSIDE THE FORMULA</p><h2 id="formula-heading">{visual.formulaTitle}</h2></header>
       <SupplementIngredientExplorer key={p.id} ingredients={copy.ingredients!} visuals={visual.ingredients} facts={visual.facts}/>
       {visual.composition?<div className="supp-composition" aria-label="Formula composition"><div><p className="skin-kicker">READING THE FORMULA</p><h3>{visual.composition.total}</h3><p>{visual.composition.note}</p></div><div className="supp-composition-measure"><div><strong>{visual.composition.percent}%</strong><span>{visual.composition.label}</span></div><div className="supp-composition-track" aria-hidden="true"><span style={{width:`${visual.composition.percent}%`}}/></div><p>Proportion within the total</p></div></div>:copy.ingredients!.length>1&&<dl className="supp-fact-strip">{visual.facts.map(fact=><div key={fact.label}><dt>{fact.label}</dt><dd><strong>{fact.value}</strong><span>{fact.detail}</span></dd></div>)}</dl>}
-      <Accordion type="single" collapsible className="skin-formulation-accordion"><AccordionItem value="formula"><AccordionTrigger>Ingredients, listed amounts & allergen details</AccordionTrigger><AccordionContent><SupplementFormula details={details}/></AccordionContent></AccordionItem></Accordion>
+      <Accordion type="single" collapsible className="skin-formulation-accordion"><AccordionItem value="formula"><AccordionTrigger>Ingredients, listed amounts & allergen details</AccordionTrigger><AccordionContent><SupplementFormula details={details} productId={verifiedPackLabel(p)?p.id:undefined}/></AccordionContent></AccordionItem></Accordion>
     </section>
 
     <section id="product-routine" className="skin-story-section skin-story-routine" aria-labelledby="routine-heading">
       <header className="skin-application-heading"><div><p className="skin-kicker">YOUR DAILY ROUTINE</p><h2 id="routine-heading">{visual.routineTitle}</h2></div><span className="skin-timing-label"><Clock3 size={18} strokeWidth={1.2} aria-hidden="true"/>{visual.timing}</span></header>
       <div className="skin-application-board">
-        <figure className="skin-application-photo"><img src={p.image} alt={`${p.name}, IQON packaging`} width={320} height={400} loading="lazy" decoding="async"/><figcaption><strong>{p.name}</strong><span>{details.contents}</span></figcaption></figure>
+        <figure className="skin-application-photo"><img src={`/images/product-editorial/${p.id}.webp`} alt={`IQON ${p.name}, product editorial composition`} width={1122} height={1402} loading="lazy" decoding="async"/><figcaption><strong>{p.name}</strong><span>{details.contents}</span></figcaption></figure>
         <ol className="skin-application-steps">{copy.routine!.steps.map((step,i)=>{const Icon=icons[visual.stepIcons[i]];return <li key={step.title}><div className="skin-step-top"><span>0{i+1}</span><Icon size={38} strokeWidth={1} aria-hidden="true"/></div><h3>{step.title}</h3><p>{step.body}</p></li>;})}</ol>
       </div>
       <div className="skin-application-details"><p><strong>Keep in mind</strong>{visual.routineNote}</p><Accordion type="single" collapsible><AccordionItem value="directions"><AccordionTrigger>Read the complete directions & care</AccordionTrigger><AccordionContent><SupplementDirections details={details}/></AccordionContent></AccordionItem></Accordion></div>
     </section>
 
-    {research&&<section id="ingredient-science" className="skin-story-section supp-research" aria-labelledby="research-heading"><div className="supp-research-heading"><BookOpen size={31} strokeWidth={1.1} aria-hidden="true"/><p className="skin-kicker">{research.eyebrow}</p><h2 id="research-heading">{research.title}</h2></div><div className="supp-research-copy"><p>{research.body}</p><div className="supp-research-links">{research.sources.map(source=><a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer"><span>{source.label}</span><ArrowUpRight size={17} aria-hidden="true"/></a>)}</div><p className="supp-research-scope">{research.scope}</p></div></section>}
+    {research&&<section id="ingredient-science" className="skin-story-section supp-research" aria-labelledby="research-heading"><div className="supp-research-heading"><BookOpen size={31} strokeWidth={1.1} aria-hidden="true"/><p className="skin-kicker">{research.eyebrow}</p><h2 id="research-heading">{research.title}</h2></div><div className="supp-research-copy">{reading?<dl className="research-reading">{[{label:"What was studied",value:reading.studied},{label:"What was found",value:reading.finding},{label:"How it relates to this formula",value:reading.relevance},{label:"What it cannot tell us",value:reading.limitation}].map(item=><div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>:<p>{research.body}</p>}<div className="supp-research-links">{research.sources.map(source=><a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer"><span>{source.label}</span><ArrowUpRight size={17} aria-hidden="true"/></a>)}</div><p className="supp-research-scope">{research.scope}</p></div></section>}
+
+    <section className="skin-story-section product-quality-note" aria-labelledby="quality-heading"><h2 id="quality-heading">Made in the {details.country}.</h2><p>{p.name} comes in {details.contents}. Keep the jar for its label, storage instructions and batch details. For a question about your product, <Link href="/help">contact IQON</Link> with the product name and batch number.</p></section>
 
     <section id="compare" className="skin-story-section skin-story-compare" aria-labelledby="comparison-heading">
-      <div className="skin-routine-heading"><div><p className="skin-kicker">THE IQON SUPPLEMENT EDIT</p><h2 id="comparison-heading">Find the formula<br/>that fits your routine.</h2></div><div><p>Compare the focus, ingredients and daily format. A clearer choice starts with the details.</p><Link href="/collections/supplements" className="skin-story-link">Explore the collection <ArrowUpRight size={17}/></Link></div></div>
+      <div className="skin-routine-heading"><div><p className="skin-kicker">THE IQON SUPPLEMENT EDIT</p><h2 id="comparison-heading">Compare other<br/>IQON formulas.</h2></div><div><p>Explore the ingredients, format and price of other products in the collection.</p><Link href="/collections/supplements" className="skin-story-link">Explore the collection <ArrowUpRight size={17}/></Link></div></div>
       <p className="skin-compare-scroll-hint">Swipe to compare <ArrowRight size={14} aria-hidden="true"/></p>
       <div className="skin-compare-scroll" role="region" aria-label="Compare supplement formulas" tabIndex={0}>
         <table className="skin-compare-table"><caption className="sr-only">Compare {comparison.map(q=>q.name).join(", ")}</caption>
