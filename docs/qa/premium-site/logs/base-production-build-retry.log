@@ -1,0 +1,25 @@
+▲ Next.js 16.3.5 (webpack)
+✓ Running next.config.ts took 14ms
+
+  Creating an optimized production build ...
+  Using tsconfig file: tsconfig.next.json
+  Using tsconfig file: tsconfig.next.json
+  Using tsconfig file: tsconfig.next.json
+✓ Compiled successfully in 5.4s
+  Running TypeScript ...
+app/api/affiliates/admin/orders/route.ts(127,40): error TS7006: Parameter 'li' implicitly has an 'any' type.
+app/api/affiliates/admin/orders/route.ts(133,15): error TS7006: Parameter 'c' implicitly has an 'any' type.
+app/api/affiliates/admin/orders/route.ts(134,18): error TS7006: Parameter 'c' implicitly has an 'any' type.
+app/api/affiliates/admin/orders/route.ts(137,10): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/affiliates/orders/[id]/route.ts(48,82): error TS7006: Parameter 'li' implicitly has an 'any' type.
+app/api/affiliates/shop-manager/orders/route.ts(15,42): error TS2307: Cannot find module '@/types/portal-commerce' or its corresponding type declarations.
+app/api/affiliates/shop-manager/orders/route.ts(69,42): error TS7006: Parameter 'li' implicitly has an 'any' type.
+components/ui/sidebar.tsx(8,29): error TS2307: Cannot find module '@/hooks/use-mobile' or its corresponding type declarations.
+lib/affiliates/shopify-ingest.ts(4,35): error TS2307: Cannot find module '@/types/portal-commerce' or its corresponding type declarations.
+lib/affiliates/shopify-ingest.ts(30,342): error TS7006: Parameter 'l' implicitly has an 'any' type.
+lib/orders/tracking.ts(13,35): error TS2307: Cannot find module '@/types/portal-commerce' or its corresponding type declarations.
+lib/orders/tracking.ts(48,45): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/orders/tracking.ts(50,16): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/portal-commerce.ts(2,50): error TS2307: Cannot find module '@/types/portal-commerce' or its corresponding type declarations.
+Failed to type check.
+

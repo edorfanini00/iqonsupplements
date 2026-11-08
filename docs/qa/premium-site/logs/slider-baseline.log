@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: skincare preservation: app/skincare/skincare-sections.tsx
+ok 1 - skincare preservation: app/skincare/skincare-sections.tsx
+  ---
+  duration_ms: 1.015458
+  type: 'test'
+  ...
+# Subtest: skincare preservation: app/skincare/skincare.css
+ok 2 - skincare preservation: app/skincare/skincare.css
+  ---
+  duration_ms: 0.333083
+  type: 'test'
+  ...
+# Subtest: skincare preservation: components/ui/slider.tsx
+ok 3 - skincare preservation: components/ui/slider.tsx
+  ---
+  duration_ms: 0.112666
+  type: 'test'
+  ...
+# Subtest: skincare preservation: lib/skincare-results.ts
+ok 4 - skincare preservation: lib/skincare-results.ts
+  ---
+  duration_ms: 0.080083
+  type: 'test'
+  ...
+# Subtest: skincare preservation: lib/skincare-design-preview.ts
+ok 5 - skincare preservation: lib/skincare-design-preview.ts
+  ---
+  duration_ms: 0.143459
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-eye-before-v11.webp
+ok 6 - skincare preservation: public/images/editorial/skin-detail-eye-before-v11.webp
+  ---
+  duration_ms: 0.583
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-texture-after-v11.webp
+ok 7 - skincare preservation: public/images/editorial/skin-detail-texture-after-v11.webp
+  ---
+  duration_ms: 0.62675
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-texture-before-v11.webp
+ok 8 - skincare preservation: public/images/editorial/skin-detail-texture-before-v11.webp
+  ---
+  duration_ms: 0.595125
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-tone-before-v11.webp
+ok 9 - skincare preservation: public/images/editorial/skin-detail-tone-before-v11.webp
+  ---
+  duration_ms: 0.674042
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-tone-after-v11.webp
+ok 10 - skincare preservation: public/images/editorial/skin-detail-tone-after-v11.webp
+  ---
+  duration_ms: 0.750333
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-cheek-after-v11.webp
+ok 11 - skincare preservation: public/images/editorial/skin-detail-cheek-after-v11.webp
+  ---
+  duration_ms: 0.457833
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-eye-after-v11.webp
+ok 12 - skincare preservation: public/images/editorial/skin-detail-eye-after-v11.webp
+  ---
+  duration_ms: 0.34075
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-cheek-before-v11.webp
+ok 13 - skincare preservation: public/images/editorial/skin-detail-cheek-before-v11.webp
+  ---
+  duration_ms: 0.338166
+  type: 'test'
+  ...
+# Subtest: skincare home retains its illustrative comparison and approved results
+ok 14 - skincare home retains its illustrative comparison and approved results
+  ---
+  duration_ms: 0.257792
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 79.271375

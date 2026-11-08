@@ -1,0 +1,55 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 134ms
+ ✓ tests/ui/skincare-ingredient-explorer.test.ts (9 tests) 318ms
+stderr | tests/ui/bundle-keyboard.test.ts > selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > held/repeated arrows do not trigger duplicate selection on focus
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > skips disabled radios and handles RTL horizontal navigation
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > leaves modified shortcuts and Tab alone, and pointer selection still changes once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > keeps a quantity above three when navigation lands on its already selected 3+ tier
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bundle-keyboard.test.ts (5 tests) 345ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bag-recommendation.test.ts (7 tests) 702ms
+   ✓ recommends eligible Gut Health to advance the active bundle tier and preserves quantity controls  392ms
+ ✓ tests/ui/answer-html.test.ts (7 tests) 720ms
+   ✓ answers in the initial HTML > includes every product FAQ answer and full label details in product HTML  515ms
+ ✓ tests/ui/product-storytelling.test.ts (4 tests) 1007ms
+   ✓ visual product guides > keeps approved packaging, excludes rejected photos and expands exact facts  637ms
+   ✓ visual product guides > uses product-specific guides with the relevant instructions in the expanded view  320ms
+ ✓ tests/ui/purchase-options.test.ts (21 tests) 1200ms
+ ✓ tests/ui/supplement-product-story.test.ts (14 tests) 1627ms
+   ✓ the complete supplement range > renders creatine-monohydrate with its formula, directions, artwork and relevant comparisons  341ms
+
+ Test Files  8 passed (8)
+      Tests  69 passed (69)
+   Start at  19:12:38
+   Duration  2.87s (transform 874ms, setup 0ms, collect 3.83s, tests 6.05s, environment 3.68s, prepare 354ms)
+

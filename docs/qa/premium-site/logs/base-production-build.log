@@ -1,0 +1,76 @@
+▲ Next.js 16.3.5 (webpack)
+✓ Running next.config.ts took 19ms
+
+  Creating an optimized production build ...
+  Using tsconfig file: tsconfig.next.json
+  Using tsconfig file: tsconfig.next.json
+  Using tsconfig file: tsconfig.next.json
+Error: Can't resolve '../vendor/shadcn-tailwind-4.13.0.css' in '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app'
+    at ignore-listed frames {
+  details: "resolve '../vendor/shadcn-tailwind-4.13.0.css' in '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app'\n" +
+    '  using description file: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/package.json (relative path: ./app)\n' +
+    '    using description file: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/package.json (relative path: ./vendor/shadcn-tailwind-4.13.0.css)\n' +
+    '      no extension\n' +
+    "        /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/vendor/shadcn-tailwind-4.13.0.css doesn't exist\n" +
+    '      .css\n' +
+    "        /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/vendor/shadcn-tailwind-4.13.0.css.css doesn't exist\n" +
+    '      as directory\n' +
+    "        /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/vendor/shadcn-tailwind-4.13.0.css doesn't exist"
+}
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[15].oneOf[10].use[2]!/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[15].oneOf[10].use[3]!/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css': No serializer registered for PostCSSSyntaxError
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> webpack/lib/ModuleBuildError -> PostCSSSyntaxError
+Failed to compile.
+
+./app/globals.css:1:1
+Syntax error: tailwindcss: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css Can't resolve '../vendor/shadcn-tailwind-4.13.0.css' in '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app'
+
+> 1 | @import "tailwindcss";
+    | ^
+  2 | @import "tw-animate-css";
+  3 | @import "../vendor/shadcn-tailwind-4.13.0.css";
+
+./app/globals.css
+Syntax error: tailwindcss: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css Can't resolve '../vendor/shadcn-tailwind-4.13.0.css' in '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app' (1:1)
+
+> 1 | @import "tailwindcss";
+    | ^
+  2 | @import "tw-animate-css";
+  3 | @import "../vendor/shadcn-tailwind-4.13.0.css";
+
+    at tryRunOrWebpackError (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:316153)
+    at __webpack_require_module__ (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:131548)
+    at __nested_webpack_require_161494__ (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:130983)
+    at /Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:131840
+    at symbolIterator (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/neo-async/async.js:1:14444)
+    at done (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/neo-async/async.js:1:14824)
+    at Hook.eval [as callAsync] (eval at create (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:14:9222), <anonymous>:15:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:14:6376)
+    at /Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:130703
+    at symbolIterator (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/neo-async/async.js:1:14402)
+-- inner error --
+Syntax error: tailwindcss: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css Can't resolve '../vendor/shadcn-tailwind-4.13.0.css' in '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app' (1:1)
+
+> 1 | @import "tailwindcss";
+    | ^
+  2 | @import "tw-animate-css";
+  3 | @import "../vendor/shadcn-tailwind-4.13.0.css";
+
+    at Object.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[15].oneOf[10].use[2]!/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[15].oneOf[10].use[3]!/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css:1:7)
+    at /Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:962868
+    at Hook.eval [as call] (eval at create (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:14:9000), <anonymous>:7:1)
+    at Hook.CALL_DELEGATE [as _call] (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:14:6270)
+    at /Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:131581
+    at tryRunOrWebpackError (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:316107)
+    at __webpack_require_module__ (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:131548)
+    at __nested_webpack_require_161494__ (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:130983)
+    at /Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/webpack/bundle5.js:29:131840
+    at symbolIterator (/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/compiled/neo-async/async.js:1:14444)
+
+Generated code for /Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[15].oneOf[10].use[2]!/Users/edorfanini/Projects/iqon-site-premium-20261107/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[15].oneOf[10].use[3]!/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css
+1 | throw new Error("Module build failed (from ../../node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js):\nSyntaxError\n\n(1:1) tailwindcss: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app/globals.css Can't resolve '../vendor/shadcn-tailwind-4.13.0.css' in '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/app'\n\n> 1 | @import \"tailwindcss\";\n    | ^\n  2 | @import \"tw-animate-css\";\n  3 | @import \"../vendor/shadcn-tailwind-4.13.0.css\";\n");
+
+Import trace for requested module:
+./app/globals.css
+
+
+> Build failed because of webpack errors

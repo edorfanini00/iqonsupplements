@@ -1,0 +1,61 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/review-integrity.test.ts (2 tests) 142ms
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 176ms
+ ✓ tests/ui/skincare-ingredient-explorer.test.ts (9 tests) 486ms
+stderr | tests/ui/bundle-keyboard.test.ts > selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > held/repeated arrows do not trigger duplicate selection on focus
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > skips disabled radios and handles RTL horizontal navigation
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > leaves modified shortcuts and Tab alone, and pointer selection still changes once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > keeps a quantity above three when navigation lands on its already selected 3+ tier
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bundle-keyboard.test.ts (5 tests) 543ms
+   ✓ selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once  329ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bag-recommendation.test.ts (7 tests) 1012ms
+   ✓ recommends eligible Gut Health to advance the active bundle tier and preserves quantity controls  584ms
+ ✓ tests/ui/answer-html.test.ts (7 tests) 995ms
+   ✓ answers in the initial HTML > includes every product FAQ answer and full label details in product HTML  708ms
+ ✓ tests/ui/product-storytelling.test.ts (4 tests) 1503ms
+   ✓ visual product guides > keeps approved packaging, excludes rejected photos and expands exact facts  991ms
+   ✓ visual product guides > uses product-specific guides with the relevant instructions in the expanded view  468ms
+ ✓ tests/ui/purchase-options.test.ts (22 tests) 1883ms
+   ✓ offers no subscription: one time is the only purchase, and the bag never receives a selling plan  308ms
+ ✓ tests/ui/supplement-product-story.test.ts (14 tests) 3247ms
+   ✓ the complete supplement range > renders creatine-monohydrate with its formula, directions, artwork and relevant comparisons  547ms
+   ✓ the complete supplement range > renders liver-support with its formula, directions, artwork and relevant comparisons  313ms
+   ✓ the complete supplement range > renders nmn with its formula, directions, artwork and relevant comparisons  373ms
+   ✓ the complete supplement range > renders hair-skin-nails-gummies with its formula, directions, artwork and relevant comparisons  446ms
+
+ Test Files  9 passed (9)
+      Tests  72 passed (72)
+   Start at  19:37:15
+   Duration  6.64s (transform 1.97s, setup 0ms, collect 9.20s, tests 9.99s, environment 13.95s, prepare 1.40s)
+

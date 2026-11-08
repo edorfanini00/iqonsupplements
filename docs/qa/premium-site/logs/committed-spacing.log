@@ -1,0 +1,370 @@
+TAP version 13
+# Subtest: synthetic 320 colostrum-powder: gallery, focus and sticky order
+ok 1 - synthetic 320 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 588.287167
+  type: 'test'
+  ...
+# Subtest: synthetic 320 creatine-monohydrate: gallery, focus and sticky order
+ok 2 - synthetic 320 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 539.696
+  type: 'test'
+  ...
+# Subtest: synthetic 320 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+ok 3 - synthetic 320 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 624.301125
+  type: 'test'
+  ...
+# Subtest: synthetic 320 nmn: gallery, focus and sticky order
+ok 4 - synthetic 320 nmn: gallery, focus and sticky order
+  ---
+  duration_ms: 346.964208
+  type: 'test'
+  ...
+# Subtest: synthetic 320 daily-travel-kit: gallery, focus and sticky order
+ok 5 - synthetic 320 daily-travel-kit: gallery, focus and sticky order
+  ---
+  duration_ms: 620.987459
+  type: 'test'
+  ...
+# Subtest: synthetic 320 generic-sized: gallery, focus and sticky order
+ok 6 - synthetic 320 generic-sized: gallery, focus and sticky order
+  ---
+  duration_ms: 592.467875
+  type: 'test'
+  ...
+# Subtest: synthetic 320 generic-unavailable: gallery, focus and sticky order
+ok 7 - synthetic 320 generic-unavailable: gallery, focus and sticky order
+  ---
+  duration_ms: 315.478417
+  type: 'test'
+  ...
+# Subtest: synthetic 320 generic-variants: gallery, focus and sticky order
+ok 8 - synthetic 320 generic-variants: gallery, focus and sticky order
+  ---
+  duration_ms: 584.487917
+  type: 'test'
+  ...
+# Subtest: synthetic 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 9 - synthetic 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 407.212458
+  type: 'test'
+  ...
+# Subtest: synthetic 390 colostrum-powder: gallery, focus and sticky order
+ok 10 - synthetic 390 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 521.690917
+  type: 'test'
+  ...
+# Subtest: synthetic 390 creatine-monohydrate: gallery, focus and sticky order
+ok 11 - synthetic 390 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 523.831084
+  type: 'test'
+  ...
+# Subtest: synthetic 390 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+ok 12 - synthetic 390 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 649.496583
+  type: 'test'
+  ...
+# Subtest: synthetic 390 nmn: gallery, focus and sticky order
+ok 13 - synthetic 390 nmn: gallery, focus and sticky order
+  ---
+  duration_ms: 319.647667
+  type: 'test'
+  ...
+# Subtest: synthetic 390 daily-travel-kit: gallery, focus and sticky order
+ok 14 - synthetic 390 daily-travel-kit: gallery, focus and sticky order
+  ---
+  duration_ms: 450.80525
+  type: 'test'
+  ...
+# Subtest: synthetic 390 generic-sized: gallery, focus and sticky order
+ok 15 - synthetic 390 generic-sized: gallery, focus and sticky order
+  ---
+  duration_ms: 529.53175
+  type: 'test'
+  ...
+# Subtest: synthetic 390 generic-unavailable: gallery, focus and sticky order
+ok 16 - synthetic 390 generic-unavailable: gallery, focus and sticky order
+  ---
+  duration_ms: 237.330042
+  type: 'test'
+  ...
+# Subtest: synthetic 390 generic-variants: gallery, focus and sticky order
+ok 17 - synthetic 390 generic-variants: gallery, focus and sticky order
+  ---
+  duration_ms: 444.520083
+  type: 'test'
+  ...
+# Subtest: synthetic 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 18 - synthetic 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 275.891833
+  type: 'test'
+  ...
+# Subtest: synthetic 760 colostrum-powder: gallery, focus and sticky order
+ok 19 - synthetic 760 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 503.794042
+  type: 'test'
+  ...
+# Subtest: synthetic 760 creatine-monohydrate: gallery, focus and sticky order
+ok 20 - synthetic 760 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 535.367
+  type: 'test'
+  ...
+# Subtest: synthetic 760 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+ok 21 - synthetic 760 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 461.568083
+  type: 'test'
+  ...
+# Subtest: synthetic 760 nmn: gallery, focus and sticky order
+ok 22 - synthetic 760 nmn: gallery, focus and sticky order
+  ---
+  duration_ms: 254.751166
+  type: 'test'
+  ...
+# Subtest: synthetic 760 daily-travel-kit: gallery, focus and sticky order
+ok 23 - synthetic 760 daily-travel-kit: gallery, focus and sticky order
+  ---
+  duration_ms: 462.162459
+  type: 'test'
+  ...
+# Subtest: synthetic 760 generic-sized: gallery, focus and sticky order
+ok 24 - synthetic 760 generic-sized: gallery, focus and sticky order
+  ---
+  duration_ms: 476.427375
+  type: 'test'
+  ...
+# Subtest: synthetic 760 generic-unavailable: gallery, focus and sticky order
+ok 25 - synthetic 760 generic-unavailable: gallery, focus and sticky order
+  ---
+  duration_ms: 245.658375
+  type: 'test'
+  ...
+# Subtest: synthetic 760 generic-variants: gallery, focus and sticky order
+ok 26 - synthetic 760 generic-variants: gallery, focus and sticky order
+  ---
+  duration_ms: 474.064291
+  type: 'test'
+  ...
+# Subtest: synthetic 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 27 - synthetic 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 275.310667
+  type: 'test'
+  ...
+# Subtest: synthetic 761 colostrum-powder: original desktop geometry
+ok 28 - synthetic 761 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 212.326791
+  type: 'test'
+  ...
+# Subtest: synthetic 761 creatine-monohydrate: original desktop geometry
+ok 29 - synthetic 761 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 308.838167
+  type: 'test'
+  ...
+# Subtest: synthetic 761 hydrolyzed-collagen-peptides: original desktop geometry
+ok 30 - synthetic 761 hydrolyzed-collagen-peptides: original desktop geometry
+  ---
+  duration_ms: 207.099583
+  type: 'test'
+  ...
+# Subtest: synthetic 761 nmn: original desktop geometry
+ok 31 - synthetic 761 nmn: original desktop geometry
+  ---
+  duration_ms: 227.828417
+  type: 'test'
+  ...
+# Subtest: synthetic 761 daily-travel-kit: original desktop geometry
+ok 32 - synthetic 761 daily-travel-kit: original desktop geometry
+  ---
+  duration_ms: 207.434708
+  type: 'test'
+  ...
+# Subtest: synthetic 761 generic-sized: original desktop geometry
+ok 33 - synthetic 761 generic-sized: original desktop geometry
+  ---
+  duration_ms: 227.02775
+  type: 'test'
+  ...
+# Subtest: synthetic 761 generic-unavailable: original desktop geometry
+ok 34 - synthetic 761 generic-unavailable: original desktop geometry
+  ---
+  duration_ms: 238.353083
+  type: 'test'
+  ...
+# Subtest: synthetic 761 generic-variants: original desktop geometry
+ok 35 - synthetic 761 generic-variants: original desktop geometry
+  ---
+  duration_ms: 237.586917
+  type: 'test'
+  ...
+# Subtest: synthetic 761 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 36 - synthetic 761 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 231.38675
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 colostrum-powder: original desktop geometry
+ok 37 - synthetic 1440 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 286.303417
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 creatine-monohydrate: original desktop geometry
+ok 38 - synthetic 1440 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 219.621083
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 hydrolyzed-collagen-peptides: original desktop geometry
+ok 39 - synthetic 1440 hydrolyzed-collagen-peptides: original desktop geometry
+  ---
+  duration_ms: 264.52975
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 nmn: original desktop geometry
+ok 40 - synthetic 1440 nmn: original desktop geometry
+  ---
+  duration_ms: 242.611833
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 daily-travel-kit: original desktop geometry
+ok 41 - synthetic 1440 daily-travel-kit: original desktop geometry
+  ---
+  duration_ms: 251.068458
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 generic-sized: original desktop geometry
+ok 42 - synthetic 1440 generic-sized: original desktop geometry
+  ---
+  duration_ms: 236.189166
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 generic-unavailable: original desktop geometry
+ok 43 - synthetic 1440 generic-unavailable: original desktop geometry
+  ---
+  duration_ms: 241.241541
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 generic-variants: original desktop geometry
+ok 44 - synthetic 1440 generic-variants: original desktop geometry
+  ---
+  duration_ms: 228.974917
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 45 - synthetic 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 300.883417
+  type: 'test'
+  ...
+# Subtest: preview 320 colostrum-powder: gallery, focus and sticky order
+ok 46 - preview 320 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 337.152583
+  type: 'test'
+  ...
+# Subtest: preview 320 creatine-monohydrate: gallery, focus and sticky order
+ok 47 - preview 320 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 285.112041
+  type: 'test'
+  ...
+# Subtest: preview 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 48 - preview 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 281.167583
+  type: 'test'
+  ...
+# Subtest: preview 390 colostrum-powder: gallery, focus and sticky order
+ok 49 - preview 390 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 272.331167
+  type: 'test'
+  ...
+# Subtest: preview 390 creatine-monohydrate: gallery, focus and sticky order
+ok 50 - preview 390 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 303.800833
+  type: 'test'
+  ...
+# Subtest: preview 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 51 - preview 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 278.722291
+  type: 'test'
+  ...
+# Subtest: preview 760 colostrum-powder: gallery, focus and sticky order
+ok 52 - preview 760 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 340.068542
+  type: 'test'
+  ...
+# Subtest: preview 760 creatine-monohydrate: gallery, focus and sticky order
+ok 53 - preview 760 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 337.820042
+  type: 'test'
+  ...
+# Subtest: preview 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 54 - preview 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 282.674125
+  type: 'test'
+  ...
+# Subtest: preview 761 colostrum-powder: original desktop geometry
+ok 55 - preview 761 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 255.325042
+  type: 'test'
+  ...
+# Subtest: preview 761 creatine-monohydrate: original desktop geometry
+ok 56 - preview 761 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 299.50775
+  type: 'test'
+  ...
+# Subtest: preview 761 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 57 - preview 761 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 237.240041
+  type: 'test'
+  ...
+# Subtest: preview 1440 colostrum-powder: original desktop geometry
+ok 58 - preview 1440 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 236.705417
+  type: 'test'
+  ...
+# Subtest: preview 1440 creatine-monohydrate: original desktop geometry
+ok 59 - preview 1440 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 333.8535
+  type: 'test'
+  ...
+# Subtest: preview 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 60 - preview 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 342.605042
+  type: 'test'
+  ...
+1..60
+# tests 60
+# suites 0
+# pass 60
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21938.135833

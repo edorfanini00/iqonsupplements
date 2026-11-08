@@ -1,0 +1,27 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 77ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/purchase-options.test.ts (22 tests) 908ms
+
+ Test Files  2 passed (2)
+      Tests  24 passed (24)
+   Start at  19:41:01
+   Duration  2.16s (transform 187ms, setup 0ms, collect 629ms, tests 985ms, environment 1.26s, prepare 71ms)
+

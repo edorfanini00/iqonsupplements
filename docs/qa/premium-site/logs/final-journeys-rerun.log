@@ -1,0 +1,126 @@
+TAP version 13
+# Subtest: collection formats, search, empty state, clearing and sort remain functional
+ok 1 - collection formats, search, empty state, clearing and sort remain functional
+  ---
+  duration_ms: 1422.460375
+  type: 'test'
+  ...
+# Subtest: live Help prioritizes order tasks and links existing account and policies
+ok 2 - live Help prioritizes order tasks and links existing account and policies
+  ---
+  duration_ms: 887.142167
+  type: 'test'
+  ...
+# Subtest: live product 390: purpose, serving price, sticky behavior and actual images
+not ok 3 - live product 390: purpose, serving price, sticky behavior and actual images
+  ---
+  duration_ms: 844.612917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-journeys.e2e.mjs:37:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /1 scoop \(5\.6 g\)/. Input:
+    
+    'Unflavored creatine monohydrate for repeated, high-intensity efforts. One ingredient that fits around the training you already do.*\n' +
+      '\n' +
+      'Supports high-intensity exercise*\n' +
+      'One ingredient · No added caffeine\n' +
+      'Unflavored · 281 g\n' +
+      '\n' +
+      '$48.97\n' +
+      '\n' +
+      'CONTENTS\n' +
+      '281 g\n' +
+      'FLAVOR\n' +
+      'Unflavored\n' +
+      'FORMULA\n' +
+      'Creatine only'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    Unflavored creatine monohydrate for repeated, high-intensity efforts. One ingredient that fits around the training you already do.*
+    
+    Supports high-intensity exercise*
+    One ingredient · No added caffeine
+    Unflavored · 281 g
+    
+    $48.97
+    
+    CONTENTS
+    281 g
+    FLAVOR
+    Unflavored
+    FORMULA
+    Creatine only
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-journeys.e2e.mjs:40:75)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: live product 1440: purpose, serving price, sticky behavior and actual images
+not ok 4 - live product 1440: purpose, serving price, sticky behavior and actual images
+  ---
+  duration_ms: 943.795583
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-journeys.e2e.mjs:37:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /1 scoop \(5\.6 g\)/. Input:
+    
+    'Unflavored creatine monohydrate for repeated, high-intensity efforts. One ingredient that fits around the training you already do.*\n' +
+      '\n' +
+      'Supports high-intensity exercise*\n' +
+      'One ingredient · No added caffeine\n' +
+      'Unflavored · 281 g\n' +
+      '\n' +
+      '$48.97\n' +
+      '\n' +
+      'CONTENTS\n' +
+      '281 g\n' +
+      'FLAVOR\n' +
+      'Unflavored\n' +
+      'FORMULA\n' +
+      'Creatine only'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    Unflavored creatine monohydrate for repeated, high-intensity efforts. One ingredient that fits around the training you already do.*
+    
+    Supports high-intensity exercise*
+    One ingredient · No added caffeine
+    Unflavored · 281 g
+    
+    $48.97
+    
+    CONTENTS
+    281 g
+    FLAVOR
+    Unflavored
+    FORMULA
+    Creatine only
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-journeys.e2e.mjs:40:75)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 200 percent product text also contains live bundle controls
+ok 5 - 200 percent product text also contains live bundle controls
+  ---
+  duration_ms: 906.604541
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 3
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5285.705791

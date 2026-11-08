@@ -1,0 +1,38 @@
+TAP version 13
+# Data source: synthetic catalog/cart with real local assets; external tracking blocked.
+# Subtest: 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 1 - 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 17485.829125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.innerText: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    checkBundleKeyboard (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/bundle-keyboard.mjs:7:68)
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:128:11)
+  ...
+# Subtest: 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 2 - 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 17401.546125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.innerText: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    checkBundleKeyboard (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/bundle-keyboard.mjs:7:68)
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:128:11)
+  ...

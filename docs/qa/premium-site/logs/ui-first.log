@@ -1,0 +1,342 @@
+
+> iqon-supplements@0.1.0 test:affiliate-ui
+> vitest run --config tests/ui/vitest.config.mjs
+
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/native-command-completion.test.ts (1 test) 8ms
+ ✓ tests/ui/category-revenue.test.ts (8 tests) 109ms
+ ✓ tests/ui/bulk-coupon.test.ts (2 tests) 177ms
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 171ms
+ ✓ tests/ui/admin-create-command.test.ts (2 tests) 183ms
+ ✓ tests/ui/native-rate-settings.test.ts (6 tests) 291ms
+stderr | tests/ui/bundle-keyboard.test.ts > selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/skincare-ingredient-explorer.test.ts (9 tests) 583ms
+stderr | tests/ui/bundle-keyboard.test.ts > held/repeated arrows do not trigger duplicate selection on focus
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > skips disabled radios and handles RTL horizontal navigation
+The current testing environment is not configured to support act(...)
+
+ ❯ tests/ui/original-relay-reads.test.ts (19 tests | 2 failed) 29ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/orders without Body filtering 6ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/subscriptions without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/customers without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/summary without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/trends without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/inventory without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/purchases without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/sales without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/expenses without Body filtering 2ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/adjustments without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/orders without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/items/item-1/history without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET orders/order-1 without Body filtering 0ms
+   × original shared operational read parity > keeps unsafe provider POST unavailable 6ms
+     → expected 400 to be 501 // Object.is equality
+   ✓ original shared operational read parity > keeps unsafe provider PATCH unavailable 1ms
+   ✓ original shared operational read parity > keeps unsafe provider DELETE unavailable 2ms
+   ✓ original shared operational read parity > keeps unsafe provider PUT unavailable 3ms
+   × original shared operational read parity > does not proxy unknown accounting reads or GET detail refresh mutations 1ms
+     → expected 403 to be 501 // Object.is equality
+   ✓ original shared operational read parity > preserves canonical auth rejection rather than an empty ledger 0ms
+ ✓ tests/ui/command-settings.test.ts (1 test) 18ms
+stderr | tests/ui/bundle-keyboard.test.ts > leaves modified shortcuts and Tab alone, and pointer selection still changes once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > keeps a quantity above three when navigation lands on its already selected 3+ tier
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bundle-keyboard.test.ts (5 tests) 669ms
+   ✓ selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once  382ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/command-recovery.test.ts (1 test) 65ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/command-context.test.ts (1 test) 107ms
+ ✓ tests/ui/payout-pending-contact.test.ts (8 tests) 1216ms
+   ✓ opens the clicked affiliate's contact details in place without any payout mutation  319ms
+ ✓ tests/ui/settings-reviewed-version.test.ts (1 test) 7ms
+ ✓ tests/ui/payout-outstanding.test.ts (7 tests) 1389ms
+   ✓ keeps currencies separate, blocks unknown/nonpositive, submits selected currency allocations  336ms
+ ✓ tests/ui/original-pages.test.ts (11 tests) 945ms
+   ✓ original page render contracts > admin/page preserves original sections and controls  383ms
+ ✓ tests/ui/overview-category-isolation.test.ts (3 tests) 1593ms
+   ✓ only commits the latest month when requests finish out of order and Shopify independently fails  884ms
+   ✓ keeps successful category data independent when original Overview fails and changes both period requests  381ms
+   ✓ does not relabel successful September totals as August after a rejected request  327ms
+ ✓ tests/ui/bag-recommendation.test.ts (7 tests) 1491ms
+   ✓ recommends eligible Gut Health to advance the active bundle tier and preserves quantity controls  809ms
+ ❯ tests/ui/answer-html.test.ts (7 tests | 1 failed) 1183ms
+   ✓ answers in the initial HTML > server-renders closed accordion answers, collapsed and hidden until opened 42ms
+   ✓ answers in the initial HTML > keeps closed answers in the hydrated DOM with Radix open/close and ARIA relationships  372ms
+   ✓ answers in the initial HTML > keeps closed answers mounted in client-only renders 30ms
+   ✓ answers in the initial HTML > hides closed panels with compiled CSS that keeps them visible only while collapsing 1ms
+   ✓ answers in the initial HTML > includes every product FAQ answer and full label details in product HTML  717ms
+   ✓ page titles and links > gives storefront pages descriptive titles and a www canonical; only the canonical production host is indexable 8ms
+   × page titles and links > does not link the approach page to a removed collection anchor 12ms
+     → expected '<main id="main" class="approach-page …' to contain 'href="/collections/supplements"'
+ ❯ tests/ui/purchase-options.test.ts (21 tests | 13 failed) 1717ms
+   ✓ offers no subscription: one time is the only purchase, and the bag never receives a selling plan  367ms
+   × shows both tiers with real per unit prices; choosing a tier sets the quantity that is added 145ms
+     → expected 'Mix eligible supplements. Save 10% on…' to match /Mix and match any eligible IQON suppl…/
+   ✓ keeps the 3+ tier selected when the stepper goes past three and returns to one 261ms
+   ✓ includes Gut Health in the approved bundle tiers 109ms
+   ✓ a subscription only product cannot be added 79ms
+   ✓ keeps all seven skincare pages browseable with no purchase controls, even if live availability is stale 230ms
+   ✓ variants: switching options keeps one time pricing from the selected variant 96ms
+   × creatine-monohydrate: gallery-first layout and all approved bundle choices 34ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × hydrolyzed-collagen-peptides: gallery-first layout and all approved bundle choices 60ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × collagen-peptides-chocolate: gallery-first layout and all approved bundle choices 28ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × colostrum-powder: gallery-first layout and all approved bundle choices 28ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × gut-health: gallery-first layout and all approved bundle choices 21ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × nmn: gallery-first layout and all approved bundle choices 73ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × glp-1-support: gallery-first layout and all approved bundle choices 24ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × hair-skin-nails-gummies: gallery-first layout and all approved bundle choices 17ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × resveratrol: gallery-first layout and all approved bundle choices 21ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × liver-support: gallery-first layout and all approved bundle choices 18ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × keto-5: gallery-first layout and all approved bundle choices 18ms
+     → expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+   × orders the phone page gallery, name and price, purchase controls, product notes, then details 22ms
+     → expected +0 to be truthy
+   ✓ does not offer quantity choices for sold-out products or variants 34ms
+   ✓ keeps unapproved future products at full price while providing quantity choices 33ms
+ ❯ tests/ui/product-storytelling.test.ts (4 tests | 1 failed) 1777ms
+   ✓ visual product guides > keeps approved packaging, excludes rejected photos and expands exact facts  1280ms
+   × visual product guides > moves through the mobile gallery and preserves additional Shopify images 73ms
+     → expected null to be 'true' // Object.is equality
+   ✓ visual product guides > uses product-specific guides with the relevant instructions in the expanded view  417ms
+   ✓ visual product guides > shows every key ingredient and its explanation without hiding them behind tabs 7ms
+ ❯ tests/ui/supplement-product-story.test.ts (14 tests | 1 failed) 2331ms
+   ✓ the complete supplement range > has a distinct photograph and a complete content path for all 11 formulas 7ms
+   ✓ the complete supplement range > renders creatine-monohydrate with its formula, directions, artwork and relevant comparisons  761ms
+   ✓ the complete supplement range > renders hydrolyzed-collagen-peptides with its formula, directions, artwork and relevant comparisons 231ms
+   ✓ the complete supplement range > renders collagen-peptides-chocolate with its formula, directions, artwork and relevant comparisons 276ms
+   × the complete supplement range > renders colostrum-powder with its formula, directions, artwork and relevant comparisons 119ms
+     → expected <article>…(3)</article>
+…(2) to have a length of 4 but got 3
+   ✓ the complete supplement range > renders gut-health with its formula, directions, artwork and relevant comparisons 161ms
+   ✓ the complete supplement range > renders keto-5 with its formula, directions, artwork and relevant comparisons 123ms
+   ✓ the complete supplement range > renders glp-1-support with its formula, directions, artwork and relevant comparisons 120ms
+   ✓ the complete supplement range > renders liver-support with its formula, directions, artwork and relevant comparisons 98ms
+   ✓ the complete supplement range > renders nmn with its formula, directions, artwork and relevant comparisons 117ms
+   ✓ the complete supplement range > renders resveratrol with its formula, directions, artwork and relevant comparisons 104ms
+   ✓ the complete supplement range > renders hair-skin-nails-gummies with its formula, directions, artwork and relevant comparisons 108ms
+   ✓ the complete supplement range > does not present included ingredient percentages as extra doses or clinical results 0ms
+   ✓ the complete supplement range > keeps the approved skincare renderer for all seven skincare products 105ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/settings-cross-portal.test.ts [ tests/ui/settings-cross-portal.test.ts ]
+Error: Failed to resolve import "../../../iqon-health-rate-settings/app/affiliates/admin/settings/page" from "tests/ui/settings-cross-portal.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/edorfanini/Projects/iqon-site-premium-20261107/tests/ui/settings-cross-portal.test.ts:7:27
+  3  |  import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+  4  |  import BodySettings from "../../app/affiliates/admin/settings/page";
+  5  |  import HealthSettings from "../../../iqon-health-rate-settings/app/affiliates/admin/settings/page";
+     |                              ^
+  6  |  import { validateCommand, commandHash } from "../../../iqon-health-rate-settings/lib/integrations/body/commands/valid...
+  7  |  import { canonicalActionFetch as bodySave } from "../../lib/affiliates/canonical-action-fetch";
+ ❯ TransformPluginContext._formatLog node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29079:43
+ ❯ TransformPluginContext.error node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29076:14
+ ❯ normalizeUrl node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27199:18
+ ❯ node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27257:32
+ ❯ TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27225:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28877:14
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:22746:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/answer-html.test.ts > page titles and links > does not link the approach page to a removed collection anchor
+AssertionError: expected '<main id="main" class="approach-page …' to contain 'href="/collections/supplements"'
+
+Expected: "href="/collections/supplements""
+Received: "<main id="main" class="approach-page premium-approach"><section class="content-heading section-pad"><p class="eyebrow">OUR APPROACH</p><h1>Choose with the<br/>details in view.</h1><p>IQON brings powders, capsules, gummies and skincare into one collection. Each formula has its own ingredients, directions and intended use. Start there.</p></section><section class="approach-details section-pad"><article><h2>The formula comes first.</h2><p>Compare the ingredient form and listed amount, then check the rest of the formula. A single ingredient powder and a blend answer different preferences. Product pages keep the full ingredient statement available alongside the short introduction.</p><a class="under-link" href="/journal/reading-a-supplement-label">Read the label guide<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></a></article><article><h2>Research needs context.</h2><p>Our research sections name the source and explain its limits. A study of an ingredient does not establish the same result for an IQON formula. Product testing, manufacturing records and clinical trials are different kinds of evidence.</p><a class="under-link" href="/products/colostrum-powder#ingredient-science">See an ingredient study<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></a></article><article><h2>Make it practical.</h2><p>Look at preparation, frequency, allergies and warnings before choosing a format. Check current availability on each product page. Skincare is coming soon and cannot be ordered yet.</p><a class="under-link" href="/journal/finding-your-supplement-format">Compare the formats<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></a></article></section><section class="approach-support section-pad"><h2>Support after you choose.</h2><p>Find order tracking, account access, shipping information and return instructions in Help. Our published policies explain the terms that apply to your order.</p><a class="button button-dark" href="/help">Get help<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></a></section><section class="journal-preview section-pad"><div class="section-heading"><div><p class="eyebrow">LATEST NEWS</p><h2>A little more understanding.</h2></div><a class="under-link" href="/journal">All stories<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></a></div><div class="journal-grid"><a class="journal-card" href="/journal/reading-a-supplement-label"><div><img src="/images/editorial/news-reading-labels-iqon-v11.webp" srcSet="/images/editorial/news-reading-labels-iqon-v11-480w.webp 480w, /images/editorial/news-reading-labels-iqon-v11-768w.webp 768w, /images/editorial/news-reading-labels-iqon-v11.webp 1536w" sizes="(max-width:760px) 88vw, 33vw" alt="The IQON NMN label and capsule bottle on a cool silver surface" width="900" height="675" loading="lazy"/></div><p class="eyebrow">UNDERSTANDING SUPPLEMENTS <span>3 MIN READ</span></p><h3>Read the label with confidence.<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></h3><p>A few details make a supplement easier to understand, compare and choose.</p></a><a class="journal-card" href="/journal/finding-your-supplement-format"><div><img src="/images/editorial/daily-water-v24.webp" srcSet="/images/editorial/daily-water-v24-480w.webp 480w, /images/editorial/daily-water-v24-768w.webp 768w, /images/editorial/daily-water-v24.webp 1536w" sizes="(max-width:760px) 88vw, 33vw" alt="An adult pouring water into a glass at home" width="900" height="675" loading="lazy"/></div><p class="eyebrow">EVERYDAY ROUTINES <span>3 MIN READ</span></p><h3>Find a format that fits.<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></h3><p>From a measured powder to a portable capsule, the practical details can shape a routine.</p></a><a class="journal-card" href="/journal/a-simple-skincare-routine"><div><img src="/images/editorial/skincare-ritual-v26.webp" srcSet="/images/editorial/skincare-ritual-v26-480w.webp 480w, /images/editorial/skincare-ritual-v26-768w.webp 768w, /images/editorial/skincare-ritual-v26.webp 1536w" sizes="(max-width:760px) 88vw, 33vw" alt="A woman applying cream to her cheek while holding IQON Copper Peptide Restore Cream" width="900" height="675" loading="lazy"/></div><p class="eyebrow">SKINCARE NOTES <span>3 MIN READ</span></p><h3>A few steps. A moment for you.<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></h3><p>Give cleansing, treatment, moisture and sun protection a clear place in your day.</p></a></div></section></main>"
+
+ ❯ tests/ui/answer-html.test.ts:136:18
+    134|     const html = renderToStaticMarkup(React.createElement(ApproachPage…
+    135|     expect(html).not.toContain("#formats");
+    136|     expect(html).toContain('href="/collections/supplements"');
+       |                  ^
+    137|   });
+    138| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  tests/ui/original-relay-reads.test.ts > original shared operational read parity > keeps unsafe provider POST unavailable
+AssertionError: expected 400 to be 501 // Object.is equality
+
+- Expected
++ Received
+
+- 501
++ 400
+
+ ❯ tests/ui/original-relay-reads.test.ts:7:344
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  tests/ui/original-relay-reads.test.ts > original shared operational read parity > does not proxy unknown accounting reads or GET detail refresh mutations
+AssertionError: expected 403 to be 501 // Object.is equality
+
+- Expected
++ Received
+
+- 501
++ 403
+
+ ❯ tests/ui/original-relay-reads.test.ts:8:337
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  tests/ui/product-storytelling.test.ts > visual product guides > moves through the mobile gallery and preserves additional Shopify images
+AssertionError: expected null to be 'true' // Object.is equality
+
+- Expected: 
+"true"
+
++ Received: 
+null
+
+ ❯ tests/ui/product-storytelling.test.ts:34:98
+     32|     expect(screen.getByRole('button', {name:'Previous product panel'})…
+     33|     fireEvent.click(screen.getByRole('button', {name:'Next product pan…
+     34|     expect(screen.getByRole('button', {name:'View formula focus'}).get…
+       |                                                                                                  ^
+     35|     fireEvent.keyDown(screen.getByRole('region'), {key:'ArrowLeft'});
+     36|     expect(screen.getByRole('button', {name:'View the packaging'}).get…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  tests/ui/purchase-options.test.ts > shows both tiers with real per unit prices; choosing a tier sets the quantity that is added
+AssertionError: expected 'Mix eligible supplements. Save 10% on…' to match /Mix and match any eligible IQON suppl…/
+
+- Expected: 
+/Mix and match any eligible IQON supplements/
+
++ Received: 
+"Mix eligible supplements. Save 10% on 2 or 25% on 3 or more. Applied automatically in your bag and at checkout. Cannot be combined with discount codes."
+
+ ❯ tests/ui/purchase-options.test.ts:45:65
+     43|   expect(three.closest("label")?.textContent).toContain("$36.73");
+     44|   expect(container.querySelector(".product-title-row")?.textContent).t…
+     45|   expect(container.querySelector(".bundle-terms")?.textContent).toMatc…
+       |                                                                 ^
+     46|   expect(container.querySelector(".bundle-terms")?.textContent).not.to…
+     47|   fireEvent.click(three);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  tests/ui/purchase-options.test.ts > creatine-monohydrate: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > hydrolyzed-collagen-peptides: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > collagen-peptides-chocolate: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > colostrum-powder: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > gut-health: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > nmn: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > glp-1-support: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > hair-skin-nails-gummies: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > resveratrol: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > liver-support: gallery-first layout and all approved bundle choices
+ FAIL  tests/ui/purchase-options.test.ts > keto-5: gallery-first layout and all approved bundle choices
+AssertionError: expected [ 'product-visual-gallery', …(4) ] to deeply equal [ 'product-visual-gallery', …(4) ]
+
+- Expected
++ Received
+
+  [
+    "product-visual-gallery",
+    "purchase-panel purchase-panel-summary",
+-   "purchase-panel purchase-panel-buy",
+    "purchase-panel purchase-panel-info",
++   "purchase-panel purchase-panel-buy",
+    "purchase-panel purchase-panel-details",
+  ]
+
+ ❯ tests/ui/purchase-options.test.ts:114:55
+    112|  const {container}=render(React.createElement(ProductPage,{product}));
+    113|  const overview=container.querySelector(".purchase-first #overview")!;
+    114|  expect([...overview.children].map(el=>el.className)).toEqual([
+       |                                                       ^
+    115|   "product-visual-gallery",
+    116|   "purchase-panel purchase-panel-summary",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  tests/ui/purchase-options.test.ts > orders the phone page gallery, name and price, purchase controls, product notes, then details
+AssertionError: expected +0 to be truthy
+
+- Expected: 
+true
+
++ Received: 
+0
+
+ ❯ tests/ui/purchase-options.test.ts:149:128
+    147|  expect(details.querySelector(".product-accordion")).toBeTruthy();
+    148|  const sequence=[gallery,summary,buy,info,details];
+    149|  for(let i=1;i<sequence.length;i++)expect(sequence[i-1].compareDocumen…
+       |                                                                                                                                ^
+    150|  // Product notes follow the purchase controls, not the title.
+    151|  expect(buy.compareDocumentPosition(info.querySelector(".product-summa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+ FAIL  tests/ui/supplement-product-story.test.ts > the complete supplement range > renders colostrum-powder with its formula, directions, artwork and relevant comparisons
+AssertionError: expected <article>…(3)</article>
+…(2) to have a length of 4 but got 3
+
+- Expected
++ Received
+
+- 4
++ 3
+
+ ❯ tests/ui/supplement-product-story.test.ts:42:72
+     40|     expect(screen.getByRole('heading',{name:visual.title})).toBeTruthy…
+     41|     expect(container.querySelector('.skin-benefits-photo img')?.getAtt…
+     42|     expect(container.querySelectorAll('.skin-benefit-points article'))…
+       |                                                                        ^
+     43|     expect(container.querySelectorAll('.skin-application-steps li')).t…
+     44|     for(const nav of container.querySelectorAll('.pdp-section-nav a')){
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
+
+
+ Test Files  6 failed | 17 passed (23)
+      Tests  18 failed | 122 passed (140)
+   Start at  19:07:26
+   Duration  5.20s (transform 3.22s, setup 0ms, collect 8.44s, tests 16.06s, environment 22.75s, prepare 9.25s)
+

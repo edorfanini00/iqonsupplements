@@ -1,0 +1,1519 @@
+
+> iqon-supplements@0.1.0 test:affiliates
+> node --import tsx --test tests/affiliates/*.test.ts
+
+TAP version 13
+# Subtest: accounting picker only maps GET with no query to additive read-only endpoint
+ok 1 - accounting picker only maps GET with no query to additive read-only endpoint
+  ---
+  duration_ms: 42.166625
+  type: 'test'
+  ...
+# Subtest: persists one actor-bound all-affiliate attempt before dispatch; lost create recovers status without resubmission
+ok 2 - persists one actor-bound all-affiliate attempt before dispatch; lost create recovers status without resubmission
+  ---
+  duration_ms: 126.112
+  type: 'test'
+  ...
+# Subtest: 404 replays exact all selection and resume only admits missing children once per step
+ok 3 - 404 replays exact all selection and resume only admits missing children once per step
+  ---
+  duration_ms: 6.439208
+  type: 'test'
+  ...
+# Subtest: revoked session stops admission, retaining journal; pending/conflict never becomes completion
+ok 4 - revoked session stops admission, retaining journal; pending/conflict never becomes completion
+  ---
+  duration_ms: 1.353042
+  type: 'test'
+  ...
+# Subtest: bulk create, scoped status and bodyless resume relay only exact contract
+ok 5 - bulk create, scoped status and bodyless resume relay only exact contract
+  ---
+  duration_ms: 133.9865
+  type: 'test'
+  ...
+# Subtest: bulk rejects query, resume body, invalid id, foreign origin and scheduler
+ok 6 - bulk rejects query, resume body, invalid id, foreign origin and scheduler
+  ---
+  duration_ms: 2.900666
+  type: 'test'
+  ...
+# Subtest: Next bodyless POST represented as an empty stream is a valid resume
+ok 7 - Next bodyless POST represented as an empty stream is a valid resume
+  ---
+  duration_ms: 0.926708
+  type: 'test'
+  ...
+# Subtest: actual canonical validator accepts original Body command envelopes
+ok 8 - actual canonical validator accepts original Body command envelopes # SKIP
+  ---
+  duration_ms: 0.651917
+  type: 'test'
+  ...
+# Subtest: category revenue uses only canonical additive read with independent reporting budget
+ok 9 - category revenue uses only canonical additive read with independent reporting budget
+  ---
+  duration_ms: 49.358833
+  type: 'test'
+  ...
+# Subtest: affiliate Overview keeps category cards; admin retains the independent original Shopify toggle
+ok 10 - affiliate Overview keeps category cards; admin retains the independent original Shopify toggle
+  ---
+  duration_ms: 2.362667
+  type: 'test'
+  ...
+# Subtest: admin-create completion follows its own canonical tasks, never coupon-only success
+ok 11 - admin-create completion follows its own canonical tasks, never coupon-only success
+  ---
+  duration_ms: 1.085625
+  type: 'test'
+  ...
+# Subtest: approval cannot finish native form while canonical identity or notification work is unresolved
+ok 12 - approval cannot finish native form while canonical identity or notification work is unresolved
+  ---
+  duration_ms: 0.299625
+  type: 'test'
+  ...
+# Subtest: durably retains exact key/payload on lost response; pending is not success; completed readback matches receipt
+ok 13 - durably retains exact key/payload on lost response; pending is not success; completed readback matches receipt
+  ---
+  duration_ms: 74.204583
+  type: 'test'
+  ...
+# Subtest: signup never persists password and supports resubmission with same key
+ok 14 - signup never persists password and supports resubmission with same key
+  ---
+  duration_ms: 0.727042
+  type: 'test'
+  ...
+# Subtest: canonical committed payout is complete but committed code with blocked provider is not advertised complete
+ok 15 - canonical committed payout is complete but committed code with blocked provider is not advertised complete
+  ---
+  duration_ms: 0.58625
+  type: 'test'
+  ...
+# Subtest: new version is explicit after canonical commit readback and archives unresolved provider receipt
+ok 16 - new version is explicit after canonical commit readback and archives unresolved provider receipt
+  ---
+  duration_ms: 6.339667
+  type: 'test'
+  ...
+# Subtest: correction requires definite validation rejection AND exact authorized canonical no-record readback
+ok 17 - correction requires definite validation rejection AND exact authorized canonical no-record readback
+  ---
+  duration_ms: 0.807917
+  type: 'test'
+  ...
+# Subtest: VERSION_CONFLICT permits corrected user submission without replaying an impossible attempt
+ok 18 - VERSION_CONFLICT permits corrected user submission without replaying an impossible attempt
+  ---
+  duration_ms: 0.436416
+  type: 'test'
+  ...
+# Subtest: PROVIDER_BUSY permits corrected user submission without replaying an impossible attempt
+ok 19 - PROVIDER_BUSY permits corrected user submission without replaying an impossible attempt
+  ---
+  duration_ms: 0.57475
+  type: 'test'
+  ...
+# Subtest: REJECTED_CONFLICT permits corrected user submission without replaying an impossible attempt
+ok 20 - REJECTED_CONFLICT permits corrected user submission without replaying an impossible attempt
+  ---
+  duration_ms: 0.639875
+  type: 'test'
+  ...
+# Subtest: anonymous signup DTO rejection permits correction without inaccessible authenticated status and never stores password
+ok 21 - anonymous signup DTO rejection permits correction without inaccessible authenticated status and never stores password
+  ---
+  duration_ms: 0.635209
+  type: 'test'
+  ...
+# Subtest: payload CONFLICT never releases an uncertain financial key
+ok 22 - payload CONFLICT never releases an uncertain financial key
+  ---
+  duration_ms: 0.343916
+  type: 'test'
+  ...
+# Subtest: storage unavailable blocks before network and mismatched command receipt is not success
+ok 23 - storage unavailable blocks before network and mismatched command receipt is not success
+  ---
+  duration_ms: 0.284459
+  type: 'test'
+  ...
+# Subtest: two-server command transport: independent simulated login, lost response, stable retry and canonical authorization
+ok 24 - two-server command transport: independent simulated login, lost response, stable retry and canonical authorization
+  ---
+  duration_ms: 987.111
+  type: 'test'
+  ...
+# Subtest: maps only five reviewed original actions, preserving payload zero and target
+ok 25 - maps only five reviewed original actions, preserving payload zero and target
+  ---
+  duration_ms: 14.200292
+  type: 'test'
+  ...
+# Subtest: original signup/approval/payout/profile forms use durable canonical action client
+ok 26 - original signup/approval/payout/profile forms use durable canonical action client
+  ---
+  duration_ms: 4.152542
+  type: 'test'
+  ...
+# Subtest: only fixed canonical commands relay exact envelope and authenticated receipt reads
+ok 27 - only fixed canonical commands relay exact envelope and authenticated receipt reads
+  ---
+  duration_ms: 161.619542
+  type: 'test'
+  ...
+# Subtest: canonical current command version uses dedicated admin state read, not guessed zero
+ok 28 - canonical current command version uses dedicated admin state read, not guessed zero
+  ---
+  duration_ms: 0.315916
+  type: 'test'
+  ...
+# Subtest: unknown commands, missing/cross origin, nonPOST command writes never dispatch
+ok 29 - unknown commands, missing/cross origin, nonPOST command writes never dispatch
+  ---
+  duration_ms: 1.782125
+  type: 'test'
+  ...
+# Subtest: actual final Health HTTP DTOs, Body session projection, rejected correction and dropped-response retries
+ok 30 - actual final Health HTTP DTOs, Body session projection, rejected correction and dropped-response retries # SKIP
+  ---
+  duration_ms: 0.644959
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/accounting/page.tsx
+not ok 31 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/accounting/page.tsx
+  ---
+  duration_ms: 6.36225
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '8048ceee3c02e2fda687669ee063cf7dfd71c3f9ff1bfec80e968050f3ee7ed0'
+    - '99bac5966e69b0619d668e9d7a9a4749ec344cbf9d804d74151f5670a31f8a40'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '99bac5966e69b0619d668e9d7a9a4749ec344cbf9d804d74151f5670a31f8a40'
+  actual: '8048ceee3c02e2fda687669ee063cf7dfd71c3f9ff1bfec80e968050f3ee7ed0'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/activity/page.tsx
+ok 32 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/activity/page.tsx
+  ---
+  duration_ms: 0.660833
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliate-messages/page.tsx
+ok 33 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliate-messages/page.tsx
+  ---
+  duration_ms: 0.749792
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/[id]/page.tsx
+ok 34 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/[id]/page.tsx
+  ---
+  duration_ms: 0.456708
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/page.tsx
+not ok 35 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/page.tsx
+  ---
+  duration_ms: 1.07225
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + 'fb61fa19639c25b9119ce4de072a07faef17138e75cfa412489abad05ac6e309'
+    - '9c72c323e1119aa6cdef8a913291ab4dd5ac382ce8861807c485be23f7475a68'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '9c72c323e1119aa6cdef8a913291ab4dd5ac382ce8861807c485be23f7475a68'
+  actual: 'fb61fa19639c25b9119ce4de072a07faef17138e75cfa412489abad05ac6e309'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/analytics/page.tsx
+ok 36 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/analytics/page.tsx
+  ---
+  duration_ms: 0.914
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/app/page.tsx
+not ok 37 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/app/page.tsx
+  ---
+  duration_ms: 1.154458
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '808725404f2d5afec5eff0f7804e00e075c19c0466b48e50298b92bb1fd511ab'
+    - 'b965f2cb1e5909d5bf2f29835042a5cff5d7d91eaa280d848f7f436f554c9631'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'b965f2cb1e5909d5bf2f29835042a5cff5d7d91eaa280d848f7f436f554c9631'
+  actual: '808725404f2d5afec5eff0f7804e00e075c19c0466b48e50298b92bb1fd511ab'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/customers/page.tsx
+not ok 38 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/customers/page.tsx
+  ---
+  duration_ms: 0.6625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '1cbb7163289da4786586704698a06d4a62d61b3a9510c4fddb5243eb3456ff7b'
+    - '6d6aeda0ee93aca6cbb95c324b307757b11328c39dddbb0940e3a08064cfd1b9'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '6d6aeda0ee93aca6cbb95c324b307757b11328c39dddbb0940e3a08064cfd1b9'
+  actual: '1cbb7163289da4786586704698a06d4a62d61b3a9510c4fddb5243eb3456ff7b'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/messages/page.tsx
+ok 39 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/messages/page.tsx
+  ---
+  duration_ms: 1.016
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/notes/page.tsx
+not ok 40 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/notes/page.tsx
+  ---
+  duration_ms: 0.968917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '2af9bb862369c63dbc80ab473c5c654f91c959b11d5b2052ce0bf3a07e54a715'
+    - '57860f57e312fde41f07a18b81e22278f003c659f8b8c67d15bbaacb1cec5514'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '57860f57e312fde41f07a18b81e22278f003c659f8b8c67d15bbaacb1cec5514'
+  actual: '2af9bb862369c63dbc80ab473c5c654f91c959b11d5b2052ce0bf3a07e54a715'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/orders/page.tsx
+not ok 41 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/orders/page.tsx
+  ---
+  duration_ms: 0.846083
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + 'ffa1bb4b6a01c9e6b74dd50edb00922858138b9130c7e3eafbbdc1066fabdea3'
+    - 'f79695701189681a02a36ba2276e367a5392eb3bb0fe0ee89a449818d3e93524'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'f79695701189681a02a36ba2276e367a5392eb3bb0fe0ee89a449818d3e93524'
+  actual: 'ffa1bb4b6a01c9e6b74dd50edb00922858138b9130c7e3eafbbdc1066fabdea3'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/page.tsx
+not ok 42 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/page.tsx
+  ---
+  duration_ms: 0.65775
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Exact native bulk-only adaptation
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:19:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/payouts/page.tsx
+not ok 43 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/payouts/page.tsx
+  ---
+  duration_ms: 0.635125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Reviewed settlement-only adaptation must match exactly once
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:26:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/rankings/page.tsx
+not ok 44 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/rankings/page.tsx
+  ---
+  duration_ms: 0.759125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '3d7186f3ad6a36a21837ac6e424612c6d6cd4dff0efaf772fd08788366d4d339'
+    - '43f03d77d606444810b3155b4d7d42a41ba9d65c0f5e2073ddbb7d0fb43a3f8d'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '43f03d77d606444810b3155b4d7d42a41ba9d65c0f5e2073ddbb7d0fb43a3f8d'
+  actual: '3d7186f3ad6a36a21837ac6e424612c6d6cd4dff0efaf772fd08788366d4d339'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/requests/page.tsx
+ok 45 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/requests/page.tsx
+  ---
+  duration_ms: 0.387208
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/subscriptions/page.tsx
+not ok 46 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/subscriptions/page.tsx
+  ---
+  duration_ms: 1.495541
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '32ce5ab98f4b9bc08274cdbcc385bb2b0bc2608754df4c2daeadc603f0aac164'
+    - '9a67f26c5559e8c8d30ad05f84f4b855a37034dcc45d81c55e8656f5a3690134'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '9a67f26c5559e8c8d30ad05f84f4b855a37034dcc45d81c55e8656f5a3690134'
+  actual: '32ce5ab98f4b9bc08274cdbcc385bb2b0bc2608754df4c2daeadc603f0aac164'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/tiktok/page.tsx
+not ok 47 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/tiktok/page.tsx
+  ---
+  duration_ms: 0.78075
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + 'af4710d8b085c5bd330614ef3fa2d5a3fa66cf61104f3de4e94db868150eeceb'
+    - '38b44b5aa2fffaa0c5171122be66cb013c473968e56ca4771035bc1b4a14f3f5'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '38b44b5aa2fffaa0c5171122be66cb013c473968e56ca4771035bc1b4a14f3f5'
+  actual: 'af4710d8b085c5bd330614ef3fa2d5a3fa66cf61104f3de4e94db868150eeceb'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/clients/page.tsx
+ok 48 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/clients/page.tsx
+  ---
+  duration_ms: 0.393625
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/learn/page.tsx
+ok 49 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/learn/page.tsx
+  ---
+  duration_ms: 1.856458
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/messages/page.tsx
+ok 50 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/messages/page.tsx
+  ---
+  duration_ms: 0.461
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/network/page.tsx
+ok 51 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/network/page.tsx
+  ---
+  duration_ms: 0.768666
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/orders/page.tsx
+ok 52 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/orders/page.tsx
+  ---
+  duration_ms: 0.443375
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/page.tsx
+not ok 53 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/page.tsx
+  ---
+  duration_ms: 1.197666
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '47b053d65049b750f5edd242516e412e20f6edce16fb353e0507a466d1b5f003'
+    - 'f9415e8a3f0ef7d5de2990309558d5f66770fb9c2b86e2c05d8c37beeaf3102b'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'f9415e8a3f0ef7d5de2990309558d5f66770fb9c2b86e2c05d8c37beeaf3102b'
+  actual: '47b053d65049b750f5edd242516e412e20f6edce16fb353e0507a466d1b5f003'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payment/page.tsx
+ok 54 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payment/page.tsx
+  ---
+  duration_ms: 0.516792
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payouts/page.tsx
+ok 55 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payouts/page.tsx
+  ---
+  duration_ms: 0.374916
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/settings/page.tsx
+ok 56 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/settings/page.tsx
+  ---
+  duration_ms: 0.395625
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/orders/page.tsx
+ok 57 - Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/orders/page.tsx
+  ---
+  duration_ms: 0.476166
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/page.tsx
+ok 58 - Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/page.tsx
+  ---
+  duration_ms: 0.218542
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: components/affiliates/shared/RangePicker.tsx
+ok 59 - Body preserves restored Health behavior and full reporting: components/affiliates/shared/RangePicker.tsx
+  ---
+  duration_ms: 0.42075
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: components/affiliates/shared/useCalendarDay.ts
+ok 60 - Body preserves restored Health behavior and full reporting: components/affiliates/shared/useCalendarDay.ts
+  ---
+  duration_ms: 0.16625
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: lib/affiliates/use-latest-read.ts
+ok 61 - Body preserves restored Health behavior and full reporting: lib/affiliates/use-latest-read.ts
+  ---
+  duration_ms: 0.242917
+  type: 'test'
+  ...
+# Subtest: HTTP BFF preserves canonical approval, current roles, cookie sessions and all read periods
+not ok 62 - HTTP BFF preserves canonical approval, current roles, cookie sessions and all read periods
+  ---
+  duration_ms: 1563.495875
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-http-authority.test.ts:1:291'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok([404,501].includes(blocked.status))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/affiliates/body-http-authority.test.ts:70:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: SSR compatibility request targets only additive Body session namespace
+ok 63 - SSR compatibility request targets only additive Body session namespace
+  ---
+  duration_ms: 177.070083
+  type: 'test'
+  ...
+# Subtest: audited marketing reads preserve complete Customers tab without permitting unkeyed sends
+ok 64 - audited marketing reads preserve complete Customers tab without permitting unkeyed sends
+  ---
+  duration_ms: 2.802708
+  type: 'test'
+  ...
+# Subtest: shop-manager read uses canonical full source rather than nonexistent local data
+ok 65 - shop-manager read uses canonical full source rather than nonexistent local data
+  ---
+  duration_ms: 0.324917
+  type: 'test'
+  ...
+# Subtest: minimal-principal dependent legacy routes never import independent financial store
+ok 66 - minimal-principal dependent legacy routes never import independent financial store
+  ---
+  duration_ms: 2.842542
+  type: 'test'
+  ...
+# Subtest: only exact outstanding GET and affiliateId reach canonical authority
+ok 67 - only exact outstanding GET and affiliateId reach canonical authority
+  ---
+  duration_ms: 144.68575
+  type: 'test'
+  ...
+# Subtest: exact server-assigned preview supports local sessions with canonical authority attribution
+ok 68 - exact server-assigned preview supports local sessions with canonical authority attribution
+  ---
+  duration_ms: 150.211416
+  type: 'test'
+  ...
+# Subtest: preview support never trusts arbitrary Host/Origin or widens production origins
+ok 69 - preview support never trusts arbitrary Host/Origin or widens production origins
+  ---
+  duration_ms: 18.202458
+  type: 'test'
+  ...
+# Subtest: bounded slow canonical commerce reads do not inherit the short auth timeout
+ok 70 - bounded slow canonical commerce reads do not inherit the short auth timeout
+  ---
+  duration_ms: 92.948042
+  type: 'test'
+  ...
+# Subtest: unqualified writes never reach canonical finance or provider state
+ok 71 - unqualified writes never reach canonical finance or provider state
+  ---
+  duration_ms: 171.102875
+  type: 'test'
+  ...
+# Subtest: order detail query cannot escalate into refreshed writes
+ok 72 - order detail query cannot escalate into refreshed writes
+  ---
+  duration_ms: 1.496292
+  type: 'test'
+  ...
+# Subtest: communication read markers need exact browser origin and no prefetch
+ok 73 - communication read markers need exact browser origin and no prefetch
+  ---
+  duration_ms: 2.180208
+  type: 'test'
+  ...
+# Subtest: upstream cookie lifetimes are never extended
+ok 74 - upstream cookie lifetimes are never extended
+  ---
+  duration_ms: 1.87275
+  type: 'test'
+  ...
+# Subtest: minimal versioned canonical session never invents full profile or leaks extra fields
+ok 75 - minimal versioned canonical session never invents full profile or leaks extra fields
+  ---
+  duration_ms: 0.876667
+  type: 'test'
+  ...
+# Subtest: full and polling principal rejects invalid version identity role approval
+ok 76 - full and polling principal rejects invalid version identity role approval
+  ---
+  duration_ms: 0.231417
+  type: 'test'
+  ...
+# Subtest: current resolved role wins over historical roles and staff can have no profile
+ok 77 - current resolved role wins over historical roles and staff can have no profile
+  ---
+  duration_ms: 0.154125
+  type: 'test'
+  ...
+# Subtest: Health subscription read display retains exact original interval labels
+ok 78 - Health subscription read display retains exact original interval labels
+  ---
+  duration_ms: 1.653416
+  type: 'test'
+  ...
+# Subtest: original browser refresh GET without Origin forwards only explicit same-origin fetch with UUID
+ok 79 - original browser refresh GET without Origin forwards only explicit same-origin fetch with UUID
+  ---
+  duration_ms: 104.983209
+  type: 'test'
+  ...
+# Subtest: refresh rejects cross-site
+ok 80 - refresh rejects cross-site
+  ---
+  duration_ms: 0.83325
+  type: 'test'
+  ...
+# Subtest: refresh rejects same-site
+ok 81 - refresh rejects same-site
+  ---
+  duration_ms: 0.255083
+  type: 'test'
+  ...
+# Subtest: refresh rejects navigation
+ok 82 - refresh rejects navigation
+  ---
+  duration_ms: 0.355209
+  type: 'test'
+  ...
+# Subtest: refresh rejects image
+ok 83 - refresh rejects image
+  ---
+  duration_ms: 0.338916
+  type: 'test'
+  ...
+# Subtest: refresh rejects prefetch
+ok 84 - refresh rejects prefetch
+  ---
+  duration_ms: 0.36125
+  type: 'test'
+  ...
+# Subtest: refresh rejects sec-prefetch
+ok 85 - refresh rejects sec-prefetch
+  ---
+  duration_ms: 0.312416
+  type: 'test'
+  ...
+# Subtest: refresh rejects explicit bad origin
+ok 86 - refresh rejects explicit bad origin
+  ---
+  duration_ms: 0.414375
+  type: 'test'
+  ...
+# Subtest: refresh rejects no metadata
+ok 87 - refresh rejects no metadata
+  ---
+  duration_ms: 0.81475
+  type: 'test'
+  ...
+# Subtest: shopify-orders: GET-only canonical relay, exact origin/cookie scope
+ok 88 - shopify-orders: GET-only canonical relay, exact origin/cookie scope
+  ---
+  duration_ms: 132.896583
+  type: 'test'
+  ...
+# Subtest: supplements-code: GET-only canonical relay, exact origin/cookie scope
+ok 89 - supplements-code: GET-only canonical relay, exact origin/cookie scope
+  ---
+  duration_ms: 1.828125
+  type: 'test'
+  ...
+# Subtest: supplements-codes: GET-only canonical relay, exact origin/cookie scope
+ok 90 - supplements-codes: GET-only canonical relay, exact origin/cookie scope
+  ---
+  duration_ms: 1.404375
+  type: 'test'
+  ...
+# Subtest: audit history redacts nested banking and authentication values
+ok 91 - audit history redacts nested banking and authentication values
+  ---
+  duration_ms: 3.076083
+  type: 'test'
+  ...
+# Subtest: passwords are salted and invalid credentials do not verify
+ok 92 - passwords are salted and invalid credentials do not verify
+  ---
+  duration_ms: 303.114083
+  type: 'test'
+  ...
+# Subtest: bank information requires a dedicated key and rejects tampering
+ok 93 - bank information requires a dedicated key and rejects tampering
+  ---
+  duration_ms: 0.973166
+  type: 'test'
+  ...
+# Subtest: Shopify webhooks fail closed without a secret or with a modified body
+ok 94 - Shopify webhooks fail closed without a secret or with a modified body
+  ---
+  duration_ms: 0.306959
+  type: 'test'
+  ...
+# Subtest: legacy credentials and another Shopify store cannot configure this business
+ok 95 - legacy credentials and another Shopify store cannot configure this business
+  ---
+  duration_ms: 1.333708
+  type: 'test'
+  ...
+# Subtest: large Shopify IDs remain exact and unsafe IDs are refused
+ok 96 - large Shopify IDs remain exact and unsafe IDs are refused
+  ---
+  duration_ms: 0.227959
+  type: 'test'
+  ...
+# Subtest: commissions exclude shipping/tax and cancellation overrides a prior payment
+ok 97 - commissions exclude shipping/tax and cancellation overrides a prior payment
+  ---
+  duration_ms: 0.195666
+  type: 'test'
+  ...
+# Subtest: Shopify normalization uses current totals and rejects unsupported currencies/partial pages
+ok 98 - Shopify normalization uses current totals and rejects unsupported currencies/partial pages
+  ---
+  duration_ms: 0.603459
+  type: 'test'
+  ...
+# Subtest: referral graph rejects indirect cycles
+ok 99 - referral graph rejects indirect cycles
+  ---
+  duration_ms: 0.389583
+  type: 'test'
+  ...
+# Subtest: HTTP: pending access, role isolation, reset single-use, session revocation, CSRF, and webhook authentication
+ok 100 - HTTP: pending access, role isolation, reset single-use, session revocation, CSRF, and webhook authentication # SKIP
+  ---
+  duration_ms: 0.89025
+  type: 'test'
+  ...
+# Subtest: real database: idempotent earnings, recurring identity, refund debits, payouts, and exclusions
+ok 101 - real database: idempotent earnings, recurring identity, refund debits, payouts, and exclusions # SKIP
+  ---
+  duration_ms: 1.884084
+  type: 'test'
+  ...
+# Subtest: exact native account/contact/thread actions preserve the operation key and never retry transport
+ok 102 - exact native account/contact/thread actions preserve the operation key and never retry transport
+  ---
+  duration_ms: 259.410375
+  type: 'test'
+  ...
+# Subtest: client retains only a UUID across response loss/reload; never passwords or automatic retries
+ok 103 - client retains only a UUID across response loss/reload; never passwords or automatic retries
+  ---
+  duration_ms: 17.133
+  type: 'test'
+  ...
+# Subtest: unreadable or negative success responses keep the operation key for safe recovery
+ok 104 - unreadable or negative success responses keep the operation key for safe recovery
+  ---
+  duration_ms: 2.462833
+  type: 'test'
+  ...
+# Subtest: generic forgot-password acknowledgement retains its key; never assumes mail delivery
+ok 105 - generic forgot-password acknowledgement retains its key; never assumes mail delivery
+  ---
+  duration_ms: 0.35325
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/admin/affiliate-messages/page.tsx
+ok 106 - native account action preserves original UI bytes: app/affiliates/admin/affiliate-messages/page.tsx
+  ---
+  duration_ms: 17.29475
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/admin/messages/page.tsx
+ok 107 - native account action preserves original UI bytes: app/affiliates/admin/messages/page.tsx
+  ---
+  duration_ms: 0.530917
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/contact/page.tsx
+ok 108 - native account action preserves original UI bytes: app/affiliates/contact/page.tsx
+  ---
+  duration_ms: 0.319583
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/dashboard/messages/page.tsx
+ok 109 - native account action preserves original UI bytes: app/affiliates/dashboard/messages/page.tsx
+  ---
+  duration_ms: 0.301708
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/dashboard/network/page.tsx
+ok 110 - native account action preserves original UI bytes: app/affiliates/dashboard/network/page.tsx
+  ---
+  duration_ms: 0.265542
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/dashboard/settings/page.tsx
+ok 111 - native account action preserves original UI bytes: app/affiliates/dashboard/settings/page.tsx
+  ---
+  duration_ms: 0.149959
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/forgot-password/page.tsx
+ok 112 - native account action preserves original UI bytes: app/affiliates/forgot-password/page.tsx
+  ---
+  duration_ms: 0.356625
+  type: 'test'
+  ...
+# Subtest: native account action preserves original UI bytes: app/affiliates/reset-password/page.tsx
+ok 113 - native account action preserves original UI bytes: app/affiliates/reset-password/page.tsx
+  ---
+  duration_ms: 0.422084
+  type: 'test'
+  ...
+# Subtest: exact thirteen accounting methods route to fixed native authority and carry receipt key
+ok 114 - exact thirteen accounting methods route to fixed native authority and carry receipt key
+  ---
+  duration_ms: 231.29175
+  type: 'test'
+  ...
+# Subtest: accounting neighboring methods, source queries and forged origin remain fail closed
+ok 115 - accounting neighboring methods, source queries and forged origin remain fail closed
+  ---
+  duration_ms: 0.663541
+  type: 'test'
+  ...
+# Subtest: all thirteen original accounting form mutations retain a durable operation UUID
+ok 116 - all thirteen original accounting form mutations retain a durable operation UUID
+  ---
+  duration_ms: 0.606375
+  type: 'test'
+  ...
+# Subtest: accounting form response loss retains UUID and does not report unreadable success
+ok 117 - accounting form response loss retains UUID and does not report unreadable success
+  ---
+  duration_ms: 18.2235
+  type: 'test'
+  ...
+# Subtest: accounting without a UUID never dispatches a financial operation
+ok 118 - accounting without a UUID never dispatches a financial operation
+  ---
+  duration_ms: 0.2455
+  type: 'test'
+  ...
+# Subtest: bank PUT uses its dedicated fixed canonical adapter without an independent DB
+ok 119 - bank PUT uses its dedicated fixed canonical adapter without an independent DB
+  ---
+  duration_ms: 140.540084
+  type: 'test'
+  ...
+# Subtest: onboarding and notes route only their exact mounted methods
+ok 120 - onboarding and notes route only their exact mounted methods
+  ---
+  duration_ms: 3.199833
+  type: 'test'
+  ...
+# Subtest: payout reversal relays the original bodyless DELETE including a Next empty stream
+ok 121 - payout reversal relays the original bodyless DELETE including a Next empty stream
+  ---
+  duration_ms: 1.000125
+  type: 'test'
+  ...
+# Subtest: native bank rejects forged Origin, queries and neighboring method escalation without dispatch
+ok 122 - native bank rejects forged Origin, queries and neighboring method escalation without dispatch
+  ---
+  duration_ms: 2.949709
+  type: 'test'
+  ...
+# Subtest: native saved-rate acknowledgement is complete without coupon writes, and malformed/other receipts do not qualify
+ok 123 - native saved-rate acknowledgement is complete without coupon writes, and malformed/other receipts do not qualify
+  ---
+  duration_ms: 0.845917
+  type: 'test'
+  ...
+# Subtest: lost acknowledgement retains UUID; confirmed native save archives receipt and permits a later rate change
+ok 124 - lost acknowledgement retains UUID; confirmed native save archives receipt and permits a later rate change
+  ---
+  duration_ms: 214.738
+  type: 'test'
+  ...
+# Subtest: foreign Origin cannot relay authenticated category data
+ok 125 - foreign Origin cannot relay authenticated category data
+  ---
+  duration_ms: 1.035
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/messages/x relay
+ok 126 - fixed DELETE admin/messages/x relay
+  ---
+  duration_ms: 78.306375
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/notes/x relay
+ok 127 - fixed DELETE admin/notes/x relay
+  ---
+  duration_ms: 1.188458
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/affiliates/x relay
+ok 128 - fixed DELETE admin/affiliates/x relay
+  ---
+  duration_ms: 1.366959
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/commissions/x relay
+ok 129 - fixed DELETE admin/commissions/x relay
+  ---
+  duration_ms: 0.526542
+  type: 'test'
+  ...
+# Subtest: fixed POST admin/app relay
+ok 130 - fixed POST admin/app relay
+  ---
+  duration_ms: 0.996208
+  type: 'test'
+  ...
+# Subtest: fixed POST tiktok relay
+ok 131 - fixed POST tiktok relay
+  ---
+  duration_ms: 1.054459
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/tiktok relay
+ok 132 - fixed PATCH admin/tiktok relay
+  ---
+  duration_ms: 1.178708
+  type: 'test'
+  ...
+# Subtest: fixed PATCH admin/rankings relay
+ok 133 - fixed PATCH admin/rankings relay
+  ---
+  duration_ms: 0.424208
+  type: 'test'
+  ...
+# Subtest: fixed DELETE admin/tiktok/x relay
+ok 134 - fixed DELETE admin/tiktok/x relay
+  ---
+  duration_ms: 0.921375
+  type: 'test'
+  ...
+# Subtest: unchanged form helper retains UUID and throws on lost committed acknowledgement
+ok 135 - unchanged form helper retains UUID and throws on lost committed acknowledgement
+  ---
+  duration_ms: 10.777542
+  type: 'test'
+  ...
+# Subtest: truncated or negative successful acknowledgements retain the UUID and cannot clear forms
+ok 136 - truncated or negative successful acknowledgements retain the UUID and cannot clear forms
+  ---
+  duration_ms: 72.947334
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST 
+ok 137 - maps only marketing POST 
+  ---
+  duration_ms: 144.455542
+  type: 'test'
+  ...
+# Subtest: maps only marketing PATCH /campaign_1
+ok 138 - maps only marketing PATCH /campaign_1
+  ---
+  duration_ms: 1.020708
+  type: 'test'
+  ...
+# Subtest: maps only marketing DELETE /campaign_1
+ok 139 - maps only marketing DELETE /campaign_1
+  ---
+  duration_ms: 0.899
+  type: 'test'
+  ...
+# Subtest: maps only marketing POST /campaign_1/run
+ok 140 - maps only marketing POST /campaign_1/run
+  ---
+  duration_ms: 0.603458
+  type: 'test'
+  ...
+# Subtest: maps exact mail action test-email
+ok 141 - maps exact mail action test-email
+  ---
+  duration_ms: 0.961125
+  type: 'test'
+  ...
+# Subtest: maps exact mail action customers/email
+ok 142 - maps exact mail action customers/email
+  ---
+  duration_ms: 0.436958
+  type: 'test'
+  ...
+# Subtest: rejects arbitrary marketing writes and missing keys
+ok 143 - rejects arbitrary marketing writes and missing keys
+  ---
+  duration_ms: 0.390583
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+ok 144 - exact-seven canonical adapter: POST /api/affiliates/admin/woocommerce-sync
+  ---
+  duration_ms: 127.143416
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+ok 145 - exact-seven canonical adapter: POST /api/affiliates/admin/portal-commerce-sync
+  ---
+  duration_ms: 1.7645
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+ok 146 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 1.46625
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+ok 147 - exact-seven canonical adapter: DELETE /api/affiliates/admin/orders/123/attribute
+  ---
+  duration_ms: 1.263375
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+ok 148 - exact-seven canonical adapter: POST /api/affiliates/admin/orders/123/refund
+  ---
+  duration_ms: 0.645542
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+ok 149 - exact-seven canonical adapter: POST /api/affiliates/admin/subscriptions/sub_123
+  ---
+  duration_ms: 0.558875
+  type: 'test'
+  ...
+# Subtest: exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+ok 150 - exact-seven canonical adapter: GET /api/affiliates/orders/order_123?refresh=1
+  ---
+  duration_ms: 0.797125
+  type: 'test'
+  ...
+# Subtest: migration command cannot start an independent affiliate database
+ok 151 - migration command cannot start an independent affiliate database
+  ---
+  duration_ms: 1.054542
+  type: 'test'
+  ...
+# Subtest: bootstrap refuses independent accounts before DB work
+ok 152 - bootstrap refuses independent accounts before DB work
+  ---
+  duration_ms: 196.175292
+  type: 'test'
+  ...
+# Subtest: duplicate scheduled ownership is gone even when directly invoked
+ok 153 - duplicate scheduled ownership is gone even when directly invoked
+  ---
+  duration_ms: 2.296292
+  type: 'test'
+  ...
+# Subtest: shared UI uses New York DST boundaries and retains affiliate/category
+ok 154 - shared UI uses New York DST boundaries and retains affiliate/category
+  ---
+  duration_ms: 54.549542
+  type: 'test'
+  ...
+# Subtest: partial payout UI rejects mixed currency and excess allocations
+ok 155 - partial payout UI rejects mixed currency and excess allocations
+  ---
+  duration_ms: 1.39675
+  type: 'test'
+  ...
+# Subtest: currency selection uses payout allocation currencies and keeps unknown records
+ok 156 - currency selection uses payout allocation currencies and keeps unknown records
+  ---
+  duration_ms: 0.335042
+  type: 'test'
+  ...
+# Subtest: full settlement nets out-of-filter negative adjustments and protects uncertain tokens
+ok 157 - full settlement nets out-of-filter negative adjustments and protects uncertain tokens
+  ---
+  duration_ms: 1.362708
+  type: 'test'
+  ...
+# Subtest: explicit zero agreements are valid but missing agreements block approval
+ok 158 - explicit zero agreements are valid but missing agreements block approval
+  ---
+  duration_ms: 0.335084
+  type: 'test'
+  ...
+# Subtest: cross-store promotion requires matching current verified activations
+ok 159 - cross-store promotion requires matching current verified activations
+  ---
+  duration_ms: 0.19475
+  type: 'test'
+  ...
+# Subtest: affiliate comparison deduplicates mixed orders and excludes referral sales
+ok 160 - affiliate comparison deduplicates mixed orders and excludes referral sales
+  ---
+  duration_ms: 1.113417
+  type: 'test'
+  ...
+# Subtest: legacy financial write paths stay unavailable even with an idempotency header
+ok 161 - legacy financial write paths stay unavailable even with an idempotency header
+  ---
+  duration_ms: 125.720291
+  type: 'test'
+  ...
+# Subtest: bodyless logout uses authority and non-JSON body is rejected
+ok 162 - bodyless logout uses authority and non-JSON body is rejected
+  ---
+  duration_ms: 1.61425
+  type: 'test'
+  ...
+# Subtest: Shopify-shaped IDs cannot trigger Health provider operations
+ok 163 - Shopify-shaped IDs cannot trigger Health provider operations
+  ---
+  duration_ms: 1.164709
+  type: 'test'
+  ...
+# Subtest: unconfigured authority never falls through
+ok 164 - unconfigured authority never falls through
+  ---
+  duration_ms: 0.187708
+  type: 'test'
+  ...
+# Subtest: only named auth cookies and trusted portal credential go to fixed authority
+ok 165 - only named auth cookies and trusted portal credential go to fixed authority
+  ---
+  duration_ms: 1.344333
+  type: 'test'
+  ...
+# Subtest: CSRF null absent foreign origins and non-JSON mutations rejected
+ok 166 - CSRF null absent foreign origins and non-JSON mutations rejected
+  ---
+  duration_ms: 0.475833
+  type: 'test'
+  ...
+# Subtest: unknown targets ingestion jobs and method escalation denied
+ok 167 - unknown targets ingestion jobs and method escalation denied
+  ---
+  duration_ms: 0.826958
+  type: 'test'
+  ...
+# Subtest: unsafe authority and transport failures fail closed
+ok 168 - unsafe authority and transport failures fail closed
+  ---
+  duration_ms: 0.933875
+  type: 'test'
+  ...
+# Subtest: exchanges client credentials with the fixed Shopify endpoint before GraphQL
+ok 169 - exchanges client credentials with the fixed Shopify endpoint before GraphQL
+  ---
+  duration_ms: 120.346375
+  type: 'test'
+  ...
+# Subtest: shares an exchange across concurrent calls and caches until the expiry skew
+ok 170 - shares an exchange across concurrent calls and caches until the expiry skew
+  ---
+  duration_ms: 3.889791
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: null
+ok 171 - rejects malformed/unscoped grants: null
+  ---
+  duration_ms: 0.758959
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: {}
+ok 172 - rejects malformed/unscoped grants: {}
+  ---
+  duration_ms: 0.514708
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: {"access_token":""}
+ok 173 - rejects malformed/unscoped grants: {"access_token":""}
+  ---
+  duration_ms: 0.3715
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":0,"scope":"read_orders"}
+ok 174 - rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":0,"scope":"read_orders"}
+  ---
+  duration_ms: 0.283833
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":"86400","scope":"read_orders"}
+ok 175 - rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":"86400","scope":"read_orders"}
+  ---
+  duration_ms: 0.228208
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":86400,"scope":""}
+ok 176 - rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":86400,"scope":""}
+  ---
+  duration_ms: 0.358833
+  type: 'test'
+  ...
+# Subtest: rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":86400,"scope":["read_orders"]}
+ok 177 - rejects malformed/unscoped grants: {"access_token":"fixture","expires_in":86400,"scope":["read_orders"]}
+  ---
+  duration_ms: 1.610083
+  type: 'test'
+  ...
+# Subtest: failed exchange is sanitized and a later call can recover
+ok 178 - failed exchange is sanitized and a later call can recover
+  ---
+  duration_ms: 1.327458
+  type: 'test'
+  ...
+# Subtest: rejects non-success exchange even if its body looks like a grant
+ok 179 - rejects non-success exchange even if its body looks like a grant
+  ---
+  duration_ms: 0.387875
+  type: 'test'
+  ...
+# Subtest: sanitizes a rejected singleflight for every concurrent waiter
+ok 180 - sanitizes a rejected singleflight for every concurrent waiter
+  ---
+  duration_ms: 0.277542
+  type: 'test'
+  ...
+# Subtest: read-only 401 renews once, and a second 401 invalidates without looping
+ok 181 - read-only 401 renews once, and a second 401 invalidates without looping
+  ---
+  duration_ms: 1.085125
+  type: 'test'
+  ...
+# Subtest: never replays mutation documents: mutation { discountCodeDeactivate(id: "fixture") { userErrors { message } } }
+ok 182 - never replays mutation documents: mutation { discountCodeDeactivate(id: "fixture") { userErrors { message } } }
+  ---
+  duration_ms: 0.462666
+  type: 'test'
+  ...
+# Subtest: never replays mutation documents: \# comment\\nmutation Change { x }
+ok 183 - never replays mutation documents: \# comment\\nmutation Change { x }
+  ---
+  duration_ms: 0.4595
+  type: 'test'
+  ...
+# Subtest: never replays mutation documents: query Read { shop { id } } mutation Change { x }
+ok 184 - never replays mutation documents: query Read { shop { id } } mutation Change { x }
+  ---
+  duration_ms: 0.368542
+  type: 'test'
+  ...
+# Subtest: never replays mutation documents: { shop { id } } mutation Change { x }
+ok 185 - never replays mutation documents: { shop { id } } mutation Change { x }
+  ---
+  duration_ms: 0.369084
+  type: 'test'
+  ...
+# Subtest: late 401 cannot evict a newer token generation even when token text is identical
+ok 186 - late 401 cannot evict a newer token generation even when token text is identical
+  ---
+  duration_ms: 0.50875
+  type: 'test'
+  ...
+# Subtest: transport and JSON failures never leak secrets or replay: query { shop { id } }
+ok 187 - transport and JSON failures never leak secrets or replay: query { shop { id } }
+  ---
+  duration_ms: 0.429667
+  type: 'test'
+  ...
+# Subtest: transport and JSON failures never leak secrets or replay: mutation { x }
+ok 188 - transport and JSON failures never leak secrets or replay: mutation { x }
+  ---
+  duration_ms: 0.340292
+  type: 'test'
+  ...
+# Subtest: static token remains supported without exchange or retry
+ok 189 - static token remains supported without exchange or retry
+  ---
+  duration_ms: 0.243708
+  type: 'test'
+  ...
+# Subtest: partial credentials fail closed despite static fallback: SUPPLEMENTS_SHOPIFY_CLIENT_ID
+ok 190 - partial credentials fail closed despite static fallback: SUPPLEMENTS_SHOPIFY_CLIENT_ID
+  ---
+  duration_ms: 0.14175
+  type: 'test'
+  ...
+# Subtest: partial credentials fail closed despite static fallback: SUPPLEMENTS_SHOPIFY_CLIENT_SECRET
+ok 191 - partial credentials fail closed despite static fallback: SUPPLEMENTS_SHOPIFY_CLIENT_SECRET
+  ---
+  duration_ms: 0.140625
+  type: 'test'
+  ...
+# Subtest: rejects nonexact store without network: other.myshopify.com
+ok 192 - rejects nonexact store without network: other.myshopify.com
+  ---
+  duration_ms: 0.349834
+  type: 'test'
+  ...
+# Subtest: rejects nonexact store without network: https://nr9zd0-t5.myshopify.com
+ok 193 - rejects nonexact store without network: https://nr9zd0-t5.myshopify.com
+  ---
+  duration_ms: 0.128333
+  type: 'test'
+  ...
+# Subtest: rejects nonexact store without network: nr9zd0-t5.myshopify.com.evil.example
+ok 194 - rejects nonexact store without network: nr9zd0-t5.myshopify.com.evil.example
+  ---
+  duration_ms: 0.102333
+  type: 'test'
+  ...
+# Subtest: rejects nonexact store without network:  nr9zd0-t5.myshopify.com
+ok 195 - rejects nonexact store without network:  nr9zd0-t5.myshopify.com
+  ---
+  duration_ms: 0.09725
+  type: 'test'
+  ...
+# Subtest: rejects nonexact store without network: 
+ok 196 - rejects nonexact store without network: 
+  ---
+  duration_ms: 0.193333
+  type: 'test'
+  ...
+# Subtest: does not renew or replay HTTP 403
+ok 197 - does not renew or replay HTTP 403
+  ---
+  duration_ms: 0.651791
+  type: 'test'
+  ...
+# Subtest: does not renew or replay HTTP 429
+ok 198 - does not renew or replay HTTP 429
+  ---
+  duration_ms: 0.335208
+  type: 'test'
+  ...
+# Subtest: does not renew or replay HTTP 500
+ok 199 - does not renew or replay HTTP 500
+  ---
+  duration_ms: 0.449833
+  type: 'test'
+  ...
+# Subtest: credentials take precedence over static fallback
+ok 200 - credentials take precedence over static fallback
+  ---
+  duration_ms: 0.447875
+  type: 'test'
+  ...
+# Subtest: credential rotation isolates in-flight exchanges from the new cache
+ok 201 - credential rotation isolates in-flight exchanges from the new cache
+  ---
+  duration_ms: 1.077792
+  type: 'test'
+  ...
+# Subtest: GraphQL authorization errors are sanitized and do not refresh
+ok 202 - GraphQL authorization errors are sanitized and do not refresh
+  ---
+  duration_ms: 1.028625
+  type: 'test'
+  ...
+# Subtest: successful 401 recovery replays reads with the renewed token
+ok 203 - successful 401 recovery replays reads with the renewed token
+  ---
+  duration_ms: 1.696375
+  type: 'test'
+  ...
+# Subtest: does not leak rejected response-stream cancellation errors
+ok 204 - does not leak rejected response-stream cancellation errors
+  ---
+  duration_ms: 0.339458
+  type: 'test'
+  ...
+# Subtest: concurrent 401s use a single renewal exchange
+ok 205 - concurrent 401s use a single renewal exchange
+  ---
+  duration_ms: 0.810167
+  type: 'test'
+  ...
+1..205
+# tests 205
+# suites 0
+# pass 188
+# fail 13
+# cancelled 0
+# skipped 4
+# todo 0
+# duration_ms 2393.24425

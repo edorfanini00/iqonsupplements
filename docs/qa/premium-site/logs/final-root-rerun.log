@@ -1,0 +1,811 @@
+TAP version 13
+# Subtest: a supplement bag persists, updates, discounts and reaches hosted checkout
+ok 1 - a supplement bag persists, updates, discounts and reaches hosted checkout
+  ---
+  duration_ms: 26.077
+  type: 'test'
+  ...
+# Subtest: expired carts clear the buyer's stale selection and a later add creates a fresh cart
+ok 2 - expired carts clear the buyer's stale selection and a later add creates a fresh cart
+  ---
+  duration_ms: 1.756667
+  type: 'test'
+  ...
+# Subtest: unavailable inventory and mismatched variants cannot be purchased
+ok 3 - unavailable inventory and mismatched variants cannot be purchased
+  ---
+  duration_ms: 0.667958
+  type: 'test'
+  ...
+# Subtest: Shopify quantity errors include the corrected public bag, never its checkout secret
+ok 4 - Shopify quantity errors include the corrected public bag, never its checkout secret
+  ---
+  duration_ms: 0.829917
+  type: 'test'
+  ...
+# Subtest: invalid discount codes remain removable and never fabricate savings
+ok 5 - invalid discount codes remain removable and never fabricate savings
+  ---
+  duration_ms: 1.395542
+  type: 'test'
+  ...
+# Subtest: cart and checkout reject cross-origin writes and unsafe checkout links
+ok 6 - cart and checkout reject cross-origin writes and unsafe checkout links
+  ---
+  duration_ms: 0.78
+  type: 'test'
+  ...
+# Subtest: new lines are one time only: no selling plan reaches Shopify, whatever the request says
+ok 7 - new lines are one time only: no selling plan reaches Shopify, whatever the request says
+  ---
+  duration_ms: 1.746458
+  type: 'test'
+  ...
+# Subtest: a subscription line from an older bag still shows as a subscription and can be changed or removed
+ok 8 - a subscription line from an older bag still shows as a subscription and can be changed or removed
+  ---
+  duration_ms: 0.909291
+  type: 'test'
+  ...
+# Subtest: arbitrary synthetic allocations map product and order savings and reconcile to cart cost (not bundle policy)
+ok 9 - arbitrary synthetic allocations map product and order savings and reconcile to cart cost (not bundle policy)
+  ---
+  duration_ms: 1.498708
+  type: 'test'
+  ...
+# Subtest: planned synthetic policy selects the best single tier or noncombining creator code below and above thresholds
+ok 10 - planned synthetic policy selects the best single tier or noncombining creator code below and above thresholds
+  ---
+  duration_ms: 3.573791
+  type: 'test'
+  ...
+# Subtest: planned synthetic bundle qualification includes Gut Health and uses only the highest eligible tier
+ok 11 - planned synthetic bundle qualification includes Gut Health and uses only the highest eligible tier
+  ---
+  duration_ms: 1.693417
+  type: 'test'
+  ...
+# Subtest: retired Colon Gentle Cleanse stays out of the catalog and cannot be added while still published in Shopify
+ok 12 - retired Colon Gentle Cleanse stays out of the catalog and cannot be added while still published in Shopify
+  ---
+  duration_ms: 0.498666
+  type: 'test'
+  ...
+# Subtest: loading an old bag removes retired Colon Gentle Cleanse with a notice and preserves other supplements
+ok 13 - loading an old bag removes retired Colon Gentle Cleanse with a notice and preserves other supplements
+  ---
+  duration_ms: 0.657083
+  type: 'test'
+  ...
+# Subtest: a retired Colon line cannot have its quantity changed
+ok 14 - a retired Colon line cannot have its quantity changed
+  ---
+  duration_ms: 0.557875
+  type: 'test'
+  ...
+# Subtest: checkout removes a retired Colon line and requires review before handing off to Shopify
+ok 15 - checkout removes a retired Colon line and requires review before handing off to Shopify
+  ---
+  duration_ms: 0.58625
+  type: 'test'
+  ...
+# Subtest: a bag holding only a retired Colon line is emptied and cannot check out
+ok 16 - a bag holding only a retired Colon line is emptied and cannot check out
+  ---
+  duration_ms: 0.5775
+  type: 'test'
+  ...
+# Subtest: an old bag with skincare and Colon removes both and shows both notices
+ok 17 - an old bag with skincare and Colon removes both and shows both notices
+  ---
+  duration_ms: 0.507042
+  type: 'test'
+  ...
+# Subtest: skincare cannot be added, even when Shopify reports available stock
+ok 18 - skincare cannot be added, even when Shopify reports available stock
+  ---
+  duration_ms: 0.592167
+  type: 'test'
+  ...
+# Subtest: loading an old bag removes skincare and preserves supplements
+ok 19 - loading an old bag removes skincare and preserves supplements
+  ---
+  duration_ms: 0.614958
+  type: 'test'
+  ...
+# Subtest: checkout removes old skincare and requires review before handing off to Shopify
+ok 20 - checkout removes old skincare and requires review before handing off to Shopify
+  ---
+  duration_ms: 0.694917
+  type: 'test'
+  ...
+# Subtest: the custom privacy implementation, its migration and route are absent from source
+ok 21 - the custom privacy implementation, its migration and route are absent from source
+  ---
+  duration_ms: 45.730834
+  type: 'test'
+  ...
+# Subtest: checkout, cart and layout are byte-identical to main: no consent dependency in checkout
+not ok 22 - checkout, cart and layout are byte-identical to main: no consent dependency in checkout
+  ---
+  duration_ms: 17.093291
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/hosted-privacy-release.test.mjs:30:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    lib/shopify.server.ts
+    + actual - expected
+    ... Skipped lines
+    
+      'import { cache } from "react";\n' +
+        'import { cookies, headers } from "next/headers";\n' +
+        'import { products, type StoreCatalog } from "./catalog";\n' +
+        'import { mergeCatalogMerchandise } from "./merchandise";\n' +
+        'import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";\n' +
+        'import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";\n' +
+        'import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";\n' +
+    +   'import { isRetiredProductHandle } from "./legacy-redirects";\n' +
+        '\n' +
+        '// Standard server environment variables work on Vercel and on the retained\n' +
+        '// Worker target with nodejs_compat_populate_process_env enabled.\n' +
+        'function config() { return shopifyConfig(process.env); }\n' +
+        'async function buyerIP() {\n' +
+    ...
+        '}\n' +
+    +   '// Retired supplements (still published in Shopify) can linger in bags created before they were retired.\n' +
+    +   'function retiredLines(cart:ShopifyCart) {\n' +
+    +   '  return cart.lines.nodes.filter(line=>isRetiredProductHandle(line.merchandise.product.handle));\n' +
+    +   '}\n' +
+    +   'type Refreshed={cart:ShopifyCart|null;removed:boolean;removedLineIds:string[];notices:string[]};\n' +
+    +   'async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<Refreshed> {\n' +
+    +   '  if(!cart)return {cart:null,removed:false,removedLineIds:[],notices:[]};\n' +
+    +   '  const skincare=blockedSkincareLines(cart);\n' +
+    +   '  const retired=retiredLines(cart).filter(line=>!skincare.includes(line));\n' +
+    +   '  const blocked=[...skincare,...retired];\n' +
+    +   '  if(!blocked.length)return {cart,removed:false,removedLineIds:[],notices:[]};\n' +
+    -   'async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<{cart:ShopifyCart|null;removed:boolean}> {\n' +
+    -   '  if(!cart)return {cart:null,removed:false};\n' +
+    -   '  const blocked=blockedSkincareLines(cart);\n' +
+    -   '  if(!blocked.length)return {cart,removed:false};\n' +
+        '  const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});\n' +
+    +   '  const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];\n' +
+    +   '  return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};\n' +
+    -   '  return {cart:result.cart,removed:true};\n' +
+        '}\n' +
+        'const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";\n' +
+    +   'const retiredNotice="Colon Gentle Cleanse has been discontinued and was removed from your bag. Gut Health replaces it.";\n' +
+        'export async function getCartResponse() {\n' +
+    +   '  try {const {cart,removed,notices}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:notices.join(" ")}:{})},{headers:responseHeaders});}catch(error){return fail(error);}\n' +
+    -   '  try {const {cart,removed}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:skincareNotice}:{})},{headers:responseHeaders});}catch(error){return fail(error);}\n' +
+        '}\n' +
+        'export async function mutateCartResponse(request:Request) {\n' +
+        '  try {\n' +
+        '    sameOrigin(request);\n' +
+        '    if(Number(request.headers.get("content-length")||0)>4096) throw new CommerceError("Invalid request.",413);\n' +
+    ...
+        '      if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);\n' +
+    +   '      // Subscriptions are retired: a new line is always a one time purchase and never carries a selling plan.\n' +
+    +   '      if(input.sellingPlanId!==undefined||(input.purchase!==undefined&&input.purchase!=="once")) throw new CommerceError("Subscriptions are no longer offered. Choose a one time purchase.",422,publicCart(current));\n' +
+    +   '      const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&!l.sellingPlanAllocation);\n' +
+    -   '      if(input.sellingPlanId!==undefined&&(typeof input.sellingPlanId!=="string"||!/^gid:\\/\\/shopify\\/SellingPlan\\/\\d+$/.test(input.sellingPlanId))) throw new CommerceError("Choose an available subscription plan.",400);\n' +
+    -   '      const plan=input.sellingPlanId?variant.sellingPlans?.find(plan=>plan.id===input.sellingPlanId):undefined;\n' +
+    -   '      if(input.sellingPlanId&&!plan) throw new CommerceError("This subscription is not available for the selected option.",422);\n' +
+    -   '      if((product.requiresSellingPlan||input.purchase==="subscription")&&!plan) throw new CommerceError("Choose a subscription plan before adding this product.",422);\n' +
+    -   '      const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&(l.sellingPlanAllocation?.sellingPlan.id||undefined)===plan?.id);\n' +
+        '      if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);\n' +
+        '      if(!existing && current && current.lines.nodes.length>=99) throw new CommerceError("Your bag is full. Please complete this order first.",422);\n' +
+    +   '      const lines=[{merchandiseId:variant.id,quantity}];\n' +
+    -   '      const lines=[{merchandiseId:variant.id,quantity,...(plan?{sellingPlanId:plan.id}:{})}];\n' +
+        '      result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});\n' +
+        '    } else if(input.action==="update") {\n' +
+        '      const quantity=validQuantity(input.quantity,true);\n' +
+    +   '      if(typeof input.lineId==="string"&&refreshed.removedLineIds.includes(input.lineId)) throw new CommerceError(refreshed.notices.join(" "),422,publicCart(current));\n' +
+        '      if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));\n' +
+        '      result=quantity?await mutate(CART_UPDATE,{cartId:current.id,lines:[{id:input.lineId,quantity}]}):await mutate(CART_REMOVE,{cartId:current.id,lineIds:[input.lineId]});\n' +
+        '    } else if(input.action==="discount") {\n' +
+        '      const discountCodes=validDiscountCodes(input.discountCodes);\n' +
+        '      if(!current?.totalQuantity) throw new CommerceError("Add an item to your bag before applying a code.",422,publicCart(current));\n' +
+    ...
+        '    const snapshot=publicCart(current);\n' +
+    +   '    const notices=[...refreshed.notices,...(result.warnings?.map(w=>w.message)||[])];\n' +
+    -   '    const notices=[...(refreshed.removed?[skincareNotice]:[]),...(result.warnings?.map(w=>w.message)||[])];\n' +
+        '    if(notices.length) snapshot.notice=notices.join(" ");\n' +
+        '    return Response.json(snapshot,{headers:responseHeaders});\n' +
+        '  } catch(error) {return fail(error);}\n' +
+        '}\n' +
+        'export async function checkoutResponse(request:Request) {\n' +
+    ...
+        '    const cart=refreshed.cart;\n' +
+    +   '    if(refreshed.removed) throw new CommerceError(`${refreshed.notices.join(" ")} Please review your bag before checking out.`,422,publicCart(cart));\n' +
+    -   '    if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));\n' +
+        '    if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));\n' +
+        '    if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);\n' +
+    +   '    const url='... 247 more characters
+    -   '    const url=new URL(cart.checkoutUrl);\n' +
+    -   '    if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");\n' +
+    -   '    return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});\n' +
+    -   '  }catch(error){return fail(error);}\n' +
+    -   '}\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: |-
+    import { cache } from "react";
+    import { cookies, headers } from "next/headers";
+    import { products, type StoreCatalog } from "./catalog";
+    import { mergeCatalogMerchandise } from "./merchandise";
+    import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
+    import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+    import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
+    
+    // Standard server environment variables work on Vercel and on the retained
+    // Worker target with nodejs_compat_populate_process_env enabled.
+    function config() { return shopifyConfig(process.env); }
+    async function buyerIP() {
+      const requestHeaders=await headers();
+      // Vercel overwrites x-forwarded-for at its edge; Cloudflare sets cf-connecting-ip.
+      return process.env.VERCEL
+        ? requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined
+        : requestHeaders.get("cf-connecting-ip") || undefined;
+    }
+    async function readCatalog():Promise<StoreCatalog> {
+      const settings=config();
+      if(!settings) return {mode:"preview",products,currency:"USD"};
+      const list:StoreCatalog["products"]=[];
+      let after:string|null=null;
+      do {
+        const data:{products:{nodes:ShopifyProduct[];pageInfo:{hasNextPage:boolean;endCursor:string|null}}}=await shopifyRequest(settings,CATALOG_QUERY,{after},await buyerIP());
+        for(const node of data.products.nodes) {const product=mapProduct(node,list.length); if(product) list.push(product);}
+        after=data.products.pageInfo.hasNextPage?data.products.pageInfo.endCursor:null;
+        if(data.products.pageInfo.hasNextPage&&!after) throw new CommerceError("The collection is temporarily unavailable.");
+      } while(after);
+      return {mode:"live",products:mergeCatalogMerchandise(list,products),currency:list[0]?.currency||"USD"};
+    }
+    // Request-scoped memoization only; no buyer-specific data in global caches.
+    export const getStoreCatalog=cache(async():Promise<StoreCatalog>=>{
+      try {return await readCatalog();}
+      catch {return {mode:"unavailable",products:[],currency:"USD"};}
+    });
+    
+    const CART_COOKIE="iqon_shopify_cart";
+    async function cartId() {return (await cookies()).get(CART_COOKIE)?.value;}
+    async function setCartId(id:string,request:Request) {
+      (await cookies()).set(CART_COOKIE,id,{httpOnly:true,secure:new URL(request.url).protocol==="https:",sameSite:"lax",path:"/",maxAge:60*60*24*10});
+    }
+    async function readCart():Promise<ShopifyCart|null> {
+      const settings=config();
+      if(!settings) throw new CommerceError("Orders are not open yet.",503);
+      const id=await cartId();
+      if(!id) return null;
+      const result=await shopifyRequest<{cart:ShopifyCart|null}>(settings,CART_QUERY,{id},await buyerIP());
+      return result.cart;
+    }
+    type CartPayload={cart:ShopifyCart|null;userErrors:{message:string}[];warnings?:{message:string}[]};
+    async function mutate(query:string,variables:Record<string,unknown>):Promise<CartPayload> {
+      const settings=config();
+      if(!settings) throw new CommerceError("Orders are not open yet.",503);
+      const data=await shopifyRequest<Record<string,CartPayload>>(settings,query,variables,await buyerIP());
+      const result=Object.values(data)[0];
+      if(result.userErrors.length) throw new CommerceError(result.userErrors.map(e=>e.message).join(" "),422,result.cart?publicCart(result.cart):undefined);
+      if(!result.cart) throw new CommerceError("We couldn’t update your bag. Please try again.");
+      return result;
+    }
+    const responseHeaders={"Cache-Control":"private, no-store","Vary":"Cookie","X-Content-Type-Options":"nosniff"};
+    function fail(error:unknown) {
+      return Response.json({error:error instanceof CommerceError?error.message:"We couldn’t update your bag. Please try again.",
+        ...(error instanceof CommerceError&&error.cart?{cart:error.cart}:{})},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
+    }
+    function blockedSkincareLines(cart:ShopifyCart) {
+      return cart.lines.nodes.filter(line=>SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p))));
+    }
+    async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<{cart:ShopifyCart|null;removed:boolean}> {
+      if(!cart)return {cart:null,removed:false};
+      const blocked=blockedSkincareLines(cart);
+      if(!blocked.length)return {cart,removed:false};
+      const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
+      return {cart:result.cart,removed:true};
+    }
+    const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
+    export async function getCartResponse() {
+      try {const {cart,removed}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:skincareNotice}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
+    }
+    export async function mutateCartResponse(request:Request) {
+      try {
+        sameOrigin(request);
+        if(Number(request.headers.get("content-length")||0)>4096) throw new CommerceError("Invalid request.",413);
+        const text=await request.text();
+        if(text.length>4096) throw new CommerceError("Invalid request.",413);
+        let input:Record<string,unknown>;
+        try {input=JSON.parse(text);}catch {throw new CommerceError("Invalid request.",400);}
+        if(!input||typeof input!=="object"||Array.isArray(input)) throw new CommerceError("Invalid request.",400);
+        const refreshed=await removeUpcomingProducts(await readCart());
+        let current=refreshed.cart;
+        let result:CartPayload;
+        if(input.action==="add") {
+          const quantity=validQuantity(input.quantity);
+          const catalog=await readCatalog();
+          const product=catalog.products.find(p=>p.id===input.id);
+          const variant=product?.variants?.find(v=>v.id===input.variantId);
+          if(product&&isComingSoon(product)) throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422,publicCart(current));
+          if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);
+          if(input.sellingPlanId!==undefined&&(typeof input.sellingPlanId!=="string"||!/^gid:\/\/shopify\/SellingPlan\/\d+$/.test(input.sellingPlanId))) throw new CommerceError("Choose an available subscription plan.",400);
+          const plan=input.sellingPlanId?variant.sellingPlans?.find(plan=>plan.id===input.sellingPlanId):undefined;
+          if(input.sellingPlanId&&!plan) throw new CommerceError("This subscription is not available for the selected option.",422);
+          if((product.requiresSellingPlan||input.purchase==="subscription")&&!plan) throw new CommerceError("Choose a subscription plan before adding this product.",422);
+          const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&(l.sellingPlanAllocation?.sellingPlan.id||undefined)===plan?.id);
+          if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);
+          if(!existing && current && current.lines.nodes.length>=99) throw new CommerceError("Your bag is full. Please complete this order first.",422);
+          const lines=[{merchandiseId:variant.id,quantity,...(plan?{sellingPlanId:plan.id}:{})}];
+          result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
+        } else if(input.action==="update") {
+          const quantity=validQuantity(input.quantity,true);
+          if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));
+          result=quantity?await mutate(CART_UPDATE,{cartId:current.id,lines:[{id:input.lineId,quantity}]}):await mutate(CART_REMOVE,{cartId:current.id,lineIds:[input.lineId]});
+        } else if(input.action==="discount") {
+          const discountCodes=validDiscountCodes(input.discountCodes);
+          if(!current?.totalQuantity) throw new CommerceError("Add an item to your bag before applying a code.",422,publicCart(current));
+          result=await mutate(CART_DISCOUNTS,{cartId:current.id,discountCodes});
+        } else throw new CommerceError("Invalid request.",400);
+        current=result.cart!;
+        await setCartId(current.id,request);
+        const snapshot=publicCart(current);
+        const notices=[...(refreshed.removed?[skincareNotice]:[]),...(result.warnings?.map(w=>w.message)||[])];
+        if(notices.length) snapshot.notice=notices.join(" ");
+        return Response.json(snapshot,{headers:responseHeaders});
+      } catch(error) {return fail(error);}
+    }
+    export async function checkoutResponse(request:Request) {
+      try {
+        sameOrigin(request);
+        // Refresh immediately before handing the buyer to Shopify's hosted checkout.
+        const refreshed=await removeUpcomingProducts(await readCart());
+        const cart=refreshed.cart;
+        if(refreshed.removed) throw new CommerceError("Skincare is coming soon and has been removed. Please review your bag before checking out.",422,publicCart(cart));
+        if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
+        if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
+        const url=new URL(cart.checkoutUrl);
+        if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
+        return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
+      }catch(error){return fail(error);}
+    }
+    
+  actual: |-
+    import { cache } from "react";
+    import { cookies, headers } from "next/headers";
+    import { products, type StoreCatalog } from "./catalog";
+    import { mergeCatalogMerchandise } from "./merchandise";
+    import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
+    import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+    import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
+    import { isRetiredProductHandle } from "./legacy-redirects";
+    
+    // Standard server environment variables work on Vercel and on the retained
+    // Worker target with nodejs_compat_populate_process_env enabled.
+    function config() { return shopifyConfig(process.env); }
+    async function buyerIP() {
+      const requestHeaders=await headers();
+      // Vercel overwrites x-forwarded-for at its edge; Cloudflare sets cf-connecting-ip.
+      return process.env.VERCEL
+        ? requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined
+        : requestHeaders.get("cf-connecting-ip") || undefined;
+    }
+    async function readCatalog():Promise<StoreCatalog> {
+      const settings=config();
+      if(!settings) return {mode:"preview",products,currency:"USD"};
+      const list:StoreCatalog["products"]=[];
+      let after:string|null=null;
+      do {
+        const data:{products:{nodes:ShopifyProduct[];pageInfo:{hasNextPage:boolean;endCursor:string|null}}}=await shopifyRequest(settings,CATALOG_QUERY,{after},await buyerIP());
+        for(const node of data.products.nodes) {const product=mapProduct(node,list.length); if(product) list.push(product);}
+        after=data.products.pageInfo.hasNextPage?data.products.pageInfo.endCursor:null;
+        if(data.products.pageInfo.hasNextPage&&!after) throw new CommerceError("The collection is temporarily unavailable.");
+      } while(after);
+      return {mode:"live",products:mergeCatalogMerchandise(list,products),currency:list[0]?.currency||"USD"};
+    }
+    // Request-scoped memoization only; no buyer-specific data in global caches.
+    export const getStoreCatalog=cache(async():Promise<StoreCatalog>=>{
+      try {return await readCatalog();}
+      catch {return {mode:"unavailable",products:[],currency:"USD"};}
+    });
+    
+    const CART_COOKIE="iqon_shopify_cart";
+    async function cartId() {return (await cookies()).get(CART_COOKIE)?.value;}
+    async function setCartId(id:string,request:Request) {
+      (await cookies()).set(CART_COOKIE,id,{httpOnly:true,secure:new URL(request.url).protocol==="https:",sameSite:"lax",path:"/",maxAge:60*60*24*10});
+    }
+    async function readCart():Promise<ShopifyCart|null> {
+      const settings=config();
+      if(!settings) throw new CommerceError("Orders are not open yet.",503);
+      const id=await cartId();
+      if(!id) return null;
+      const result=await shopifyRequest<{cart:ShopifyCart|null}>(settings,CART_QUERY,{id},await buyerIP());
+      return result.cart;
+    }
+    type CartPayload={cart:ShopifyCart|null;userErrors:{message:string}[];warnings?:{message:string}[]};
+    async function mutate(query:string,variables:Record<string,unknown>):Promise<CartPayload> {
+      const settings=config();
+      if(!settings) throw new CommerceError("Orders are not open yet.",503);
+      const data=await shopifyRequest<Record<string,CartPayload>>(settings,query,variables,await buyerIP());
+      const result=Object.values(data)[0];
+      if(result.userErrors.length) throw new CommerceError(result.userErrors.map(e=>e.message).join(" "),422,result.cart?publicCart(result.cart):undefined);
+      if(!result.cart) throw new CommerceError("We couldn’t update your bag. Please try again.");
+      return result;
+    }
+    const responseHeaders={"Cache-Control":"private, no-store","Vary":"Cookie","X-Content-Type-Options":"nosniff"};
+    function fail(error:unknown) {
+      return Response.json({error:error instanceof CommerceError?error.message:"We couldn’t update your bag. Please try again.",
+        ...(error instanceof CommerceError&&error.cart?{cart:error.cart}:{})},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
+    }
+    function blockedSkincareLines(cart:ShopifyCart) {
+      return cart.lines.nodes.filter(line=>SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p))));
+    }
+    // Retired supplements (still published in Shopify) can linger in bags created before they were retired.
+    function retiredLines(cart:ShopifyCart) {
+      return cart.lines.nodes.filter(line=>isRetiredProductHandle(line.merchandise.product.handle));
+    }
+    type Refreshed={cart:ShopifyCart|null;removed:boolean;removedLineIds:string[];notices:string[]};
+    async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<Refreshed> {
+      if(!cart)return {cart:null,removed:false,removedLineIds:[],notices:[]};
+      const skincare=blockedSkincareLines(cart);
+      const retired=retiredLines(cart).filter(line=>!skincare.includes(line));
+      const blocked=[...skincare,...retired];
+      if(!blocked.length)return {cart,removed:false,removedLineIds:[],notices:[]};
+      const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
+      const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];
+      return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};
+    }
+    const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
+    const retiredNotice="Colon Gentle Cleanse has been discontinued and was removed from your bag. Gut Health replaces it.";
+    export async function getCartResponse() {
+      try {const {cart,removed,notices}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:notices.join(" ")}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
+    }
+    export async function mutateCartResponse(request:Request) {
+      try {
+        sameOrigin(request);
+        if(Number(request.headers.get("content-length")||0)>4096) throw new CommerceError("Invalid request.",413);
+        const text=await request.text();
+        if(text.length>4096) throw new CommerceError("Invalid request.",413);
+        let input:Record<string,unknown>;
+        try {input=JSON.parse(text);}catch {throw new CommerceError("Invalid request.",400);}
+        if(!input||typeof input!=="object"||Array.isArray(input)) throw new CommerceError("Invalid request.",400);
+        const refreshed=await removeUpcomingProducts(await readCart());
+        let current=refreshed.cart;
+        let result:CartPayload;
+        if(input.action==="add") {
+          const quantity=validQuantity(input.quantity);
+          const catalog=await readCatalog();
+          const product=catalog.products.find(p=>p.id===input.id);
+          const variant=product?.variants?.find(v=>v.id===input.variantId);
+          if(product&&isComingSoon(product)) throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422,publicCart(current));
+          if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);
+          // Subscriptions are retired: a new line is always a one time purchase and never carries a selling plan.
+          if(input.sellingPlanId!==undefined||(input.purchase!==undefined&&input.purchase!=="once")) throw new CommerceError("Subscriptions are no longer offered. Choose a one time purchase.",422,publicCart(current));
+          const existing=current?.lines.nodes.find(l=>l.merchandise.id===variant.id&&!l.sellingPlanAllocation);
+          if(existing && existing.quantity+quantity>20) throw new CommerceError("You can add up to 20 of this option.",422);
+          if(!existing && current && current.lines.nodes.length>=99) throw new CommerceError("Your bag is full. Please complete this order first.",422);
+          const lines=[{merchandiseId:variant.id,quantity}];
+          result=current?await mutate(CART_ADD,{cartId:current.id,lines}):await mutate(CART_CREATE,{input:{lines}});
+        } else if(input.action==="update") {
+          const quantity=validQuantity(input.quantity,true);
+          if(typeof input.lineId==="string"&&refreshed.removedLineIds.includes(input.lineId)) throw new CommerceError(refreshed.notices.join(" "),422,publicCart(current));
+          if(!current || !current.lines.nodes.some(l=>l.id===input.lineId)) throw new CommerceError("Your bag has changed. Please review it and try again.",409,publicCart(current));
+          result=quantity?await mutate(CART_UPDATE,{cartId:current.id,lines:[{id:input.lineId,quantity}]}):await mutate(CART_REMOVE,{cartId:current.id,lineIds:[input.lineId]});
+        } else if(input.action==="discount") {
+          const discountCodes=validDiscountCodes(input.discountCodes);
+          if(!current?.totalQuantity) throw new CommerceError("Add an item to your bag before applying a code.",422,publicCart(current));
+          result=await mutate(CART_DISCOUNTS,{cartId:current.id,discountCodes});
+        } else throw new CommerceError("Invalid request.",400);
+        current=result.cart!;
+        await setCartId(current.id,request);
+        const snapshot=publicCart(current);
+        const notices=[...refreshed.notices,...(result.warnings?.map(w=>w.message)||[])];
+        if(notices.length) snapshot.notice=notices.join(" ");
+        return Response.json(snapshot,{headers:responseHeaders});
+      } catch(error) {return fail(error);}
+    }
+    export async function checkoutResponse(request:Request) {
+      try {
+        sameOrigin(request);
+        // Refresh immediately before handing the buyer to Shopify's hosted checkout.
+        const refreshed=await removeUpcomingProducts(await readCart());
+        const cart=refreshed.cart;
+        if(refreshed.removed) throw new CommerceError(`${refreshed.notices.join(" ")} Please review your bag before checking out.`,422,publicCart(cart));
+        if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));
+        if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.",422);
+        const url=new URL(cart.checkoutUrl);
+        if(url.protocol!=="https:") throw new CommerceError("Checkout is temporarily unavailable.");
+        return Response.json({checkoutUrl:cart.checkoutUrl},{headers:responseHeaders});
+      }catch(error){return fail(error);}
+    }
+    
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/hosted-privacy-release.test.mjs:32:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: store shell retains the public Privacy link without a custom consent runtime
+ok 23 - store shell retains the public Privacy link without a custom consent runtime
+  ---
+  duration_ms: 0.198709
+  type: 'test'
+  ...
+# Subtest: the privacy page links to the verified Shopify-hosted pages and keeps no consent state
+ok 24 - the privacy page links to the verified Shopify-hosted pages and keeps no consent state
+  ---
+  duration_ms: 0.166375
+  type: 'test'
+  ...
+# Subtest: build output: no /api/privacy route and no privacy runtime in any client bundle
+ok 25 - build output: no /api/privacy route and no privacy runtime in any client bundle
+  ---
+  duration_ms: 38.751083
+  type: 'test'
+  ...
+# Subtest: unpublished supplements and skincare are visible but cannot acquire inventory from editorial data
+ok 26 - unpublished supplements and skincare are visible but cannot acquire inventory from editorial data
+  ---
+  duration_ms: 1.363792
+  type: 'test'
+  ...
+# Subtest: a live Shopify record owns price, currency, stock and variants without duplication
+ok 27 - a live Shopify record owns price, currency, stock and variants without duplication
+  ---
+  duration_ms: 0.128667
+  type: 'test'
+  ...
+# Subtest: all seven current skincare prices match the owner-approved higher prices
+ok 28 - all seven current skincare prices match the owner-approved higher prices
+  ---
+  duration_ms: 0.301875
+  type: 'test'
+  ...
+# Subtest: approved skincare photography replaces only its primary image and preserves live commerce and other galleries
+ok 29 - approved skincare photography replaces only its primary image and preserves live commerce and other galleries
+  ---
+  duration_ms: 0.262
+  type: 'test'
+  ...
+# 7:29:50 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+# Subtest: every catalog product renders useful education with working section links
+ok 30 - every catalog product renders useful education with working section links
+  ---
+  duration_ms: 573.62675
+  type: 'test'
+  ...
+# Subtest: full supplement information preserves ingredients, allergens and label directions
+ok 31 - full supplement information preserves ingredients, allergens and label directions
+  ---
+  duration_ms: 1.282
+  type: 'test'
+  ...
+# Subtest: comparisons keep live prices and unique products, with the viewed product first
+ok 32 - comparisons keep live prices and unique products, with the viewed product first
+  ---
+  duration_ms: 27.012875
+  type: 'test'
+  ...
+# Subtest: all product pages keep illustrative ratings out of published reviews
+ok 33 - all product pages keep illustrative ratings out of published reviews
+  ---
+  duration_ms: 6.185583
+  type: 'test'
+  ...
+# Subtest: daily prices follow live currency and disappear for unconfirmed supply or multiple packs
+ok 34 - daily prices follow live currency and disappear for unconfirmed supply or multiple packs
+  ---
+  duration_ms: 1.317666
+  type: 'test'
+  ...
+# Subtest: renders development preview metadata
+not ok 35 - renders development preview metadata
+  ---
+  duration_ms: 60.172625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/rendered-html.test.mjs:7:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    __dirname is not defined in ES module scope
+    This file is being treated as an ES module because it has a '.js' file extension and '/Users/edorfanini/Projects/iqon-site-premium-20261107/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+  code: 'ERR_TEST_FAILURE'
+  name: 'ReferenceError'
+  stack: |-
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:17166:17
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:29:49
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:23072:339
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:29:49
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:23559:24
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:29:49
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:23564:24
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:29:49
+    file:///Users/edorfanini/Projects/iqon-site-premium-20261107/dist/server/index.js?test=31213-1794097790502:23565:5
+    ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+  ...
+# node:internal/modules/esm/resolve:839
+#       const error = new ERR_UNSUPPORTED_RESOLVE_REQUEST(specifier, base);
+#                     ^
+# TypeError [ERR_UNSUPPORTED_RESOLVE_REQUEST]: Failed to resolve module specifier "./legacy-redirects" from "data:text/javascript;base64,aW1wb3J0IHsgaXNDb21pbmdTb29uIH0gZnJvbSAiZGF0YTp0ZXh0L2phdmFzY3JpcHQ7YmFzZTY0LEx5b3FJRXRsWlhBZ2MydHBibU5oY21VZ2RtbHphV0pzWlNCbWIzSWdaR2x6WTI5MlpYSjVMQ0JpZFhRZ1kyeHZjMlZrSUhSdklHVjJaWEo1SUhCMWNtTm9ZWE5sSUdWdWRISjVJSEJ2YVc1MExpQXFMd3BsZUhCdmNuUWdkbUZ5SUZOTFNVNURRVkpGWDBOUFRVbE9SMTlUVDA5T0lEMGdkSEoxWlRzS1pYaHdiM0owSUdaMWJtTjBhVzl1SUdselEyOXRhVzVuVTI5dmJpaHdjbTlrZFdOMEtTQjdDaUFnSUNCeVpYUjFjbTRnVTB0SlRrTkJVa1ZmUTA5TlNVNUhYMU5QVDA0Z0ppWWdjSEp2WkhWamRDNWpZWFJsWjI5eWVTQTlQVDBnSW5OcmFXNWpZWEpsSWpzS2ZRb3ZLaW9nVkdobElITjBiM0psWm5KdmJuUW5jeUJ6YUdsd2NHbHVaeUJ6ZEdGMFpXMWxiblFzSUhOb1lYSmxaQ0JpZVNBdmFHVnNjQ0JoYm1RZ1pYWmxjbmtnY0hKdlpIVmpkQ0J3WVdkbExpQlVhR1VnZEhsd2FXTmhiQ0IzYVc1a2IzY2dhWE1nZEdobElHOTNibVZ5SjNNS0lDb2dLREl4SUU5amRHOWlaWElnTWpBeU5pazZJQ0l6SUhSdklEVWdaR0Y1Y3lJc0lHNXZkQ0JpZFhOcGJtVnpjeUJrWVhsekxDQjNhWFJvSUc1dklHZDFZWEpoYm5SbFpTQnZjaUJ6ZEdGeWRDQndiMmx1ZEM0Z1RXVjBhRzlrY3lCaGJtUWdZMjl6ZEhNZ1kyOXRaUW9nS2lCbWNtOXRJRk5vYjNCcFpua2dZMmhsWTJ0dmRYUXVJQ292Q21WNGNHOXlkQ0IyWVhJZ1UwaEpVRkJKVGtkZlRrOVVSU0E5SUNKVGFHbHdjR2x1WnlCMWMzVmhiR3g1SUhSaGEyVnpJRE1nZEc4Z05TQmtZWGx6TGlCQmRtRnBiR0ZpYkdVZ2MyaHBjSEJwYm1jZ2IzQjBhVzl1Y3lCaGJtUWdZMjl6ZEhNZ1lYSmxJSE5vYjNkdUlHRjBJR05vWldOcmIzVjBMaUk3Q2k4cUtpQklaV3h3SUc5dWJIazZJRk5vYjNCcFpua25jeUJUYUc5d0lHaGhibVJzWlhNZ2RISmhZMnRwYm1jZ2RYQmtZWFJsY3lBb2IzZHVaWElzSURJeElFOWpkRzlpWlhJZ01qQXlOaWs3SUc1dklITmxjR0Z5WVhSbElHMWxjM05oWjJVZ1puSnZiU0JKVVU5T0lHbHpJR2x0Y0d4cFpXUXVJQ292Q21WNGNHOXlkQ0IyWVhJZ1UwaFBVRjlVVWtGRFMwbE9SMTlPVDFSRklEMGdJbFJ5WVdOcmFXNW5JSFZ3WkdGMFpYTWdZWEpsSUdGMllXbHNZV0pzWlNCMGFISnZkV2RvSUZOb2IzQWdiMjVqWlNCNWIzVnlJRzl5WkdWeUlHbHpJRzl1SUdsMGN5QjNZWGt1SWpzS0x5b3FJRUVnY0hKdlpIVmpkQ0JoSUhOb2IzQndaWElnWTJGdUlHOXlaR1Z5SUhKcFoyaDBJRzV2ZHpvZ2JHbDJaU0JUYUc5d2FXWjVJR1JoZEdFc0lHNXZkQ0JqYjIxcGJtY2djMjl2YmlCdmNpQjFibkJ5YVdObFpDd2dkMmwwYUNCaGJpQmhkbUZwYkdGaWJHVUtJQ29nZG1GeWFXRnVkQzRnVUhKdlpIVmpkQ0JzYVc1cmN5QndjbVZ6Wlc1MFpXUWdZWE1nWVNCdVpYaDBJSEIxY21Ob1lYTmxJSE4wWlhBZ0tHZDFhV1JsY3l3Z2MyVnNaV04wYVc5dWN5a2djbVZ4ZFdseVpTQjBhR2x6T3lCaGJubDBhR2x1WnlCbGJITmxJR1poYVd4eklHTnNiM05sWkM0Z0tpOEtaWGh3YjNKMElHWjFibU4wYVc5dUlHbHpUM0prWlhKaFlteGxLSEJ5YjJSMVkzUXNJRzF2WkdVcElIc0tJQ0FnSUhaaGNpQmZZVHNLSUNBZ0lISmxkSFZ5YmlCdGIyUmxJRDA5UFNBaWJHbDJaU0lnSmlZZ0lXbHpRMjl0YVc1blUyOXZiaWh3Y205a2RXTjBLU0FtSmlBaGNISnZaSFZqZEM1d2NtbGpaVkJsYm1ScGJtY2dKaVlnY0hKdlpIVmpkQzVoZG1GcGJHRmliR1VnSVQwOUlHWmhiSE5sSUNZbUlDRWhLQ2hmWVNBOUlIQnliMlIxWTNRdWRtRnlhV0Z1ZEhNcElEMDlQU0J1ZFd4c0lIeDhJRjloSUQwOVBTQjJiMmxrSURBZ1B5QjJiMmxrSURBZ09pQmZZUzV6YjIxbEtHWjFibU4wYVc5dUlDaDJLU0I3SUhKbGRIVnliaUIyTG1GMllXbHNZV0pzWlRzZ2ZTa3BPd3A5Q2c9PSI7CmltcG9ydCB7IGlzUmV0aXJlZFByb2R1Y3RIYW5kbGUgfSBmcm9tICIuL2xlZ2FjeS1yZWRpcmVjdHMiOwpleHBvcnQgY2xhc3MgQ29tbWVyY2VFcnJvciBleHRlbmRzIEVycm9yIHsKICAgIHN0YXR1czsKICAgIGNhcnQ7CiAgICBjb25zdHJ1Y3RvcihtZXNzYWdlLCBzdGF0dXMgPSA1MDIsIGNhcnQpIHsKICAgICAgICBzdXBlcihtZXNzYWdlKTsKICAgICAgICB0aGlzLnN0YXR1cyA9IHN0YXR1czsKICAgICAgICB0aGlzLmNhcnQgPSBjYXJ0OwogICAgfQp9CmV4cG9ydCBmdW5jdGlvbiBzaG9waWZ5Q29uZmlnKHZhbHVlcykgewogICAgY29uc3QgZG9tYWluID0gU3RyaW5nKHZhbHVlcy5TSE9QSUZZX1NUT1JFX0RPTUFJTiB8fCAiIikudHJpbSgpLnRvTG93ZXJDYXNlKCk7CiAgICBjb25zdCB0b2tlbiA9IFN0cmluZyh2YWx1ZXMuU0hPUElGWV9TVE9SRUZST05UX1BSSVZBVEVfVE9LRU4gfHwgIiIpLnRyaW0oKTsKICAgIGlmICghZG9tYWluICYmICF0b2tlbikKICAgICAgICByZXR1cm4gbnVsbDsKICAgIGlmICghL15bYS16MC05XVthLXowLTktXSpcLm15c2hvcGlmeVwuY29tJC8udGVzdChkb21haW4pIHx8ICF0b2tlbikKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiVGhlIHN0b3JlIGlzIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlLiIsIDUwMyk7CiAgICBjb25zdCB2ZXJzaW9uID0gU3RyaW5nKHZhbHVlcy5TSE9QSUZZX0FQSV9WRVJTSU9OIHx8ICIyMDI2LTA3Iik7CiAgICBpZiAoIS9eMjBcZHsyfS0oMDF8MDR8MDd8MTApJC8udGVzdCh2ZXJzaW9uKSkKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiVGhlIHN0b3JlIGlzIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlLiIsIDUwMyk7CiAgICByZXR1cm4geyBkb21haW4sIHRva2VuLCB2ZXJzaW9uIH07Cn0KZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHNob3BpZnlSZXF1ZXN0KGNvbmZpZywgcXVlcnksIHZhcmlhYmxlcyA9IHt9LCBidXllcklQLCBmZXRjaGVyID0gZmV0Y2gpIHsKICAgIGNvbnN0IGhlYWRlcnMgPSB7ICJDb250ZW50LVR5cGUiOiAiYXBwbGljYXRpb24vanNvbiIsICJTaG9waWZ5LVN0b3JlZnJvbnQtUHJpdmF0ZS1Ub2tlbiI6IGNvbmZpZy50b2tlbiB9OwogICAgaWYgKGJ1eWVySVApCiAgICAgICAgaGVhZGVyc1siU2hvcGlmeS1TdG9yZWZyb250LUJ1eWVyLUlQIl0gPSBidXllcklQOwogICAgbGV0IHJlc3BvbnNlOwogICAgdHJ5IHsKICAgICAgICByZXNwb25zZSA9IGF3YWl0IGZldGNoZXIoYGh0dHBzOi8vJHtjb25maWcuZG9tYWlufS9hcGkvJHtjb25maWcudmVyc2lvbn0vZ3JhcGhxbC5qc29uYCwgewogICAgICAgICAgICBtZXRob2Q6ICJQT1NUIiwgaGVhZGVycywgYm9keTogSlNPTi5zdHJpbmdpZnkoeyBxdWVyeSwgdmFyaWFibGVzIH0pLCBjYWNoZTogIm5vLXN0b3JlIiwgc2lnbmFsOiBBYm9ydFNpZ25hbC50aW1lb3V0KDEyMDAwKSwKICAgICAgICB9KTsKICAgIH0KICAgIGNhdGNoIHsKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiV2UgY291bGRu4oCZdCByZWFjaCB0aGUgc3RvcmUuIFBsZWFzZSB0cnkgYWdhaW4uIik7CiAgICB9CiAgICBpZiAoIXJlc3BvbnNlLm9rKQogICAgICAgIHRocm93IG5ldyBDb21tZXJjZUVycm9yKCJUaGUgc3RvcmUgaXMgdGVtcG9yYXJpbHkgdW5hdmFpbGFibGUuIFBsZWFzZSB0cnkgYWdhaW4uIiwgcmVzcG9uc2Uuc3RhdHVzID09PSA0MjkgPyA0MjkgOiA1MDIpOwogICAgY29uc3QgcmVzdWx0ID0gYXdhaXQgcmVzcG9uc2UuanNvbigpOwogICAgaWYgKHJlc3VsdC5lcnJvcnM/Lmxlbmd0aCB8fCAhcmVzdWx0LmRhdGEpCiAgICAgICAgdGhyb3cgbmV3IENvbW1lcmNlRXJyb3IoIldlIGNvdWxkbuKAmXQgY29tcGxldGUgdGhhdCByZXF1ZXN0LiBQbGVhc2UgdHJ5IGFnYWluLiIpOwogICAgcmV0dXJuIHJlc3VsdC5kYXRhOwp9CmV4cG9ydCBmdW5jdGlvbiBtYXBQcm9kdWN0KHAsIGluZGV4KSB7CiAgICAvLyBFeHBsaWNpdCBtZXJjaGFuZGlzaW5nIHRhZ3MgcHJldmVudCB1bnJlbGF0ZWQgcHJvZHVjdHMgZW50ZXJpbmcgdGhpcyBjYXRhbG9nLgogICAgY29uc3QgY2F0ZWdvcnkgPSBwLnRhZ3MuaW5jbHVkZXMoImlxb24tc3VwcGxlbWVudHMiKSA/ICJzdXBwbGVtZW50cyIgOiBwLnRhZ3MuaW5jbHVkZXMoImlxb24tc2tpbmNhcmUiKSA/ICJza2luY2FyZSIgOiBudWxsOwogICAgaWYgKCFjYXRlZ29yeSB8fCBpc1JldGlyZWRQcm9kdWN0SGFuZGxlKHAuaGFuZGxlKSkKICAgICAgICByZXR1cm4gbnVsbDsKICAgIGlmIChwLnZhcmlhbnRzLnBhZ2VJbmZvLmhhc05leHRQYWdlKQogICAgICAgIHRocm93IG5ldyBDb21tZXJjZUVycm9yKCJUaGlzIHByb2R1Y3TigJlzIG9wdGlvbnMgYXJlIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlLiIpOwogICAgLy8gT25lIHRpbWUgcHVyY2hhc2VzIG9ubHk6IHNlbGxpbmcgcGxhbnMgYXJlIG5vdCByZWFkLCBzbyBubyBzdWJzY3JpcHRpb24gY2FuIGJlIG9mZmVyZWQuCiAgICBjb25zdCB2YXJpYW50cyA9IHAudmFyaWFudHMubm9kZXMubWFwKHYgPT4gKHsgaWQ6IHYuaWQsIHRpdGxlOiB2LnRpdGxlLCBwcmljZTogTnVtYmVyKHYucHJpY2UuYW1vdW50KSwgY3VycmVuY3k6IHYucHJpY2UuY3VycmVuY3lDb2RlLCBhdmFpbGFibGU6IHYuYXZhaWxhYmxlRm9yU2FsZSB9KSk7CiAgICBjb25zdCBmaXJzdCA9IHZhcmlhbnRzLmZpbmQodiA9PiB2LmF2YWlsYWJsZSkgfHwgdmFyaWFudHNbMF07CiAgICBpZiAoIWZpcnN0IHx8ICFOdW1iZXIuaXNGaW5pdGUoZmlyc3QucHJpY2UpKQogICAgICAgIHJldHVybiBudWxsOwogICAgY29uc3QgaW1hZ2VzID0gcC5pbWFnZXMubm9kZXMuZmlsdGVyKGkgPT4gaS51cmwuc3RhcnRzV2l0aCgiaHR0cHM6Ly8iKSkubWFwKGkgPT4gKHsgc3JjOiBpLnVybCwgYWx0OiBpLmFsdFRleHQgfHwgcC50aXRsZSB9KSk7CiAgICAvLyBBIG5ldXRyYWwgbWF0ZXJpYWwgcGhvdG9ncmFwaCBpcyB1c2VkIG9ubHkgd2hlbiB0aGUgbWVyY2hhbnQgaGFzIG5vIHByb2R1Y3QgaW1hZ2UuCiAgICBjb25zdCBpbWFnZSA9IGltYWdlc1swXT8uc3JjIHx8ICIvaW1hZ2VzL3N0b3JlL3ByZWNpc2lvbi53ZWJwIjsKICAgIHJldHVybiB7IGlkOiBwLmhhbmRsZSwgbmFtZTogcC50aXRsZSwgY2F0ZWdvcnksIHR5cGU6IHAucHJvZHVjdFR5cGUgfHwgY2F0ZWdvcnksIG51bWJlcjogU3RyaW5nKGluZGV4ICsgMSkucGFkU3RhcnQoMiwgIjAiKSwKICAgICAgICBwcmljZTogZmlyc3QucHJpY2UsIGN1cnJlbmN5OiBmaXJzdC5jdXJyZW5jeSwgc2l6ZTogZmlyc3QudGl0bGUgPT09ICJEZWZhdWx0IFRpdGxlIiA/ICIiIDogZmlyc3QudGl0bGUsCiAgICAgICAgZGVzY3JpcHRvcjogIiIsIGRlc2NyaXB0aW9uOiBwLmRlc2NyaXB0aW9uLCBpbWFnZSwgY2FtcGFpZ246IGltYWdlc1sxXT8uc3JjIHx8IGltYWdlLCB0b25lOiAic2lsdmVyIiwgcml0dWFsOiAiIiwKICAgICAgICBpbWFnZXM6IGltYWdlcy5sZW5ndGggPyBpbWFnZXMgOiBbeyBzcmM6IGltYWdlLCBhbHQ6ICJJUU9OIG1hdGVyaWFsIHN0dWR5OyBwcm9kdWN0IHBob3RvZ3JhcGggY29taW5nIHNvb24iIH1dLCB2YXJpYW50cywKICAgICAgICBhdmFpbGFibGU6ICFpc0NvbWluZ1Nvb24oeyBjYXRlZ29yeSB9KSAmJiBwLmF2YWlsYWJsZUZvclNhbGUgJiYgIXAucmVxdWlyZXNTZWxsaW5nUGxhbiAmJiB2YXJpYW50cy5zb21lKHYgPT4gdi5hdmFpbGFibGUpLCByZXF1aXJlc1NlbGxpbmdQbGFuOiBwLnJlcXVpcmVzU2VsbGluZ1BsYW4gfTsKfQovLyBTdW1zIFNob3BpZnkncyBhbGxvY2F0aW9ucyBwZXIgZGlzY291bnQgKGF1dG9tYXRpYyB0aXRsZSBvciBlbnRlcmVkIGNvZGUpLCBpbiBjZW50cy4KZnVuY3Rpb24gZGlzY291bnRMaW5lcyhhbGxvY2F0aW9ucykgewogICAgY29uc3QgdG90YWxzID0gbmV3IE1hcCgpOwogICAgZm9yIChjb25zdCBhIG9mIGFsbG9jYXRpb25zKSB7CiAgICAgICAgY29uc3QgdGl0bGUgPSBhLnRpdGxlIHx8IGEuY29kZSB8fCAiRGlzY291bnQiOwogICAgICAgIGNvbnN0IGFtb3VudCA9IE1hdGgucm91bmQoTnVtYmVyKGEuZGlzY291bnRlZEFtb3VudC5hbW91bnQpICogMTAwKTsKICAgICAgICBpZiAoTnVtYmVyLmlzRmluaXRlKGFtb3VudCkgJiYgYW1vdW50ID4gMCkKICAgICAgICAgICAgdG90YWxzLnNldCh0aXRsZSwgKHRvdGFscy5nZXQodGl0bGUpIHx8IDApICsgYW1vdW50KTsKICAgIH0KICAgIHJldHVybiBbLi4udG90YWxzXS5tYXAoKFt0aXRsZSwgYW1vdW50XSkgPT4gKHsgdGl0bGUsIGFtb3VudDogYW1vdW50IC8gMTAwIH0pKTsKfQpleHBvcnQgZnVuY3Rpb24gcHVibGljQ2FydChjYXJ0KSB7CiAgICBpZiAoIWNhcnQpCiAgICAgICAgcmV0dXJuIHsgaXRlbXM6IFtdLCBzdWJ0b3RhbDogMCwgY3VycmVuY3k6ICJVU0QiLCBjb3VudDogMCwgZGlzY291bnRDb2RlczogW10sIG1lcmNoYW5kaXNlOiAwLCBsaW5lRGlzY291bnRzOiBbXSwgb3JkZXJEaXNjb3VudHM6IFtdLCB0b3RhbDogMCB9OwogICAgaWYgKGNhcnQubGluZXMucGFnZUluZm8uaGFzTmV4dFBhZ2UpCiAgICAgICAgdGhyb3cgbmV3IENvbW1lcmNlRXJyb3IoIllvdXIgYmFnIGhhcyB0b28gbWFueSBkaWZmZXJlbnQgaXRlbXMuIFBsZWFzZSBjb250YWN0IHRoZSBzdG9yZS4iKTsKICAgIGNvbnN0IGxpbmVTdWJ0b3RhbCA9IChsaW5lKSA9PiBOdW1iZXIoKGxpbmUuY29zdC5zdWJ0b3RhbEFtb3VudCB8fCBsaW5lLmNvc3QudG90YWxBbW91bnQpLmFtb3VudCk7CiAgICByZXR1cm4geyBpdGVtczogY2FydC5saW5lcy5ub2Rlcy5tYXAobGluZSA9PiAoeyBpZDogbGluZS5tZXJjaGFuZGlzZS5wcm9kdWN0LmhhbmRsZSwgbGluZUlkOiBsaW5lLmlkLAogICAgICAgICAgICB2YXJpYW50SWQ6IGxpbmUubWVyY2hhbmRpc2UuaWQsIHZhcmlhbnRUaXRsZTogbGluZS5tZXJjaGFuZGlzZS50aXRsZSwgbmFtZTogbGluZS5tZXJjaGFuZGlzZS5wcm9kdWN0LnRpdGxlLAogICAgICAgICAgICBpbWFnZTogbGluZS5tZXJjaGFuZGlzZS5pbWFnZT8udXJsLCBxdWFudGl0eTogbGluZS5xdWFudGl0eSwgcHVyY2hhc2U6IGxpbmUuc2VsbGluZ1BsYW5BbGxvY2F0aW9uID8gInN1YnNjcmlwdGlvbiIgOiAib25jZSIsIGZyZXF1ZW5jeTogbGluZS5zZWxsaW5nUGxhbkFsbG9jYXRpb24/LnNlbGxpbmdQbGFuLm9wdGlvbnMubWFwKG8gPT4gby52YWx1ZSkuam9pbigiIC8gIikgfHwgIm9uY2UiLAogICAgICAgICAgICAuLi4obGluZS5zZWxsaW5nUGxhbkFsbG9jYXRpb24gPyB7IHNlbGxpbmdQbGFuSWQ6IGxpbmUuc2VsbGluZ1BsYW5BbGxvY2F0aW9uLnNlbGxpbmdQbGFuLmlkLCBzZWxsaW5nUGxhbk5hbWU6IGxpbmUuc2VsbGluZ1BsYW5BbGxvY2F0aW9uLnNlbGxpbmdQbGFuLm5hbWUgfSA6IHt9KSwKICAgICAgICAgICAgYW1vdW50OiBOdW1iZXIobGluZS5jb3N0LnRvdGFsQW1vdW50LmFtb3VudCksIC4uLihsaW5lU3VidG90YWwobGluZSkgPiBOdW1iZXIobGluZS5jb3N0LnRvdGFsQW1vdW50LmFtb3VudCkgPyB7IGNvbXBhcmVBbW91bnQ6IGxpbmVTdWJ0b3RhbChsaW5lKSB9IDoge30pLCBjdXJyZW5jeTogbGluZS5jb3N0LnRvdGFsQW1vdW50LmN1cnJlbmN5Q29kZSB9KSksCiAgICAgICAgc3VidG90YWw6IE51bWJlcihjYXJ0LmNvc3Quc3VidG90YWxBbW91bnQuYW1vdW50KSwgY3VycmVuY3k6IGNhcnQuY29zdC5zdWJ0b3RhbEFtb3VudC5jdXJyZW5jeUNvZGUsIGNvdW50OiBjYXJ0LnRvdGFsUXVhbnRpdHksCiAgICAgICAgZGlzY291bnRDb2RlczogY2FydC5kaXNjb3VudENvZGVzIHx8IFtdLAogICAgICAgIG1lcmNoYW5kaXNlOiBNYXRoLnJvdW5kKGNhcnQubGluZXMubm9kZXMucmVkdWNlKChzdW0sIGxpbmUpID0+IHN1bSArIE1hdGgucm91bmQobGluZVN1YnRvdGFsKGxpbmUpICogMTAwKSwgMCkpIC8gMTAwLAogICAgICAgIGxpbmVEaXNjb3VudHM6IGRpc2NvdW50TGluZXMoY2FydC5saW5lcy5ub2Rlcy5mbGF0TWFwKGxpbmUgPT4gbGluZS5kaXNjb3VudEFsbG9jYXRpb25zIHx8IFtdKSksCiAgICAgICAgb3JkZXJEaXNjb3VudHM6IGRpc2NvdW50TGluZXMoY2FydC5kaXNjb3VudEFsbG9jYXRpb25zIHx8IFtdKSwKICAgICAgICB0b3RhbDogTnVtYmVyKGNhcnQuY29zdC50b3RhbEFtb3VudC5hbW91bnQpIH07Cn0KZXhwb3J0IGZ1bmN0aW9uIHNhbWVPcmlnaW4ocmVxdWVzdCkgewogICAgaWYgKHJlcXVlc3QuaGVhZGVycy5nZXQoIm9yaWdpbiIpICE9PSBuZXcgVVJMKHJlcXVlc3QudXJsKS5vcmlnaW4pCiAgICAgICAgdGhyb3cgbmV3IENvbW1lcmNlRXJyb3IoIlBsZWFzZSByZWZyZXNoIHRoZSBwYWdlIGFuZCB0cnkgYWdhaW4uIiwgNDAzKTsKICAgIGlmICghcmVxdWVzdC5oZWFkZXJzLmdldCgiY29udGVudC10eXBlIik/LnN0YXJ0c1dpdGgoImFwcGxpY2F0aW9uL2pzb24iKSkKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiSW52YWxpZCByZXF1ZXN0LiIsIDQxNSk7Cn0KZXhwb3J0IGZ1bmN0aW9uIHZhbGlkUXVhbnRpdHkodmFsdWUsIGFsbG93WmVybyA9IGZhbHNlKSB7CiAgICBpZiAodHlwZW9mIHZhbHVlICE9PSAibnVtYmVyIiB8fCAhTnVtYmVyLmlzSW50ZWdlcih2YWx1ZSkgfHwgdmFsdWUgPCAoYWxsb3daZXJvID8gMCA6IDEpIHx8IHZhbHVlID4gMjApCiAgICAgICAgdGhyb3cgbmV3IENvbW1lcmNlRXJyb3IoIkNob29zZSBhIHF1YW50aXR5IGJldHdlZW4gMSBhbmQgMjAuIiwgNDAwKTsKICAgIHJldHVybiB2YWx1ZTsKfQpleHBvcnQgZnVuY3Rpb24gdmFsaWREaXNjb3VudENvZGVzKHZhbHVlKSB7CiAgICBpZiAoIUFycmF5LmlzQXJyYXkodmFsdWUpIHx8IHZhbHVlLmxlbmd0aCA+IDUgfHwgdmFsdWUuc29tZShjb2RlID0+IHR5cGVvZiBjb2RlICE9PSAic3RyaW5nIiB8fCAhY29kZS50cmltKCkgfHwgY29kZS50cmltKCkubGVuZ3RoID4gMjU1IHx8IC9bXHUwMDAwLVx1MDAxZlx1MDA3Zl0vLnRlc3QoY29kZSkpKQogICAgICAgIHRocm93IG5ldyBDb21tZXJjZUVycm9yKCJFbnRlciBhIHZhbGlkIGRpc2NvdW50IGNvZGUuIFlvdSBjYW4gYXBwbHkgdXAgdG8gZml2ZSBjb2Rlcy4iLCA0MDApOwogICAgcmV0dXJuIFsuLi5uZXcgU2V0KHZhbHVlLm1hcChjb2RlID0+IGNvZGUudHJpbSgpLnRvVXBwZXJDYXNlKCkpKV07Cn0K": Invalid relative URL or base scheme is not hierarchical.
+#     at moduleResolve (node:internal/modules/esm/resolve:839:21)
+#     at defaultResolve (node:internal/modules/esm/resolve:985:11)
+#     ... 3 lines matching cause stack trace ...
+#     at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+#   code: 'ERR_UNSUPPORTED_RESOLVE_REQUEST',
+#   cause: TypeError: Invalid URL
+#       at new URL (node:internal/url:818:25)
+#       at moduleResolve (node:internal/modules/esm/resolve:837:18)
+#       at defaultResolve (node:internal/modules/esm/resolve:985:11)
+#       at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#       at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#       at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#       at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+#     code: 'ERR_INVALID_URL',
+#     input: './legacy-redirects',
+#     base: 'data:text/javascript;base64,aW1wb3J0IHsgaXNDb21pbmdTb29uIH0gZnJvbSAiZGF0YTp0ZXh0L2phdmFzY3JpcHQ7YmFzZTY0LEx5b3FJRXRsWlhBZ2MydHBibU5oY21VZ2RtbHphV0pzWlNCbWIzSWdaR2x6WTI5MlpYSjVMQ0JpZFhRZ1kyeHZjMlZrSUhSdklHVjJaWEo1SUhCMWNtTm9ZWE5sSUdWdWRISjVJSEJ2YVc1MExpQXFMd3BsZUhCdmNuUWdkbUZ5SUZOTFNVNURRVkpGWDBOUFRVbE9SMTlUVDA5T0lEMGdkSEoxWlRzS1pYaHdiM0owSUdaMWJtTjBhVzl1SUdselEyOXRhVzVuVTI5dmJpaHdjbTlrZFdOMEtTQjdDaUFnSUNCeVpYUjFjbTRnVTB0SlRrTkJVa1ZmUTA5TlNVNUhYMU5QVDA0Z0ppWWdjSEp2WkhWamRDNWpZWFJsWjI5eWVTQTlQVDBnSW5OcmFXNWpZWEpsSWpzS2ZRb3ZLaW9nVkdobElITjBiM0psWm5KdmJuUW5jeUJ6YUdsd2NHbHVaeUJ6ZEdGMFpXMWxiblFzSUhOb1lYSmxaQ0JpZVNBdmFHVnNjQ0JoYm1RZ1pYWmxjbmtnY0hKdlpIVmpkQ0J3WVdkbExpQlVhR1VnZEhsd2FXTmhiQ0IzYVc1a2IzY2dhWE1nZEdobElHOTNibVZ5SjNNS0lDb2dLREl4SUU5amRHOWlaWElnTWpBeU5pazZJQ0l6SUhSdklEVWdaR0Y1Y3lJc0lHNXZkQ0JpZFhOcGJtVnpjeUJrWVhsekxDQjNhWFJvSUc1dklHZDFZWEpoYm5SbFpTQnZjaUJ6ZEdGeWRDQndiMmx1ZEM0Z1RXVjBhRzlrY3lCaGJtUWdZMjl6ZEhNZ1kyOXRaUW9nS2lCbWNtOXRJRk5vYjNCcFpua2dZMmhsWTJ0dmRYUXVJQ292Q21WNGNHOXlkQ0IyWVhJZ1UwaEpVRkJKVGtkZlRrOVVSU0E5SUNKVGFHbHdjR2x1WnlCMWMzVmhiR3g1SUhSaGEyVnpJRE1nZEc4Z05TQmtZWGx6TGlCQmRtRnBiR0ZpYkdVZ2MyaHBjSEJwYm1jZ2IzQjBhVzl1Y3lCaGJtUWdZMjl6ZEhNZ1lYSmxJSE5vYjNkdUlHRjBJR05vWldOcmIzVjBMaUk3Q2k4cUtpQklaV3h3SUc5dWJIazZJRk5vYjNCcFpua25jeUJUYUc5d0lHaGhibVJzWlhNZ2RISmhZMnRwYm1jZ2RYQmtZWFJsY3lBb2IzZHVaWElzSURJeElFOWpkRzlpWlhJZ01qQXlOaWs3SUc1dklITmxjR0Z5WVhSbElHMWxjM05oWjJVZ1puSnZiU0JKVVU5T0lHbHpJR2x0Y0d4cFpXUXVJQ292Q21WNGNHOXlkQ0IyWVhJZ1UwaFBVRjlVVWtGRFMwbE9SMTlPVDFSRklEMGdJbFJ5WVdOcmFXNW5JSFZ3WkdGMFpYTWdZWEpsSUdGMllXbHNZV0pzWlNCMGFISnZkV2RvSUZOb2IzQWdiMjVqWlNCNWIzVnlJRzl5WkdWeUlHbHpJRzl1SUdsMGN5QjNZWGt1SWpzS0x5b3FJRUVnY0hKdlpIVmpkQ0JoSUhOb2IzQndaWElnWTJGdUlHOXlaR1Z5SUhKcFoyaDBJRzV2ZHpvZ2JHbDJaU0JUYUc5d2FXWjVJR1JoZEdFc0lHNXZkQ0JqYjIxcGJtY2djMjl2YmlCdmNpQjFibkJ5YVdObFpDd2dkMmwwYUNCaGJpQmhkbUZwYkdGaWJHVUtJQ29nZG1GeWFXRnVkQzRnVUhKdlpIVmpkQ0JzYVc1cmN5QndjbVZ6Wlc1MFpXUWdZWE1nWVNCdVpYaDBJSEIxY21Ob1lYTmxJSE4wWlhBZ0tHZDFhV1JsY3l3Z2MyVnNaV04wYVc5dWN5a2djbVZ4ZFdseVpTQjBhR2x6T3lCaGJubDBhR2x1WnlCbGJITmxJR1poYVd4eklHTnNiM05sWkM0Z0tpOEtaWGh3YjNKMElHWjFibU4wYVc5dUlHbHpUM0prWlhKaFlteGxLSEJ5YjJSMVkzUXNJRzF2WkdVcElIc0tJQ0FnSUhaaGNpQmZZVHNLSUNBZ0lISmxkSFZ5YmlCdGIyUmxJRDA5UFNBaWJHbDJaU0lnSmlZZ0lXbHpRMjl0YVc1blUyOXZiaWh3Y205a2RXTjBLU0FtSmlBaGNISnZaSFZqZEM1d2NtbGpaVkJsYm1ScGJtY2dKaVlnY0hKdlpIVmpkQzVoZG1GcGJHRmliR1VnSVQwOUlHWmhiSE5sSUNZbUlDRWhLQ2hmWVNBOUlIQnliMlIxWTNRdWRtRnlhV0Z1ZEhNcElEMDlQU0J1ZFd4c0lIeDhJRjloSUQwOVBTQjJiMmxrSURBZ1B5QjJiMmxrSURBZ09pQmZZUzV6YjIxbEtHWjFibU4wYVc5dUlDaDJLU0I3SUhKbGRIVnliaUIyTG1GMllXbHNZV0pzWlRzZ2ZTa3BPd3A5Q2c9PSI7CmltcG9ydCB7IGlzUmV0aXJlZFByb2R1Y3RIYW5kbGUgfSBmcm9tICIuL2xlZ2FjeS1yZWRpcmVjdHMiOwpleHBvcnQgY2xhc3MgQ29tbWVyY2VFcnJvciBleHRlbmRzIEVycm9yIHsKICAgIHN0YXR1czsKICAgIGNhcnQ7CiAgICBjb25zdHJ1Y3RvcihtZXNzYWdlLCBzdGF0dXMgPSA1MDIsIGNhcnQpIHsKICAgICAgICBzdXBlcihtZXNzYWdlKTsKICAgICAgICB0aGlzLnN0YXR1cyA9IHN0YXR1czsKICAgICAgICB0aGlzLmNhcnQgPSBjYXJ0OwogICAgfQp9CmV4cG9ydCBmdW5jdGlvbiBzaG9waWZ5Q29uZmlnKHZhbHVlcykgewogICAgY29uc3QgZG9tYWluID0gU3RyaW5nKHZhbHVlcy5TSE9QSUZZX1NUT1JFX0RPTUFJTiB8fCAiIikudHJpbSgpLnRvTG93ZXJDYXNlKCk7CiAgICBjb25zdCB0b2tlbiA9IFN0cmluZyh2YWx1ZXMuU0hPUElGWV9TVE9SRUZST05UX1BSSVZBVEVfVE9LRU4gfHwgIiIpLnRyaW0oKTsKICAgIGlmICghZG9tYWluICYmICF0b2tlbikKICAgICAgICByZXR1cm4gbnVsbDsKICAgIGlmICghL15bYS16MC05XVthLXowLTktXSpcLm15c2hvcGlmeVwuY29tJC8udGVzdChkb21haW4pIHx8ICF0b2tlbikKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiVGhlIHN0b3JlIGlzIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlLiIsIDUwMyk7CiAgICBjb25zdCB2ZXJzaW9uID0gU3RyaW5nKHZhbHVlcy5TSE9QSUZZX0FQSV9WRVJTSU9OIHx8ICIyMDI2LTA3Iik7CiAgICBpZiAoIS9eMjBcZHsyfS0oMDF8MDR8MDd8MTApJC8udGVzdCh2ZXJzaW9uKSkKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiVGhlIHN0b3JlIGlzIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlLiIsIDUwMyk7CiAgICByZXR1cm4geyBkb21haW4sIHRva2VuLCB2ZXJzaW9uIH07Cn0KZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHNob3BpZnlSZXF1ZXN0KGNvbmZpZywgcXVlcnksIHZhcmlhYmxlcyA9IHt9LCBidXllcklQLCBmZXRjaGVyID0gZmV0Y2gpIHsKICAgIGNvbnN0IGhlYWRlcnMgPSB7ICJDb250ZW50LVR5cGUiOiAiYXBwbGljYXRpb24vanNvbiIsICJTaG9waWZ5LVN0b3JlZnJvbnQtUHJpdmF0ZS1Ub2tlbiI6IGNvbmZpZy50b2tlbiB9OwogICAgaWYgKGJ1eWVySVApCiAgICAgICAgaGVhZGVyc1siU2hvcGlmeS1TdG9yZWZyb250LUJ1eWVyLUlQIl0gPSBidXllcklQOwogICAgbGV0IHJlc3BvbnNlOwogICAgdHJ5IHsKICAgICAgICByZXNwb25zZSA9IGF3YWl0IGZldGNoZXIoYGh0dHBzOi8vJHtjb25maWcuZG9tYWlufS9hcGkvJHtjb25maWcudmVyc2lvbn0vZ3JhcGhxbC5qc29uYCwgewogICAgICAgICAgICBtZXRob2Q6ICJQT1NUIiwgaGVhZGVycywgYm9keTogSlNPTi5zdHJpbmdpZnkoeyBxdWVyeSwgdmFyaWFibGVzIH0pLCBjYWNoZTogIm5vLXN0b3JlIiwgc2lnbmFsOiBBYm9ydFNpZ25hbC50aW1lb3V0KDEyMDAwKSwKICAgICAgICB9KTsKICAgIH0KICAgIGNhdGNoIHsKICAgICAgICB0aHJvdyBuZXcgQ29tbWVyY2VFcnJvcigiV2UgY291bGRu4oCZdCByZWFjaCB0aGUgc3RvcmUuIFBsZWFzZSB0cnkgYWdhaW4uIik7CiAgICB9CiAgICBpZiAoIXJlc3BvbnNlLm9rKQogICAgICAgIHRocm93IG5ldyBDb21tZXJjZUVycm9yKCJUaGUgc3RvcmUgaXMgdGVtcG9yYXJpbHkgdW5hdmFpbGFibGUuIFBsZWFzZSB0cnkgYWdhaW4uIiwgcmVzcG9uc2Uuc3RhdHVzID09PSA0MjkgPyA0MjkgOiA1MDIpOwogICAgY29uc3QgcmVzdWx0ID0gYXdhaXQgcmVzcG9uc2UuanNvbigpOwogICAgaWYgKHJlc3VsdC5lcnJvcnM/Lmxlbmd0aCB8fCAhcmVzdWx0LmRhdGEpCiAgICAgICAgdGhyb3cgbmV3IENvbW1lcmNlRXJyb3IoIldlIGNvdWxkbuKAmXQgY29tcGxldGUgdGhhdCByZXF1ZXN0LiBQbGVhc2UgdHJ5IGFnYWluLiIpOwogICAgcmV0dXJuIHJlc3VsdC5kYXRhOwp9CmV4cG9ydCBmdW5jdGlvbiBtYXBQcm9kdWN0KHAsIGluZGV4KSB7CiAgICAvLyBFeHBsaWNpdCBtZXJjaGFuZGlzaW5nIHRhZ3MgcHJldmVudCB1bnJlbGF0ZWQgcHJvZHVjdHMgZW50ZXJpbmcgdGhpcyBjYXRhbG9nLgogICAgY29uc3QgY2F0ZWdvcnkgPSBwLnRhZ3MuaW5jbHVkZXMoImlxb24tc3VwcGxlbWVudHMiKSA/ICJzdXBwbGVtZW50cyIgOiBwLnRhZ3MuaW5jbHVkZXMoImlxb24tc2tpbmNhcmUiKSA/ICJza2luY2FyZSIgOiBudWxsOwogICAgaWYgKCFjYXRlZ29yeSB8fCBpc1JldGlyZWRQcm9kdWN0SGFuZGxlKHAuaGFuZGxlKSkKICAgICAgICByZXR1cm4gbnVsbDsKICAgIGlmIChwLnZhcmlhbnRzLnBhZ2VJbmZvLmhhc05leHRQYWdlKQogICAgICAgIHRocm93IG5ldyBDb21tZXJjZUVycm9yKCJUaGlzIHByb2R1Y3TigJlzIG9wdGlvbnMgYXJlIHRlbXBvcmFyaWx5IHVuYXZhaWxhYmxlLiIpOwogICAgLy8gT25lIHRpbWUgcHVyY2hhc2VzIG9ubHk6IHNlbGxpbmcgcGxhbnMgYXJlIG5vdCByZWFkLCBzbyBubyBzdWJzY3JpcHRpb24gY2FuIGJlIG9mZmVyZWQuCiAgICBjb25zdCB2YXJpYW50cyA9IHAudmFyaWFudHMubm9kZXMubWFwKHYgPT4gKHsgaWQ6IHYuaWQsIHRpdGxlOiB2LnRpdGxlLCBwcmljZTogTnVtYmVyKHYucHJpY2UuYW1vdW50KSwgY3VycmVuY3k6IHYucHJpY2UuY3VycmVuY3lDb2RlLCBhdmFpbGFibGU6IHYuYXZhaWxhYmxlRm9yU2FsZSB9KSk7CiAgICBjb25zdCBmaXJzdCA9IHZhcmlhbnRzLmZpbmQodiA9PiB2LmF2YWlsYWJsZSkgfHwgdmFyaWFudHNbMF07CiAgICBpZiAoIWZpcnN0IHx8ICFOdW1iZXIuaXNGaW5pdGUoZmlyc3QucHJpY2UpKQogICAgICAgIHJldHVybiBudWxsOwogICAgY29uc3QgaW1hZ2VzID0gcC5pbWFnZXMubm9kZXMuZmlsdGVyKGkgPT4gaS51cmwuc3RhcnRzV2l0aCgiaHR0cHM6Ly8iKSkubWFwKGkgPT4gKHsgc3JjOiBpLnVybCwgYWx0OiBpLmFsdFRleHQgfHwgcC50aXRsZSB9KSk7CiAgICAvLyBBIG5ldXRyYWwgbWF0ZXJpYWwgcGhvdG9ncmFwaCBpcyB1c2VkIG9ubHkgd2hlbiB0aGUgbWVyY2hhbnQgaGFzIG5vIHByb2R1Y3QgaW1hZ2UuCiAgICBjb25zdCBpbWFnZSA9IGltYWdlc1swXT8uc3JjIHx8ICIvaW1hZ2VzL3N0b3JlL3ByZWNpc2lvbi53ZWJwIjsKICAgIHJldHVybiB7IGlkOiBwLmhhbmRsZSwgbmFtZTogcC50aXRsZSwgY2F0ZWdvcnksIHR5cGU6IHAucHJvZHVjdFR5cGUgfHwgY2F0ZWdvcnksIG51bWJlcjogU3RyaW5nKGluZGV4ICsgMSkucGFkU3RhcnQoMiwgIjAiKSwKICAgICAgICBwcmljZTogZmlyc3QucHJpY2UsIGN1cnJlbmN5OiBmaXJzdC5jdXJyZW5jeSwgc2l6ZTogZmlyc3QudGl0bGUgPT09ICJEZWZhdWx0IFRpdGxlIiA/ICIiIDogZmlyc3QudGl0bGUsCiAgICAgICAgZGVzY3JpcHRvcjogIiIsIGRlc2NyaXB0aW9uOiBwLmRlc2NyaXB0aW9uLCBpbWFnZSwgY2FtcGFpZ246IGltYWdlc1sxXT8uc3JjIHx8IGltYWdlLCB0b25lOiAic2lsdmVyIiwgcml0dWFsOiAiIiwKICAgICAgICBpbWFnZXM6IGltYWdlcy5sZW5ndGggPyBpbWFnZXMgOiBbeyBzcmM6IGltYWdlLCBhbHQ6ICJJUU9OIG1hdGVyaWFsIHN0dWR5OyBwcm9kdWN0IHBob3RvZ3JhcGggY29taW5nIHNvb24iIH1dLCB2YXJpYW50cywKICAgICAgICBhdmFpbGFibGU6ICFpc0NvbWluZ1Nvb24oeyBjYXRlZ29yeSB9KSAmJiBwLmF2YWlsYWJsZUZvclNhbGUgJiYgIXAucmVxdWlyZXNTZWxsaW5nUGxhbiAmJiB2YXJpYW50cy5zb21lKHYgPT4gdi5hdmFpbGFibGUpLCByZXF1aXJlc1NlbGxpbmdQbGFuOiBwLnJlcXVpcmVzU2VsbGluZ1BsYW4gfTsKfQovLyBTdW1zIFNob3BpZnkncyBhbGxvY2F0aW9ucyBwZXIgZGlzY291bnQgKGF1dG9tYXRpYyB0aXRsZSBvciBlbnRlcmVkIGNvZGUpLCBpbiBjZW50cy4KZnVuY3Rpb24gZGlzY291bnRMaW5lcyhhbGxvY2F0aW9ucykgewogICAgY29uc3QgdG90YWxzID0gbmV3IE1hcCgpOwogICAgZm9yIChjb25zdCBhIG9mIGFsbG9jYXRpb25zKSB7CiAgICAgICAgY29uc3QgdGl0bGUgPSBhLnRpdGxlIHx8IGEuY29kZSB8fCAiRGlzY291bnQiOwogICAgICAgIGNvbnN0IGFtb3VudCA9IE1hdGgucm91bmQoTnVtYmVyKGEuZGlzY291bnRlZEFtb3VudC5hbW91bnQpICogMTAwKTsKICAgICAgICBpZiAoTnVtYmVyLmlzRmluaXRlKGFtb3VudCkgJiYgYW1vdW50ID4gMCkKICAgICAgICAgICAgdG90YWxzLnNldCh0aXRsZSwgKHRvdGFscy5nZXQodGl0bGUpIHx8IDApICsgYW1vdW50KTsKICAgIH0KICAgIHJldHVybiBbLi4udG90YWxzXS5tYXAoKFt0aXRsZSwgYW1vdW50XSkgPT4gKHsgdGl0bGUsIGFtb3VudDogYW1vdW50IC8gMTAwIH0pKTsKfQpleHBvcnQgZnVuY3Rpb24gcHVibGljQ2FydChjYXJ0KSB7CiAgICBpZiAoIWNhcnQpCiAgICAgICAgcmV0dXJuIHsgaXRlbXM6IFtdLCBzdWJ0b3RhbDogMCwgY3VycmVuY3k6ICJVU0QiLCBjb3VudDogMCwgZGlzY291bnRDb2RlczogW10sIG1lcmNoYW5kaXNlOiAwLCBsaW5lRGlzY291bnRzOiBbXSwgb3JkZXJEaXNjb3VudHM6IFtdLCB0b3RhbDogMCB9OwogICAgaWYgKGNhcnQubGluZXMucGFnZUluZm8uaGFzTmV4dFBhZ2UpCiAgICAgICAgdGhyb3cgbmV3IENvbW1lcmNlRXJyb3IoIllvdXIgYmFnIGhhcyB0b28gbWFueSBkaWZmZXJlbnQgaXRlbXMuIFBsZWFzZSBjb250YWN0IHRoZSBzdG9yZS4iKTsKICAgIGNvbnN0IGxpbmVTdWJ0b3RhbCA9IChsaW5lKSA9PiBOdW1iZXIoKGxpbmUuY29zdC5zdWJ0b3RhbEFtb3VudCB8fCBsaW5lLmNvc3QudG90YWxBbW91bnQpLmFtb3VudCk7CiAgICByZXR1cm4geyBpdGVtczogY2FydC5saW5lcy5ub2Rlcy5tYXAobGluZSA9PiAoeyBpZDogbGluZS5tZXJjaGFuZGlzZS5wcm9kdWN0LmhhbmRsZSwgbGluZUlkOiBsaW5lLmlkLAogICAgICAgICAgICB2YXJpYW50SWQ6IGxpbmUubWVyY2hhbmRpc2UuaWQsIHZhcmlhbnRUaXRsZTogbGluZS5tZXJjaGFuZGlzZS50aXRsZSwgbmFtZTogbGluZS5tZXJjaGFuZGlzZS5wcm9kdWN0LnRpdGxlLAogICAgICAgICAgICBpbWFnZTogbGluZS5tZXJjaGFuZGlzZS5pbWFnZT8udXJsLCBxdWFudGl0eTogbGluZS5xdWFudGl0eSwgcHVyY2hhc2U6IGxpbmUuc2VsbGluZ1BsYW5BbGxvY2F0aW9uID8gInN1YnNjcmlwdGlvbiIgOiAib25jZSIsIGZyZXF1ZW5jeTogbGluZS5zZWxsaW5nUGxhbkFsbG9jYXRpb24/LnNlbGxpbmdQbGFuLm9wdGlvbnMubWFwKG8gPT4gby52YWx1ZSkuam9pbigiIC8gIikgfHwgIm9uY2UiLAogICAgICAgICAgICAuLi4obGluZS5zZWxsaW5nUGxhbkFsbG9jYXRpb24gPyB7IHNlbGxpbmdQbGFuSWQ6IGxpbmUuc2VsbGluZ1BsYW5BbGxvY2F0aW9uLnNlbGxpbmdQbGFuLmlkLCBzZWxsaW5nUGxhbk5hbWU6IGxpbmUuc2VsbGluZ1BsYW5BbGxvY2F0aW9uLnNlbGxpbmdQbGFuLm5hbWUgfSA6IHt9KSwKICAgICAgICAgICAgYW1vdW50OiBOdW1iZXIobGluZS5jb3N0LnRvdGFsQW1vdW50LmFtb3VudCksIC4uLihsaW5lU3VidG90YWwobGluZSkgPiBOdW1iZXIobGluZS5jb3N0LnRvdGFsQW1vdW50LmFtb3VudCkgPyB7IGNvbXBhcmVBbW91bnQ6IGxpbmVTdWJ0b3RhbChsaW5lKSB9IDoge30pLCBjdXJyZW5jeTogbGluZS5jb3N0LnRvdGFsQW1vdW50LmN1cnJlbmN5Q29kZSB9KSks'... 2044 more characters
+#   }
+# }
+# Node.js v22.23.2
+# Subtest: tests/shopify.test.mjs
+not ok 6 - tests/shopify.test.mjs
+  ---
+  duration_ms: 279.790875
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/shopify.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: skincare preservation: app/skincare/skincare-sections.tsx
+ok 37 - skincare preservation: app/skincare/skincare-sections.tsx
+  ---
+  duration_ms: 1.254042
+  type: 'test'
+  ...
+# Subtest: skincare preservation: app/skincare/skincare.css
+ok 38 - skincare preservation: app/skincare/skincare.css
+  ---
+  duration_ms: 0.3815
+  type: 'test'
+  ...
+# Subtest: skincare preservation: components/ui/slider.tsx
+ok 39 - skincare preservation: components/ui/slider.tsx
+  ---
+  duration_ms: 0.216916
+  type: 'test'
+  ...
+# Subtest: skincare preservation: lib/skincare-results.ts
+ok 40 - skincare preservation: lib/skincare-results.ts
+  ---
+  duration_ms: 0.205709
+  type: 'test'
+  ...
+# Subtest: skincare preservation: lib/skincare-design-preview.ts
+ok 41 - skincare preservation: lib/skincare-design-preview.ts
+  ---
+  duration_ms: 0.218125
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-eye-before-v11.webp
+ok 42 - skincare preservation: public/images/editorial/skin-detail-eye-before-v11.webp
+  ---
+  duration_ms: 0.203291
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-texture-after-v11.webp
+ok 43 - skincare preservation: public/images/editorial/skin-detail-texture-after-v11.webp
+  ---
+  duration_ms: 0.270584
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-texture-before-v11.webp
+ok 44 - skincare preservation: public/images/editorial/skin-detail-texture-before-v11.webp
+  ---
+  duration_ms: 0.1615
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-tone-before-v11.webp
+ok 45 - skincare preservation: public/images/editorial/skin-detail-tone-before-v11.webp
+  ---
+  duration_ms: 0.368667
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-tone-after-v11.webp
+ok 46 - skincare preservation: public/images/editorial/skin-detail-tone-after-v11.webp
+  ---
+  duration_ms: 0.389042
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-cheek-after-v11.webp
+ok 47 - skincare preservation: public/images/editorial/skin-detail-cheek-after-v11.webp
+  ---
+  duration_ms: 0.196583
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-eye-after-v11.webp
+ok 48 - skincare preservation: public/images/editorial/skin-detail-eye-after-v11.webp
+  ---
+  duration_ms: 0.1935
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-cheek-before-v11.webp
+ok 49 - skincare preservation: public/images/editorial/skin-detail-cheek-before-v11.webp
+  ---
+  duration_ms: 0.156292
+  type: 'test'
+  ...
+# Subtest: skincare home retains its illustrative comparison and approved results
+ok 50 - skincare home retains its illustrative comparison and approved results
+  ---
+  duration_ms: 0.292833
+  type: 'test'
+  ...
+# WebSocket server error: Port 24678 is already in use
+# 7:29:50 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+# Subtest: emits the catalog's animation and scrolling utilities
+ok 51 - emits the catalog's animation and scrolling utilities
+  ---
+  duration_ms: 17.073875
+  type: 'test'
+  ...
+# Subtest: forwards progress semantics to the primitive
+ok 52 - forwards progress semantics to the primitive
+  ---
+  duration_ms: 213.129958
+  type: 'test'
+  ...
+# Subtest: labels the interactive slider thumb for assistive technology
+ok 53 - labels the interactive slider thumb for assistive technology
+  ---
+  duration_ms: 9.6285
+  type: 'test'
+  ...
+# Subtest: keeps skincare layout samples separate from publishable customer evidence
+ok 54 - keeps skincare layout samples separate from publishable customer evidence
+  ---
+  duration_ms: 115.970541
+  type: 'test'
+  ...
+# Subtest: uses the shared community carousel with supplement-specific content
+ok 55 - uses the shared community carousel with supplement-specific content
+  ---
+  duration_ms: 6.825208
+  type: 'test'
+  ...
+# Subtest: keeps product rating samples out of published customer reviews
+ok 56 - keeps product rating samples out of published customer reviews
+  ---
+  duration_ms: 32.706709
+  type: 'test'
+  ...
+# Subtest: emits chart themes for the starter's media dark mode
+ok 57 - emits chart themes for the starter's media dark mode
+  ---
+  duration_ms: 89.130083
+  type: 'test'
+  ...
+# Subtest: renders sidebar skeletons deterministically
+ok 58 - renders sidebar skeletons deterministically
+  ---
+  duration_ms: 19.236667
+  type: 'test'
+  ...
+# Subtest: Vercel uses the qualified webpack build without database migrations
+ok 59 - Vercel uses the qualified webpack build without database migrations
+  ---
+  duration_ms: 0.599041
+  type: 'test'
+  ...
+1..59
+# tests 59
+# suites 0
+# pass 56
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 852.553208

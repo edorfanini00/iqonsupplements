@@ -1,0 +1,103 @@
+TAP version 13
+# Subtest: home 390: real assets, stable reading layout and capture
+ok 1 - home 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1981.850416
+  type: 'test'
+  ...
+# Subtest: collection 390: real assets, stable reading layout and capture
+ok 2 - collection 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1683.824292
+  type: 'test'
+  ...
+# Subtest: all 390: real assets, stable reading layout and capture
+ok 3 - all 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1781.002375
+  type: 'test'
+  ...
+# Subtest: skincare 390: real assets, stable reading layout and capture
+not ok 4 - skincare 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 16402.452125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:33:327'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 15000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    inspect (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:28:13)
+    async TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:35:10)
+  ...
+# Subtest: approach 390: real assets, stable reading layout and capture
+ok 5 - approach 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1435.768166
+  type: 'test'
+  ...
+# Subtest: help 390: real assets, stable reading layout and capture
+ok 6 - help 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1110.805167
+  type: 'test'
+  ...
+# Subtest: journal 390: real assets, stable reading layout and capture
+ok 7 - journal 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1646.689792
+  type: 'test'
+  ...
+# Subtest: colostrum 390: real assets, stable reading layout and capture
+not ok 8 - colostrum 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 16715.867667
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:33:327'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 15000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    inspect (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:28:13)
+    async TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:35:10)
+  ...
+# Subtest: creatine 390: real assets, stable reading layout and capture
+not ok 9 - creatine 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 16698.787959
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:33:327'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 15000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    inspect (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:28:13)
+    async TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-site.e2e.mjs:35:10)
+  ...
+# Subtest: home 1440: real assets, stable reading layout and capture
+ok 10 - home 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 3561.045666
+  type: 'test'
+  ...
+# Subtest: collection 1440: real assets, stable reading layout and capture
+ok 11 - collection 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 3009.427667
+  type: 'test'
+  ...
+# Subtest: all 1440: real assets, stable reading layout and capture
+ok 12 - all 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 3468.48625
+  type: 'test'
+  ...
+# Subtest: skincare 1440: real assets, stable reading layout and capture
+ok 13 - skincare 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 4375.973667
+  type: 'test'
+  ...

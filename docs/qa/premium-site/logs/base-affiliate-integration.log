@@ -1,0 +1,477 @@
+TAP version 13
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/accounting/page.tsx
+not ok 1 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/accounting/page.tsx
+  ---
+  duration_ms: 3.289917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '8048ceee3c02e2fda687669ee063cf7dfd71c3f9ff1bfec80e968050f3ee7ed0'
+    - '99bac5966e69b0619d668e9d7a9a4749ec344cbf9d804d74151f5670a31f8a40'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '99bac5966e69b0619d668e9d7a9a4749ec344cbf9d804d74151f5670a31f8a40'
+  actual: '8048ceee3c02e2fda687669ee063cf7dfd71c3f9ff1bfec80e968050f3ee7ed0'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/activity/page.tsx
+ok 2 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/activity/page.tsx
+  ---
+  duration_ms: 0.368875
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliate-messages/page.tsx
+ok 3 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliate-messages/page.tsx
+  ---
+  duration_ms: 0.272542
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/[id]/page.tsx
+ok 4 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/[id]/page.tsx
+  ---
+  duration_ms: 0.263334
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/page.tsx
+not ok 5 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/affiliates/page.tsx
+  ---
+  duration_ms: 0.839625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + 'fb61fa19639c25b9119ce4de072a07faef17138e75cfa412489abad05ac6e309'
+    - '9c72c323e1119aa6cdef8a913291ab4dd5ac382ce8861807c485be23f7475a68'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '9c72c323e1119aa6cdef8a913291ab4dd5ac382ce8861807c485be23f7475a68'
+  actual: 'fb61fa19639c25b9119ce4de072a07faef17138e75cfa412489abad05ac6e309'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/analytics/page.tsx
+ok 6 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/analytics/page.tsx
+  ---
+  duration_ms: 0.193833
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/app/page.tsx
+not ok 7 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/app/page.tsx
+  ---
+  duration_ms: 0.2625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '808725404f2d5afec5eff0f7804e00e075c19c0466b48e50298b92bb1fd511ab'
+    - 'b965f2cb1e5909d5bf2f29835042a5cff5d7d91eaa280d848f7f436f554c9631'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'b965f2cb1e5909d5bf2f29835042a5cff5d7d91eaa280d848f7f436f554c9631'
+  actual: '808725404f2d5afec5eff0f7804e00e075c19c0466b48e50298b92bb1fd511ab'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/customers/page.tsx
+not ok 8 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/customers/page.tsx
+  ---
+  duration_ms: 0.288875
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '1cbb7163289da4786586704698a06d4a62d61b3a9510c4fddb5243eb3456ff7b'
+    - '6d6aeda0ee93aca6cbb95c324b307757b11328c39dddbb0940e3a08064cfd1b9'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '6d6aeda0ee93aca6cbb95c324b307757b11328c39dddbb0940e3a08064cfd1b9'
+  actual: '1cbb7163289da4786586704698a06d4a62d61b3a9510c4fddb5243eb3456ff7b'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/messages/page.tsx
+ok 9 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/messages/page.tsx
+  ---
+  duration_ms: 0.400459
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/notes/page.tsx
+not ok 10 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/notes/page.tsx
+  ---
+  duration_ms: 0.449
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '2af9bb862369c63dbc80ab473c5c654f91c959b11d5b2052ce0bf3a07e54a715'
+    - '57860f57e312fde41f07a18b81e22278f003c659f8b8c67d15bbaacb1cec5514'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '57860f57e312fde41f07a18b81e22278f003c659f8b8c67d15bbaacb1cec5514'
+  actual: '2af9bb862369c63dbc80ab473c5c654f91c959b11d5b2052ce0bf3a07e54a715'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/orders/page.tsx
+not ok 11 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/orders/page.tsx
+  ---
+  duration_ms: 0.509542
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + 'ffa1bb4b6a01c9e6b74dd50edb00922858138b9130c7e3eafbbdc1066fabdea3'
+    - 'f79695701189681a02a36ba2276e367a5392eb3bb0fe0ee89a449818d3e93524'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'f79695701189681a02a36ba2276e367a5392eb3bb0fe0ee89a449818d3e93524'
+  actual: 'ffa1bb4b6a01c9e6b74dd50edb00922858138b9130c7e3eafbbdc1066fabdea3'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/page.tsx
+not ok 12 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/page.tsx
+  ---
+  duration_ms: 0.615667
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Exact native bulk-only adaptation
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:19:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/payouts/page.tsx
+not ok 13 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/payouts/page.tsx
+  ---
+  duration_ms: 0.494584
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Reviewed settlement-only adaptation must match exactly once
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:26:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/rankings/page.tsx
+not ok 14 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/rankings/page.tsx
+  ---
+  duration_ms: 0.438875
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '3d7186f3ad6a36a21837ac6e424612c6d6cd4dff0efaf772fd08788366d4d339'
+    - '43f03d77d606444810b3155b4d7d42a41ba9d65c0f5e2073ddbb7d0fb43a3f8d'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '43f03d77d606444810b3155b4d7d42a41ba9d65c0f5e2073ddbb7d0fb43a3f8d'
+  actual: '3d7186f3ad6a36a21837ac6e424612c6d6cd4dff0efaf772fd08788366d4d339'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/requests/page.tsx
+ok 15 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/requests/page.tsx
+  ---
+  duration_ms: 0.345042
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/subscriptions/page.tsx
+not ok 16 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/subscriptions/page.tsx
+  ---
+  duration_ms: 0.441292
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '32ce5ab98f4b9bc08274cdbcc385bb2b0bc2608754df4c2daeadc603f0aac164'
+    - '9a67f26c5559e8c8d30ad05f84f4b855a37034dcc45d81c55e8656f5a3690134'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '9a67f26c5559e8c8d30ad05f84f4b855a37034dcc45d81c55e8656f5a3690134'
+  actual: '32ce5ab98f4b9bc08274cdbcc385bb2b0bc2608754df4c2daeadc603f0aac164'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/admin/tiktok/page.tsx
+not ok 17 - Body preserves restored Health behavior and full reporting: app/affiliates/admin/tiktok/page.tsx
+  ---
+  duration_ms: 0.315625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + 'af4710d8b085c5bd330614ef3fa2d5a3fa66cf61104f3de4e94db868150eeceb'
+    - '38b44b5aa2fffaa0c5171122be66cb013c473968e56ca4771035bc1b4a14f3f5'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '38b44b5aa2fffaa0c5171122be66cb013c473968e56ca4771035bc1b4a14f3f5'
+  actual: 'af4710d8b085c5bd330614ef3fa2d5a3fa66cf61104f3de4e94db868150eeceb'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/clients/page.tsx
+ok 18 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/clients/page.tsx
+  ---
+  duration_ms: 0.224666
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/learn/page.tsx
+ok 19 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/learn/page.tsx
+  ---
+  duration_ms: 0.912458
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/messages/page.tsx
+ok 20 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/messages/page.tsx
+  ---
+  duration_ms: 0.249208
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/network/page.tsx
+ok 21 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/network/page.tsx
+  ---
+  duration_ms: 0.245416
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/orders/page.tsx
+ok 22 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/orders/page.tsx
+  ---
+  duration_ms: 0.147875
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/page.tsx
+not ok 23 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/page.tsx
+  ---
+  duration_ms: 0.699334
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:1:320'
+  failureType: 'testCodeFailure'
+  error: |-
+    Original source must remain exact outside reviewed additive mounts
+    + actual - expected
+    
+    + '47b053d65049b750f5edd242516e412e20f6edce16fb353e0507a466d1b5f003'
+    - 'f9415e8a3f0ef7d5de2990309558d5f66770fb9c2b86e2c05d8c37beeaf3102b'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'f9415e8a3f0ef7d5de2990309558d5f66770fb9c2b86e2c05d8c37beeaf3102b'
+  actual: '47b053d65049b750f5edd242516e412e20f6edce16fb353e0507a466d1b5f003'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-health-parity.test.ts:44:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payment/page.tsx
+ok 24 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payment/page.tsx
+  ---
+  duration_ms: 0.143917
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payouts/page.tsx
+ok 25 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/payouts/page.tsx
+  ---
+  duration_ms: 0.09825
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/settings/page.tsx
+ok 26 - Body preserves restored Health behavior and full reporting: app/affiliates/dashboard/settings/page.tsx
+  ---
+  duration_ms: 0.107625
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/orders/page.tsx
+ok 27 - Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/orders/page.tsx
+  ---
+  duration_ms: 0.124125
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/page.tsx
+ok 28 - Body preserves restored Health behavior and full reporting: app/affiliates/shop-manager/page.tsx
+  ---
+  duration_ms: 0.119125
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: components/affiliates/shared/RangePicker.tsx
+ok 29 - Body preserves restored Health behavior and full reporting: components/affiliates/shared/RangePicker.tsx
+  ---
+  duration_ms: 0.648333
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: components/affiliates/shared/useCalendarDay.ts
+ok 30 - Body preserves restored Health behavior and full reporting: components/affiliates/shared/useCalendarDay.ts
+  ---
+  duration_ms: 0.378917
+  type: 'test'
+  ...
+# Subtest: Body preserves restored Health behavior and full reporting: lib/affiliates/use-latest-read.ts
+ok 31 - Body preserves restored Health behavior and full reporting: lib/affiliates/use-latest-read.ts
+  ---
+  duration_ms: 0.290125
+  type: 'test'
+  ...
+# Subtest: HTTP BFF preserves canonical approval, current roles, cookie sessions and all read periods
+not ok 32 - HTTP BFF preserves canonical approval, current roles, cookie sessions and all read periods
+  ---
+  duration_ms: 627.062375
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-http-authority.test.ts:1:291'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok([404,501].includes(blocked.status))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/affiliates/body-http-authority.test.ts:70:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 19
+# fail 13
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1551.251875

@@ -1,0 +1,209 @@
+TAP version 13
+# Subtest: collection formats, search, empty state, clearing and sort remain functional
+ok 1 - collection formats, search, empty state, clearing and sort remain functional
+  ---
+  duration_ms: 1779.288542
+  type: 'test'
+  ...
+# Subtest: live Help prioritizes order tasks and links existing account and policies
+ok 2 - live Help prioritizes order tasks and links existing account and policies
+  ---
+  duration_ms: 839.445958
+  type: 'test'
+  ...
+# Subtest: live product 390: purpose, serving price, sticky behavior and actual images
+ok 3 - live product 390: purpose, serving price, sticky behavior and actual images
+  ---
+  duration_ms: 1110.336417
+  type: 'test'
+  ...
+# Subtest: live product 1440: purpose, serving price, sticky behavior and actual images
+ok 4 - live product 1440: purpose, serving price, sticky behavior and actual images
+  ---
+  duration_ms: 944.614667
+  type: 'test'
+  ...
+# Subtest: 200 percent product text also contains live bundle controls
+ok 5 - 200 percent product text also contains live bundle controls
+  ---
+  duration_ms: 732.933709
+  type: 'test'
+  ...
+# Data source: synthetic catalog/cart with real local assets; external tracking blocked.
+# Subtest: 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 6 - 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6923.109208
+  type: 'test'
+  ...
+# Subtest: 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 7 - 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6880.5355
+  type: 'test'
+  ...
+# Subtest: 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 8 - 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6911.739125
+  type: 'test'
+  ...
+# Subtest: 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 9 - 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6981.327042
+  type: 'test'
+  ...
+# Subtest: 320: additional eligible product uses gallery-first DOM
+ok 10 - 320: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 430.522666
+  type: 'test'
+  ...
+# Subtest: 320: mixed lines align on the review page
+ok 11 - 320: mixed lines align on the review page
+  ---
+  duration_ms: 954.103792
+  type: 'test'
+  ...
+# Subtest: 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 12 - 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 2980.749083
+  type: 'test'
+  ...
+# Subtest: 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 13 - 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8751.606917
+  type: 'test'
+  ...
+# Subtest: 390 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 14 - 390 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8760.36875
+  type: 'test'
+  ...
+# Subtest: 390 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 15 - 390 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8753.005
+  type: 'test'
+  ...
+# Subtest: 390 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 16 - 390 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8747.549625
+  type: 'test'
+  ...
+# Subtest: 390: additional eligible product uses gallery-first DOM
+ok 17 - 390: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 240.41775
+  type: 'test'
+  ...
+# Subtest: 390: mixed lines align on the review page
+ok 18 - 390: mixed lines align on the review page
+  ---
+  duration_ms: 902.071708
+  type: 'test'
+  ...
+# Subtest: 390: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 19 - 390: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 2645.246042
+  type: 'test'
+  ...
+# Subtest: 430 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 20 - 430 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6820.797209
+  type: 'test'
+  ...
+# Subtest: 430 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 21 - 430 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6865.522083
+  type: 'test'
+  ...
+# Subtest: 430 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 22 - 430 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6862.968292
+  type: 'test'
+  ...
+# Subtest: 430 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 23 - 430 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 7313.554667
+  type: 'test'
+  ...
+# Subtest: 430: additional eligible product uses gallery-first DOM
+ok 24 - 430: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 341.55875
+  type: 'test'
+  ...
+# Subtest: 430: mixed lines align on the review page
+ok 25 - 430: mixed lines align on the review page
+  ---
+  duration_ms: 903.896375
+  type: 'test'
+  ...
+# Subtest: 430: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 26 - 430: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 2851.316666
+  type: 'test'
+  ...
+# Subtest: 1440 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 27 - 1440 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6504.584291
+  type: 'test'
+  ...
+# Subtest: 1440 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 28 - 1440 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6481.422375
+  type: 'test'
+  ...
+# Subtest: 1440 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 29 - 1440 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6614.4955
+  type: 'test'
+  ...
+# Subtest: 1440 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 30 - 1440 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6352.539041
+  type: 'test'
+  ...
+# Subtest: 1440: additional eligible product uses gallery-first DOM
+ok 31 - 1440: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 238.220333
+  type: 'test'
+  ...
+# Subtest: 1440: mixed lines align on the review page
+ok 32 - 1440: mixed lines align on the review page
+  ---
+  duration_ms: 666.854708
+  type: 'test'
+  ...
+# Subtest: 1440: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 33 - 1440: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 2985.699958
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 138734.911625

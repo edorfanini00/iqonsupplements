@@ -1,0 +1,51 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 118ms
+ ✓ tests/ui/skincare-ingredient-explorer.test.ts (9 tests) 248ms
+stderr | tests/ui/bundle-keyboard.test.ts > selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > held/repeated arrows do not trigger duplicate selection on focus
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > skips disabled radios and handles RTL horizontal navigation
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > leaves modified shortcuts and Tab alone, and pointer selection still changes once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > keeps a quantity above three when navigation lands on its already selected 3+ tier
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bundle-keyboard.test.ts (5 tests) 250ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bag-recommendation.test.ts (7 tests) 563ms
+ ✓ tests/ui/product-storytelling.test.ts (4 tests) 860ms
+   ✓ visual product guides > keeps approved packaging, excludes rejected photos and expands exact facts  509ms
+   ✓ visual product guides > uses product-specific guides with the relevant instructions in the expanded view  316ms
+ ✓ tests/ui/purchase-options.test.ts (21 tests) 997ms
+ ✓ tests/ui/supplement-product-story.test.ts (14 tests) 1494ms
+
+ Test Files  7 passed (7)
+      Tests  62 passed (62)
+   Start at  19:09:11
+   Duration  3.08s (transform 683ms, setup 0ms, collect 3.16s, tests 4.53s, environment 5.27s, prepare 353ms)
+

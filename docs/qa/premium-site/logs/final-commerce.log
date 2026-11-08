@@ -1,0 +1,112 @@
+TAP version 13
+# Data source: synthetic catalog/cart with real local assets; external tracking blocked.
+# Subtest: 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 1 - 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 15430.138792
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.boundingBox: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:70:66)
+  ...
+# Subtest: 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 2 - 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 15197.096
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.boundingBox: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:70:66)
+  ...
+# Subtest: 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 3 - 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 15186.565291
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.boundingBox: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:70:66)
+  ...
+# Subtest: 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 4 - 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 15188.506416
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.boundingBox: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:70:66)
+  ...
+# Subtest: 320: additional eligible product uses gallery-first DOM
+ok 5 - 320: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 328.760625
+  type: 'test'
+  ...
+# Subtest: 320: mixed lines align on the review page
+ok 6 - 320: mixed lines align on the review page
+  ---
+  duration_ms: 775.040292
+  type: 'test'
+  ...
+# Subtest: 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+not ok 7 - 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 16443.649125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:167:2'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 15000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:185:24)
+  ...
+# Subtest: 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+not ok 8 - 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 15180.947709
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:60:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.boundingBox: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('.product-title-row>span')[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:70:66)
+  ...

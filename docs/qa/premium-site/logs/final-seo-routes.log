@@ -1,0 +1,167 @@
+TAP version 13
+# Subtest: production, live catalog, canonical and alias hosts
+    # Subtest: IndexNow key is served as exact public text and aliases remain noindex
+    ok 1 - IndexNow key is served as exact public text and aliases remain noindex
+      ---
+      duration_ms: 12.816834
+      type: 'test'
+      ...
+    # Subtest: public pages are indexable with www canonical in <head>
+    ok 2 - public pages are indexable with www canonical in <head>
+      ---
+      duration_ms: 104.972125
+      type: 'test'
+      ...
+    # Subtest: query parameters canonicalize to the clean URL
+    ok 3 - query parameters canonicalize to the clean URL
+      ---
+      duration_ms: 4.35575
+      type: 'test'
+      ...
+    # Subtest: thin, placeholder and missing pages stay out
+    ok 4 - thin, placeholder and missing pages stay out
+      ---
+      duration_ms: 115.004125
+      type: 'test'
+      ...
+    # Subtest: private paths send X-Robots-Tag noindex, nofollow
+    ok 5 - private paths send X-Robots-Tag noindex, nofollow
+      ---
+      duration_ms: 48.903167
+      type: 'test'
+      ...
+    # Subtest: legacy and Vercel hosts: same 200 page, no redirect, noindex + www canonical
+    ok 6 - legacy and Vercel hosts: same 200 page, no redirect, noindex + www canonical
+      ---
+      duration_ms: 48.685042
+      type: 'test'
+      ...
+    # Subtest: robots.txt and sitemap.xml are valid and in sync
+    ok 7 - robots.txt and sitemap.xml are valid and in sync
+      ---
+      duration_ms: 86.110792
+      type: 'test'
+      ...
+    # Subtest: structured data matches visible facts
+    ok 8 - structured data matches visible facts
+      ---
+      duration_ms: 31.532291
+      type: 'test'
+      ...
+    # Subtest: support inbox is a visible mailto link on /help and in every footer
+    ok 9 - support inbox is a visible mailto link on /help and in every footer
+      ---
+      duration_ms: 203.341208
+      type: 'test'
+      ...
+    # Subtest: help names IQON's online store by its canonical domain, without an IQON Daily alias
+    ok 10 - help names IQON's online store by its canonical domain, without an IQON Daily alias
+      ---
+      duration_ms: 19.830292
+      type: 'test'
+      ...
+    # Subtest: PDP section links point at sections that exist
+    ok 11 - PDP section links point at sections that exist
+      ---
+      duration_ms: 189.503708
+      type: 'test'
+      ...
+    # Subtest: journal guides are titled as IQON Journal; H1 and citations unchanged
+    ok 12 - journal guides are titled as IQON Journal; H1 and citations unchanged
+      ---
+      duration_ms: 19.648291
+      type: 'test'
+      ...
+    # Subtest: label guide explains blend arithmetic in server HTML with its FDA source
+    ok 13 - label guide explains blend arithmetic in server HTML with its FDA source
+      ---
+      duration_ms: 10.172125
+      type: 'test'
+      ...
+    # Subtest: finding-your-supplement-format: new answer and source render in indexable server HTML
+    ok 14 - finding-your-supplement-format: new answer and source render in indexable server HTML
+      ---
+      duration_ms: 10.363375
+      type: 'test'
+      ...
+    # Subtest: a-simple-skincare-routine: new answer and source render in indexable server HTML
+    ok 15 - a-simple-skincare-routine: new answer and source render in indexable server HTML
+      ---
+      duration_ms: 10.038917
+      type: 'test'
+      ...
+    # Subtest: help and product pages state the owner's 3 to 5 day window; help adds Shop tracking
+    ok 16 - help and product pages state the owner's 3 to 5 day window; help adds Shop tracking
+      ---
+      duration_ms: 125.753666
+      type: 'test'
+      ...
+    # Subtest: first-party policies are linked from every footer, /help and subscription terms; native policy routes
+    ok 17 - first-party policies are linked from every footer, /help and subscription terms; native policy routes
+      ---
+      duration_ms: 267.571042
+      type: 'test'
+      ...
+    # Subtest: guides link only to orderable products, and those products link back
+    ok 18 - guides link only to orderable products, and those products link back
+      ---
+      duration_ms: 128.941166
+      type: 'test'
+      ...
+    # Subtest: collections separate orderable supplements from the skincare preview and link the guides
+    ok 19 - collections separate orderable supplements from the skincare preview and link the guides
+      ---
+      duration_ms: 111.567708
+      type: 'test'
+      ...
+    # Subtest: headings with a visual <br> keep a word space in the server HTML
+    ok 20 - headings with a visual <br> keep a word space in the server HTML
+      ---
+      duration_ms: 213.596542
+      type: 'test'
+      ...
+    # Subtest: browsers get the same head metadata as crawlers
+    ok 21 - browsers get the same head metadata as crawlers
+      ---
+      duration_ms: 6.11825
+      type: 'test'
+      ...
+    1..21
+ok 1 - production, live catalog, canonical and alias hosts
+  ---
+  duration_ms: 2357.306875
+  type: 'test'
+  ...
+# Subtest: production, successful but empty Shopify response: editorial placeholders are not indexed or listed
+ok 2 - production, successful but empty Shopify response: editorial placeholders are not indexed or listed
+  ---
+  duration_ms: 670.178167
+  type: 'test'
+  ...
+# Subtest: production, Shopify outage: shopping pages fail closed, static pages stay indexable
+ok 3 - production, Shopify outage: shopping pages fail closed, static pages stay indexable
+  ---
+  duration_ms: 700.756791
+  type: 'test'
+  ...
+# Subtest: production without Shopify configuration: preview fixtures are never indexed or enumerated
+ok 4 - production without Shopify configuration: preview fixtures are never indexed or enumerated
+  ---
+  duration_ms: 823.368042
+  type: 'test'
+  ...
+# Subtest: preview deployment: nothing is indexable and robots.txt blocks crawling
+ok 5 - preview deployment: nothing is indexable and robots.txt blocks crawling
+  ---
+  duration_ms: 723.206666
+  type: 'test'
+  ...
+1..5
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5928.455083

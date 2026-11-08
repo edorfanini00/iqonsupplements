@@ -1,0 +1,28 @@
+{
+  "head_errors": 115,
+  "head_warnings": 81,
+  "base_errors": 116,
+  "base_warnings": 79,
+  "added": [
+    [
+      "app/site.tsx",
+      "@next/next/no-img-element",
+      1,
+      3
+    ]
+  ],
+  "removed": [
+    [
+      "app/approach/page.tsx",
+      "@next/next/no-img-element",
+      1,
+      1
+    ],
+    [
+      "app/help/help-questions.tsx",
+      "@next/next/no-html-link-for-pages",
+      2,
+      1
+    ]
+  ]
+}

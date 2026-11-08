@@ -1,0 +1,266 @@
+TAP version 13
+# Subtest: production, live catalog, canonical and alias hosts
+    # Subtest: IndexNow key is served as exact public text and aliases remain noindex
+    ok 1 - IndexNow key is served as exact public text and aliases remain noindex
+      ---
+      duration_ms: 12.438
+      type: 'test'
+      ...
+    # Subtest: public pages are indexable with www canonical in <head>
+    ok 2 - public pages are indexable with www canonical in <head>
+      ---
+      duration_ms: 105.021708
+      type: 'test'
+      ...
+    # Subtest: query parameters canonicalize to the clean URL
+    ok 3 - query parameters canonicalize to the clean URL
+      ---
+      duration_ms: 4.027292
+      type: 'test'
+      ...
+    # Subtest: thin, placeholder and missing pages stay out
+    ok 4 - thin, placeholder and missing pages stay out
+      ---
+      duration_ms: 109.445167
+      type: 'test'
+      ...
+    # Subtest: private paths send X-Robots-Tag noindex, nofollow
+    ok 5 - private paths send X-Robots-Tag noindex, nofollow
+      ---
+      duration_ms: 54.782167
+      type: 'test'
+      ...
+    # Subtest: legacy and Vercel hosts: same 200 page, no redirect, noindex + www canonical
+    ok 6 - legacy and Vercel hosts: same 200 page, no redirect, noindex + www canonical
+      ---
+      duration_ms: 50.594292
+      type: 'test'
+      ...
+    # Subtest: robots.txt and sitemap.xml are valid and in sync
+    ok 7 - robots.txt and sitemap.xml are valid and in sync
+      ---
+      duration_ms: 80.273458
+      type: 'test'
+      ...
+    # Subtest: structured data matches visible facts
+    ok 8 - structured data matches visible facts
+      ---
+      duration_ms: 26.354083
+      type: 'test'
+      ...
+    # Subtest: support inbox is a visible mailto link on /help and in every footer
+    ok 9 - support inbox is a visible mailto link on /help and in every footer
+      ---
+      duration_ms: 211.34025
+      type: 'test'
+      ...
+    # Subtest: help names IQON's online store by its canonical domain, without an IQON Daily alias
+    not ok 10 - help names IQON's online store by its canonical domain, without an IQON Daily alias
+      ---
+      duration_ms: 13.407167
+      type: 'test'
+      location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:222:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        + actual - expected
+        
+        + 'Where can I track my order?'
+        - 'How do I place an order?'
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 'How do I place an order?'
+      actual: 'Where can I track my order?'
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:236:12)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:222:3)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+      ...
+    # Subtest: PDP section links point at sections that exist
+    ok 11 - PDP section links point at sections that exist
+      ---
+      duration_ms: 245.307459
+      type: 'test'
+      ...
+    # Subtest: journal guides are titled as IQON Journal; H1 and citations unchanged
+    ok 12 - journal guides are titled as IQON Journal; H1 and citations unchanged
+      ---
+      duration_ms: 21.707875
+      type: 'test'
+      ...
+    # Subtest: label guide explains blend arithmetic in server HTML with its FDA source
+    ok 13 - label guide explains blend arithmetic in server HTML with its FDA source
+      ---
+      duration_ms: 11.889667
+      type: 'test'
+      ...
+    # Subtest: finding-your-supplement-format: new answer and source render in indexable server HTML
+    ok 14 - finding-your-supplement-format: new answer and source render in indexable server HTML
+      ---
+      duration_ms: 11.700958
+      type: 'test'
+      ...
+    # Subtest: a-simple-skincare-routine: new answer and source render in indexable server HTML
+    ok 15 - a-simple-skincare-routine: new answer and source render in indexable server HTML
+      ---
+      duration_ms: 12.214875
+      type: 'test'
+      ...
+    # Subtest: help and product pages state the owner's 3 to 5 day window; help adds Shop tracking
+    ok 16 - help and product pages state the owner's 3 to 5 day window; help adds Shop tracking
+      ---
+      duration_ms: 149.33825
+      type: 'test'
+      ...
+    # Subtest: first-party policies are linked from every footer, /help and subscription terms; native policy routes
+    ok 17 - first-party policies are linked from every footer, /help and subscription terms; native policy routes
+      ---
+      duration_ms: 330.709959
+      type: 'test'
+      ...
+    # Subtest: guides link only to orderable products, and those products link back
+    not ok 18 - guides link only to orderable products, and those products link back
+      ---
+      duration_ms: 22.001
+      type: 'test'
+      location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:370:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly deep-equal:
+        + actual - expected
+        
+          [
+            '/products/creatine-monohydrate',
+        +   '/products/creatine-monohydrate'
+          ]
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+        0: '/products/creatine-monohydrate'
+      actual:
+        0: '/products/creatine-monohydrate'
+        1: '/products/creatine-monohydrate'
+      operator: 'deepStrictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:383:12)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:370:3)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+      ...
+    # Subtest: collections separate orderable supplements from the skincare preview and link the guides
+    ok 19 - collections separate orderable supplements from the skincare preview and link the guides
+      ---
+      duration_ms: 119.429833
+      type: 'test'
+      ...
+    # Subtest: headings with a visual <br> keep a word space in the server HTML
+    not ok 20 - headings with a visual <br> keep a word space in the server HTML
+      ---
+      duration_ms: 9.605042
+      type: 'test'
+      location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:422:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        /
+        + actual - expected
+        
+          [
+        +   'Make room forfeeling your best.'
+        -   'For the life you want to live.'
+          ]
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+        0: 'For the life you want to live.'
+      actual:
+        0: 'Make room forfeeling your best.'
+      operator: 'deepStrictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:423:61)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:422:3)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+      ...
+    # Subtest: browsers get the same head metadata as crawlers
+    ok 21 - browsers get the same head metadata as crawlers
+      ---
+      duration_ms: 5.088458
+      type: 'test'
+      ...
+    1..21
+not ok 1 - production, live catalog, canonical and alias hosts
+  ---
+  duration_ms: 2185.181542
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:86:1'
+  failureType: 'subtestsFailed'
+  error: '3 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: production, successful but empty Shopify response: editorial placeholders are not indexed or listed
+ok 2 - production, successful but empty Shopify response: editorial placeholders are not indexed or listed
+  ---
+  duration_ms: 732.119708
+  type: 'test'
+  ...
+# Subtest: production, Shopify outage: shopping pages fail closed, static pages stay indexable
+ok 3 - production, Shopify outage: shopping pages fail closed, static pages stay indexable
+  ---
+  duration_ms: 729.557042
+  type: 'test'
+  ...
+# Subtest: production without Shopify configuration: preview fixtures are never indexed or enumerated
+not ok 4 - production without Shopify configuration: preview fixtures are never indexed or enumerated
+  ---
+  duration_ms: 757.523125
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:473:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    /
+    + actual - expected
+    
+      [
+    +   'Make room forfeeling your best.'
+    -   'For the life you want to live.'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'For the life you want to live.'
+  actual:
+    0: 'Make room forfeeling your best.'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/seo/route-matrix.test.mjs:480:48)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: preview deployment: nothing is indexable and robots.txt blocks crawling
+ok 5 - preview deployment: nothing is indexable and robots.txt blocks crawling
+  ---
+  duration_ms: 786.207667
+  type: 'test'
+  ...
+1..5
+# tests 26
+# suites 0
+# pass 21
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6024.516167

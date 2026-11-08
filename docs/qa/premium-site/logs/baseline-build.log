@@ -1,0 +1,202 @@
+
+> iqon-supplements@0.1.0 build:vercel
+> prisma generate && next build --webpack
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.19.0) to ./node_modules/@prisma/client in 68ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+▲ Next.js 16.3.5 (webpack)
+✓ Running next.config.ts took 1625ms
+
+  Creating an optimized production build ...
+  Using tsconfig file: tsconfig.next.json
+  Using tsconfig file: tsconfig.next.json
+  Using tsconfig file: tsconfig.next.json
+✓ Compiled successfully in 9.9s
+  Running TypeScript ...
+  Finished TypeScript in 6.0s ...
+  Collecting page data using 17 workers ...
+  Generating static pages using 17 workers (0/62) ...
+  Generating static pages using 17 workers (15/62) 
+  Generating static pages using 17 workers (30/62) 
+  Generating static pages using 17 workers (46/62) 
+✓ Generating static pages using 17 workers (62/62) in 85ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /account
+├ ƒ /account/addresses
+├ ƒ /account/callback
+├ ƒ /account/login
+├ ƒ /account/logout
+├ ƒ /account/orders
+├ ƒ /account/orders/[id]
+├ ƒ /account/privacy
+├ ƒ /account/profile
+├ ƒ /account/signed-out
+├ ƒ /account/subscriptions
+├ ƒ /account/subscriptions/[id]
+├ ƒ /affiliates
+├ ƒ /affiliates/admin
+├ ƒ /affiliates/admin/accounting
+├ ƒ /affiliates/admin/activity
+├ ƒ /affiliates/admin/affiliate-messages
+├ ƒ /affiliates/admin/affiliates
+├ ƒ /affiliates/admin/affiliates/[id]
+├ ƒ /affiliates/admin/analytics
+├ ƒ /affiliates/admin/app
+├ ƒ /affiliates/admin/customers
+├ ƒ /affiliates/admin/integrations
+├ ƒ /affiliates/admin/messages
+├ ƒ /affiliates/admin/notes
+├ ƒ /affiliates/admin/orders
+├ ƒ /affiliates/admin/payouts
+├ ƒ /affiliates/admin/rankings
+├ ƒ /affiliates/admin/requests
+├ ƒ /affiliates/admin/settings
+├ ƒ /affiliates/admin/subscriptions
+├ ƒ /affiliates/admin/tiktok
+├ ƒ /affiliates/contact
+├ ƒ /affiliates/dashboard
+├ ƒ /affiliates/dashboard/clients
+├ ƒ /affiliates/dashboard/learn
+├ ƒ /affiliates/dashboard/messages
+├ ƒ /affiliates/dashboard/network
+├ ƒ /affiliates/dashboard/orders
+├ ƒ /affiliates/dashboard/payment
+├ ƒ /affiliates/dashboard/payouts
+├ ƒ /affiliates/dashboard/settings
+├ ƒ /affiliates/forgot-password
+├ ƒ /affiliates/login
+├ ƒ /affiliates/reset-password
+├ ƒ /affiliates/shop-manager
+├ ƒ /affiliates/shop-manager/orders
+├ ƒ /affiliates/signup
+├ ƒ /api/account/addresses
+├ ƒ /api/account/addresses/[id]
+├ ƒ /api/account/orders
+├ ƒ /api/account/orders/[id]
+├ ƒ /api/account/overview
+├ ƒ /api/account/profile
+├ ƒ /api/account/session
+├ ƒ /api/account/subscriptions
+├ ƒ /api/account/subscriptions/[id]
+├ ƒ /api/account/subscriptions/[id]/actions
+├ ƒ /api/affiliates/admin/accounting/adjustments
+├ ƒ /api/affiliates/admin/accounting/adjustments/[id]
+├ ƒ /api/affiliates/admin/accounting/expenses
+├ ƒ /api/affiliates/admin/accounting/expenses/[id]
+├ ƒ /api/affiliates/admin/accounting/inventory
+├ ƒ /api/affiliates/admin/accounting/items/[id]
+├ ƒ /api/affiliates/admin/accounting/items/[id]/history
+├ ƒ /api/affiliates/admin/accounting/orders
+├ ƒ /api/affiliates/admin/accounting/orders/[id]
+├ ƒ /api/affiliates/admin/accounting/products
+├ ƒ /api/affiliates/admin/accounting/purchases
+├ ƒ /api/affiliates/admin/accounting/purchases/[id]
+├ ƒ /api/affiliates/admin/accounting/sales
+├ ƒ /api/affiliates/admin/accounting/sales/[id]
+├ ƒ /api/affiliates/admin/accounting/summary
+├ ƒ /api/affiliates/admin/accounting/trends
+├ ƒ /api/affiliates/admin/affiliate-messages
+├ ƒ /api/affiliates/admin/affiliate-messages/[affiliateId]
+├ ƒ /api/affiliates/admin/affiliate-messages/broadcast
+├ ƒ /api/affiliates/admin/affiliates
+├ ƒ /api/affiliates/admin/affiliates/[id]
+├ ƒ /api/affiliates/admin/affiliates/[id]/clients
+├ ƒ /api/affiliates/admin/app
+├ ƒ /api/affiliates/admin/badges
+├ ƒ /api/affiliates/admin/commissions/[id]
+├ ƒ /api/affiliates/admin/coupon-sync
+├ ƒ /api/affiliates/admin/create
+├ ƒ /api/affiliates/admin/customers
+├ ƒ /api/affiliates/admin/customers/email
+├ ƒ /api/affiliates/admin/dashboard
+├ ƒ /api/affiliates/admin/export
+├ ƒ /api/affiliates/admin/integrations
+├ ƒ /api/affiliates/admin/marketing/audience
+├ ƒ /api/affiliates/admin/marketing/campaigns
+├ ƒ /api/affiliates/admin/marketing/campaigns/[id]
+├ ƒ /api/affiliates/admin/marketing/campaigns/[id]/run
+├ ƒ /api/affiliates/admin/messages
+├ ƒ /api/affiliates/admin/messages/[id]
+├ ƒ /api/affiliates/admin/messages/[id]/reply
+├ ƒ /api/affiliates/admin/notes
+├ ƒ /api/affiliates/admin/notes/[id]
+├ ƒ /api/affiliates/admin/orders
+├ ƒ /api/affiliates/admin/orders/[id]/attribute
+├ ƒ /api/affiliates/admin/orders/[id]/refund
+├ ƒ /api/affiliates/admin/payouts
+├ ƒ /api/affiliates/admin/payouts/[id]
+├ ƒ /api/affiliates/admin/portal-commerce-sync
+├ ƒ /api/affiliates/admin/rankings
+├ ƒ /api/affiliates/admin/referrer-options
+├ ƒ /api/affiliates/admin/requests
+├ ƒ /api/affiliates/admin/requests/[id]
+├ ƒ /api/affiliates/admin/subscriptions
+├ ƒ /api/affiliates/admin/subscriptions/[id]
+├ ƒ /api/affiliates/admin/test-email
+├ ƒ /api/affiliates/admin/tiktok
+├ ƒ /api/affiliates/admin/tiktok/[id]
+├ ƒ /api/affiliates/bank
+├ ƒ /api/affiliates/change-password
+├ ƒ /api/affiliates/clients
+├ ƒ /api/affiliates/contact
+├ ƒ /api/affiliates/creator-code
+├ ƒ /api/affiliates/dashboard
+├ ƒ /api/affiliates/forgot-password
+├ ƒ /api/affiliates/invite
+├ ƒ /api/affiliates/invite/lookup
+├ ƒ /api/affiliates/login
+├ ƒ /api/affiliates/logout
+├ ƒ /api/affiliates/me
+├ ƒ /api/affiliates/messages
+├ ƒ /api/affiliates/messages/unread
+├ ƒ /api/affiliates/network
+├ ƒ /api/affiliates/onboarding
+├ ƒ /api/affiliates/orders/[id]
+├ ƒ /api/affiliates/rankings
+├ ƒ /api/affiliates/referrer-search
+├ ƒ /api/affiliates/reset-password
+├ ƒ /api/affiliates/roster
+├ ƒ /api/affiliates/shop-manager/orders
+├ ƒ /api/affiliates/shopify-orders
+├ ƒ /api/affiliates/signup
+├ ƒ /api/affiliates/supplements-code
+├ ƒ /api/affiliates/supplements-codes
+├ ƒ /api/affiliates/tiktok
+├ ƒ /api/affiliates/webhooks/shopify
+├ ƒ /api/cart
+├ ƒ /api/checkout
+├ ƒ /api/cron/affiliate-sync
+├ ƒ /api/cron/app-commissions
+├ ƒ /api/cron/email-campaigns
+├ ƒ /api/cron/leaderboard
+├ ƒ /api/cron/monthly-bonus
+├ ƒ /api/webhooks/shopify/orders
+├ ƒ /approach
+├ ƒ /checkout
+├ ƒ /collections/[category]
+├ ƒ /help
+├ ƒ /journal
+├ ƒ /journal/[slug]
+├ ƒ /policies/[slug]
+├ ƒ /products/[slug]
+├ ƒ /reviews
+├ ƒ /robots.txt
+├ ƒ /sitemap.xml
+└ ƒ /skincare
+
+
+ƒ Proxy (Middleware)
+
+ƒ  (Dynamic)  server-rendered on demand
+

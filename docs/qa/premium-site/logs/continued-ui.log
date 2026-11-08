@@ -1,0 +1,97 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/review-integrity.test.ts (2 tests) 53ms
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 174ms
+ ✓ tests/ui/skincare-ingredient-explorer.test.ts (9 tests) 367ms
+stderr | tests/ui/bundle-keyboard.test.ts > selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > held/repeated arrows do not trigger duplicate selection on focus
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > skips disabled radios and handles RTL horizontal navigation
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > leaves modified shortcuts and Tab alone, and pointer selection still changes once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > keeps a quantity above three when navigation lands on its already selected 3+ tier
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bundle-keyboard.test.ts (5 tests) 384ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bag-recommendation.test.ts (7 tests) 881ms
+   ✓ recommends eligible Gut Health to advance the active bundle tier and preserves quantity controls  467ms
+ ✓ tests/ui/answer-html.test.ts (7 tests) 840ms
+   ✓ answers in the initial HTML > includes every product FAQ answer and full label details in product HTML  615ms
+ ✓ tests/ui/product-storytelling.test.ts (4 tests) 1294ms
+   ✓ visual product guides > keeps approved packaging, excludes rejected photos and expands exact facts  784ms
+   ✓ visual product guides > uses product-specific guides with the relevant instructions in the expanded view  426ms
+ ❯ tests/ui/purchase-options.test.ts (21 tests | 1 failed) 1522ms
+   ✓ offers no subscription: one time is the only purchase, and the bag never receives a selling plan 222ms
+   ✓ shows both tiers with real per unit prices; choosing a tier sets the quantity that is added 177ms
+   ✓ keeps the 3+ tier selected when the stepper goes past three and returns to one 102ms
+   ✓ includes Gut Health in the approved bundle tiers 108ms
+   ✓ a subscription only product cannot be added 30ms
+   ✓ keeps all seven skincare pages browseable with no purchase controls, even if live availability is stale 179ms
+   ✓ variants: switching options keeps one time pricing from the selected variant 63ms
+   ✓ creatine-monohydrate: gallery-first layout and all approved bundle choices 74ms
+   ✓ hydrolyzed-collagen-peptides: gallery-first layout and all approved bundle choices 57ms
+   ✓ collagen-peptides-chocolate: gallery-first layout and all approved bundle choices 54ms
+   ✓ colostrum-powder: gallery-first layout and all approved bundle choices 80ms
+   ✓ gut-health: gallery-first layout and all approved bundle choices 54ms
+   ✓ nmn: gallery-first layout and all approved bundle choices 58ms
+   ✓ glp-1-support: gallery-first layout and all approved bundle choices 47ms
+   ✓ hair-skin-nails-gummies: gallery-first layout and all approved bundle choices 48ms
+   ✓ resveratrol: gallery-first layout and all approved bundle choices 51ms
+   ✓ liver-support: gallery-first layout and all approved bundle choices 37ms
+   ✓ keto-5: gallery-first layout and all approved bundle choices 34ms
+   × orders the phone page gallery, name and price, product notes, purchase controls, then details 13ms
+     → expected 'SUPPLEMENTS / POWDERCreatine Monohydr…' to contain '$48.97'
+   ✓ does not offer quantity choices for sold-out products or variants 17ms
+   ✓ keeps unapproved future products at full price while providing quantity choices 14ms
+ ✓ tests/ui/supplement-product-story.test.ts (14 tests) 1946ms
+   ✓ the complete supplement range > renders creatine-monohydrate with its formula, directions, artwork and relevant comparisons  432ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/purchase-options.test.ts > orders the phone page gallery, name and price, product notes, purchase controls, then details
+AssertionError: expected 'SUPPLEMENTS / POWDERCreatine Monohydr…' to contain '$48.97'
+
+Expected: "$48.97"
+Received: "SUPPLEMENTS / POWDERCreatine Monohydrate281 g"
+
+ ❯ tests/ui/purchase-options.test.ts:140:30
+    138|  const details=overview.querySelector(".purchase-panel-details")!;
+    139|  expect(summary.textContent).toContain("Creatine Monohydrate");
+    140|  expect(summary.textContent).toContain("$48.97");
+       |                              ^
+    141|  expect(buy.querySelector(".bundle-choices")).toBeTruthy();
+    142|  expect(buy.querySelector(".add-to-bag-row")).toBeTruthy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  1 failed | 70 passed (71)
+   Start at  19:19:42
+   Duration  4.05s (transform 1.01s, setup 0ms, collect 4.98s, tests 7.46s, environment 6.79s, prepare 1.16s)
+

@@ -1,0 +1,85 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression
+
+ ❯ tests/ui/original-relay-reads.test.ts (19 tests | 2 failed) 42ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/orders without Body filtering 8ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/subscriptions without Body filtering 3ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/customers without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/summary without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/trends without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/inventory without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/purchases without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/sales without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/expenses without Body filtering 2ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/adjustments without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/orders without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/items/item-1/history without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET orders/order-1 without Body filtering 1ms
+   × original shared operational read parity > keeps unsafe provider POST unavailable 8ms
+     → expected 400 to be 501 // Object.is equality
+   ✓ original shared operational read parity > keeps unsafe provider PATCH unavailable 4ms
+   ✓ original shared operational read parity > keeps unsafe provider DELETE unavailable 1ms
+   ✓ original shared operational read parity > keeps unsafe provider PUT unavailable 3ms
+   × original shared operational read parity > does not proxy unknown accounting reads or GET detail refresh mutations 1ms
+     → expected 403 to be 501 // Object.is equality
+   ✓ original shared operational read parity > preserves canonical auth rejection rather than an empty ledger 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/settings-cross-portal.test.ts [ tests/ui/settings-cross-portal.test.ts ]
+Error: Failed to resolve import "../../../iqon-health-rate-settings/app/affiliates/admin/settings/page" from "tests/ui/settings-cross-portal.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/ui/settings-cross-portal.test.ts:7:27
+  3  |  import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+  4  |  import BodySettings from "../../app/affiliates/admin/settings/page";
+  5  |  import HealthSettings from "../../../iqon-health-rate-settings/app/affiliates/admin/settings/page";
+     |                              ^
+  6  |  import { validateCommand, commandHash } from "../../../iqon-health-rate-settings/lib/integrations/body/commands/valid...
+  7  |  import { canonicalActionFetch as bodySave } from "../../lib/affiliates/canonical-action-fetch";
+ ❯ TransformPluginContext._formatLog ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29079:43
+ ❯ TransformPluginContext.error ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29076:14
+ ❯ normalizeUrl ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27199:18
+ ❯ ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27257:32
+ ❯ TransformPluginContext.transform ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27225:4
+ ❯ EnvironmentPluginContainer.transform ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28877:14
+ ❯ loadAndTransform ../../node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:22746:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/original-relay-reads.test.ts > original shared operational read parity > keeps unsafe provider POST unavailable
+AssertionError: expected 400 to be 501 // Object.is equality
+
+- Expected
++ Received
+
+- 501
++ 400
+
+ ❯ tests/ui/original-relay-reads.test.ts:7:344
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/original-relay-reads.test.ts > original shared operational read parity > does not proxy unknown accounting reads or GET detail refresh mutations
+AssertionError: expected 403 to be 501 // Object.is equality
+
+- Expected
++ Received
+
+- 501
++ 403
+
+ ❯ tests/ui/original-relay-reads.test.ts:8:337
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 17 passed (19)
+   Start at  19:09:29
+   Duration  1.05s (transform 49ms, setup 0ms, collect 43ms, tests 42ms, environment 720ms, prepare 180ms)
+
