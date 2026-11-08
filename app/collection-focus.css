@@ -1,0 +1,9 @@
+/* Supplement browsing only; no shared product, financial table or skincare rules. */
+.catalog-focus{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px}
+.catalog-focus>span{font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#687279}
+.catalog-focus a{display:inline-flex;align-items:center;min-height:40px;font-size:14px;border-bottom:1px solid transparent}
+.catalog-focus a:hover,.catalog-focus a[aria-current]{border-bottom-color:currentColor}
+.catalog-focus a[aria-current]{font-weight:600}
+.catalog-focus-description{flex-basis:100%;font-size:14px;line-height:1.6;color:#4b575d;margin:0}
+.catalog-focus .catalog-reset{display:inline-flex;align-items:center;gap:6px;min-height:40px;margin:0;font-size:14px;text-decoration:underline;text-underline-offset:4px;background:none;border:0;padding:0}
+@media(max-width:760px){.catalog-focus{margin-top:12px;margin-bottom:14px;gap:2px 18px}.catalog-focus>span{width:100%}.catalog-focus-description{margin-bottom:14px}}

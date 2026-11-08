@@ -1,0 +1,11 @@
+{
+  "baseline": "d45146950c456fb0f5f29ee85eded20659428d8e",
+  "unchanged_prior_application_files": 721,
+  "allowed_changed_existing_files": [
+    "app/collection-page.tsx",
+    "app/collections/[category]/page.tsx"
+  ],
+  "all_old_source_matches": true,
+  "prior_evidence_files": 2523,
+  "all_old_evidence_matches": true
+}
