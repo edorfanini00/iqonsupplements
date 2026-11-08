@@ -45,7 +45,10 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  const bundle=p.category==="supplements"&&isBundleEligible(p.id);
  const estimate=bundle?bundleEstimate(price,quantity):{gross:Math.round(price*100)*quantity/100,total:Math.round(price*100)*quantity/100,saved:0};
  useEffect(()=>{
-  if(live&&variantId&&!comingSoon)trackViewContent({variantId,name:p.name,price,currency});
+  const track=()=>{if(live&&variantId&&!comingSoon)trackViewContent({variantId,name:p.name,price,currency});};
+  track();
+  for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.addEventListener(name,track);
+  return ()=>{for(const name of ["consentTrackingApiLoaded","visitorConsentCollected"])document.removeEventListener(name,track);};
  },[live,variantId,comingSoon,p.name,price,currency]);
  const purchaseFirst=!comingSoon;
  const inlineCta=useRef<HTMLDivElement>(null);

@@ -1,9 +1,10 @@
+import { parseVisitorConsent, type VisitorConsent } from "./shopify-consent";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
 import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
-import { CATALOG_QUERY, CART_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
+import { CATALOG_QUERY, CART_QUERY, CHECKOUT_CONSENT_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 import { isRetiredProductHandle } from "./legacy-redirects";
 
@@ -41,12 +42,13 @@ async function cartId() {return (await cookies()).get(CART_COOKIE)?.value;}
 async function setCartId(id:string,request:Request) {
   (await cookies()).set(CART_COOKIE,id,{httpOnly:true,secure:new URL(request.url).protocol==="https:",sameSite:"lax",path:"/",maxAge:60*60*24*10});
 }
-async function readCart():Promise<ShopifyCart|null> {
+async function readCart(visitorConsent?:VisitorConsent):Promise<ShopifyCart|null> {
   const settings=config();
   if(!settings) throw new CommerceError("Orders are not open yet.",503);
   const id=await cartId();
   if(!id) return null;
-  const result=await shopifyRequest<{cart:ShopifyCart|null}>(settings,CART_QUERY,{id},await buyerIP());
+  const result=await shopifyRequest<{cart:ShopifyCart|null}>(settings,visitorConsent?CHECKOUT_CONSENT_QUERY:CART_QUERY,
+    visitorConsent?{id,visitorConsent}:{id},await buyerIP());
   return result.cart;
 }
 type CartPayload={cart:ShopifyCart|null;userErrors:{message:string}[];warnings?:{message:string}[]};
@@ -134,8 +136,13 @@ export async function mutateCartResponse(request:Request) {
 export async function checkoutResponse(request:Request) {
   try {
     sameOrigin(request);
-    // Refresh immediately before handing the buyer to Shopify's hosted checkout.
-    const refreshed=await removeUpcomingProducts(await readCart());
+    const text=await request.text();
+    if(text.length>1024)throw new CommerceError("Invalid request.",413);
+    let visitorConsent;
+    try {visitorConsent=parseVisitorConsent((text?JSON.parse(text):{}).visitorConsent);}catch {throw new CommerceError("Invalid request.",400);}
+    if(request.headers.get("Sec-GPC")==="1")visitorConsent={...visitorConsent,marketing:false,saleOfData:false};
+    // Validate the same fresh cart that carries consent into its checkout URL.
+    const refreshed=await removeUpcomingProducts(await readCart(visitorConsent));
     const cart=refreshed.cart;
     if(refreshed.removed) throw new CommerceError(`${refreshed.notices.join(" ")} Please review your bag before checking out.`,422,publicCart(cart));
     if(!cart?.totalQuantity) throw new CommerceError("Your bag is empty. Add your essentials to continue.",422,publicCart(cart));

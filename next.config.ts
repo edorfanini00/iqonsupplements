@@ -5,6 +5,14 @@ import { LEGACY_PRODUCT_REDIRECTS } from "./lib/legacy-redirects";
 const noindex = (value: string) => [{key: "X-Robots-Tag", value}];
 
 const nextConfig: NextConfig = {
+  webpack(config) {
+    // Hydrogen's browser SDK imports this public module at runtime.
+    config.output.environment = {...config.output.environment, dynamicImport: true, asyncFunction: true};
+    config.externals = [...(Array.isArray(config.externals) ? config.externals : [config.externals]).filter(Boolean), {
+      "https://cdn.shopify.com/storefront/standard-events.js": "import https://cdn.shopify.com/storefront/standard-events.js",
+    }];
+    return config;
+  },
   async redirects() {
     return LEGACY_PRODUCT_REDIRECTS.map(({handle, destination}) => ({source: `/products/${handle}`, destination, permanent: true}));
   },

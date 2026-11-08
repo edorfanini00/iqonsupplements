@@ -1,4 +1,5 @@
 import type { CartItem } from "./catalog";
+import {nativeConsent,nativeConsentReady} from "./shopify-consent";
 
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1006368245818889";
 type Pixel = {
@@ -18,7 +19,9 @@ export function isStorefrontPath(pathname: string) {
   return !/^\/(account|affiliates|api)(\/|$)/.test(pathname);
 }
 export function pixelAllowed() {
+  const consent=nativeConsent();
   return typeof window !== "undefined" &&
+    consent.marketing && consent.saleOfData &&
     (window.navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl !== true &&
     isStorefrontPath(window.location.pathname);
 }
@@ -26,6 +29,28 @@ export function pixelAllowed() {
 let initialized = false;
 let lastPage: string | undefined;
 let lastProduct: string | undefined;
+
+// Discard unsent events before unloading a previously initialized runtime.
+// Native Shopify consent remains the only source of the permission decision.
+export function syncPixelConsent() {
+  const consent=nativeConsent();
+  if(consent.marketing&&consent.saleOfData)return false;
+  lastPage=undefined;lastProduct=undefined;
+  if(typeof window==="undefined")return false;
+  // Unready/stale permission pauses the runtime, but is not a refusal. Only a
+  // fresh native decision or GPC authorizes erasing previously consented IDs.
+  const refused=nativeConsentReady()||
+    (window.navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true;
+  if(initialized){
+    if(Array.isArray(window.fbq?.queue))window.fbq.queue.length=0;
+    window.fbq?.("consent","revoke");
+  }
+  if(refused&&typeof document!=="undefined")for(const name of ["_fbp","_fbc"]){
+    for(const domain of ["","; Domain=www.iqondaily.com","; Domain=iqondaily.com"])
+      document.cookie=`${name}=; Max-Age=0; Path=/; Secure; SameSite=Lax${domain}`;
+  }
+  return initialized;
+}
 
 // The standard Meta queue. next/script owns the single external script load.
 export function initializePixel() {
@@ -48,6 +73,7 @@ export function initializePixel() {
   window.fbq.disablePushState = true;
   // Only the explicit storefront events below; no automatic button/form events.
   window.fbq("set", "autoConfig", false, META_PIXEL_ID);
+  window.fbq("consent", "grant");
   window.fbq("init", META_PIXEL_ID);
   initialized = true;
   return true;

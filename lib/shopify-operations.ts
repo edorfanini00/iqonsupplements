@@ -55,6 +55,7 @@ const DISCOUNT_BODY = `mutation IQONCartDiscounts($cartId: ID!, $discountCodes: 
   cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $discountCodes) { cart { ...IQONCart } userErrors { field message } }
 }`;
 const CART_FRAGMENT = CART_FRAGMENT_BODY + "\n" + DISCOUNT_FRAGMENT;
+export const CHECKOUT_CONSENT_QUERY = `query IQONCheckoutConsent($id: ID!, $visitorConsent: VisitorConsent!) @inContext(visitorConsent: $visitorConsent) { cart(id: $id) { ...IQONCart } }` + CART_FRAGMENT;
 export const CART_QUERY = CART_QUERY_BODY + CART_FRAGMENT;
 export const CART_CREATE = CREATE_BODY + CART_FRAGMENT;
 export const CART_ADD = ADD_BODY + CART_FRAGMENT;

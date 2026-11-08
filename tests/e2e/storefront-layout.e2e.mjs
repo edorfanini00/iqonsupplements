@@ -307,12 +307,12 @@ for (const device of VIEWPORTS) {
     const [cartRequest] = await Promise.all([page.waitForRequest(r => r.url().endsWith("/api/cart") && r.method() === "POST"), add.click()]);
     const body = JSON.parse(cartRequest.postData());
     assert.deepEqual([body.action, body.id, body.purchase, body.sellingPlanId], ["add", "creatine-monohydrate", "once", undefined], "one-time line, no selling plan");
-    const checkout = page.locator(".bag-sheet button", {hasText: "Secure checkout"});
+    const checkout = page.locator(".bag-sheet a", {hasText: "Secure checkout"});
     await page.waitForFunction(() => !!document.querySelector(".bag-sheet") && /\$39/.test(document.querySelector(".bag-sheet").textContent));
-    await page.waitForFunction(() => [...document.querySelectorAll(".bag-sheet button")].some(b => /Secure checkout/.test(b.textContent) && !b.disabled));
+    await page.waitForFunction(() => [...document.querySelectorAll(".bag-sheet a[href]")].some(b => /Secure checkout/.test(b.textContent)));
     await page.screenshot({path: path.join(shots, `${device.name}_bag_before_checkout.png`)});
-    const [handoff] = await Promise.all([page.waitForRequest(r => r.url().startsWith("https://iqon-test.myshopify.com/cart/c/")), checkout.click()]);
-    assert.match(handoff.url(), /^https:\/\/iqon-test\.myshopify\.com\/cart\/c\/synthetic-\d+\?key=synthetic$/);
+    const [handoff] = await Promise.all([page.waitForRequest(r => r.url().startsWith("https://nr9zd0-t5.myshopify.com/cart/c/")), checkout.click()]);
+    assert.match(handoff.url(), /^https:\/\/nr9zd0-t5\.myshopify\.com\/cart\/c\/synthetic-\d+\?key=synthetic&_cs=/);
     await close();
   });
 
@@ -578,6 +578,7 @@ for (const device of VIEWPORTS) {
       const add = page.locator(".add-to-bag-row button.button-dark");
       await add.click();
       await waitForQuantity(1);
+      await bag.getByRole("link", {name: /^Secure checkout/}).waitFor();
       // Native Tab navigation must scroll the sheet to each focused control.
       await bag.locator(".cart-line > a").focus();
       for (let i = 0; i < 12; i++) {
