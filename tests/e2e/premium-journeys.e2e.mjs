@@ -7,7 +7,7 @@ const base=process.env.QA_BASE||'http://localhost:3990';
 const out='docs/qa/premium-site/real-assets-commerce';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch();test.after(()=>browser.close());
 async function open(route,width=390){
- const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
+ const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900},reducedMotion:'reduce'});
  await context.route(/^https?:\/\/(?!localhost)/,r=>r.abort());
  await context.addInitScript(()=>Object.defineProperty(navigator,'globalPrivacyControl',{value:true}));
  const page=await context.newPage();await page.goto(base+route);await page.waitForLoadState('networkidle');await page.evaluate(()=>document.fonts.ready);return {page,context};
@@ -38,10 +38,12 @@ test('live Help prioritizes order tasks and links existing account and policies'
 for(const width of [390,1440])test(`live product ${width}: purpose, serving price, sticky behavior and actual images`,async()=>{
  const {page,context}=await open('/products/creatine-monohydrate',width);try{
  await page.locator('.add-to-bag-row .button:enabled').waitFor();
+ assert.match(await page.locator('.visual-pack img').getAttribute('src'),/localhost:3991\/images\/supplements\/00_pack_creatine\.webp$/);
+ await page.waitForFunction(()=>{const i=document.querySelector('.visual-pack img');return i.complete&&i.naturalWidth>0;});
  const info=await page.locator('.purchase-panel-info').innerText();assert.match(info,/1 scoop \(5\.6 g\)/);assert.match(info,/50 servings/);assert.match(info,/\/ serving/);assert.doesNotMatch(info,/50.day/);
  assert.equal(await page.locator('.sticky-purchase').getAttribute('class'),'sticky-purchase inline-cta-in-view');
  const purpose=await page.locator('.product-summary-description').boundingBox();const price=await page.locator('.product-current-price').boundingBox();const buy=await page.locator('.bundle-choices').boundingBox();assert.ok(purpose.y<price.y&&price.y<buy.y);
- await page.locator('.purchase-panel-info').evaluate(e=>e.scrollIntoView({block:'start',behavior:'instant'}));await page.waitForTimeout(150);await page.screenshot({path:`${out}/creatine-value-${width}.png`});
+ await page.locator('.product-summary-description').evaluate(e=>scrollTo({top:scrollY+e.getBoundingClientRect().top-(document.querySelector('.store-header')?.getBoundingClientRect().height||130)-20,behavior:'instant'}));await page.waitForTimeout(150);await page.screenshot({path:`${out}/creatine-value-${width}.png`});
  await page.locator('#ingredient-science').evaluate(e=>e.scrollIntoView({block:'start',behavior:'instant'}));await page.waitForFunction(()=>!document.querySelector('.sticky-purchase').classList.contains('inline-cta-in-view'));assert.equal(await page.locator('.sticky-purchase.inline-cta-in-view').count(),0);
  const cta=await page.locator('.sticky-purchase button').boundingBox();assert.ok(cta.y>=0&&cta.y+cta.height<=900);
  assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).scrollBehavior),'auto');

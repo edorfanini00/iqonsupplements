@@ -30,8 +30,8 @@ test.after(async()=>{await browser.close();server?.kill('SIGTERM');});
 const handles=process.env.QA_CATALOG ? JSON.parse(fs.readFileSync(process.env.QA_CATALOG)).products.filter(p=>p.category==='supplements'&&p.available&&!p.requiresSellingPlan).map(p=>p.handle) : ['creatine-monohydrate','hydrolyzed-collagen-peptides','colostrum-powder','gut-health'];
 const widths=[320,390,430,1440];
 async function open(width,handle){
- const context=await browser.newContext({viewport:{width,height:width===320?740:width===1440?900:844},reducedMotion:'reduce'});
- await context.route('**/*',r=>{const u=new URL(r.request().url());return u.origin===base||(real&&u.hostname==='cdn.shopify.com')?r.continue():r.abort()});
+ const context=await browser.newContext({ignoreHTTPSErrors:process.env.QA_LOCAL_ASSETS==='1',viewport:{width,height:width===320?740:width===1440?900:844},reducedMotion:'reduce'});
+ await context.route('**/*',r=>{const u=new URL(r.request().url());return u.origin===base||(real&&u.hostname==='cdn.shopify.com')||(process.env.QA_LOCAL_ASSETS==='1'&&u.hostname==='localhost'&&u.port==='3991')?r.continue():r.abort()});
  context.setDefaultTimeout(15000);
  const page=await context.newPage();
  await page.goto(`${base}/products/${handle}`);
