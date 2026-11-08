@@ -92,6 +92,11 @@ globalThis.fetch = async (input, init) => {
     if (process.env.FAKE_SHOPIFY === "down") return new Response("unavailable", {status: 503});
     const {query} = JSON.parse(String(init?.body || "{}"));
     const {variables = {}} = JSON.parse(String(init?.body || "{}"));
+    if (query?.includes("IQONCheckoutConsent")) {
+      const data=cartResponse("Read",variables);
+      if(data.cart)data.cart.checkoutUrl=`https://nr9zd0-t5.myshopify.com/cart/c/${encodeURIComponent(variables.id.split("/").pop())}?key=synthetic&_cs=${encodeURIComponent(JSON.stringify(variables.visitorConsent))}`;
+      return Response.json({data});
+    }
     const cartOperation = query?.match(/IQONCart(Read|Create|Add|Update|Remove)\b/)?.[1];
     if (cartOperation) return Response.json({data: cartResponse(cartOperation, variables)});
     if (query?.includes("IQONCatalog")) return Response.json({data: {products: {pageInfo: {hasNextPage: false, endCursor: null}, nodes: process.env.FAKE_SHOPIFY === "empty" ? [] : catalog}}});
