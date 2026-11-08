@@ -39,7 +39,7 @@ export const productVisuals: Record<string, ProductVisual> = {
       { title: "Your mix", body: "Use a shaker or blender with the liquid you prefer. The full formula includes stevia, acacia and xanthan gum." }], ritualTitle: "Turn a daily drink into a ritual."
   },
   "colostrum-powder": {
-    headline: "Colostrum, clearly specified.", lead: "2,300 mg of bovine colostrum per serving, standardized to 25% IgG. One scoop for your cold drink.",
+    headline: "Colostrum, clearly specified.", lead: "Bovine colostrum in an unflavored powder. One scoop to mix into cold water or your favorite drink.",
     benefitTitle: "Know what is in your scoop.", benefits: ["2,300 mg bovine colostrum", "575 mg naturally present IgG", "A simple, cold-mix powder"],
     fact: { value: "25%", label: "IgG in the bovine colostrum.", body: "575 mg of immunoglobulin G within each 2,300 mg serving of colostrum." },
     whyTitle: "The amount matters. So does the composition.", whyBody: "Colostrum is the first milk produced after a cow gives birth. Its composition is different from mature milk. IQON specifies both the colostrum amount and its IgG content, so you can see exactly what your serving provides.",

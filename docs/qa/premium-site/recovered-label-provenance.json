@@ -1,0 +1,166 @@
+{
+  "creatine-monohydrate": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_Creatine_Monohydrate_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/creatine-monohydrate--primary.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/creatine-monohydrate--primary.png",
+      "sha256": "56074a15e7c618315bfde71c8ec4915e95057ad5c5a665917632af16b6aefde4",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "No new lot assay or purity evidence; do not infer the identity of the difference between 5.6 g scoop mass and 5 g active from this panel.",
+      "Front net weight is 281 g; 50 × 5.6 g is 280 g. Preserve the printed fields, not a revised calculated net weight."
+    ]
+  },
+  "hydrolyzed-collagen-peptides": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_CollagenNoFlavor_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/hydrolyzed-collagen-peptides--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/hydrolyzed-collagen-peptides--supplier-ready.png",
+      "sha256": "734c07edd2d600b4199168787a721f6a3174755914f6702c0bfac699f9433431",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "Grass fed is printed front label language, not independent source traceability.",
+      "Recovered directions say mix in a shaker or blender with 8–10 oz beverage; the earlier supplier transcription specifies chilled liquid and about five seconds. Keep that source difference visible rather than silently replacing directions."
+    ]
+  },
+  "collagen-peptides-chocolate": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_CollagenChocolate_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/collagen-peptides-chocolate--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/collagen-peptides-chocolate--supplier-ready.png",
+      "sha256": "0b012104932f43a777adfb81ad2f99d89fe8b647fcb28d712eb5505c3380a382",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "No grass fed chain of custody or independent efficacy evidence recovered.",
+      "No sugars row is printed in the inspected panel; do not infer sugar free."
+    ]
+  },
+  "colostrum-powder": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/Colostrum-corrected-2026-10-02/IQON_ColostrumPowder_PRINT_v3.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/colostrum-powder--corrected-oct02-print.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/colostrum-powder--corrected-oct02-print.png",
+      "sha256": "2745b20018001bf98237cb07c8b20adb29525c0d87d311137b0a6c0beeba493b",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "No IgG batch assay or new source/processing proof. Front immune/inflammatory marketing is not clinical evidence.",
+      "Final folder, supplier-ready, corrected October label and print v3 all show the same inspected panel facts. Corrected print selected for citation; no version discarded."
+    ]
+  },
+  "gut-health": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/final/Gut Health/Approved Family Format 2026-11-06/IQON_Gut_Health_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/gut-health--primary.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/gut-health--primary.png",
+      "sha256": "ad32db9cfc3e55bdb28423dac74d1e5b28955750adfca3544f2f00a1557111b1",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "No lot COA, expiry viability guarantee or facility certificates recovered by this label task."
+    ]
+  },
+  "keto-5": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_Keto5_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/keto-5--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/keto-5--supplier-ready.png",
+      "sha256": "83cc91af8f62c298bc2423dc4758842e7f9bafe14ed0c67941ecdb35e78736a5",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "Cannot calculate total caffeine from blend mass and listed component standardizations.",
+      "No ketosis, weight loss or product efficacy substantiation recovered."
+    ]
+  },
+  "glp-1-support": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_Glp1Support_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/glp-1-support--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/glp-1-support--supplier-ready.png",
+      "sha256": "40228c6e56ff5e1979f4b3fde7da4a6622d16f3af8d6a6c737980ce5326eb3ee",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "Do not add repeated nutrients inside named blends to separately listed nutrient amounts; exact accounting needs manufacturer clarification.",
+      "No expiry viability claim, clinical GLP-1 activity, drug equivalence or compatibility evidence recovered.",
+      "DV percentages are transcribed as printed, not recalculated or independently validated."
+    ]
+  },
+  "liver-support": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_LiverSupport_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/liver-support--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/liver-support--supplier-ready.png",
+      "sha256": "23c24e7e16363b67c377bd43b58d1e428ae79e254150de0c89f2e88f557145ef",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "No detox or clinical liver outcome evidence recovered."
+    ]
+  },
+  "nmn": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_Nmn_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/nmn--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/nmn--supplier-ready.png",
+      "sha256": "f7578a9fe245b78c58ad2ed15f511125b291eaae426dc29226d64832148f263b",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "99.9% purity is not established by the recovered panel; remains supplier statement without assay.",
+      "No NAD outcome or longevity proof recovered."
+    ]
+  },
+  "resveratrol": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_Resveratrol_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/resveratrol--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/resveratrol--supplier-ready.png",
+      "sha256": "b5b3e3bcc2a9ad4c7d54a966a8eca68c396c9425cf2013f29fa44457b89b97e7",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "300 mg trans-resveratrol would be arithmetic from the declared standardization, not a separately printed assay result.",
+      "Do not adopt front heart/weight loss marketing as clinical evidence."
+    ]
+  },
+  "hair-skin-nails-gummies": {
+    "source": {
+      "source": "/Users/edorfanini/Desktop/IQON/supplement labels/Supliful-Ready-2026-09-14/IQON_HairAndSkinGummies_Label.pdf",
+      "pdf": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/hair-skin-nails-gummies--supplier-ready.pdf",
+      "render": "/Users/edorfanini/.hermes/workspace/iqon-premium-site-20261107/recovered-labels/hair-skin-nails-gummies--supplier-ready.png",
+      "sha256": "3cf1a4f31c20c988fdbd69abc08c34886116a3d73def1e2fb0352225f93d14bd",
+      "page": 1,
+      "panel": "Supplement Facts on right; directions and cautions on left"
+    },
+    "version_status": "No conflicting serving size, count or panel amount observed across the recovered versions. Artwork/color and PDF structure differ; all source versions retained. Selection is for readable citation, not a new production approval.",
+    "remaining_limitations": [
+      "No independent nutrient assay or hair growth efficacy proof.",
+      "Retain biotin laboratory test interference context already in existing FAQ; recovery does not establish clinical benefit."
+    ]
+  }
+}
