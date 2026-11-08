@@ -1,0 +1,152 @@
+TAP version 13
+# Subtest: collection formats, search, empty state, clearing and sort remain functional
+ok 1 - collection formats, search, empty state, clearing and sort remain functional
+  ---
+  duration_ms: 2051.514916
+  type: 'test'
+  ...
+# Subtest: live Help prioritizes order tasks and links existing account and policies
+ok 2 - live Help prioritizes order tasks and links existing account and policies
+  ---
+  duration_ms: 913.448166
+  type: 'test'
+  ...
+# Subtest: live product 390: purpose, serving price, sticky behavior and actual images
+not ok 3 - live product 390: purpose, serving price, sticky behavior and actual images
+  ---
+  duration_ms: 1085.725584
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-journeys.e2e.mjs:37:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/premium-journeys.e2e.mjs:44:146)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: live product 1440: purpose, serving price, sticky behavior and actual images
+ok 4 - live product 1440: purpose, serving price, sticky behavior and actual images
+  ---
+  duration_ms: 1164.710667
+  type: 'test'
+  ...
+# Subtest: 200 percent product text also contains live bundle controls
+ok 5 - 200 percent product text also contains live bundle controls
+  ---
+  duration_ms: 931.841209
+  type: 'test'
+  ...
+# Data source: synthetic catalog/cart with real local assets; external tracking blocked.
+# Subtest: 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 6 - 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 7129.047834
+  type: 'test'
+  ...
+# Subtest: 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 7 - 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6669.037834
+  type: 'test'
+  ...
+# Subtest: 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 8 - 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6804.578666
+  type: 'test'
+  ...
+# Subtest: 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 9 - 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6839.292209
+  type: 'test'
+  ...
+# Subtest: 320: additional eligible product uses gallery-first DOM
+ok 10 - 320: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 492.799292
+  type: 'test'
+  ...
+# Subtest: 320: mixed lines align on the review page
+ok 11 - 320: mixed lines align on the review page
+  ---
+  duration_ms: 1049.806
+  type: 'test'
+  ...
+# Subtest: 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+not ok 12 - 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 16383.440625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:167:2'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 15000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:185:24)
+  ...
+# Subtest: 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 13 - 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8731.100333
+  type: 'test'
+  ...
+# Subtest: 390 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 14 - 390 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8644.927709
+  type: 'test'
+  ...
+# Subtest: 390 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 15 - 390 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8613.439625
+  type: 'test'
+  ...
+# Subtest: 390 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 16 - 390 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8418.901208
+  type: 'test'
+  ...
+# Subtest: 390: additional eligible product uses gallery-first DOM
+ok 17 - 390: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 302.427125
+  type: 'test'
+  ...
+# Subtest: 390: mixed lines align on the review page
+ok 18 - 390: mixed lines align on the review page
+  ---
+  duration_ms: 776.587333
+  type: 'test'
+  ...
+# Subtest: 390: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+not ok 19 - 390: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 16415.768917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:167:2'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 15000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/purchase-clarity.e2e.mjs:185:24)
+  ...
+# Subtest: 430 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 20 - 430 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6873.54325
+  type: 'test'
+  ...

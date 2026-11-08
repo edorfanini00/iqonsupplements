@@ -1,0 +1,493 @@
+TAP version 13
+# Subtest: 320px: finding-your-supplement-format answer and source survive hydration without overflow
+ok 1 - 320px: finding-your-supplement-format answer and source survive hydration without overflow
+  ---
+  duration_ms: 1090.58275
+  type: 'test'
+  ...
+# Subtest: 320px: a-simple-skincare-routine answer and source survive hydration without overflow
+ok 2 - 320px: a-simple-skincare-routine answer and source survive hydration without overflow
+  ---
+  duration_ms: 1019.381042
+  type: 'test'
+  ...
+# Subtest: 320px: label blend explanation stays visible after hydration with its FDA source
+ok 3 - 320px: label blend explanation stays visible after hydration with its FDA source
+  ---
+  duration_ms: 759.403708
+  type: 'test'
+  ...
+# Subtest: 320px: Help store answer survives hydration, opens and fits without overflow
+ok 4 - 320px: Help store answer survives hydration, opens and fits without overflow
+  ---
+  duration_ms: 1140.246333
+  type: 'test'
+  ...
+# Subtest: 320px: no horizontal page overflow
+ok 5 - 320px: no horizontal page overflow
+  ---
+  duration_ms: 4500.275
+  type: 'test'
+  ...
+# Subtest: 320px: footer links meet WCAG AA 4.5:1 at rest, hover and focus
+ok 6 - 320px: footer links meet WCAG AA 4.5:1 at rest, hover and focus
+  ---
+  duration_ms: 520.438166
+  type: 'test'
+  ...
+# Subtest: 320px: store policy links are visible, readable and tappable in the footer and on /help
+ok 7 - 320px: store policy links are visible, readable and tappable in the footer and on /help
+  ---
+  duration_ms: 1070.750041
+  type: 'test'
+  ...
+# Subtest: 320px: all five native policies render readable content without horizontal overflow
+ok 8 - 320px: all five native policies render readable content without horizontal overflow
+  ---
+  duration_ms: 1039.778875
+  type: 'test'
+  ...
+# Subtest: 320px: hydrated H1 text keeps word spaces at line breaks
+not ok 9 - 320px: hydrated H1 text keeps word spaces at line breaks
+  ---
+  duration_ms: 112.958541
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:268:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    /
+    + actual - expected
+    
+      [
+    +   'Make room forfeeling your best.'
+    -   'Make room for feeling your best.'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'Make room for feeling your best.'
+  actual:
+    0: 'Make room forfeeling your best.'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:271:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 320px: hydrated guide and collection links match the server HTML
+ok 10 - 320px: hydrated guide and collection links match the server HTML
+  ---
+  duration_ms: 411.474458
+  type: 'test'
+  ...
+# Subtest: 320px: guide → live product → one-time purchase → checkout handoff
+ok 11 - 320px: guide → live product → one-time purchase → checkout handoff
+  ---
+  duration_ms: 1100.653834
+  type: 'test'
+  ...
+# Subtest: 320px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+not ok 12 - 320px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+  ---
+  duration_ms: 1762.794542
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:319:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:371:12)
+    runNextTicks (node:internal/process/task_queues:64:5)
+    process.processImmediate (node:internal/timers:452:9)
+    process.callbackTrampoline (node:internal/async_hooks:130:17)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 320px: hydrated product pages show the shipping window only where the product is orderable
+ok 13 - 320px: hydrated product pages show the shipping window only where the product is orderable
+  ---
+  duration_ms: 657.431125
+  type: 'test'
+  ...
+# Subtest: 390px: finding-your-supplement-format answer and source survive hydration without overflow
+ok 14 - 390px: finding-your-supplement-format answer and source survive hydration without overflow
+  ---
+  duration_ms: 787.984208
+  type: 'test'
+  ...
+# Subtest: 390px: a-simple-skincare-routine answer and source survive hydration without overflow
+ok 15 - 390px: a-simple-skincare-routine answer and source survive hydration without overflow
+  ---
+  duration_ms: 1002.445667
+  type: 'test'
+  ...
+# Subtest: 390px: label blend explanation stays visible after hydration with its FDA source
+ok 16 - 390px: label blend explanation stays visible after hydration with its FDA source
+  ---
+  duration_ms: 709.624666
+  type: 'test'
+  ...
+# Subtest: 390px: Help store answer survives hydration, opens and fits without overflow
+ok 17 - 390px: Help store answer survives hydration, opens and fits without overflow
+  ---
+  duration_ms: 1083.578542
+  type: 'test'
+  ...
+# Subtest: 390px: no horizontal page overflow
+ok 18 - 390px: no horizontal page overflow
+  ---
+  duration_ms: 4649.631667
+  type: 'test'
+  ...
+# Subtest: 390px: footer links meet WCAG AA 4.5:1 at rest, hover and focus
+ok 19 - 390px: footer links meet WCAG AA 4.5:1 at rest, hover and focus
+  ---
+  duration_ms: 495.233625
+  type: 'test'
+  ...
+# Subtest: 390px: store policy links are visible, readable and tappable in the footer and on /help
+ok 20 - 390px: store policy links are visible, readable and tappable in the footer and on /help
+  ---
+  duration_ms: 1572.866708
+  type: 'test'
+  ...
+# Subtest: 390px: all five native policies render readable content without horizontal overflow
+ok 21 - 390px: all five native policies render readable content without horizontal overflow
+  ---
+  duration_ms: 1335.378541
+  type: 'test'
+  ...
+# Subtest: 390px: hydrated H1 text keeps word spaces at line breaks
+not ok 22 - 390px: hydrated H1 text keeps word spaces at line breaks
+  ---
+  duration_ms: 107.180208
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:268:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    /
+    + actual - expected
+    
+      [
+    +   'Make room forfeeling your best.'
+    -   'Make room for feeling your best.'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'Make room for feeling your best.'
+  actual:
+    0: 'Make room forfeeling your best.'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:271:14)
+    runNextTicks (node:internal/process/task_queues:64:5)
+    process.processImmediate (node:internal/timers:452:9)
+    process.callbackTrampoline (node:internal/async_hooks:130:17)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 390px: hydrated guide and collection links match the server HTML
+ok 23 - 390px: hydrated guide and collection links match the server HTML
+  ---
+  duration_ms: 409.244084
+  type: 'test'
+  ...
+# Subtest: 390px: guide → live product → one-time purchase → checkout handoff
+ok 24 - 390px: guide → live product → one-time purchase → checkout handoff
+  ---
+  duration_ms: 1104.899375
+  type: 'test'
+  ...
+# Subtest: 390px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+not ok 25 - 390px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+  ---
+  duration_ms: 1844.130584
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:319:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:371:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 390px: hydrated product pages show the shipping window only where the product is orderable
+ok 26 - 390px: hydrated product pages show the shipping window only where the product is orderable
+  ---
+  duration_ms: 598.994458
+  type: 'test'
+  ...
+# Subtest: 1440px: finding-your-supplement-format answer and source survive hydration without overflow
+ok 27 - 1440px: finding-your-supplement-format answer and source survive hydration without overflow
+  ---
+  duration_ms: 669.99475
+  type: 'test'
+  ...
+# Subtest: 1440px: a-simple-skincare-routine answer and source survive hydration without overflow
+ok 28 - 1440px: a-simple-skincare-routine answer and source survive hydration without overflow
+  ---
+  duration_ms: 821.955125
+  type: 'test'
+  ...
+# Subtest: 1440px: label blend explanation stays visible after hydration with its FDA source
+ok 29 - 1440px: label blend explanation stays visible after hydration with its FDA source
+  ---
+  duration_ms: 694.288708
+  type: 'test'
+  ...
+# Subtest: 1440px: Help store answer survives hydration, opens and fits without overflow
+ok 30 - 1440px: Help store answer survives hydration, opens and fits without overflow
+  ---
+  duration_ms: 1068.048291
+  type: 'test'
+  ...
+# Subtest: 1440px: no horizontal page overflow
+ok 31 - 1440px: no horizontal page overflow
+  ---
+  duration_ms: 4115.74425
+  type: 'test'
+  ...
+# Subtest: 1440px: footer links meet WCAG AA 4.5:1 at rest, hover and focus
+ok 32 - 1440px: footer links meet WCAG AA 4.5:1 at rest, hover and focus
+  ---
+  duration_ms: 319.548542
+  type: 'test'
+  ...
+# Subtest: 1440px: store policy links are visible, readable and tappable in the footer and on /help
+ok 33 - 1440px: store policy links are visible, readable and tappable in the footer and on /help
+  ---
+  duration_ms: 845.002042
+  type: 'test'
+  ...
+# Subtest: 1440px: all five native policies render readable content without horizontal overflow
+ok 34 - 1440px: all five native policies render readable content without horizontal overflow
+  ---
+  duration_ms: 1040.107542
+  type: 'test'
+  ...
+# Subtest: 1440px: hydrated H1 text keeps word spaces at line breaks
+not ok 35 - 1440px: hydrated H1 text keeps word spaces at line breaks
+  ---
+  duration_ms: 107.927583
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:268:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    /
+    + actual - expected
+    
+      [
+    +   'Make room forfeeling your best.'
+    -   'Make room for feeling your best.'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'Make room for feeling your best.'
+  actual:
+    0: 'Make room forfeeling your best.'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:271:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 1440px: hydrated guide and collection links match the server HTML
+ok 36 - 1440px: hydrated guide and collection links match the server HTML
+  ---
+  duration_ms: 406.349042
+  type: 'test'
+  ...
+# Subtest: 1440px: guide → live product → one-time purchase → checkout handoff
+ok 37 - 1440px: guide → live product → one-time purchase → checkout handoff
+  ---
+  duration_ms: 931.371166
+  type: 'test'
+  ...
+# Subtest: 1440px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+not ok 38 - 1440px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+  ---
+  duration_ms: 1766.799333
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:319:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:371:12)
+    runNextTicks (node:internal/process/task_queues:64:5)
+    process.processImmediate (node:internal/timers:452:9)
+    process.callbackTrampoline (node:internal/async_hooks:130:17)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 1440px: hydrated product pages show the shipping window only where the product is orderable
+ok 39 - 1440px: hydrated product pages show the shipping window only where the product is orderable
+  ---
+  duration_ms: 688.238417
+  type: 'test'
+  ...
+# Subtest: 320px: homepage muted text meets WCAG AA 4.5:1
+ok 40 - 320px: homepage muted text meets WCAG AA 4.5:1
+  ---
+  duration_ms: 106.890917
+  type: 'test'
+  ...
+# Subtest: 320px: homepage photographs are right-sized without losing resolution
+ok 41 - 320px: homepage photographs are right-sized without losing resolution
+  ---
+  duration_ms: 132.071625
+  type: 'test'
+  ...
+# Subtest: 390px: homepage muted text meets WCAG AA 4.5:1
+ok 42 - 390px: homepage muted text meets WCAG AA 4.5:1
+  ---
+  duration_ms: 106.360125
+  type: 'test'
+  ...
+# Subtest: 390px: homepage photographs are right-sized without losing resolution
+ok 43 - 390px: homepage photographs are right-sized without losing resolution
+  ---
+  duration_ms: 137.681208
+  type: 'test'
+  ...
+# Subtest: 1440px: homepage muted text meets WCAG AA 4.5:1
+ok 44 - 1440px: homepage muted text meets WCAG AA 4.5:1
+  ---
+  duration_ms: 109.81875
+  type: 'test'
+  ...
+# Subtest: 1440px: homepage photographs are right-sized without losing resolution
+ok 45 - 1440px: homepage photographs are right-sized without losing resolution
+  ---
+  duration_ms: 128.660333
+  type: 'test'
+  ...
+# Subtest: 320px: expanded Help and product accordion answers meet WCAG AA 4.5:1
+ok 46 - 320px: expanded Help and product accordion answers meet WCAG AA 4.5:1
+  ---
+  duration_ms: 9212.96575
+  type: 'test'
+  ...
+# Subtest: 390px: expanded Help and product accordion answers meet WCAG AA 4.5:1
+ok 47 - 390px: expanded Help and product accordion answers meet WCAG AA 4.5:1
+  ---
+  duration_ms: 9371.551375
+  type: 'test'
+  ...
+# Subtest: 1440px: expanded Help and product accordion answers meet WCAG AA 4.5:1
+ok 48 - 1440px: expanded Help and product accordion answers meet WCAG AA 4.5:1
+  ---
+  duration_ms: 9091.304916
+  type: 'test'
+  ...
+# Subtest: 320px: corrected Help and supplement product text meets WCAG AA 4.5:1
+ok 49 - 320px: corrected Help and supplement product text meets WCAG AA 4.5:1
+  ---
+  duration_ms: 3597.81625
+  type: 'test'
+  ...
+# Subtest: 390px: corrected Help and supplement product text meets WCAG AA 4.5:1
+ok 50 - 390px: corrected Help and supplement product text meets WCAG AA 4.5:1
+  ---
+  duration_ms: 3680.410958
+  type: 'test'
+  ...
+# Subtest: 1440px: corrected Help and supplement product text meets WCAG AA 4.5:1
+ok 51 - 1440px: corrected Help and supplement product text meets WCAG AA 4.5:1
+  ---
+  duration_ms: 2719.775583
+  type: 'test'
+  ...
+# Subtest: every corrected Help / supplement product selector was rendered and checked
+ok 52 - every corrected Help / supplement product selector was rendered and checked
+  ---
+  duration_ms: 0.149125
+  type: 'test'
+  ...
+# Subtest: every local srcset candidate on the homepage is served as WebP at its declared width
+not ok 53 - every local srcset candidate on the homepage is served as WebP at its declared width
+  ---
+  duration_ms: 112.837292
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:531:1'
+  failureType: 'testCodeFailure'
+  error: '[["/images/editorial/news-reading-labels-iqon-v11-480w.webp","480w"],["/images/editorial/news-reading-labels-iqon-v11-768w.webp","768w"],["/images/editorial/news-reading-labels-iqon-v11.webp","1536w"],["/images/editorial/daily-water-v24-480w.webp","480w"],["/images/editorial/daily-water-v24-768w.webp","768w"],["/images/editorial/daily-water-v24.webp","1536w"],["/images/editorial/skincare-ritual-v26-480w.webp","480w"],["/images/editorial/skincare-ritual-v26-768w.webp","768w"],["/images/editorial/skincare-ritual-v26.webp","1536w"]]'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:535:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 320px: bag quantity controls remain reachable through every bundle tier
+ok 54 - 320px: bag quantity controls remain reachable through every bundle tier
+  ---
+  duration_ms: 3782.607458
+  type: 'test'
+  ...
+# Subtest: 390px: bag quantity controls remain reachable through every bundle tier
+ok 55 - 390px: bag quantity controls remain reachable through every bundle tier
+  ---
+  duration_ms: 3903.947
+  type: 'test'
+  ...
+# Subtest: 1440px: bag quantity controls remain reachable through every bundle tier
+not ok 56 - 1440px: bag quantity controls remain reachable through every bundle tier
+  ---
+  duration_ms: 244.160708
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:547:3'
+  failureType: 'testCodeFailure'
+  error: 'focused control is occluded: {"label":"Creatine Monohydrate","box":{"x":1581,"y":139.03125,"width":307,"height":23.25,"top":139.03125,"right":1888,"bottom":162.28125,"left":1581},"hit":false}'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/storefront-layout.e2e.mjs:591:16)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..56
+# tests 56
+# suites 0
+# pass 48
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 91955.765333

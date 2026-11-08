@@ -1,0 +1,179 @@
+TAP version 13
+# Data source: synthetic catalog/cart; external tracking blocked.
+# Subtest: 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 1 - 320 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6823.620541
+  type: 'test'
+  ...
+# Subtest: 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 2 - 320 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6508.152625
+  type: 'test'
+  ...
+# Subtest: 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 3 - 320 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6781.392084
+  type: 'test'
+  ...
+# Subtest: 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 4 - 320 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6646.339875
+  type: 'test'
+  ...
+# Subtest: 320: additional eligible product uses gallery-first DOM
+ok 5 - 320: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 320.667875
+  type: 'test'
+  ...
+# Subtest: 320: mixed lines align on the review page
+ok 6 - 320: mixed lines align on the review page
+  ---
+  duration_ms: 1438.6845
+  type: 'test'
+  ...
+# Subtest: 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 7 - 320: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 3330.481333
+  type: 'test'
+  ...
+# Subtest: 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 8 - 390 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 9717.157208
+  type: 'test'
+  ...
+# Subtest: 390 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 9 - 390 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8648.6325
+  type: 'test'
+  ...
+# Subtest: 390 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 10 - 390 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8779.819833
+  type: 'test'
+  ...
+# Subtest: 390 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 11 - 390 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 11190.398625
+  type: 'test'
+  ...
+# Subtest: 390: additional eligible product uses gallery-first DOM
+ok 12 - 390: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 605.481375
+  type: 'test'
+  ...
+# Subtest: 390: mixed lines align on the review page
+ok 13 - 390: mixed lines align on the review page
+  ---
+  duration_ms: 1980.0555
+  type: 'test'
+  ...
+# Subtest: 390: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 14 - 390: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 4510.69725
+  type: 'test'
+  ...
+# Subtest: 430 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 15 - 430 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 8600.217458
+  type: 'test'
+  ...
+# Subtest: 430 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 16 - 430 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 7607.805833
+  type: 'test'
+  ...
+# Subtest: 430 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 17 - 430 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 7348.577708
+  type: 'test'
+  ...
+# Subtest: 430 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 18 - 430 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6520.79825
+  type: 'test'
+  ...
+# Subtest: 430: additional eligible product uses gallery-first DOM
+ok 19 - 430: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 355.575292
+  type: 'test'
+  ...
+# Subtest: 430: mixed lines align on the review page
+ok 20 - 430: mixed lines align on the review page
+  ---
+  duration_ms: 842.396917
+  type: 'test'
+  ...
+# Subtest: 430: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 21 - 430: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 3174.865084
+  type: 'test'
+  ...
+# Subtest: 1440 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 22 - 1440 creatine-monohydrate: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 7056.704875
+  type: 'test'
+  ...
+# Subtest: 1440 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 23 - 1440 hydrolyzed-collagen-peptides: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6304.726917
+  type: 'test'
+  ...
+# Subtest: 1440 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 24 - 1440 colostrum-powder: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6375.423583
+  type: 'test'
+  ...
+# Subtest: 1440 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+ok 25 - 1440 gut-health: gallery precedes purchase, keyboard order, policy links, images and totals
+  ---
+  duration_ms: 6257.656792
+  type: 'test'
+  ...
+# Subtest: 1440: additional eligible product uses gallery-first DOM
+ok 26 - 1440: additional eligible product uses gallery-first DOM
+  ---
+  duration_ms: 303.095625
+  type: 'test'
+  ...
+# Subtest: 1440: mixed lines align on the review page
+ok 27 - 1440: mixed lines align on the review page
+  ---
+  duration_ms: 750.560917
+  type: 'test'
+  ...
+# Subtest: 1440: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+ok 28 - 1440: both add buttons, bag 1/2/3/4/3/2/1, full cents, removal and no selling plans
+  ---
+  duration_ms: 2833.403083
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 142487.044083

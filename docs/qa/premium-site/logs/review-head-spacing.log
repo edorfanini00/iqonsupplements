@@ -1,0 +1,1134 @@
+TAP version 13
+# Subtest: synthetic 320 colostrum-powder: gallery, focus and sticky order
+ok 1 - synthetic 320 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 698.795375
+  type: 'test'
+  ...
+# Subtest: synthetic 320 creatine-monohydrate: gallery, focus and sticky order
+ok 2 - synthetic 320 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 714.1705
+  type: 'test'
+  ...
+# Subtest: synthetic 320 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+ok 3 - synthetic 320 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 849.867042
+  type: 'test'
+  ...
+# Subtest: synthetic 320 nmn: gallery, focus and sticky order
+ok 4 - synthetic 320 nmn: gallery, focus and sticky order
+  ---
+  duration_ms: 328.867
+  type: 'test'
+  ...
+# Subtest: synthetic 320 daily-travel-kit: gallery, focus and sticky order
+ok 5 - synthetic 320 daily-travel-kit: gallery, focus and sticky order
+  ---
+  duration_ms: 622.426125
+  type: 'test'
+  ...
+# Subtest: synthetic 320 generic-sized: gallery, focus and sticky order
+ok 6 - synthetic 320 generic-sized: gallery, focus and sticky order
+  ---
+  duration_ms: 521.791125
+  type: 'test'
+  ...
+# Subtest: synthetic 320 generic-unavailable: gallery, focus and sticky order
+ok 7 - synthetic 320 generic-unavailable: gallery, focus and sticky order
+  ---
+  duration_ms: 309.158709
+  type: 'test'
+  ...
+# Subtest: synthetic 320 generic-variants: gallery, focus and sticky order
+ok 8 - synthetic 320 generic-variants: gallery, focus and sticky order
+  ---
+  duration_ms: 705.771
+  type: 'test'
+  ...
+# Subtest: synthetic 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 9 - synthetic 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 648.465333
+  type: 'test'
+  ...
+# Subtest: synthetic 390 colostrum-powder: gallery, focus and sticky order
+ok 10 - synthetic 390 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 843.69225
+  type: 'test'
+  ...
+# Subtest: synthetic 390 creatine-monohydrate: gallery, focus and sticky order
+ok 11 - synthetic 390 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 655.015583
+  type: 'test'
+  ...
+# Subtest: synthetic 390 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+ok 12 - synthetic 390 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 691.981125
+  type: 'test'
+  ...
+# Subtest: synthetic 390 nmn: gallery, focus and sticky order
+ok 13 - synthetic 390 nmn: gallery, focus and sticky order
+  ---
+  duration_ms: 344.9465
+  type: 'test'
+  ...
+# Subtest: synthetic 390 daily-travel-kit: gallery, focus and sticky order
+ok 14 - synthetic 390 daily-travel-kit: gallery, focus and sticky order
+  ---
+  duration_ms: 527.985
+  type: 'test'
+  ...
+# Subtest: synthetic 390 generic-sized: gallery, focus and sticky order
+ok 15 - synthetic 390 generic-sized: gallery, focus and sticky order
+  ---
+  duration_ms: 442.810375
+  type: 'test'
+  ...
+# Subtest: synthetic 390 generic-unavailable: gallery, focus and sticky order
+ok 16 - synthetic 390 generic-unavailable: gallery, focus and sticky order
+  ---
+  duration_ms: 224.559875
+  type: 'test'
+  ...
+# Subtest: synthetic 390 generic-variants: gallery, focus and sticky order
+ok 17 - synthetic 390 generic-variants: gallery, focus and sticky order
+  ---
+  duration_ms: 461.647834
+  type: 'test'
+  ...
+# Subtest: synthetic 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 18 - synthetic 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 267.716208
+  type: 'test'
+  ...
+# Subtest: synthetic 760 colostrum-powder: gallery, focus and sticky order
+ok 19 - synthetic 760 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 490.56875
+  type: 'test'
+  ...
+# Subtest: synthetic 760 creatine-monohydrate: gallery, focus and sticky order
+ok 20 - synthetic 760 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 544.413833
+  type: 'test'
+  ...
+# Subtest: synthetic 760 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+ok 21 - synthetic 760 hydrolyzed-collagen-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 523.073084
+  type: 'test'
+  ...
+# Subtest: synthetic 760 nmn: gallery, focus and sticky order
+ok 22 - synthetic 760 nmn: gallery, focus and sticky order
+  ---
+  duration_ms: 312.3755
+  type: 'test'
+  ...
+# Subtest: synthetic 760 daily-travel-kit: gallery, focus and sticky order
+ok 23 - synthetic 760 daily-travel-kit: gallery, focus and sticky order
+  ---
+  duration_ms: 701.309833
+  type: 'test'
+  ...
+# Subtest: synthetic 760 generic-sized: gallery, focus and sticky order
+ok 24 - synthetic 760 generic-sized: gallery, focus and sticky order
+  ---
+  duration_ms: 628.060083
+  type: 'test'
+  ...
+# Subtest: synthetic 760 generic-unavailable: gallery, focus and sticky order
+ok 25 - synthetic 760 generic-unavailable: gallery, focus and sticky order
+  ---
+  duration_ms: 329.6035
+  type: 'test'
+  ...
+# Subtest: synthetic 760 generic-variants: gallery, focus and sticky order
+ok 26 - synthetic 760 generic-variants: gallery, focus and sticky order
+  ---
+  duration_ms: 505.355208
+  type: 'test'
+  ...
+# Subtest: synthetic 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 27 - synthetic 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 491.466
+  type: 'test'
+  ...
+# Subtest: synthetic 761 colostrum-powder: original desktop geometry
+ok 28 - synthetic 761 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 529.760125
+  type: 'test'
+  ...
+# Subtest: synthetic 761 creatine-monohydrate: original desktop geometry
+not ok 29 - synthetic 761 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 459.145625
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:88:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    split panels must preserve original desktop geometry
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        boxes: {
+          '.add-to-bag-row': {
+            height: 48.796875,
+            width: 292.328125,
+            x: 423.234375,
+    +       y: 1099.625
+    -       y: 1083.625
+          },
+          '.bundle-choices': {
+            height: 369.640625,
+            width: 292.328125,
+            x: 423.234375,
+    +       y: 717.984375
+    -       y: 701.984375
+          },
+          '.commerce-message': null,
+          '.product-accordion': {
+            height: 277.1875,
+            width: 292.328125,
+            x: 423.234375,
+    +       y: 1311.796875
+    -       y: 1295.796875
+          },
+          '.product-current-price': {
+            height: 33.59375,
+            width: 292.328125,
+            x: 423.234375,
+    ...
+            x: 423.234375,
+    +       y: 1614.984375
+    -       y: 1598.984375
+          },
+          '.product-highlights': {
+            height: 74.5,
+            width: 292.328125,
+            x: 423.234375,
+    ...
+            x: 423.234375,
+    +       y: 1261.796875
+    -       y: 1245.796875
+          },
+          '.product-launch-note': null,
+          '.product-summary': {
+            height: 99.453125,
+            width: 292.328125,
+    ...
+            x: 423.234375,
+    +       y: 607.296875
+    -       y: 591.296875
+          },
+          '.product-visual-gallery': {
+            height: 484.53125,
+            width: 365.40625,
+            x: 30.4375,
+    ...
+            x: 423.234375,
+    +       y: 1162.421875
+    -       y: 1146.421875
+          }
+        },
+    +   height: 9261,
+    -   height: 9245,
+        scrollWidth: 746
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    boxes:
+      .product-visual-gallery:
+        x: 30.4375
+        y: 199
+        width: 365.40625
+        height: 484.53125
+      .product-summary:
+        x: 423.234375
+        y: 199
+        width: 292.328125
+        height: 99.453125
+      .product-current-price:
+        x: 423.234375
+        y: 533.703125
+        width: 292.328125
+        height: 33.59375
+      .product-summary-description:
+        x: 423.234375
+        y: 314.453125
+        width: 292.328125
+        height: 108.75
+      .product-highlights:
+        x: 423.234375
+        y: 439.203125
+        width: 292.328125
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker:
+        x: 423.234375
+        y: 591.296875
+        width: 292.328125
+        height: 86.6875
+      .bundle-choices:
+        x: 423.234375
+        y: 701.984375
+        width: 292.328125
+        height: 369.640625
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 423.234375
+        y: 1083.625
+        width: 292.328125
+        height: 48.796875
+      .purchase-assurance:
+        x: 423.234375
+        y: 1146.421875
+        width: 292.328125
+        height: 81.375
+      .product-jump-links:
+        x: 423.234375
+        y: 1245.796875
+        width: 292.328125
+        height: 32
+      .product-accordion:
+        x: 423.234375
+        y: 1295.796875
+        width: 292.328125
+        height: 277.1875
+      .product-guides:
+        x: 423.234375
+        y: 1598.984375
+        width: 292.328125
+        height: 115.1875
+      .product-launch-note: ~
+    scrollWidth: 746
+    height: 9245
+  actual:
+    boxes:
+      .product-visual-gallery:
+        x: 30.4375
+        y: 199
+        width: 365.40625
+        height: 484.53125
+      .product-summary:
+        x: 423.234375
+        y: 199
+        width: 292.328125
+        height: 99.453125
+      .product-current-price:
+        x: 423.234375
+        y: 533.703125
+        width: 292.328125
+        height: 33.59375
+      .product-summary-description:
+        x: 423.234375
+        y: 314.453125
+        width: 292.328125
+        height: 108.75
+      .product-highlights:
+        x: 423.234375
+        y: 439.203125
+        width: 292.328125
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker:
+        x: 423.234375
+        y: 607.296875
+        width: 292.328125
+        height: 86.6875
+      .bundle-choices:
+        x: 423.234375
+        y: 717.984375
+        width: 292.328125
+        height: 369.640625
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 423.234375
+        y: 1099.625
+        width: 292.328125
+        height: 48.796875
+      .purchase-assurance:
+        x: 423.234375
+        y: 1162.421875
+        width: 292.328125
+        height: 81.375
+      .product-jump-links:
+        x: 423.234375
+        y: 1261.796875
+        width: 292.328125
+        height: 32
+      .product-accordion:
+        x: 423.234375
+        y: 1311.796875
+        width: 292.328125
+        height: 277.1875
+      .product-guides:
+        x: 423.234375
+        y: 1614.984375
+        width: 292.328125
+        height: 115.1875
+      .product-launch-note: ~
+    scrollWidth: 746
+    height: 9261
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:110:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: synthetic 761 hydrolyzed-collagen-peptides: original desktop geometry
+ok 30 - synthetic 761 hydrolyzed-collagen-peptides: original desktop geometry
+  ---
+  duration_ms: 371.853959
+  type: 'test'
+  ...
+# Subtest: synthetic 761 nmn: original desktop geometry
+not ok 31 - synthetic 761 nmn: original desktop geometry
+  ---
+  duration_ms: 354.001667
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:88:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    split panels must preserve original desktop geometry
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        boxes: {
+          '.add-to-bag-row': {
+            height: 65.59375,
+            width: 292.328125,
+            x: 423.234375,
+    +       y: 662.234375
+    -       y: 650.234375
+          },
+          '.bundle-choices': null,
+          '.commerce-message': null,
+          '.product-accordion': {
+            height: 208.140625,
+            width: 292.328125,
+            x: 423.234375,
+    +       y: 795.828125
+    -       y: 783.828125
+          },
+          '.product-current-price': {
+            height: 33.59375,
+            width: 292.328125,
+            x: 423.234375,
+    ...
+            x: 423.234375,
+    +       y: 1029.96875
+    -       y: 1017.96875
+          },
+          '.product-highlights': {
+            height: 74.5,
+            width: 292.328125,
+            x: 423.234375,
+    ...
+            x: 423.234375,
+    +       y: 745.828125
+    -       y: 733.828125
+          },
+          '.product-launch-note': null,
+          '.product-summary': {
+            height: 166.390625,
+            width: 292.328125,
+    ...
+        },
+    +   height: 8419,
+    -   height: 8407,
+        scrollWidth: 746
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    boxes:
+      .product-visual-gallery:
+        x: 30.4375
+        y: 199
+        width: 365.40625
+        height: 484.53125
+      .product-summary:
+        x: 423.234375
+        y: 199
+        width: 292.328125
+        height: 166.390625
+      .product-current-price:
+        x: 423.234375
+        y: 600.640625
+        width: 292.328125
+        height: 33.59375
+      .product-summary-description:
+        x: 423.234375
+        y: 381.390625
+        width: 292.328125
+        height: 108.75
+      .product-highlights:
+        x: 423.234375
+        y: 506.140625
+        width: 292.328125
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker: ~
+      .bundle-choices: ~
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 423.234375
+        y: 650.234375
+        width: 292.328125
+        height: 65.59375
+      .purchase-assurance: ~
+      .product-jump-links:
+        x: 423.234375
+        y: 733.828125
+        width: 292.328125
+        height: 32
+      .product-accordion:
+        x: 423.234375
+        y: 783.828125
+        width: 292.328125
+        height: 208.140625
+      .product-guides:
+        x: 423.234375
+        y: 1017.96875
+        width: 292.328125
+        height: 67.1875
+      .product-launch-note: ~
+    scrollWidth: 746
+    height: 8407
+  actual:
+    boxes:
+      .product-visual-gallery:
+        x: 30.4375
+        y: 199
+        width: 365.40625
+        height: 484.53125
+      .product-summary:
+        x: 423.234375
+        y: 199
+        width: 292.328125
+        height: 166.390625
+      .product-current-price:
+        x: 423.234375
+        y: 600.640625
+        width: 292.328125
+        height: 33.59375
+      .product-summary-description:
+        x: 423.234375
+        y: 381.390625
+        width: 292.328125
+        height: 108.75
+      .product-highlights:
+        x: 423.234375
+        y: 506.140625
+        width: 292.328125
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker: ~
+      .bundle-choices: ~
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 423.234375
+        y: 662.234375
+        width: 292.328125
+        height: 65.59375
+      .purchase-assurance: ~
+      .product-jump-links:
+        x: 423.234375
+        y: 745.828125
+        width: 292.328125
+        height: 32
+      .product-accordion:
+        x: 423.234375
+        y: 795.828125
+        width: 292.328125
+        height: 208.140625
+      .product-guides:
+        x: 423.234375
+        y: 1029.96875
+        width: 292.328125
+        height: 67.1875
+      .product-launch-note: ~
+    scrollWidth: 746
+    height: 8419
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:110:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: synthetic 761 daily-travel-kit: original desktop geometry
+ok 32 - synthetic 761 daily-travel-kit: original desktop geometry
+  ---
+  duration_ms: 450.977334
+  type: 'test'
+  ...
+# Subtest: synthetic 761 generic-sized: original desktop geometry
+ok 33 - synthetic 761 generic-sized: original desktop geometry
+  ---
+  duration_ms: 437.97725
+  type: 'test'
+  ...
+# Subtest: synthetic 761 generic-unavailable: original desktop geometry
+ok 34 - synthetic 761 generic-unavailable: original desktop geometry
+  ---
+  duration_ms: 215.535542
+  type: 'test'
+  ...
+# Subtest: synthetic 761 generic-variants: original desktop geometry
+ok 35 - synthetic 761 generic-variants: original desktop geometry
+  ---
+  duration_ms: 257.429167
+  type: 'test'
+  ...
+# Subtest: synthetic 761 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 36 - synthetic 761 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 509.237167
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 colostrum-powder: original desktop geometry
+ok 37 - synthetic 1440 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 469.422791
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 creatine-monohydrate: original desktop geometry
+not ok 38 - synthetic 1440 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 414.329583
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:88:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    split panels must preserve original desktop geometry
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        boxes: {
+          '.add-to-bag-row': {
+            height: 48.796875,
+            width: 454.875,
+            x: 912.53125,
+    +       y: 1040.5625
+    -       y: 1024.5625
+          },
+          '.bundle-choices': {
+            height: 326.90625,
+            width: 454.875,
+            x: 912.53125,
+    +       y: 701.65625
+    -       y: 685.65625
+          },
+          '.commerce-message': null,
+          '.product-accordion': {
+            height: 277.1875,
+            width: 454.875,
+            x: 912.53125,
+    +       y: 1234.140625
+    -       y: 1218.140625
+          },
+          '.product-current-price': {
+            height: 33.59375,
+            width: 454.875,
+            x: 912.53125,
+    ...
+            x: 912.53125,
+    +       y: 1537.328125
+    -       y: 1521.328125
+          },
+          '.product-highlights': {
+            height: 74.5,
+            width: 454.875,
+            x: 912.53125,
+    ...
+            x: 912.53125,
+    +       y: 1184.140625
+    -       y: 1168.140625
+          },
+          '.product-launch-note': null,
+          '.product-summary': {
+            height: 110.3125,
+            width: 454.875,
+    ...
+            x: 912.53125,
+    +       y: 590.96875
+    -       y: 574.96875
+          },
+          '.product-visual-gallery': {
+            height: 993,
+            width: 796,
+            x: 57.59375,
+    ...
+            x: 912.53125,
+    +       y: 1103.359375
+    -       y: 1087.359375
+          }
+        },
+    +   height: 9003,
+    -   height: 8987,
+        scrollWidth: 1425
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    boxes:
+      .product-visual-gallery:
+        x: 57.59375
+        y: 199
+        width: 796
+        height: 993
+      .product-summary:
+        x: 912.53125
+        y: 199
+        width: 454.875
+        height: 110.3125
+      .product-current-price:
+        x: 912.53125
+        y: 517.375
+        width: 454.875
+        height: 33.59375
+      .product-summary-description:
+        x: 912.53125
+        y: 325.3125
+        width: 454.875
+        height: 81.5625
+      .product-highlights:
+        x: 912.53125
+        y: 422.875
+        width: 454.875
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker:
+        x: 912.53125
+        y: 574.96875
+        width: 454.875
+        height: 86.6875
+      .bundle-choices:
+        x: 912.53125
+        y: 685.65625
+        width: 454.875
+        height: 326.90625
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 912.53125
+        y: 1024.5625
+        width: 454.875
+        height: 48.796875
+      .purchase-assurance:
+        x: 912.53125
+        y: 1087.359375
+        width: 454.875
+        height: 62.78125
+      .product-jump-links:
+        x: 912.53125
+        y: 1168.140625
+        width: 454.875
+        height: 32
+      .product-accordion:
+        x: 912.53125
+        y: 1218.140625
+        width: 454.875
+        height: 277.1875
+      .product-guides:
+        x: 912.53125
+        y: 1521.328125
+        width: 454.875
+        height: 67.1875
+      .product-launch-note: ~
+    scrollWidth: 1425
+    height: 8987
+  actual:
+    boxes:
+      .product-visual-gallery:
+        x: 57.59375
+        y: 199
+        width: 796
+        height: 993
+      .product-summary:
+        x: 912.53125
+        y: 199
+        width: 454.875
+        height: 110.3125
+      .product-current-price:
+        x: 912.53125
+        y: 517.375
+        width: 454.875
+        height: 33.59375
+      .product-summary-description:
+        x: 912.53125
+        y: 325.3125
+        width: 454.875
+        height: 81.5625
+      .product-highlights:
+        x: 912.53125
+        y: 422.875
+        width: 454.875
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker:
+        x: 912.53125
+        y: 590.96875
+        width: 454.875
+        height: 86.6875
+      .bundle-choices:
+        x: 912.53125
+        y: 701.65625
+        width: 454.875
+        height: 326.90625
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 912.53125
+        y: 1040.5625
+        width: 454.875
+        height: 48.796875
+      .purchase-assurance:
+        x: 912.53125
+        y: 1103.359375
+        width: 454.875
+        height: 62.78125
+      .product-jump-links:
+        x: 912.53125
+        y: 1184.140625
+        width: 454.875
+        height: 32
+      .product-accordion:
+        x: 912.53125
+        y: 1234.140625
+        width: 454.875
+        height: 277.1875
+      .product-guides:
+        x: 912.53125
+        y: 1537.328125
+        width: 454.875
+        height: 67.1875
+      .product-launch-note: ~
+    scrollWidth: 1425
+    height: 9003
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:110:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: synthetic 1440 hydrolyzed-collagen-peptides: original desktop geometry
+ok 39 - synthetic 1440 hydrolyzed-collagen-peptides: original desktop geometry
+  ---
+  duration_ms: 340.767542
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 nmn: original desktop geometry
+not ok 40 - synthetic 1440 nmn: original desktop geometry
+  ---
+  duration_ms: 312.271334
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:88:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    split panels must preserve original desktop geometry
+    + actual - expected
+    ... Skipped lines
+    
+      {
+        boxes: {
+          '.add-to-bag-row': {
+            height: 48.796875,
+            width: 454.875,
+            x: 912.53125,
+    +       y: 623.296875
+    -       y: 611.296875
+          },
+          '.bundle-choices': null,
+          '.commerce-message': null,
+          '.product-accordion': {
+            height: 208.140625,
+            width: 454.875,
+            x: 912.53125,
+    +       y: 740.09375
+    -       y: 728.09375
+          },
+          '.product-current-price': {
+            height: 33.59375,
+            width: 454.875,
+            x: 912.53125,
+    ...
+            x: 912.53125,
+    +       y: 974.234375
+    -       y: 962.234375
+          },
+          '.product-highlights': {
+            height: 74.5,
+            width: 454.875,
+            x: 912.53125,
+    ...
+            x: 912.53125,
+    +       y: 690.09375
+    -       y: 678.09375
+          },
+          '.product-launch-note': null,
+          '.product-summary': {
+            height: 154.640625,
+            width: 454.875,
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    boxes:
+      .product-visual-gallery:
+        x: 57.59375
+        y: 199
+        width: 796
+        height: 993
+      .product-summary:
+        x: 912.53125
+        y: 199
+        width: 454.875
+        height: 154.640625
+      .product-current-price:
+        x: 912.53125
+        y: 561.703125
+        width: 454.875
+        height: 33.59375
+      .product-summary-description:
+        x: 912.53125
+        y: 369.640625
+        width: 454.875
+        height: 81.5625
+      .product-highlights:
+        x: 912.53125
+        y: 467.203125
+        width: 454.875
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker: ~
+      .bundle-choices: ~
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 912.53125
+        y: 611.296875
+        width: 454.875
+        height: 48.796875
+      .purchase-assurance: ~
+      .product-jump-links:
+        x: 912.53125
+        y: 678.09375
+        width: 454.875
+        height: 32
+      .product-accordion:
+        x: 912.53125
+        y: 728.09375
+        width: 454.875
+        height: 208.140625
+      .product-guides:
+        x: 912.53125
+        y: 962.234375
+        width: 454.875
+        height: 67.1875
+      .product-launch-note: ~
+    scrollWidth: 1425
+    height: 8481
+  actual:
+    boxes:
+      .product-visual-gallery:
+        x: 57.59375
+        y: 199
+        width: 796
+        height: 993
+      .product-summary:
+        x: 912.53125
+        y: 199
+        width: 454.875
+        height: 154.640625
+      .product-current-price:
+        x: 912.53125
+        y: 561.703125
+        width: 454.875
+        height: 33.59375
+      .product-summary-description:
+        x: 912.53125
+        y: 369.640625
+        width: 454.875
+        height: 81.5625
+      .product-highlights:
+        x: 912.53125
+        y: 467.203125
+        width: 454.875
+        height: 74.5
+      .product-essentials: ~
+      .product-variant-picker: ~
+      .bundle-choices: ~
+      .commerce-message: ~
+      .add-to-bag-row:
+        x: 912.53125
+        y: 623.296875
+        width: 454.875
+        height: 48.796875
+      .purchase-assurance: ~
+      .product-jump-links:
+        x: 912.53125
+        y: 690.09375
+        width: 454.875
+        height: 32
+      .product-accordion:
+        x: 912.53125
+        y: 740.09375
+        width: 454.875
+        height: 208.140625
+      .product-guides:
+        x: 912.53125
+        y: 974.234375
+        width: 454.875
+        height: 67.1875
+      .product-launch-note: ~
+    scrollWidth: 1425
+    height: 8481
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/tests/e2e/pdp-spacing.e2e.mjs:110:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: synthetic 1440 daily-travel-kit: original desktop geometry
+ok 41 - synthetic 1440 daily-travel-kit: original desktop geometry
+  ---
+  duration_ms: 307.877375
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 generic-sized: original desktop geometry
+ok 42 - synthetic 1440 generic-sized: original desktop geometry
+  ---
+  duration_ms: 402.772167
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 generic-unavailable: original desktop geometry
+ok 43 - synthetic 1440 generic-unavailable: original desktop geometry
+  ---
+  duration_ms: 393.571291
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 generic-variants: original desktop geometry
+ok 44 - synthetic 1440 generic-variants: original desktop geometry
+  ---
+  duration_ms: 414.798541
+  type: 'test'
+  ...
+# Subtest: synthetic 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 45 - synthetic 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 538.907042
+  type: 'test'
+  ...
+# Subtest: preview 320 colostrum-powder: gallery, focus and sticky order
+ok 46 - preview 320 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 419.847292
+  type: 'test'
+  ...
+# Subtest: preview 320 creatine-monohydrate: gallery, focus and sticky order
+ok 47 - preview 320 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 379.912042
+  type: 'test'
+  ...
+# Subtest: preview 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 48 - preview 320 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 458.0555
+  type: 'test'
+  ...
+# Subtest: preview 390 colostrum-powder: gallery, focus and sticky order
+ok 49 - preview 390 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 457.903541
+  type: 'test'
+  ...
+# Subtest: preview 390 creatine-monohydrate: gallery, focus and sticky order
+ok 50 - preview 390 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 398.663291
+  type: 'test'
+  ...
+# Subtest: preview 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 51 - preview 390 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 348.839625
+  type: 'test'
+  ...
+# Subtest: preview 760 colostrum-powder: gallery, focus and sticky order
+ok 52 - preview 760 colostrum-powder: gallery, focus and sticky order
+  ---
+  duration_ms: 300.777208
+  type: 'test'
+  ...
+# Subtest: preview 760 creatine-monohydrate: gallery, focus and sticky order
+ok 53 - preview 760 creatine-monohydrate: gallery, focus and sticky order
+  ---
+  duration_ms: 388.929833
+  type: 'test'
+  ...
+# Subtest: preview 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+ok 54 - preview 760 anti-aging-cleanser-with-peptides: gallery, focus and sticky order
+  ---
+  duration_ms: 371.547208
+  type: 'test'
+  ...
+# Subtest: preview 761 colostrum-powder: original desktop geometry
+ok 55 - preview 761 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 357.671792
+  type: 'test'
+  ...
+# Subtest: preview 761 creatine-monohydrate: original desktop geometry
+ok 56 - preview 761 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 329.470541
+  type: 'test'
+  ...
+# Subtest: preview 761 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 57 - preview 761 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 435.92875
+  type: 'test'
+  ...
+# Subtest: preview 1440 colostrum-powder: original desktop geometry
+ok 58 - preview 1440 colostrum-powder: original desktop geometry
+  ---
+  duration_ms: 466.024666
+  type: 'test'
+  ...
+# Subtest: preview 1440 creatine-monohydrate: original desktop geometry
+ok 59 - preview 1440 creatine-monohydrate: original desktop geometry
+  ---
+  duration_ms: 432.633125
+  type: 'test'
+  ...
+# Subtest: preview 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+ok 60 - preview 1440 anti-aging-cleanser-with-peptides: original desktop geometry
+  ---
+  duration_ms: 308.330459
+  type: 'test'
+  ...
+1..60
+# tests 60
+# suites 0
+# pass 56
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 28688.460083

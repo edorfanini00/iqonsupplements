@@ -1,0 +1,97 @@
+TAP version 13
+# Subtest: 320px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+not ok 1 - 320px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+  ---
+  duration_ms: 1917.575917
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/storefront-layout.e2e.mjs:319:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/storefront-layout.e2e.mjs:371:12)
+    runNextTicks (node:internal/process/task_queues:64:5)
+    process.processImmediate (node:internal/timers:452:9)
+    process.callbackTrampoline (node:internal/async_hooks:130:17)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: 390px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+not ok 2 - 390px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+  ---
+  duration_ms: 1850.595833
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/storefront-layout.e2e.mjs:319:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/storefront-layout.e2e.mjs:371:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 1440px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+not ok 3 - 1440px: bundle tiers on the product page, Shopify bundle savings and nudges in the bag and on /checkout
+  ---
+  duration_ms: 1729.125458
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/storefront-layout.e2e.mjs:319:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/storefront-layout.e2e.mjs:371:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 320px: bag quantity controls remain reachable through every bundle tier
+ok 4 - 320px: bag quantity controls remain reachable through every bundle tier
+  ---
+  duration_ms: 3590.664833
+  type: 'test'
+  ...
+# Subtest: 390px: bag quantity controls remain reachable through every bundle tier
+ok 5 - 390px: bag quantity controls remain reachable through every bundle tier
+  ---
+  duration_ms: 3673.023
+  type: 'test'
+  ...
+# Subtest: 1440px: bag quantity controls remain reachable through every bundle tier
+ok 6 - 1440px: bag quantity controls remain reachable through every bundle tier
+  ---
+  duration_ms: 3506.035
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 3
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18319.217

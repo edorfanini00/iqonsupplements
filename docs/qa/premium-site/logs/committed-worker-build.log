@@ -1,0 +1,198 @@
+
+  vinext build  (Vite 8.0.13)
+
+[1/5] analyze client references...
+[2Ktransforming...✓ 451 modules transformed.
+rendering chunks...
+✓ built in 1.19s
+[2/5] analyze server references...
+[2Ktransforming...✓ 459 modules transformed.
+rendering chunks...
+✓ built in 396ms
+[3/5] build rsc environment...
+[2Ktransforming...✓ 549 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.14s
+[4/5] build client environment...
+[2Ktransforming...✓ 2148 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 952ms
+[5/5] build ssr environment...
+[2Ktransforming...✓ 465 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 645ms
+[0m
+  Route (app)
+  ┌ ? /                                                    
+  ├ ? /account                                             
+  ├ ? /account/addresses                                   
+  ├ λ /account/callback                                    
+  ├ λ /account/login                                       
+  ├ λ /account/logout                                      
+  ├ ? /account/orders                                      
+  ├ ƒ /account/orders/:id                                  
+  ├ ? /account/privacy                                     
+  ├ ? /account/profile                                     
+  ├ ? /account/signed-out                                  
+  ├ ? /account/subscriptions                               
+  ├ ƒ /account/subscriptions/:id                           
+  ├ ? /affiliates                                          
+  ├ ? /affiliates/admin                                    
+  ├ ? /affiliates/admin/accounting                         
+  ├ ? /affiliates/admin/activity                           
+  ├ ? /affiliates/admin/affiliate-messages                 
+  ├ ? /affiliates/admin/affiliates                         
+  ├ ƒ /affiliates/admin/affiliates/:id                     
+  ├ ? /affiliates/admin/analytics                          
+  ├ ? /affiliates/admin/app                                
+  ├ ? /affiliates/admin/customers                          
+  ├ ? /affiliates/admin/integrations                       
+  ├ ? /affiliates/admin/messages                           
+  ├ ? /affiliates/admin/notes                              
+  ├ ? /affiliates/admin/orders                             
+  ├ ? /affiliates/admin/payouts                            
+  ├ ? /affiliates/admin/rankings                           
+  ├ ? /affiliates/admin/requests                           
+  ├ ? /affiliates/admin/settings                           
+  ├ ? /affiliates/admin/subscriptions                      
+  ├ ? /affiliates/admin/tiktok                             
+  ├ ? /affiliates/contact                                  
+  ├ ? /affiliates/dashboard                                
+  ├ ? /affiliates/dashboard/clients                        
+  ├ ? /affiliates/dashboard/learn                          
+  ├ ? /affiliates/dashboard/messages                       
+  ├ ? /affiliates/dashboard/network                        
+  ├ ? /affiliates/dashboard/orders                         
+  ├ ? /affiliates/dashboard/payment                        
+  ├ ? /affiliates/dashboard/payouts                        
+  ├ ? /affiliates/dashboard/settings                       
+  ├ ? /affiliates/forgot-password                          
+  ├ ? /affiliates/login                                    
+  ├ ? /affiliates/reset-password                           
+  ├ ? /affiliates/shop-manager                             
+  ├ ? /affiliates/shop-manager/orders                      
+  ├ ? /affiliates/signup                                   
+  ├ λ /api/account/addresses                               
+  ├ λ /api/account/addresses/:id                           
+  ├ λ /api/account/orders                                  
+  ├ λ /api/account/orders/:id                              
+  ├ λ /api/account/overview                                
+  ├ λ /api/account/profile                                 
+  ├ λ /api/account/session                                 
+  ├ λ /api/account/subscriptions                           
+  ├ λ /api/account/subscriptions/:id                       
+  ├ λ /api/account/subscriptions/:id/actions               
+  ├ λ /api/affiliates/admin/accounting/adjustments         
+  ├ λ /api/affiliates/admin/accounting/adjustments/:id     
+  ├ λ /api/affiliates/admin/accounting/expenses            
+  ├ λ /api/affiliates/admin/accounting/expenses/:id        
+  ├ λ /api/affiliates/admin/accounting/inventory           
+  ├ λ /api/affiliates/admin/accounting/items/:id           
+  ├ λ /api/affiliates/admin/accounting/items/:id/history   
+  ├ λ /api/affiliates/admin/accounting/orders              
+  ├ λ /api/affiliates/admin/accounting/orders/:id          
+  ├ λ /api/affiliates/admin/accounting/products            
+  ├ λ /api/affiliates/admin/accounting/purchases           
+  ├ λ /api/affiliates/admin/accounting/purchases/:id       
+  ├ λ /api/affiliates/admin/accounting/sales               
+  ├ λ /api/affiliates/admin/accounting/sales/:id           
+  ├ λ /api/affiliates/admin/accounting/summary             
+  ├ λ /api/affiliates/admin/accounting/trends              
+  ├ λ /api/affiliates/admin/affiliate-messages             
+  ├ λ /api/affiliates/admin/affiliate-messages/:affiliateId
+  ├ λ /api/affiliates/admin/affiliate-messages/broadcast   
+  ├ λ /api/affiliates/admin/affiliates                     
+  ├ λ /api/affiliates/admin/affiliates/:id                 
+  ├ λ /api/affiliates/admin/affiliates/:id/clients         
+  ├ λ /api/affiliates/admin/app                            
+  ├ λ /api/affiliates/admin/badges                         
+  ├ λ /api/affiliates/admin/commissions/:id                
+  ├ λ /api/affiliates/admin/coupon-sync                    
+  ├ λ /api/affiliates/admin/create                         
+  ├ λ /api/affiliates/admin/customers                      
+  ├ λ /api/affiliates/admin/customers/email                
+  ├ λ /api/affiliates/admin/dashboard                      
+  ├ λ /api/affiliates/admin/export                         
+  ├ λ /api/affiliates/admin/integrations                   
+  ├ λ /api/affiliates/admin/marketing/audience             
+  ├ λ /api/affiliates/admin/marketing/campaigns            
+  ├ λ /api/affiliates/admin/marketing/campaigns/:id        
+  ├ λ /api/affiliates/admin/marketing/campaigns/:id/run    
+  ├ λ /api/affiliates/admin/messages                       
+  ├ λ /api/affiliates/admin/messages/:id                   
+  ├ λ /api/affiliates/admin/messages/:id/reply             
+  ├ λ /api/affiliates/admin/notes                          
+  ├ λ /api/affiliates/admin/notes/:id                      
+  ├ λ /api/affiliates/admin/orders                         
+  ├ λ /api/affiliates/admin/orders/:id/attribute           
+  ├ λ /api/affiliates/admin/orders/:id/refund              
+  ├ λ /api/affiliates/admin/payouts                        
+  ├ λ /api/affiliates/admin/payouts/:id                    
+  ├ λ /api/affiliates/admin/portal-commerce-sync           
+  ├ λ /api/affiliates/admin/rankings                       
+  ├ λ /api/affiliates/admin/referrer-options               
+  ├ λ /api/affiliates/admin/requests                       
+  ├ λ /api/affiliates/admin/requests/:id                   
+  ├ λ /api/affiliates/admin/subscriptions                  
+  ├ λ /api/affiliates/admin/subscriptions/:id              
+  ├ λ /api/affiliates/admin/test-email                     
+  ├ λ /api/affiliates/admin/tiktok                         
+  ├ λ /api/affiliates/admin/tiktok/:id                     
+  ├ λ /api/affiliates/bank                                 
+  ├ λ /api/affiliates/change-password                      
+  ├ λ /api/affiliates/clients                              
+  ├ λ /api/affiliates/contact                              
+  ├ λ /api/affiliates/creator-code                         
+  ├ λ /api/affiliates/dashboard                            
+  ├ λ /api/affiliates/forgot-password                      
+  ├ λ /api/affiliates/invite                               
+  ├ λ /api/affiliates/invite/lookup                        
+  ├ λ /api/affiliates/login                                
+  ├ λ /api/affiliates/logout                               
+  ├ λ /api/affiliates/me                                   
+  ├ λ /api/affiliates/messages                             
+  ├ λ /api/affiliates/messages/unread                      
+  ├ λ /api/affiliates/network                              
+  ├ λ /api/affiliates/onboarding                           
+  ├ λ /api/affiliates/orders/:id                           
+  ├ λ /api/affiliates/rankings                             
+  ├ λ /api/affiliates/referrer-search                      
+  ├ λ /api/affiliates/reset-password                       
+  ├ λ /api/affiliates/roster                               
+  ├ λ /api/affiliates/shop-manager/orders                  
+  ├ λ /api/affiliates/shopify-orders                       
+  ├ λ /api/affiliates/signup                               
+  ├ λ /api/affiliates/supplements-code                     
+  ├ λ /api/affiliates/supplements-codes                    
+  ├ λ /api/affiliates/tiktok                               
+  ├ λ /api/affiliates/webhooks/shopify                     
+  ├ λ /api/cart                                            
+  ├ λ /api/checkout                                        
+  ├ λ /api/cron/affiliate-sync                             
+  ├ λ /api/cron/app-commissions                            
+  ├ λ /api/cron/email-campaigns                            
+  ├ λ /api/cron/leaderboard                                
+  ├ λ /api/cron/monthly-bonus                              
+  ├ λ /api/webhooks/shopify/orders                         
+  ├ ? /approach                                            
+  ├ ? /checkout                                            
+  ├ ƒ /collections/:category                               
+  ├ ? /help                                                
+  ├ ? /journal                                             
+  ├ ƒ /journal/:slug                                       
+  ├ ƒ /policies/:slug                                      
+  ├ ƒ /products/:slug                                      
+  ├ ? /reviews                                             
+  └ ? /skincare                                            
+
+  λ API  ƒ Dynamic  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+

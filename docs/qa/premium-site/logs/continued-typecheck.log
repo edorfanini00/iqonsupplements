@@ -1,0 +1,4 @@
+
+> iqon-supplements@0.1.0 typecheck:next
+> tsc -p tsconfig.next.json --noEmit --incremental false
+

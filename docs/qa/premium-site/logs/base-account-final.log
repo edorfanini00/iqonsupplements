@@ -1,0 +1,183 @@
+account-test-db: owned cluster on 127.0.0.1:32350 database account_sessions_1794097235_336
+TAP version 13
+# Subtest: real /account/login response: 303 to the provider with state, nonce, PKCE and an HttpOnly transaction cookie
+ok 1 - real /account/login response: 303 to the provider with state, nonce, PKCE and an HttpOnly transaction cookie
+  ---
+  duration_ms: 273.111709
+  type: 'test'
+  ...
+# Subtest: negative control: an unrouted redirect hop to Shopify cannot leave the machine
+ok 2 - negative control: an unrouted redirect hop to Shopify cannot leave the machine
+  ---
+  duration_ms: 37.741584
+  type: 'test'
+  ...
+# Subtest: signed-out visitors get the sign-in entry from the header, at desktop and phone sizes
+ok 3 - signed-out visitors get the sign-in entry from the header, at desktop and phone sizes
+  ---
+  duration_ms: 2085.626667
+  type: 'test'
+  ...
+# Subtest: MOCK sign-in returns to the account; tokens stay out of the page, storage and URL
+ok 4 - MOCK sign-in returns to the account; tokens stay out of the page, storage and URL
+  ---
+  duration_ms: 331.962917
+  type: 'test'
+  ...
+# Subtest: real-preview regression in the browser: an id_token without sub still signs in through the real callback
+ok 5 - real-preview regression in the browser: an id_token without sub still signs in through the real callback
+  ---
+  duration_ms: 312.548417
+  type: 'test'
+  ...
+# Subtest: overview, orders and order detail render real provider rows (desktop + phone)
+ok 6 - overview, orders and order detail render real provider rows (desktop + phone)
+  ---
+  duration_ms: 1321.174875
+  type: 'test'
+  ...
+# Subtest: address book: validation, add as default, set default, remove — persisted through the provider
+ok 7 - address book: validation, add as default, set default, remove — persisted through the provider
+  ---
+  duration_ms: 2699.491375
+  type: 'test'
+  ...
+# Subtest: subscriptions: skip, pause and resume through the provider; ineligible contracts show no buttons
+ok 8 - subscriptions: skip, pause and resume through the provider; ineligible contracts show no buttons
+  ---
+  duration_ms: 2190.721042
+  type: 'test'
+  ...
+# Subtest: if Shopify withholds undocumented subscription fields, the page degrades honestly
+ok 9 - if Shopify withholds undocumented subscription fields, the page degrades honestly
+  ---
+  duration_ms: 401.125333
+  type: 'test'
+  ...
+# Subtest: guests can open /account/privacy without signing in (footer access), at desktop and phone sizes
+ok 10 - guests can open /account/privacy without signing in (footer access), at desktop and phone sizes
+  ---
+  duration_ms: 517.376
+  type: 'test'
+  ...
+# Subtest: hosted privacy: the footer Privacy link opens /account/privacy with the verified Shopify pages; no custom privacy runtime remains
+not ok 11 - hosted privacy: the footer Privacy link opens /account/privacy with the verified Shopify pages; no custom privacy runtime remains
+  ---
+  duration_ms: 10229.510042
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/customer-account.e2e.mjs:367:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('This site doesn’t run advertising or analytics tracking of its own.') to be visible[22m
+    
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/customer-account.e2e.mjs:380:97)
+  ...
+# Subtest: no advertising or analytics requests leave the browser on storefront and account pages
+not ok 12 - no advertising or analytics requests leave the browser on storefront and account pages
+  ---
+  duration_ms: 5181.658166
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/customer-account.e2e.mjs:400:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    no third-party requests at all
+    + actual - expected
+    
+    + [
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js'
+    + ]
+    - []
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0: 'https://connect.facebook.net/en_US/fbevents.js'
+    1: 'https://connect.facebook.net/en_US/fbevents.js'
+    2: 'https://connect.facebook.net/en_US/fbevents.js'
+    3: 'https://connect.facebook.net/en_US/fbevents.js'
+    4: 'https://connect.facebook.net/en_US/fbevents.js'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/customer-account.e2e.mjs:412:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: phone: every account destination, including Privacy, is visible without scrolling the menu
+ok 13 - phone: every account destination, including Privacy, is visible without scrolling the menu
+  ---
+  duration_ms: 834.079459
+  type: 'test'
+  ...
+# Subtest: profile edit, privacy seam, empty and error states
+ok 14 - profile edit, privacy seam, empty and error states
+  ---
+  duration_ms: 1993.019042
+  type: 'test'
+  ...
+# Subtest: two tabs: A's slow request finishing after sign-out and B's sign-in cannot bring A back
+ok 15 - two tabs: A's slow request finishing after sign-out and B's sign-in cannot bring A back
+  ---
+  duration_ms: 3134.135333
+  type: 'test'
+  ...
+# Subtest: sign out revokes the session locally and at the (MOCK) provider
+not ok 16 - sign out revokes the session locally and at the (MOCK) provider
+  ---
+  duration_ms: 454.432375
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/customer-account.e2e.mjs:507:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    no unexpected external requests from the browser
+    + actual - expected
+    
+    + [
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js',
+    +   'https://connect.facebook.net/en_US/fbevents.js'
+    + ]
+    - []
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0: 'https://connect.facebook.net/en_US/fbevents.js'
+    1: 'https://connect.facebook.net/en_US/fbevents.js'
+    2: 'https://connect.facebook.net/en_US/fbevents.js'
+    3: 'https://connect.facebook.net/en_US/fbevents.js'
+    4: 'https://connect.facebook.net/en_US/fbevents.js'
+    5: 'https://connect.facebook.net/en_US/fbevents.js'
+    6: 'https://connect.facebook.net/en_US/fbevents.js'
+    7: 'https://connect.facebook.net/en_US/fbevents.js'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/e2e/customer-account.e2e.mjs:523:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# screenshots: /Users/edorfanini/Projects/iqon-site-premium-20261107/docs/qa/premium-site/base-account
+1..16
+# tests 16
+# suites 0
+# pass 13
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 33493.985167

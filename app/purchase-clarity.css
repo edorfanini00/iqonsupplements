@@ -1,6 +1,6 @@
 /* Product pages show the product first: the gallery leads the page on phones and the purchase
-   panel follows it. The rendered DOM order is gallery → summary → purchase controls → product
-   notes → details, so keyboard order follows the same flow. Desktop keeps its two-column
+   panel follows it. The rendered DOM order is gallery → summary → product notes → purchase
+   controls → details, so keyboard order follows the same flow. Desktop keeps its two-column
    composition, and its existing visual order, by grid placement. */
 .purchase-assurance{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:7px;font-size:12px;line-height:1.55;color:#536168}
 .purchase-assurance li{display:flex;gap:9px;align-items:flex-start;min-width:0}
@@ -26,7 +26,8 @@ html:has(.product-page.purchase-first){scroll-padding-bottom:104px}
     remaining 6px for a 24px variant picker after 18px essentials, and retain the full
     control margin on generic products with no preceding notes or empty size line. */
  .product-page.purchase-first .product-detail{--purchase-trailing-margin:0px}
- .product-page.purchase-first .product-detail:has(>.purchase-panel-info:empty):has(>.purchase-panel-summary .product-size:empty){--purchase-trailing-margin:12px}
+ .product-page.purchase-first .product-detail:has(>.purchase-panel-info>.product-current-price:last-child){--purchase-trailing-margin:16px}
+ .product-page.purchase-first .product-detail:has(>.purchase-panel-info>.product-current-price:only-child):has(>.purchase-panel-summary .product-size:empty)>.purchase-panel-info{margin-top:-12px}
  .product-page.purchase-first .product-detail:has(>.purchase-panel-info>.product-essentials){--purchase-trailing-margin:18px}
  .product-page.purchase-first .purchase-panel-buy:has(>.product-purchase-choices:nth-child(1 of :not(.product-format))){--purchase-leading-margin:4px}
  .product-page.purchase-first .purchase-panel-buy:has(>.add-to-bag-row:nth-child(1 of :not(.product-format))){--purchase-leading-margin:12px}

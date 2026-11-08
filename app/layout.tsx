@@ -7,13 +7,14 @@ import "./product-experience.css";
 import "./product-story-v4.css";
 import "./skincare-product-story.css";
 import "./supplement-product-story.css";
+import "./premium-storefront.css";
 import { ShopifyPrivacy } from "./shopify-privacy";
 import { StoreShell } from "./store-shell";
 import { getStoreCatalog } from "@/lib/shopify.server";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "IQON — Supplements & Skincare",
-  description: "Explore the IQON collection. A considered approach to supplements, skincare and the everyday.",
+  title: "IQON | Supplements & Skincare",
+  description: "Explore IQON supplements by ingredient and format. Compare powders, capsules and gummies, and discover the coming soon skincare collection.",
   robots: { index: false, follow: false },
   icons: { icon: "/favicon.svg" },
 };

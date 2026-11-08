@@ -1,0 +1,129 @@
+{
+  "processes": [
+    {
+      "pid": 21352,
+      "port": 3987,
+      "command": "next start",
+      "purpose": "local real asset preview",
+      "state": "stopped after browser run",
+      "log": "docs/qa/premium-site/logs/continued-server-3987.log"
+    },
+    {
+      "pid": 21353,
+      "port": 3990,
+      "command": "next start",
+      "purpose": "synthetic commerce with real local assets",
+      "state": "stopped after browser run",
+      "log": "docs/qa/premium-site/logs/continued-server-3990.log"
+    },
+    {
+      "pid": 25398,
+      "port": 3987,
+      "command": "next start",
+      "purpose": "real assets local preview",
+      "state": "stopped for final build",
+      "log": "docs/qa/premium-site/logs/final-server-3987.log"
+    },
+    {
+      "pid": 25399,
+      "port": 3990,
+      "command": "next start",
+      "purpose": "synthetic commerce with actual assets",
+      "state": "stopped for final build",
+      "log": "docs/qa/premium-site/logs/final-server-3990.log"
+    },
+    {
+      "pid": 33871,
+      "port": 3987,
+      "command": "next start",
+      "purpose": "real assets local preview",
+      "state": "stopped for geometry correction build",
+      "log": "docs/qa/premium-site/logs/final-server-3987.log"
+    },
+    {
+      "pid": 33872,
+      "port": 3990,
+      "command": "next start",
+      "purpose": "synthetic commerce with actual assets",
+      "state": "stopped for geometry correction build",
+      "log": "docs/qa/premium-site/logs/final-server-3990.log"
+    },
+    {
+      "pid": 34070,
+      "port": 3989,
+      "command": "next start owned by E2E runner",
+      "purpose": "isolated account test",
+      "state": "stopped by completed E2E runner"
+    },
+    {
+      "pid": 33918,
+      "port": 4101,
+      "command": "next start owned by E2E runner",
+      "purpose": "PDP geometry test",
+      "state": "stopped by completed E2E runner"
+    },
+    {
+      "pid": 33937,
+      "port": 4103,
+      "command": "next start owned by E2E runner",
+      "purpose": "PDP geometry test",
+      "state": "stopped by completed E2E runner"
+    },
+    {
+      "pid": 39403,
+      "port": 3987,
+      "command": "next start",
+      "purpose": "real assets local preview",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/final-server-3987.log"
+    },
+    {
+      "pid": 39404,
+      "port": 3990,
+      "command": "next start",
+      "purpose": "synthetic commerce with actual assets",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/final-server-3990.log"
+    },
+    {
+      "pid": 46856,
+      "port": 3987,
+      "command": "next start",
+      "purpose": "real assets local preview",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/final-server-3987.log"
+    },
+    {
+      "pid": 46857,
+      "port": 3990,
+      "command": "next start",
+      "purpose": "synthetic commerce with actual assets",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/final-server-3990.log"
+    },
+    {
+      "pid": 49178,
+      "port": 3991,
+      "command": "node tests/e2e/premium-asset-server.mjs",
+      "purpose": "actual asset HTTPS delivery for synthetic commerce",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/qa-assets.log"
+    },
+    {
+      "pid": 49180,
+      "port": 3987,
+      "command": "next start",
+      "purpose": "real assets local preview",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/final-server-3987.log"
+    },
+    {
+      "pid": 49181,
+      "port": 3990,
+      "command": "next start",
+      "purpose": "synthetic commerce with actual assets",
+      "state": "stopped",
+      "log": "docs/qa/premium-site/logs/final-server-3990.log"
+    }
+  ]
+}

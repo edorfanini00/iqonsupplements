@@ -1,0 +1,896 @@
+account-test-db: owned cluster on 127.0.0.1:31546 database account_sessions_1794097884_4410
+TAP version 13
+# Subtest: customer responses are private, uncached and isolated between customers A and B
+ok 1 - customer responses are private, uncached and isolated between customers A and B
+  ---
+  duration_ms: 151.404125
+  type: 'test'
+  ...
+# Subtest: anti-IDOR: A cannot read or change B's order, address or subscription
+ok 2 - anti-IDOR: A cannot read or change B's order, address or subscription
+  ---
+  duration_ms: 75.452084
+  type: 'test'
+  ...
+# Subtest: mutations require same-origin JSON and the session's CSRF token
+ok 3 - mutations require same-origin JSON and the session's CSRF token
+  ---
+  duration_ms: 88.160583
+  type: 'test'
+  ...
+# Subtest: address book: validation, create with default, edit, set default, delete persist through the provider
+ok 4 - address book: validation, create with default, edit, set default, delete persist through the provider
+  ---
+  duration_ms: 217.230167
+  type: 'test'
+  ...
+# Subtest: subscriptions: provider eligibility gates actions; pause, resume, skip, unskip and confirmed cancel
+ok 5 - subscriptions: provider eligibility gates actions; pause, resume, skip, unskip and confirmed cancel
+  ---
+  duration_ms: 45.84825
+  type: 'test'
+  ...
+# Subtest: subscription management link appears only when the provider page is published
+ok 6 - subscription management link appears only when the provider page is published
+  ---
+  duration_ms: 42.261791
+  type: 'test'
+  ...
+# Subtest: a brand-new customer gets real empty states, not fabricated rows
+ok 7 - a brand-new customer gets real empty states, not fabricated rows
+  ---
+  duration_ms: 15.829917
+  type: 'test'
+  ...
+# Subtest: upstream failures are 'unavailable' and keep the session; nothing leaks tokens or customer data to logs
+ok 8 - upstream failures are 'unavailable' and keep the session; nothing leaks tokens or customer data to logs
+  ---
+  duration_ms: 38.178542
+  type: 'test'
+  ...
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# Subtest: if Shopify denies the undocumented subscription fields, pages still work and nothing signs out
+ok 9 - if Shopify denies the undocumented subscription fields, pages still work and nothing signs out
+  ---
+  duration_ms: 67.245708
+  type: 'test'
+  ...
+# Subtest: address ids in another GID form still work, and writes use Shopify's exact id
+ok 10 - address ids in another GID form still work, and writes use Shopify's exact id
+  ---
+  duration_ms: 41.797708
+  type: 'test'
+  ...
+# Subtest: order summaries never present a truncated sum as the total (5 distinct lines, mixed quantities)
+ok 11 - order summaries never present a truncated sum as the total (5 distinct lines, mixed quantities)
+  ---
+  duration_ms: 1099.022792
+  type: 'test'
+  ...
+# Subtest: configuration: absent is 'not configured', partial or weak is rejected
+ok 12 - configuration: absent is 'not configured', partial or weak is rejected
+  ---
+  duration_ms: 6.7005
+  type: 'test'
+  ...
+# Subtest: return destinations are a fixed same-origin allowlist (open redirect attempts)
+ok 13 - return destinations are a fixed same-origin allowlist (open redirect attempts)
+  ---
+  duration_ms: 11.926959
+  type: 'test'
+  ...
+# Subtest: login builds a PKCE S256 authorization request and an encrypted single-use transaction cookie
+ok 14 - login builds a PKCE S256 authorization request and an encrypted single-use transaction cookie
+  ---
+  duration_ms: 106.799708
+  type: 'test'
+  ...
+# Subtest: prefetches never start a sign-in
+ok 15 - prefetches never start a sign-in
+  ---
+  duration_ms: 80.746125
+  type: 'test'
+  ...
+# Subtest: successful callback creates an encrypted HttpOnly session and returns to the allowlisted page
+ok 16 - successful callback creates an encrypted HttpOnly session and returns to the allowlisted page
+  ---
+  duration_ms: 40.684875
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: token request rejected (400)
+# Subtest: callback rejects tampered state, missing transaction, provider errors and replay
+ok 17 - callback rejects tampered state, missing transaction, provider errors and replay
+  ---
+  duration_ms: 150.077416
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: id_token nonce mismatch
+# [customer-account] sign-in rejected: id_token audience mismatch
+# [customer-account] sign-in rejected: id_token issuer mismatch
+# [customer-account] sign-in rejected: id_token expired
+# [customer-account] sign-in rejected: id_token signature invalid
+# [customer-account] sign-in rejected: id_token algorithm not allowed
+# Subtest: id_token must carry the transaction nonce, the shop issuer, this client and a valid signature
+ok 18 - id_token must carry the transaction nonce, the shop issuer, this client and a valid signature
+  ---
+  duration_ms: 248.730667
+  type: 'test'
+  ...
+# [customer-account] sign-in unavailable: token endpoint returned 503
+# Subtest: provider outage during sign-in is reported as unavailable, not as a failed sign-in
+ok 19 - provider outage during sign-in is reported as unavailable, not as a failed sign-in
+  ---
+  duration_ms: 39.903541
+  type: 'test'
+  ...
+# Subtest: forged, sibling, foreign-secret and malformed cookies are signed out, and nothing is ever cleared
+ok 20 - forged, sibling, foreign-secret and malformed cookies are signed out, and nothing is ever cleared
+  ---
+  duration_ms: 86.898541
+  type: 'test'
+  ...
+# Subtest: session absolute lifetime ends the session even with a valid refresh token
+ok 21 - session absolute lifetime ends the session even with a valid refresh token
+  ---
+  duration_ms: 11.635709
+  type: 'test'
+  ...
+# Subtest: expired access tokens refresh once for concurrent requests; the cookie is untouched
+ok 22 - expired access tokens refresh once for concurrent requests; the cookie is untouched
+  ---
+  duration_ms: 69.916792
+  type: 'test'
+  ...
+# [customer-account] upstream unavailable: token endpoint returned 503
+# Subtest: a revoked refresh token ends the session; a refresh outage does not
+ok 23 - a revoked refresh token ends the session; a refresh outage does not
+  ---
+  duration_ms: 18.521542
+  type: 'test'
+  ...
+# Subtest: an access token revoked before expiry gets exactly one refresh and retry
+ok 24 - an access token revoked before expiry gets exactly one refresh and retry
+  ---
+  duration_ms: 50.942416
+  type: 'test'
+  ...
+# Subtest: logout is POST + same-origin only, revokes the session and ends the Shopify session
+ok 25 - logout is POST + same-origin only, revokes the session and ends the Shopify session
+  ---
+  duration_ms: 22.993
+  type: 'test'
+  ...
+# Subtest: not configured and misconfigured states are distinct from signed out
+ok 26 - not configured and misconfigured states are distinct from signed out
+  ---
+  duration_ms: 80.748541
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: token request rejected (400)
+# Subtest: an attacker's authorization code injected into a victim's callback fails PKCE at the provider
+ok 27 - an attacker's authorization code injected into a victim's callback fails PKCE at the provider
+  ---
+  duration_ms: 25.133791
+  type: 'test'
+  ...
+# Subtest: logout and sign-in never write tokens or the id_token_hint to logs
+ok 28 - logout and sign-in never write tokens or the id_token_hint to logs
+  ---
+  duration_ms: 19.961667
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: id_token signature invalid
+# Subtest: an id_token with perfect claims but signed by a foreign key (same kid) is rejected
+ok 29 - an id_token with perfect claims but signed by a foreign key (same kid) is rejected
+  ---
+  duration_ms: 37.046083
+  type: 'test'
+  ...
+# Subtest: real-preview regression: an id_token without a usable sub signs in as the customer the Customer Account API reports
+ok 30 - real-preview regression: an id_token without a usable sub signs in as the customer the Customer Account API reports
+  ---
+  duration_ms: 103.000083
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: id_token nonce mismatch
+# Subtest: an id_token without sub is still fully verified: nonce, audience, issuer and signature failures still fail
+ok 31 - an id_token without sub is still fully verified: nonce, audience, issuer and signature failures still fail
+  ---
+  duration_ms: 24.8855
+  type: 'test'
+  ...
+# [customer-account] sign-in: id_token sub claim is absent; customer identity comes from the Customer Account API
+# [customer-account] sign-in unavailable: customer api returned 503
+# [customer-account] sign-in rejected: new access token rejected by the Customer Account API
+# Subtest: sign-in creates no session when the Customer Account API can't confirm the customer
+ok 32 - sign-in creates no session when the Customer Account API can't confirm the customer
+  ---
+  duration_ms: 65.189791
+  type: 'test'
+  ...
+# Subtest: late successful refresh (GraphQL held) after logout cannot restore the session
+ok 33 - late successful refresh (GraphQL held) after logout cannot restore the session
+  ---
+  duration_ms: 156.663583
+  type: 'test'
+  ...
+# Subtest: late refresh (token response held) after logout: the new tokens are discarded
+ok 34 - late refresh (token response held) after logout: the new tokens are discarded
+  ---
+  duration_ms: 52.920416
+  type: 'test'
+  ...
+# Subtest: A's held request completing after B signs in on the same browser leaves B signed in
+ok 35 - A's held request completing after B signs in on the same browser leaves B signed in
+  ---
+  duration_ms: 181.170125
+  type: 'test'
+  ...
+# Subtest: concurrent session checks under strict rotation: one refresh, both signed in, either delivery order
+ok 36 - concurrent session checks under strict rotation: one refresh, both signed in, either delivery order
+  ---
+  duration_ms: 205.250875
+  type: 'test'
+  ...
+# Subtest: a delayed rejection of A's dead grant arriving after B signs in does not touch B
+ok 37 - a delayed rejection of A's dead grant arriving after B signs in does not touch B
+  ---
+  duration_ms: 18.743583
+  type: 'test'
+  ...
+# Subtest: a delayed logout response arriving after a new sign-in does not sign the new session out
+ok 38 - a delayed logout response arriving after a new sign-in does not sign the new session out
+  ---
+  duration_ms: 19.403083
+  type: 'test'
+  ...
+# [customer-account] upstream unavailable: refresh coordination timed out
+# Subtest: a crashed refresher's lease lapses; waiting is bounded and honest
+ok 39 - a crashed refresher's lease lapses; waiting is bounded and honest
+  ---
+  duration_ms: 432.845583
+  type: 'test'
+  ...
+# Subtest: a hanging token endpoint is cut off by the refresh timeout and the lease is released
+not ok 40 - a hanging token endpoint is cut off by the refresh timeout and the lease is released
+  ---
+  duration_ms: 14.409208
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/customer-account/races.test.ts:1:6546'
+  failureType: 'cancelledByParent'
+  error: 'Promise resolution is still pending but the event loop has already resolved'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    process.emit (node:events:519:28)
+  ...
+# Subtest: database outage is 'unavailable', never 'signed out', and sets no cookie
+not ok 41 - database outage is 'unavailable', never 'signed out', and sets no cookie
+  ---
+  duration_ms: 0
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/tests/customer-account/races.test.ts:1:7415'
+  failureType: 'cancelledByParent'
+  error: 'Promise resolution is still pending but the event loop has already resolved'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    process.emit (node:events:519:28)
+  ...
+# Subtest: schema fixture is the pinned provider schema
+ok 42 - schema fixture is the pinned provider schema
+  ---
+  duration_ms: 2.222792
+  type: 'test'
+  ...
+# Subtest: SESSION_CUSTOMER is valid against the Customer Account API schema
+ok 43 - SESSION_CUSTOMER is valid against the Customer Account API schema
+  ---
+  duration_ms: 12.229
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_OVERVIEW is valid against the Customer Account API schema
+ok 44 - ACCOUNT_OVERVIEW is valid against the Customer Account API schema
+  ---
+  duration_ms: 5.31225
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_PROFILE is valid against the Customer Account API schema
+ok 45 - ACCOUNT_PROFILE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.74575
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_ORDERS is valid against the Customer Account API schema
+ok 46 - ACCOUNT_ORDERS is valid against the Customer Account API schema
+  ---
+  duration_ms: 3.053125
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_ORDER is valid against the Customer Account API schema
+ok 47 - ACCOUNT_ORDER is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.552291
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_ADDRESSES is valid against the Customer Account API schema
+ok 48 - ACCOUNT_ADDRESSES is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.936416
+  type: 'test'
+  ...
+# Subtest: ADDRESS_CREATE is valid against the Customer Account API schema
+ok 49 - ADDRESS_CREATE is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.2605
+  type: 'test'
+  ...
+# Subtest: ADDRESS_UPDATE is valid against the Customer Account API schema
+ok 50 - ADDRESS_UPDATE is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.688208
+  type: 'test'
+  ...
+# Subtest: ADDRESS_DELETE is valid against the Customer Account API schema
+ok 51 - ADDRESS_DELETE is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.89175
+  type: 'test'
+  ...
+# Subtest: PROFILE_UPDATE is valid against the Customer Account API schema
+ok 52 - PROFILE_UPDATE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.747416
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_SUBSCRIPTIONS is valid against the Customer Account API schema
+ok 53 - ACCOUNT_SUBSCRIPTIONS is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.871584
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_SUBSCRIPTION is valid against the Customer Account API schema
+ok 54 - ACCOUNT_SUBSCRIPTION is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.956583
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_EXTRAS_LIST is valid against the Customer Account API schema
+ok 55 - SUBSCRIPTION_EXTRAS_LIST is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.426875
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_EXTRAS is valid against the Customer Account API schema
+ok 56 - SUBSCRIPTION_EXTRAS is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.753125
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_PAUSE is valid against the Customer Account API schema
+ok 57 - SUBSCRIPTION_PAUSE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.391
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_RESUME is valid against the Customer Account API schema
+ok 58 - SUBSCRIPTION_RESUME is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.373084
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_CANCEL is valid against the Customer Account API schema
+ok 59 - SUBSCRIPTION_CANCEL is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.364083
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_SKIP is valid against the Customer Account API schema
+ok 60 - SUBSCRIPTION_SKIP is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.42925
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_UNSKIP is valid against the Customer Account API schema
+ok 61 - SUBSCRIPTION_UNSKIP is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.316083
+  type: 'test'
+  ...
+# Subtest: negative control: an invented frequency mutation is rejected by the schema
+ok 62 - negative control: an invented frequency mutation is rejected by the schema
+  ---
+  duration_ms: 2.820292
+  type: 'test'
+  ...
+# Subtest: customer-scoped roots only: no Admin API fields are used
+ok 63 - customer-scoped roots only: no Admin API fields are used
+  ---
+  duration_ms: 0.321583
+  type: 'test'
+  ...
+# Subtest: core documents avoid fields missing from Shopify's public 2026-10 reference
+ok 64 - core documents avoid fields missing from Shopify's public 2026-10 reference
+  ---
+  duration_ms: 0.747584
+  type: 'test'
+  ...
+# Subtest: a lease is exclusive until it lapses, and only for the current generation
+ok 65 - a lease is exclusive until it lapses, and only for the current generation
+  ---
+  duration_ms: 36.022584
+  type: 'test'
+  ...
+# Subtest: refreshed tokens are never installed on a revoked row, even by a live lease holder
+ok 66 - refreshed tokens are never installed on a revoked row, even by a live lease holder
+  ---
+  duration_ms: 5.646542
+  type: 'test'
+  ...
+# Subtest: revocation is permanent and generation-guarded when asked
+ok 67 - revocation is permanent and generation-guarded when asked
+  ---
+  duration_ms: 11.723459
+  type: 'test'
+  ...
+# Subtest: purge removes only expired or long-revoked rows
+ok 68 - purge removes only expired or long-revoked rows
+  ---
+  duration_ms: 9.362583
+  type: 'test'
+  ...
+# Subtest: two real processes, strict rotation: exactly one refresh, both signed in, no cookie writes
+ok 69 - two real processes, strict rotation: exactly one refresh, both signed in, no cookie writes
+  ---
+  duration_ms: 1788.468042
+  type: 'test'
+  ...
+# Subtest: the destructive suite only runs against a throwaway local database
+ok 70 - the destructive suite only runs against a throwaway local database
+  ---
+  duration_ms: 192.544041
+  type: 'test'
+  ...
+# Subtest: concurrent first claims on Postgres: exactly one winner
+ok 71 - concurrent first claims on Postgres: exactly one winner
+  ---
+  duration_ms: 106.4415
+  type: 'test'
+  ...
+# Subtest: concurrent reclaims of a failed row: exactly one winner, attempts incremented once
+ok 72 - concurrent reclaims of a failed row: exactly one winner, attempts incremented once
+  ---
+  duration_ms: 35.465958
+  type: 'test'
+  ...
+# Subtest: stale claims are reclaimable, fresh ones and sent rows are not; old token cannot finish
+ok 73 - stale claims are reclaimable, fresh ones and sent rows are not; old token cannot finish
+  ---
+  duration_ms: 29.517166
+  type: 'test'
+  ...
+# Subtest: end to end on Postgres: 10 concurrent orders/paid deliveries send one email and store the snapshot
+ok 74 - end to end on Postgres: 10 concurrent orders/paid deliveries send one email and store the snapshot
+  ---
+  duration_ms: 102.883709
+  type: 'test'
+  ...
+# Subtest: Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable
+ok 75 - Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable
+  ---
+  duration_ms: 38.61
+  type: 'test'
+  ...
+# Subtest: snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported
+ok 76 - snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported
+  ---
+  duration_ms: 12.360958
+  type: 'test'
+  ...
+# Subtest: renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it
+ok 77 - renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it
+  ---
+  duration_ms: 19.561542
+  type: 'test'
+  ...
+# Subtest: order payload parsing uses current totals, presentment currency and drops payment data
+ok 78 - order payload parsing uses current totals, presentment currency and drops payment data
+  ---
+  duration_ms: 3.017958
+  type: 'test'
+  ...
+# Subtest: receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total
+ok 79 - receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total
+  ---
+  duration_ms: 14.161417
+  type: 'test'
+  ...
+# Subtest: fulfilment readiness: tracking required, live statuses only
+ok 80 - fulfilment readiness: tracking required, live statuses only
+  ---
+  duration_ms: 0.553125
+  type: 'test'
+  ...
+# Subtest: partial detection across multiple fulfilments
+ok 81 - partial detection across multiple fulfilments
+  ---
+  duration_ms: 0.534083
+  type: 'test'
+  ...
+# Subtest: order confirmation renders every required detail
+ok 82 - order confirmation renders every required detail
+  ---
+  duration_ms: 2.076917
+  type: 'test'
+  ...
+# Subtest: email markup is table based, 600px, Outlook and dark mode aware, and only uses absolute https assets
+ok 83 - email markup is table based, 600px, Outlook and dark mode aware, and only uses absolute https assets
+  ---
+  duration_ms: 1.772875
+  type: 'test'
+  ...
+# Subtest: shipping confirmation with tracking
+ok 84 - shipping confirmation with tracking
+  ---
+  duration_ms: 0.999292
+  type: 'test'
+  ...
+# Subtest: shipping confirmation, partial shipment, no carrier URL
+ok 85 - shipping confirmation, partial shipment, no carrier URL
+  ---
+  duration_ms: 0.580958
+  type: 'test'
+  ...
+# Subtest: shipping confirmation without any tracking link still states the window and shows no tracking button
+ok 86 - shipping confirmation without any tracking link still states the window and shows no tracking button
+  ---
+  duration_ms: 2.00125
+  type: 'test'
+  ...
+# Subtest: no first name falls back to warm generic greetings
+ok 87 - no first name falls back to warm generic greetings
+  ---
+  duration_ms: 1.86225
+  type: 'test'
+  ...
+# Subtest: every dynamic value is HTML escaped (XSS)
+ok 88 - every dynamic value is HTML escaped (XSS)
+  ---
+  duration_ms: 1.365416
+  type: 'test'
+  ...
+# Subtest: brand config: env overrides, unsafe origins ignored, emails masked for logs
+ok 89 - brand config: env overrides, unsafe origins ignored, emails masked for logs
+  ---
+  duration_ms: 0.215709
+  type: 'test'
+  ...
+# Subtest: images: Storefront first, then catalog by handle or title, then placeholder
+ok 90 - images: Storefront first, then catalog by handle or title, then placeholder
+  ---
+  duration_ms: 0.240625
+  type: 'test'
+  ...
+# Subtest: Storefront image lookup builds the query from variant ids and maps the response
+ok 91 - Storefront image lookup builds the query from variant ids and maps the response
+  ---
+  duration_ms: 26.831709
+  type: 'test'
+  ...
+# Subtest: HMAC helper: valid, tampered, wrong secret and missing secret
+ok 92 - HMAC helper: valid, tampered, wrong secret and missing secret
+  ---
+  duration_ms: 0.935708
+  type: 'test'
+  ...
+# Subtest: orders/paid with a valid signature sends exactly one confirmation
+ok 93 - orders/paid with a valid signature sends exactly one confirmation
+  ---
+  duration_ms: 25.430667
+  type: 'test'
+  ...
+# Subtest: ledger snapshot keeps only what the emails need (no payment or billing data)
+ok 94 - ledger snapshot keeps only what the emails need (no payment or billing data)
+  ---
+  duration_ms: 0.696583
+  type: 'test'
+  ...
+# Subtest: rejects bad signature, wrong shop and missing secret without sending
+ok 95 - rejects bad signature, wrong shop and missing secret without sending
+  ---
+  duration_ms: 0.327208
+  type: 'test'
+  ...
+# Subtest: unknown topics are acknowledged and ignored; oversized bodies are refused
+ok 96 - unknown topics are acknowledged and ignored; oversized bodies are refused
+  ---
+  duration_ms: 4.550459
+  type: 'test'
+  ...
+# Subtest: fails closed with 503 when the database or Resend is not configured
+ok 97 - fails closed with 503 when the database or Resend is not configured
+  ---
+  duration_ms: 0.246625
+  type: 'test'
+  ...
+# Subtest: duplicate delivery of the same order sends once
+ok 98 - duplicate delivery of the same order sends once
+  ---
+  duration_ms: 0.780625
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate deliveries result in exactly one send
+ok 99 - concurrent duplicate deliveries result in exactly one send
+  ---
+  duration_ms: 53.813416
+  type: 'test'
+  ...
+# Subtest: a stale sending claim is reclaimed and sent; a fresh one is not
+ok 100 - a stale sending claim is reclaimed and sent; a fresh one is not
+  ---
+  duration_ms: 2.502541
+  type: 'test'
+  ...
+# Subtest: transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key
+ok 101 - transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key
+  ---
+  duration_ms: 3.177709
+  type: 'test'
+  ...
+# Subtest: a hung Resend call is cut off inside the budget and retried later
+ok 102 - a hung Resend call is cut off inside the budget and retried later
+  ---
+  duration_ms: 1502.058917
+  type: 'test'
+  ...
+# Subtest: a permanent Resend rejection is recorded and acknowledged (no endless retries)
+ok 103 - a permanent Resend rejection is recorded and acknowledged (no endless retries)
+  ---
+  duration_ms: 1.565959
+  type: 'test'
+  ...
+# Subtest: an order without an email is skipped durably and never retried
+ok 104 - an order without an email is skipped durably and never retried
+  ---
+  duration_ms: 0.656875
+  type: 'test'
+  ...
+# Subtest: Shopify test orders still send and are flagged in logs
+ok 105 - Shopify test orders still send and are flagged in logs
+  ---
+  duration_ms: 0.768292
+  type: 'test'
+  ...
+# Subtest: logs never contain a full email address or the secret
+ok 106 - logs never contain a full email address or the secret
+  ---
+  duration_ms: 1.139834
+  type: 'test'
+  ...
+# Subtest: fulfilment without tracking waits; the update that adds tracking sends; later tracking changes do not resend
+ok 107 - fulfilment without tracking waits; the update that adds tracking sends; later tracking changes do not resend
+  ---
+  duration_ms: 2.127584
+  type: 'test'
+  ...
+# Subtest: create and update for the same fulfilment arriving together send once
+ok 108 - create and update for the same fulfilment arriving together send once
+  ---
+  duration_ms: 64.806375
+  type: 'test'
+  ...
+# Subtest: cancelled, error, failure and pending fulfilments never send
+ok 109 - cancelled, error, failure and pending fulfilments never send
+  ---
+  duration_ms: 0.868083
+  type: 'test'
+  ...
+# Subtest: partial fulfilment lists only its items and says the rest will follow; the final shipment does not
+ok 110 - partial fulfilment lists only its items and says the rest will follow; the final shipment does not
+  ---
+  duration_ms: 2.363709
+  type: 'test'
+  ...
+# Subtest: shipping email reuses the stored snapshot (name, subscription label, images)
+ok 111 - shipping email reuses the stored snapshot (name, subscription label, images)
+  ---
+  duration_ms: 1.235625
+  type: 'test'
+  ...
+# Subtest: shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address
+ok 112 - shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address
+  ---
+  duration_ms: 0.942541
+  type: 'test'
+  ...
+# Subtest: a failing Admin or Storefront lookup never blocks the email
+ok 113 - a failing Admin or Storefront lookup never blocks the email
+  ---
+  duration_ms: 1.117167
+  type: 'test'
+  ...
+# Subtest: a database outage before the claim returns 503 and sends nothing
+ok 114 - a database outage before the claim returns 503 and sends nothing
+  ---
+  duration_ms: 0.404458
+  type: 'test'
+  ...
+# Subtest: REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email
+ok 115 - REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email
+  ---
+  duration_ms: 1.180958
+  type: 'test'
+  ...
+# Subtest: markSent is retried once, so a single lost update still records `sent`
+ok 116 - markSent is retried once, so a single lost update still records `sent`
+  ---
+  duration_ms: 1.005209
+  type: 'test'
+  ...
+# Subtest: within Resend's window a stale `sending` row is retried with the same key and the same body
+ok 117 - within Resend's window a stale `sending` row is retried with the same key and the same body
+  ---
+  duration_ms: 2.46225
+  type: 'test'
+  ...
+# Subtest: an uncertain failure (timeout) is retried inside 23h but never after
+ok 118 - an uncertain failure (timeout) is retried inside 23h but never after
+  ---
+  duration_ms: 3.267833
+  type: 'test'
+  ...
+# Subtest: a certain rejection (Resend refused it) may be retried even after 23h
+ok 119 - a certain rejection (Resend refused it) may be retried even after 23h
+  ---
+  duration_ms: 0.979708
+  type: 'test'
+  ...
+# Subtest: uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h
+ok 120 - uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h
+  ---
+  duration_ms: 3.896417
+  type: 'test'
+  ...
+# Subtest: a shipment_status only update for a fulfilment already sent is a duplicate
+ok 121 - a shipment_status only update for a fulfilment already sent is a duplicate
+  ---
+  duration_ms: 0.8695
+  type: 'test'
+  ...
+# Subtest: ledger writes after the claim are bounded by the budget
+ok 122 - ledger writes after the claim are bounded by the budget
+  ---
+  duration_ms: 1501.734417
+  type: 'test'
+  ...
+# Subtest: Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain
+ok 123 - Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain
+  ---
+  duration_ms: 0.644542
+  type: 'test'
+  ...
+# Subtest: HMAC is computed over the raw bytes, not a re-encoded string
+ok 124 - HMAC is computed over the raw bytes, not a re-encoded string
+  ---
+  duration_ms: 0.275625
+  type: 'test'
+  ...
+# Subtest: a body that trickles in past the read deadline is refused with 408
+ok 125 - a body that trickles in past the read deadline is refused with 408
+  ---
+  duration_ms: 202.675458
+  type: 'test'
+  ...
+# Subtest: Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender
+ok 126 - Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender
+  ---
+  duration_ms: 0.604833
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent
+ok 127 - REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent
+  ---
+  duration_ms: 3.806584
+  type: 'test'
+  ...
+# Subtest: an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent
+ok 128 - an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent
+  ---
+  duration_ms: 2.184375
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed
+ok 129 - REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed
+  ---
+  duration_ms: 2.847125
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2a N2: after a certain rejection the retry renders the current data
+ok 130 - REGRESSION r2a N2: after a certain rejection the retry renders the current data
+  ---
+  duration_ms: 2.921583
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read
+ok 131 - REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read
+  ---
+  duration_ms: 0.501875
+  type: 'test'
+  ...
+# Subtest: the handler itself ignores a stored snapshot when the claim reports no uncertain attempt
+ok 132 - the handler itself ignores a stored snapshot when the claim reports no uncertain attempt
+  ---
+  duration_ms: 2.032667
+  type: 'test'
+  ...
+# Subtest: order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM
+ok 133 - order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM
+  ---
+  duration_ms: 0.179875
+  type: 'test'
+  ...
+# Subtest: a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal
+ok 134 - a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal
+  ---
+  duration_ms: 0.565291
+  type: 'test'
+  ...
+# Subtest: a duplicate renewal webhook is still skipped and sends nothing
+ok 135 - a duplicate renewal webhook is still skipped and sends nothing
+  ---
+  duration_ms: 1.213625
+  type: 'test'
+  ...
+# Subtest: the first subscription order (checkout with a selling plan line) gets the thank you email
+ok 136 - the first subscription order (checkout with a selling plan line) gets the thank you email
+  ---
+  duration_ms: 0.803167
+  type: 'test'
+  ...
+# Subtest: a one time order gets the thank you email
+ok 137 - a one time order gets the thank you email
+  ---
+  duration_ms: 3.564417
+  type: 'test'
+  ...
+# Subtest: a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row
+ok 138 - a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row
+  ---
+  duration_ms: 0.922333
+  type: 'test'
+  ...
+# Subtest: a renewal shipment with no stored order snapshot still sends from the fulfilment payload
+ok 139 - a renewal shipment with no stored order snapshot still sends from the fulfilment payload
+  ---
+  duration_ms: 0.579334
+  type: 'test'
+  ...
+# Subtest: isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals
+ok 140 - isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals
+  ---
+  duration_ms: 0.210583
+  type: 'test'
+  ...
+# Subtest: every paid order logs its origin (no PII) so the renewal rule can be checked on real orders
+ok 141 - every paid order logs its origin (no PII) so the renewal rule can be checked on real orders
+  ---
+  duration_ms: 4.392167
+  type: 'test'
+  ...
+# Subtest: REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival
+ok 142 - REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival
+  ---
+  duration_ms: 2.064334
+  type: 'test'
+  ...
+1..142
+# tests 142
+# suites 0
+# pass 140
+# fail 0
+# cancelled 2
+# skipped 0
+# todo 0
+# duration_ms 3808.507292

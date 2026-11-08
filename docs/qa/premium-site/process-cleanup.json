@@ -1,0 +1,29 @@
+{
+  "checked_at": "2026-11-08T00:50:24.739831+00:00",
+  "owned_port_checks": [
+    {
+      "port": 3987,
+      "listener": ""
+    },
+    {
+      "port": 3989,
+      "listener": ""
+    },
+    {
+      "port": 3990,
+      "listener": ""
+    },
+    {
+      "port": 3991,
+      "listener": ""
+    },
+    {
+      "port": 4101,
+      "listener": ""
+    },
+    {
+      "port": 4103,
+      "listener": ""
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 /** Product information transcribed from the supplier screenshots supplied on 10 September 2026.
- * These are ingredient statements, not complete Supplement Facts panels. Do not infer Daily Values
+ * Recovered original label panels supplement these statements in verified-label-data.json. Do not infer Daily Values
  * or undisclosed ingredient amounts. Shopify inventory and checkout remain authoritative. */
 export type SupplementDetails = {
   country: string;
@@ -36,13 +36,13 @@ export const supplementDetails: Record<string, SupplementDetails> = {
     ingredients: "Vitamin A (as retinyl acetate), Vitamin C (as ascorbic acid), Vitamin D (as cholecalciferol), Vitamin E (as dl-Alpha tocopheryl acetate), Vitamin B-6 (as pyridoxine HCl), Folate, Vitamin B-12 (as cyanocobalamin), Biotin, Pantothenic Acid (as calcium d-pantothenate), Iodine (as potassium iodide), Zinc (as zinc citrate), PABA (para-Aminobenzoic Acid), Collagen (piscine), Silicon, Glucose syrup, Sugar, Glucose, Pectin, Citric acid, Sodium citrate, Passion fruit flavor, Vegetable oil (contains carnauba wax), Purple carrot juice concentrate.",
     directions: ["Take two (2) gummies daily, or as directed by a healthcare professional."],
     cautions: ["Take only as directed. Do not exceed the suggested dosage. Pregnant or nursing mothers, children under 18, or individuals with a known medical condition should consult a physician before using this or any dietary supplement."],
-    allergens: ["Contains fish-derived (piscine) collagen.", "Manufactured and packaged in a facility that may also process milk, soy, wheat, eggs, peanuts, tree nuts, fish, and crustacean shellfish."],
+    allergens: ["Contains fish (tilapia) and tree nuts (coconut).", "Manufactured and packaged in a facility that may also process milk, soy, wheat, eggs, peanuts, tree nuts, fish, and crustacean shellfish."],
     notes: ["The product may settle during shipping. Natural colors may darken over time; this does not affect potency."],
     storage, dietary: [],
   },
   "liver-support": {
     country: "USA", contents: "60 capsules", grossWeight: "68 g",
-    ingredients: "Turmeric Powder (root); Beet Root Powder (Beta vulgaris, root); Dandelion Powder (leaf); Artichoke Extract (Cynara scolymus, whole herb, standardized to 5% Cynarin); Ginger Powder (root); Milk Thistle Powder; Alfalfa Powder (leaf); L-Cysteine Hydrochloride.",
+    ingredients: "Turmeric Powder (root); Beet Root Powder (Beta vulgaris, root); Dandelion Powder (leaf); Artichoke Extract (Cynara scolymus, whole herb, standardized to 5% Cynarin); Ginger Powder (root); Milk Thistle Powder; Alfalfa Powder (leaf); L-Cysteine Hydrochloride. Other ingredients: Hypromellose (vegetable capsule), Brown Rice Flour.",
     directions: ["As a dietary supplement, adults take two (2) capsules daily. For best results, take with 6–8 oz of water, or as directed by a healthcare professional."],
     cautions: [standardCaution], storage, dietary: ["Non-GMO"],
   },
@@ -101,13 +101,13 @@ export const supplementDetails: Record<string, SupplementDetails> = {
     country: "USA", contents: "378 g powder", netWeight: "378 g", grossWeight: "499 g", flavor: "Chocolate",
     ingredients: "Hydrolyzed Collagen Peptides (from bovine hide), Cocoa Powder, Acacia Powder, Natural Flavor, Sodium Chloride, Xanthan Gum, Stevia Extract Powder (Reb A), Silica.",
     directions: ["As a dietary supplement, adults mix two (2) scoops with 8–10 oz (236–295 ml) of a favorite beverage in a shaker cup or blender."],
-    cautions: [], storage: `${storage} Keep away from direct light.`, dietary: ["Gluten-free", "Non-GMO"],
+    cautions: [shortCaution, "This product is sold by weight, not volume. Settling may occur."], storage: `${storage} Keep away from direct light.`, dietary: ["Gluten-free", "Non-GMO"],
   },
   "hydrolyzed-collagen-peptides": {
     country: "USA", contents: "280 g powder", netWeight: "280 g", grossWeight: "376 g", flavor: "Unflavored",
     ingredients: "Bovine Hide Collagen Peptides.",
     directions: ["Add one (1) level scoop to 8–10 oz (236–295 ml) of chilled water or a preferred beverage in a shaker cup. Mix for about 5 seconds. Drink and enjoy a shake each day."],
-    cautions: [], storage, dietary: ["Gluten-free", "Lactose-free", "Corn-free"],
+    cautions: [shortCaution, "This product is sold by weight, not volume. Settling may occur."], storage, dietary: ["Gluten-free", "Lactose-free", "Corn-free"],
   },
   "colostrum-powder": {
     country: "USA", contents: "69 g powder", netWeight: "69 g", grossWeight: "114 g",
@@ -120,6 +120,6 @@ export const supplementDetails: Record<string, SupplementDetails> = {
     country: "USA", contents: "281 g powder", netWeight: "281 g", grossWeight: "281 g", flavor: "Unflavored",
     ingredients: "Creatine Monohydrate.",
     directions: ["As a dietary supplement, adults take one (1) scoop in eight (8) oz of water or juice four (4) times daily during the first five (5) days (loading phase). After the loading phase, take one (1) or two (2) times daily, or as directed by a healthcare professional."],
-    cautions: [], storage: `${storage} Keep away from direct light.`, dietary: ["Gluten-free", "Lactose-free", "Non-GMO", "Corn-free", "Vegan"],
+    cautions: [shortCaution], storage: `${storage} Keep away from direct light.`, dietary: ["Gluten-free", "Lactose-free", "Non-GMO", "Corn-free", "Vegan"],
   },
 };

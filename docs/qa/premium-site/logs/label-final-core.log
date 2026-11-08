@@ -1,0 +1,838 @@
+TAP version 13
+# Subtest: tiers: 2 units save 10%, 3 or more save 25%, and only the best tier applies
+ok 1 - tiers: 2 units save 10%, 3 or more save 25%, and only the best tier applies
+  ---
+  duration_ms: 1.099167
+  type: 'test'
+  ...
+# Subtest: nudges name the next tier and stop once the top tier is reached
+ok 2 - nudges name the next tier and stop once the top tier is reached
+  ---
+  duration_ms: 0.134958
+  type: 'test'
+  ...
+# Subtest: eligibility: all eleven approved supplements including Gut Health; retired Colon and skincare remain excluded
+ok 3 - eligibility: all eleven approved supplements including Gut Health; retired Colon and skincare remain excluded
+  ---
+  duration_ms: 0.10525
+  type: 'test'
+  ...
+# Subtest: per unit prices match Shopify's whole-cent discount truncation
+ok 4 - per unit prices match Shopify's whole-cent discount truncation
+  ---
+  duration_ms: 0.053542
+  type: 'test'
+  ...
+# Subtest: single product estimates multiply the truncated unit discount by quantity
+ok 5 - single product estimates multiply the truncated unit discount by quantity
+  ---
+  duration_ms: 0.157208
+  type: 'test'
+  ...
+# Subtest: mixed eligible lines truncate independently at the shared quantity tier
+ok 6 - mixed eligible lines truncate independently at the shared quantity tier
+  ---
+  duration_ms: 0.042541
+  type: 'test'
+  ...
+# Subtest: fractional-cent discounts never round up, including half-cent and exact-cent boundaries
+ok 7 - fractional-cent discounts never round up, including half-cent and exact-cent boundaries
+  ---
+  duration_ms: 0.085833
+  type: 'test'
+  ...
+# Subtest: bag summary shows discount rows only when Shopify's own figures reconcile to the cent
+ok 8 - bag summary shows discount rows only when Shopify's own figures reconcile to the cent
+  ---
+  duration_ms: 0.097583
+  type: 'test'
+  ...
+# Subtest: GPC blocks initialization, page, product and cart events
+ok 9 - GPC blocks initialization, page, product and cart events
+  ---
+  duration_ms: 0.926083
+  type: 'test'
+  ...
+# Subtest: standard base initializes only once and suppresses automatic configuration
+ok 10 - standard base initializes only once and suppresses automatic configuration
+  ---
+  duration_ms: 0.683333
+  type: 'test'
+  ...
+# Subtest: PageView deduplicates effect replay but tracks route/query changes and back navigation
+ok 11 - PageView deduplicates effect replay but tracks route/query changes and back navigation
+  ---
+  duration_ms: 0.115375
+  type: 'test'
+  ...
+# Subtest: account, affiliates and API routes are excluded, including nested routes
+ok 12 - account, affiliates and API routes are excluded, including nested routes
+  ---
+  duration_ms: 0.161042
+  type: 'test'
+  ...
+# Subtest: product payload uses numeric catalog variant IDs, USD and total value
+ok 13 - product payload uses numeric catalog variant IDs, USD and total value
+  ---
+  duration_ms: 1.914125
+  type: 'test'
+  ...
+# Subtest: ViewContent deduplicates repeated effects, tracks changed variants and later visits
+ok 14 - ViewContent deduplicates repeated effects, tracks changed variants and later visits
+  ---
+  duration_ms: 0.368042
+  type: 'test'
+  ...
+# Subtest: AddToCart tracks this successful request, not the full existing line
+ok 15 - AddToCart tracks this successful request, not the full existing line
+  ---
+  duration_ms: 0.211458
+  type: 'test'
+  ...
+# Subtest: expired-cart replacement still tracks the successful addition
+ok 16 - expired-cart replacement still tracks the successful addition
+  ---
+  duration_ms: 0.155459
+  type: 'test'
+  ...
+# Subtest: another tab's addition is not counted again in this request
+ok 17 - another tab's addition is not counted again in this request
+  ---
+  duration_ms: 0.23925
+  type: 'test'
+  ...
+# Subtest: no AddToCart for absent line, missing price, or invalid request quantity
+ok 18 - no AddToCart for absent line, missing price, or invalid request quantity
+  ---
+  duration_ms: 0.3045
+  type: 'test'
+  ...
+# Subtest: quantity cannot exceed the returned line if Shopify adjusts it
+ok 19 - quantity cannot exceed the returned line if Shopify adjusts it
+  ---
+  duration_ms: 0.094
+  type: 'test'
+  ...
+# Subtest: subscription additions match their selling plan and use its actual price
+ok 20 - subscription additions match their selling plan and use its actual price
+  ---
+  duration_ms: 0.078958
+  type: 'test'
+  ...
+# Subtest: the destructive suite only runs against a throwaway local database
+ok 21 - the destructive suite only runs against a throwaway local database
+  ---
+  duration_ms: 0.513041
+  type: 'test'
+  ...
+# Subtest: concurrent first claims on Postgres: exactly one winner
+ok 22 - concurrent first claims on Postgres: exactly one winner # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.081875
+  type: 'test'
+  ...
+# Subtest: concurrent reclaims of a failed row: exactly one winner, attempts incremented once
+ok 23 - concurrent reclaims of a failed row: exactly one winner, attempts incremented once # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.040208
+  type: 'test'
+  ...
+# Subtest: stale claims are reclaimable, fresh ones and sent rows are not; old token cannot finish
+ok 24 - stale claims are reclaimable, fresh ones and sent rows are not; old token cannot finish # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.091625
+  type: 'test'
+  ...
+# Subtest: end to end on Postgres: 10 concurrent orders/paid deliveries send one email and store the snapshot
+ok 25 - end to end on Postgres: 10 concurrent orders/paid deliveries send one email and store the snapshot # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.0415
+  type: 'test'
+  ...
+# Subtest: Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable
+ok 26 - Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.032791
+  type: 'test'
+  ...
+# Subtest: snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported
+ok 27 - snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.100292
+  type: 'test'
+  ...
+# Subtest: renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it
+ok 28 - renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it # SKIP ORDER_EMAILS_TEST_DATABASE_URL not set
+  ---
+  duration_ms: 0.144625
+  type: 'test'
+  ...
+# Subtest: order payload parsing uses current totals, presentment currency and drops payment data
+ok 29 - order payload parsing uses current totals, presentment currency and drops payment data
+  ---
+  duration_ms: 2.552
+  type: 'test'
+  ...
+# Subtest: receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total
+ok 30 - receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total
+  ---
+  duration_ms: 11.556209
+  type: 'test'
+  ...
+# Subtest: fulfilment readiness: tracking required, live statuses only
+ok 31 - fulfilment readiness: tracking required, live statuses only
+  ---
+  duration_ms: 0.533583
+  type: 'test'
+  ...
+# Subtest: partial detection across multiple fulfilments
+ok 32 - partial detection across multiple fulfilments
+  ---
+  duration_ms: 0.501375
+  type: 'test'
+  ...
+# Subtest: order confirmation renders every required detail
+ok 33 - order confirmation renders every required detail
+  ---
+  duration_ms: 1.686958
+  type: 'test'
+  ...
+# Subtest: email markup is table based, 600px, Outlook and dark mode aware, and only uses absolute https assets
+ok 34 - email markup is table based, 600px, Outlook and dark mode aware, and only uses absolute https assets
+  ---
+  duration_ms: 0.974959
+  type: 'test'
+  ...
+# Subtest: shipping confirmation with tracking
+ok 35 - shipping confirmation with tracking
+  ---
+  duration_ms: 0.494792
+  type: 'test'
+  ...
+# Subtest: shipping confirmation, partial shipment, no carrier URL
+ok 36 - shipping confirmation, partial shipment, no carrier URL
+  ---
+  duration_ms: 0.2965
+  type: 'test'
+  ...
+# Subtest: shipping confirmation without any tracking link still states the window and shows no tracking button
+ok 37 - shipping confirmation without any tracking link still states the window and shows no tracking button
+  ---
+  duration_ms: 0.621417
+  type: 'test'
+  ...
+# Subtest: no first name falls back to warm generic greetings
+ok 38 - no first name falls back to warm generic greetings
+  ---
+  duration_ms: 0.900083
+  type: 'test'
+  ...
+# Subtest: every dynamic value is HTML escaped (XSS)
+ok 39 - every dynamic value is HTML escaped (XSS)
+  ---
+  duration_ms: 0.639459
+  type: 'test'
+  ...
+# Subtest: brand config: env overrides, unsafe origins ignored, emails masked for logs
+ok 40 - brand config: env overrides, unsafe origins ignored, emails masked for logs
+  ---
+  duration_ms: 0.132709
+  type: 'test'
+  ...
+# Subtest: images: Storefront first, then catalog by handle or title, then placeholder
+ok 41 - images: Storefront first, then catalog by handle or title, then placeholder
+  ---
+  duration_ms: 0.143
+  type: 'test'
+  ...
+# Subtest: Storefront image lookup builds the query from variant ids and maps the response
+ok 42 - Storefront image lookup builds the query from variant ids and maps the response
+  ---
+  duration_ms: 21.279834
+  type: 'test'
+  ...
+# Subtest: HMAC helper: valid, tampered, wrong secret and missing secret
+ok 43 - HMAC helper: valid, tampered, wrong secret and missing secret
+  ---
+  duration_ms: 1.335334
+  type: 'test'
+  ...
+# Subtest: orders/paid with a valid signature sends exactly one confirmation
+ok 44 - orders/paid with a valid signature sends exactly one confirmation
+  ---
+  duration_ms: 32.541666
+  type: 'test'
+  ...
+# Subtest: ledger snapshot keeps only what the emails need (no payment or billing data)
+ok 45 - ledger snapshot keeps only what the emails need (no payment or billing data)
+  ---
+  duration_ms: 1.1915
+  type: 'test'
+  ...
+# Subtest: rejects bad signature, wrong shop and missing secret without sending
+ok 46 - rejects bad signature, wrong shop and missing secret without sending
+  ---
+  duration_ms: 0.440667
+  type: 'test'
+  ...
+# Subtest: unknown topics are acknowledged and ignored; oversized bodies are refused
+ok 47 - unknown topics are acknowledged and ignored; oversized bodies are refused
+  ---
+  duration_ms: 5.647375
+  type: 'test'
+  ...
+# Subtest: fails closed with 503 when the database or Resend is not configured
+ok 48 - fails closed with 503 when the database or Resend is not configured
+  ---
+  duration_ms: 0.301583
+  type: 'test'
+  ...
+# Subtest: duplicate delivery of the same order sends once
+ok 49 - duplicate delivery of the same order sends once
+  ---
+  duration_ms: 0.989291
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate deliveries result in exactly one send
+ok 50 - concurrent duplicate deliveries result in exactly one send
+  ---
+  duration_ms: 53.379542
+  type: 'test'
+  ...
+# Subtest: a stale sending claim is reclaimed and sent; a fresh one is not
+ok 51 - a stale sending claim is reclaimed and sent; a fresh one is not
+  ---
+  duration_ms: 0.899666
+  type: 'test'
+  ...
+# Subtest: transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key
+ok 52 - transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key
+  ---
+  duration_ms: 0.99775
+  type: 'test'
+  ...
+# Subtest: a hung Resend call is cut off inside the budget and retried later
+ok 53 - a hung Resend call is cut off inside the budget and retried later
+  ---
+  duration_ms: 1501.113708
+  type: 'test'
+  ...
+# Subtest: a permanent Resend rejection is recorded and acknowledged (no endless retries)
+ok 54 - a permanent Resend rejection is recorded and acknowledged (no endless retries)
+  ---
+  duration_ms: 0.905041
+  type: 'test'
+  ...
+# Subtest: an order without an email is skipped durably and never retried
+ok 55 - an order without an email is skipped durably and never retried
+  ---
+  duration_ms: 0.337542
+  type: 'test'
+  ...
+# Subtest: Shopify test orders still send and are flagged in logs
+ok 56 - Shopify test orders still send and are flagged in logs
+  ---
+  duration_ms: 0.752583
+  type: 'test'
+  ...
+# Subtest: logs never contain a full email address or the secret
+ok 57 - logs never contain a full email address or the secret
+  ---
+  duration_ms: 1.013125
+  type: 'test'
+  ...
+# Subtest: fulfilment without tracking waits; the update that adds tracking sends; later tracking changes do not resend
+ok 58 - fulfilment without tracking waits; the update that adds tracking sends; later tracking changes do not resend
+  ---
+  duration_ms: 0.698333
+  type: 'test'
+  ...
+# Subtest: create and update for the same fulfilment arriving together send once
+ok 59 - create and update for the same fulfilment arriving together send once
+  ---
+  duration_ms: 61.670958
+  type: 'test'
+  ...
+# Subtest: cancelled, error, failure and pending fulfilments never send
+ok 60 - cancelled, error, failure and pending fulfilments never send
+  ---
+  duration_ms: 0.429333
+  type: 'test'
+  ...
+# Subtest: partial fulfilment lists only its items and says the rest will follow; the final shipment does not
+ok 61 - partial fulfilment lists only its items and says the rest will follow; the final shipment does not
+  ---
+  duration_ms: 1.092125
+  type: 'test'
+  ...
+# Subtest: shipping email reuses the stored snapshot (name, subscription label, images)
+ok 62 - shipping email reuses the stored snapshot (name, subscription label, images)
+  ---
+  duration_ms: 0.5745
+  type: 'test'
+  ...
+# Subtest: shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address
+ok 63 - shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address
+  ---
+  duration_ms: 0.428041
+  type: 'test'
+  ...
+# Subtest: a failing Admin or Storefront lookup never blocks the email
+ok 64 - a failing Admin or Storefront lookup never blocks the email
+  ---
+  duration_ms: 0.511917
+  type: 'test'
+  ...
+# Subtest: a database outage before the claim returns 503 and sends nothing
+ok 65 - a database outage before the claim returns 503 and sends nothing
+  ---
+  duration_ms: 0.147959
+  type: 'test'
+  ...
+# Subtest: REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email
+ok 66 - REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email
+  ---
+  duration_ms: 0.418875
+  type: 'test'
+  ...
+# Subtest: markSent is retried once, so a single lost update still records `sent`
+ok 67 - markSent is retried once, so a single lost update still records `sent`
+  ---
+  duration_ms: 0.481
+  type: 'test'
+  ...
+# Subtest: within Resend's window a stale `sending` row is retried with the same key and the same body
+ok 68 - within Resend's window a stale `sending` row is retried with the same key and the same body
+  ---
+  duration_ms: 0.813334
+  type: 'test'
+  ...
+# Subtest: an uncertain failure (timeout) is retried inside 23h but never after
+ok 69 - an uncertain failure (timeout) is retried inside 23h but never after
+  ---
+  duration_ms: 0.978
+  type: 'test'
+  ...
+# Subtest: a certain rejection (Resend refused it) may be retried even after 23h
+ok 70 - a certain rejection (Resend refused it) may be retried even after 23h
+  ---
+  duration_ms: 0.208209
+  type: 'test'
+  ...
+# Subtest: uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h
+ok 71 - uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h
+  ---
+  duration_ms: 0.284291
+  type: 'test'
+  ...
+# Subtest: a shipment_status only update for a fulfilment already sent is a duplicate
+ok 72 - a shipment_status only update for a fulfilment already sent is a duplicate
+  ---
+  duration_ms: 0.263833
+  type: 'test'
+  ...
+# Subtest: ledger writes after the claim are bounded by the budget
+ok 73 - ledger writes after the claim are bounded by the budget
+  ---
+  duration_ms: 1501.654292
+  type: 'test'
+  ...
+# Subtest: Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain
+ok 74 - Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain
+  ---
+  duration_ms: 0.418458
+  type: 'test'
+  ...
+# Subtest: HMAC is computed over the raw bytes, not a re-encoded string
+ok 75 - HMAC is computed over the raw bytes, not a re-encoded string
+  ---
+  duration_ms: 0.156208
+  type: 'test'
+  ...
+# Subtest: a body that trickles in past the read deadline is refused with 408
+ok 76 - a body that trickles in past the read deadline is refused with 408
+  ---
+  duration_ms: 201.033084
+  type: 'test'
+  ...
+# Subtest: Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender
+ok 77 - Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender
+  ---
+  duration_ms: 0.398791
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent
+ok 78 - REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent
+  ---
+  duration_ms: 2.427875
+  type: 'test'
+  ...
+# Subtest: an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent
+ok 79 - an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent
+  ---
+  duration_ms: 1.648167
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed
+ok 80 - REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed
+  ---
+  duration_ms: 1.773333
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2a N2: after a certain rejection the retry renders the current data
+ok 81 - REGRESSION r2a N2: after a certain rejection the retry renders the current data
+  ---
+  duration_ms: 1.472417
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read
+ok 82 - REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read
+  ---
+  duration_ms: 0.265375
+  type: 'test'
+  ...
+# Subtest: the handler itself ignores a stored snapshot when the claim reports no uncertain attempt
+ok 83 - the handler itself ignores a stored snapshot when the claim reports no uncertain attempt
+  ---
+  duration_ms: 1.262875
+  type: 'test'
+  ...
+# Subtest: order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM
+ok 84 - order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM
+  ---
+  duration_ms: 0.1395
+  type: 'test'
+  ...
+# Subtest: a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal
+ok 85 - a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal
+  ---
+  duration_ms: 0.29175
+  type: 'test'
+  ...
+# Subtest: a duplicate renewal webhook is still skipped and sends nothing
+ok 86 - a duplicate renewal webhook is still skipped and sends nothing
+  ---
+  duration_ms: 0.4695
+  type: 'test'
+  ...
+# Subtest: the first subscription order (checkout with a selling plan line) gets the thank you email
+ok 87 - the first subscription order (checkout with a selling plan line) gets the thank you email
+  ---
+  duration_ms: 0.557334
+  type: 'test'
+  ...
+# Subtest: a one time order gets the thank you email
+ok 88 - a one time order gets the thank you email
+  ---
+  duration_ms: 0.664375
+  type: 'test'
+  ...
+# Subtest: a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row
+ok 89 - a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row
+  ---
+  duration_ms: 0.487042
+  type: 'test'
+  ...
+# Subtest: a renewal shipment with no stored order snapshot still sends from the fulfilment payload
+ok 90 - a renewal shipment with no stored order snapshot still sends from the fulfilment payload
+  ---
+  duration_ms: 0.22025
+  type: 'test'
+  ...
+# Subtest: isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals
+ok 91 - isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals
+  ---
+  duration_ms: 0.212917
+  type: 'test'
+  ...
+# Subtest: every paid order logs its origin (no PII) so the renewal rule can be checked on real orders
+ok 92 - every paid order logs its origin (no PII) so the renewal rule can be checked on real orders
+  ---
+  duration_ms: 0.817667
+  type: 'test'
+  ...
+# Subtest: REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival
+ok 93 - REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival
+  ---
+  duration_ms: 0.505792
+  type: 'test'
+  ...
+# Subtest: orderable means live, not coming soon or unpriced, with an available variant
+ok 94 - orderable means live, not coming soon or unpriced, with an available variant
+  ---
+  duration_ms: 0.602875
+  type: 'test'
+  ...
+# Subtest: guide sections name real formats and handles, and each has an orderable product live
+ok 95 - guide sections name real formats and handles, and each has an orderable product live
+  ---
+  duration_ms: 0.355792
+  type: 'test'
+  ...
+# Subtest: guide product links fail closed for preview, outage, sold-out, placeholder and skincare products
+ok 96 - guide product links fail closed for preview, outage, sold-out, placeholder and skincare products
+  ---
+  duration_ms: 0.866625
+  type: 'test'
+  ...
+# Subtest: product pages link back to exactly the guides that link to them
+ok 97 - product pages link back to exactly the guides that link to them
+  ---
+  duration_ms: 0.660709
+  type: 'test'
+  ...
+# Subtest: format selection lists only formats that can be ordered now
+ok 98 - format selection lists only formats that can be ordered now
+  ---
+  duration_ms: 0.116791
+  type: 'test'
+  ...
+# Subtest: the shipping statement is the owner's 3 to 5 day window, with checkout-calculated options
+ok 99 - the shipping statement is the owner's 3 to 5 day window, with checkout-calculated options
+  ---
+  duration_ms: 0.186167
+  type: 'test'
+  ...
+# Subtest: finding-your-supplement-format: direct answer, placement and supporting source
+ok 100 - finding-your-supplement-format: direct answer, placement and supporting source
+  ---
+  duration_ms: 1.114917
+  type: 'test'
+  ...
+# Subtest: a-simple-skincare-routine: direct answer, placement and supporting source
+ok 101 - a-simple-skincare-routine: direct answer, placement and supporting source
+  ---
+  duration_ms: 0.206292
+  type: 'test'
+  ...
+# Subtest: complete existing journal articles remain identical outside the approved added answers and AAD citation
+ok 102 - complete existing journal articles remain identical outside the approved added answers and AAD citation
+  ---
+  duration_ms: 1.127
+  type: 'test'
+  ...
+# Subtest: IndexNow public verification file has exact key bytes and stays out of the sitemap
+ok 103 - IndexNow public verification file has exact key bytes and stays out of the sitemap
+  ---
+  duration_ms: 0.751292
+  type: 'test'
+  ...
+# Subtest: only the production deployment on www.iqondaily.com is indexable
+ok 104 - only the production deployment on www.iqondaily.com is indexable
+  ---
+  duration_ms: 0.089666
+  type: 'test'
+  ...
+# Subtest: catalog-dependent pages fail closed unless Shopify is live
+ok 105 - catalog-dependent pages fail closed unless Shopify is live
+  ---
+  duration_ms: 0.12925
+  type: 'test'
+  ...
+# Subtest: only Shopify-backed products are listed
+ok 106 - only Shopify-backed products are listed
+  ---
+  duration_ms: 0.059375
+  type: 'test'
+  ...
+# Subtest: metadata always canonicalizes to www and noindexes non-canonical copies
+ok 107 - metadata always canonicalizes to www and noindexes non-canonical copies
+  ---
+  duration_ms: 0.122583
+  type: 'test'
+  ...
+# Subtest: robots.txt: canonical lists sitemap and private exclusions, aliases omit sitemap, previews block all
+ok 108 - robots.txt: canonical lists sitemap and private exclusions, aliases omit sitemap, previews block all
+  ---
+  duration_ms: 0.310375
+  type: 'test'
+  ...
+# Subtest: sitemap lists canonical 200 pages only
+ok 109 - sitemap lists canonical 200 pages only
+  ---
+  duration_ms: 0.413542
+  type: 'test'
+  ...
+# Subtest: Product JSON-LD mirrors visible facts and invents nothing
+ok 110 - Product JSON-LD mirrors visible facts and invents nothing
+  ---
+  duration_ms: 0.178125
+  type: 'test'
+  ...
+# Subtest: Article JSON-LD has no fabricated dates or people
+ok 111 - Article JSON-LD has no fabricated dates or people
+  ---
+  duration_ms: 0.074875
+  type: 'test'
+  ...
+# Subtest: journal article titles name the journal, not "Latest News"
+ok 112 - journal article titles name the journal, not "Latest News"
+  ---
+  duration_ms: 0.114208
+  type: 'test'
+  ...
+# Subtest: Organization contact is the owner-approved support inbox only
+ok 113 - Organization contact is the owner-approved support inbox only
+  ---
+  duration_ms: 0.070458
+  type: 'test'
+  ...
+# Subtest: JSON-LD cannot break out of its script element
+ok 114 - JSON-LD cannot break out of its script element
+  ---
+  duration_ms: 0.033375
+  type: 'test'
+  ...
+# Subtest: all five mappings load the matching published Shopify JSON and preserve sanitized content
+ok 115 - all five mappings load the matching published Shopify JSON and preserve sanitized content
+  ---
+  duration_ms: 7.537792
+  type: 'test'
+  ...
+# Subtest: unknown slugs never make a request
+ok 116 - unknown slugs never make a request
+  ---
+  duration_ms: 0.069541
+  type: 'test'
+  ...
+# Subtest: HTTP, network, timeout, malformed, mismatched and empty policies fail closed
+ok 117 - HTTP, network, timeout, malformed, mismatched and empty policies fail closed
+  ---
+  duration_ms: 2.056416
+  type: 'test'
+  ...
+# Subtest: response size is bounded even without Content-Length; oversized streams are cancelled
+ok 118 - response size is bounded even without Content-Length; oversized streams are cancelled
+  ---
+  duration_ms: 0.433959
+  type: 'test'
+  ...
+# Subtest: concurrent reads coalesce, content expires, failures replace stale content and retry shortly
+ok 119 - concurrent reads coalesce, content expires, failures replace stale content and retry shortly
+  ---
+  duration_ms: 0.373
+  type: 'test'
+  ...
+# Subtest: sanitization removes executable markup, CSS, tracking and unsafe links while keeping accessible policy structure
+ok 120 - sanitization removes executable markup, CSS, tracking and unsafe links while keeping accessible policy structure
+  ---
+  duration_ms: 43.731625
+  type: 'test'
+  ...
+# Subtest: the fetch deadline also aborts a stalled response body
+ok 121 - the fetch deadline also aborts a stalled response body
+  ---
+  duration_ms: 5006.072
+  type: 'test'
+  ...
+# Subtest: skincare preservation: app/skincare/skincare-sections.tsx
+ok 122 - skincare preservation: app/skincare/skincare-sections.tsx
+  ---
+  duration_ms: 1.672125
+  type: 'test'
+  ...
+# Subtest: skincare preservation: app/skincare/skincare.css
+ok 123 - skincare preservation: app/skincare/skincare.css
+  ---
+  duration_ms: 0.696375
+  type: 'test'
+  ...
+# Subtest: skincare preservation: components/ui/slider.tsx
+ok 124 - skincare preservation: components/ui/slider.tsx
+  ---
+  duration_ms: 0.666166
+  type: 'test'
+  ...
+# Subtest: skincare preservation: lib/skincare-results.ts
+ok 125 - skincare preservation: lib/skincare-results.ts
+  ---
+  duration_ms: 0.346333
+  type: 'test'
+  ...
+# Subtest: skincare preservation: lib/skincare-design-preview.ts
+ok 126 - skincare preservation: lib/skincare-design-preview.ts
+  ---
+  duration_ms: 0.291375
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-eye-before-v11.webp
+ok 127 - skincare preservation: public/images/editorial/skin-detail-eye-before-v11.webp
+  ---
+  duration_ms: 0.68225
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-texture-after-v11.webp
+ok 128 - skincare preservation: public/images/editorial/skin-detail-texture-after-v11.webp
+  ---
+  duration_ms: 0.468167
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-texture-before-v11.webp
+ok 129 - skincare preservation: public/images/editorial/skin-detail-texture-before-v11.webp
+  ---
+  duration_ms: 0.639333
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-tone-before-v11.webp
+ok 130 - skincare preservation: public/images/editorial/skin-detail-tone-before-v11.webp
+  ---
+  duration_ms: 1.123666
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-tone-after-v11.webp
+ok 131 - skincare preservation: public/images/editorial/skin-detail-tone-after-v11.webp
+  ---
+  duration_ms: 0.941542
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-cheek-after-v11.webp
+ok 132 - skincare preservation: public/images/editorial/skin-detail-cheek-after-v11.webp
+  ---
+  duration_ms: 0.741083
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-eye-after-v11.webp
+ok 133 - skincare preservation: public/images/editorial/skin-detail-eye-after-v11.webp
+  ---
+  duration_ms: 0.463625
+  type: 'test'
+  ...
+# Subtest: skincare preservation: public/images/editorial/skin-detail-cheek-before-v11.webp
+ok 134 - skincare preservation: public/images/editorial/skin-detail-cheek-before-v11.webp
+  ---
+  duration_ms: 0.380333
+  type: 'test'
+  ...
+# Subtest: skincare home retains its illustrative comparison and approved results
+ok 135 - skincare home retains its illustrative comparison and approved results
+  ---
+  duration_ms: 1.024292
+  type: 'test'
+  ...
+# Subtest: recovered panel distinguishes scoop mass, active mass and servings from duration
+ok 136 - recovered panel distinguishes scoop mass, active mass and servings from duration
+  ---
+  duration_ms: 0.614084
+  type: 'test'
+  ...
+# Subtest: per serving value follows the canonical current price and currency
+ok 137 - per serving value follows the canonical current price and currency
+  ---
+  duration_ms: 10.469791
+  type: 'test'
+  ...
+# Subtest: alternate packs, variants and unknown prices never inherit a serving cost
+ok 138 - alternate packs, variants and unknown prices never inherit a serving cost
+  ---
+  duration_ms: 0.217292
+  type: 'test'
+  ...
+1..138
+# tests 138
+# suites 0
+# pass 131
+# fail 0
+# cancelled 0
+# skipped 7
+# todo 0
+# duration_ms 5941.651875

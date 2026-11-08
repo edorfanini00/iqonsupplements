@@ -1,0 +1,449 @@
+account-test-db: owned cluster on 127.0.0.1:27710 database account_sessions_1794097932_20673
+TAP version 13
+# Subtest: the destructive suite only runs against a throwaway local database
+ok 1 - the destructive suite only runs against a throwaway local database
+  ---
+  duration_ms: 38.023042
+  type: 'test'
+  ...
+# Subtest: concurrent first claims on Postgres: exactly one winner
+ok 2 - concurrent first claims on Postgres: exactly one winner
+  ---
+  duration_ms: 29.389042
+  type: 'test'
+  ...
+# Subtest: concurrent reclaims of a failed row: exactly one winner, attempts incremented once
+ok 3 - concurrent reclaims of a failed row: exactly one winner, attempts incremented once
+  ---
+  duration_ms: 7.13075
+  type: 'test'
+  ...
+# Subtest: stale claims are reclaimable, fresh ones and sent rows are not; old token cannot finish
+ok 4 - stale claims are reclaimable, fresh ones and sent rows are not; old token cannot finish
+  ---
+  duration_ms: 6.88175
+  type: 'test'
+  ...
+# Subtest: end to end on Postgres: 10 concurrent orders/paid deliveries send one email and store the snapshot
+ok 5 - end to end on Postgres: 10 concurrent orders/paid deliveries send one email and store the snapshot
+  ---
+  duration_ms: 68.219667
+  type: 'test'
+  ...
+# Subtest: Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable
+ok 6 - Resend window on Postgres: uncertain rows expire to sent_unconfirmed after 23h, certain failures stay retryable
+  ---
+  duration_ms: 10.626542
+  type: 'test'
+  ...
+# Subtest: snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported
+ok 7 - snapshot on Postgres: replaced after a certain failure, kept after an uncertain one; previous error reported
+  ---
+  duration_ms: 3.158125
+  type: 'test'
+  ...
+# Subtest: renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it
+ok 8 - renewal on Postgres: confirmation row skipped with its snapshot, the shipment email still sends from it
+  ---
+  duration_ms: 5.163791
+  type: 'test'
+  ...
+# Subtest: order payload parsing uses current totals, presentment currency and drops payment data
+ok 9 - order payload parsing uses current totals, presentment currency and drops payment data
+  ---
+  duration_ms: 1.434209
+  type: 'test'
+  ...
+# Subtest: receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total
+ok 10 - receipt totals add up: subtotal minus discounts plus shipping plus tax (unless included) equals total
+  ---
+  duration_ms: 8.763
+  type: 'test'
+  ...
+# Subtest: fulfilment readiness: tracking required, live statuses only
+ok 11 - fulfilment readiness: tracking required, live statuses only
+  ---
+  duration_ms: 0.329958
+  type: 'test'
+  ...
+# Subtest: partial detection across multiple fulfilments
+ok 12 - partial detection across multiple fulfilments
+  ---
+  duration_ms: 0.356666
+  type: 'test'
+  ...
+# Subtest: order confirmation renders every required detail
+ok 13 - order confirmation renders every required detail
+  ---
+  duration_ms: 1.277958
+  type: 'test'
+  ...
+# Subtest: email markup is table based, 600px, Outlook and dark mode aware, and only uses absolute https assets
+ok 14 - email markup is table based, 600px, Outlook and dark mode aware, and only uses absolute https assets
+  ---
+  duration_ms: 0.711125
+  type: 'test'
+  ...
+# Subtest: shipping confirmation with tracking
+ok 15 - shipping confirmation with tracking
+  ---
+  duration_ms: 0.483625
+  type: 'test'
+  ...
+# Subtest: shipping confirmation, partial shipment, no carrier URL
+ok 16 - shipping confirmation, partial shipment, no carrier URL
+  ---
+  duration_ms: 0.288833
+  type: 'test'
+  ...
+# Subtest: shipping confirmation without any tracking link still states the window and shows no tracking button
+ok 17 - shipping confirmation without any tracking link still states the window and shows no tracking button
+  ---
+  duration_ms: 0.746458
+  type: 'test'
+  ...
+# Subtest: no first name falls back to warm generic greetings
+ok 18 - no first name falls back to warm generic greetings
+  ---
+  duration_ms: 0.726917
+  type: 'test'
+  ...
+# Subtest: every dynamic value is HTML escaped (XSS)
+ok 19 - every dynamic value is HTML escaped (XSS)
+  ---
+  duration_ms: 0.513792
+  type: 'test'
+  ...
+# Subtest: brand config: env overrides, unsafe origins ignored, emails masked for logs
+ok 20 - brand config: env overrides, unsafe origins ignored, emails masked for logs
+  ---
+  duration_ms: 0.096084
+  type: 'test'
+  ...
+# Subtest: images: Storefront first, then catalog by handle or title, then placeholder
+ok 21 - images: Storefront first, then catalog by handle or title, then placeholder
+  ---
+  duration_ms: 0.101792
+  type: 'test'
+  ...
+# Subtest: Storefront image lookup builds the query from variant ids and maps the response
+ok 22 - Storefront image lookup builds the query from variant ids and maps the response
+  ---
+  duration_ms: 14.805625
+  type: 'test'
+  ...
+# Subtest: HMAC helper: valid, tampered, wrong secret and missing secret
+ok 23 - HMAC helper: valid, tampered, wrong secret and missing secret
+  ---
+  duration_ms: 0.914791
+  type: 'test'
+  ...
+# Subtest: orders/paid with a valid signature sends exactly one confirmation
+ok 24 - orders/paid with a valid signature sends exactly one confirmation
+  ---
+  duration_ms: 26.134666
+  type: 'test'
+  ...
+# Subtest: ledger snapshot keeps only what the emails need (no payment or billing data)
+ok 25 - ledger snapshot keeps only what the emails need (no payment or billing data)
+  ---
+  duration_ms: 0.7675
+  type: 'test'
+  ...
+# Subtest: rejects bad signature, wrong shop and missing secret without sending
+ok 26 - rejects bad signature, wrong shop and missing secret without sending
+  ---
+  duration_ms: 0.338334
+  type: 'test'
+  ...
+# Subtest: unknown topics are acknowledged and ignored; oversized bodies are refused
+ok 27 - unknown topics are acknowledged and ignored; oversized bodies are refused
+  ---
+  duration_ms: 4.966791
+  type: 'test'
+  ...
+# Subtest: fails closed with 503 when the database or Resend is not configured
+ok 28 - fails closed with 503 when the database or Resend is not configured
+  ---
+  duration_ms: 0.326542
+  type: 'test'
+  ...
+# Subtest: duplicate delivery of the same order sends once
+ok 29 - duplicate delivery of the same order sends once
+  ---
+  duration_ms: 0.936125
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate deliveries result in exactly one send
+ok 30 - concurrent duplicate deliveries result in exactly one send
+  ---
+  duration_ms: 52.506167
+  type: 'test'
+  ...
+# Subtest: a stale sending claim is reclaimed and sent; a fresh one is not
+ok 31 - a stale sending claim is reclaimed and sent; a fresh one is not
+  ---
+  duration_ms: 0.943833
+  type: 'test'
+  ...
+# Subtest: transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key
+ok 32 - transient send failure releases the claim, returns 503, and the retry sends with the same idempotency key
+  ---
+  duration_ms: 1.061541
+  type: 'test'
+  ...
+# Subtest: a hung Resend call is cut off inside the budget and retried later
+ok 33 - a hung Resend call is cut off inside the budget and retried later
+  ---
+  duration_ms: 1499.648375
+  type: 'test'
+  ...
+# Subtest: a permanent Resend rejection is recorded and acknowledged (no endless retries)
+ok 34 - a permanent Resend rejection is recorded and acknowledged (no endless retries)
+  ---
+  duration_ms: 0.873375
+  type: 'test'
+  ...
+# Subtest: an order without an email is skipped durably and never retried
+ok 35 - an order without an email is skipped durably and never retried
+  ---
+  duration_ms: 0.335375
+  type: 'test'
+  ...
+# Subtest: Shopify test orders still send and are flagged in logs
+ok 36 - Shopify test orders still send and are flagged in logs
+  ---
+  duration_ms: 0.53725
+  type: 'test'
+  ...
+# Subtest: logs never contain a full email address or the secret
+ok 37 - logs never contain a full email address or the secret
+  ---
+  duration_ms: 1.011916
+  type: 'test'
+  ...
+# Subtest: fulfilment without tracking waits; the update that adds tracking sends; later tracking changes do not resend
+ok 38 - fulfilment without tracking waits; the update that adds tracking sends; later tracking changes do not resend
+  ---
+  duration_ms: 0.849
+  type: 'test'
+  ...
+# Subtest: create and update for the same fulfilment arriving together send once
+ok 39 - create and update for the same fulfilment arriving together send once
+  ---
+  duration_ms: 62.428334
+  type: 'test'
+  ...
+# Subtest: cancelled, error, failure and pending fulfilments never send
+ok 40 - cancelled, error, failure and pending fulfilments never send
+  ---
+  duration_ms: 0.390542
+  type: 'test'
+  ...
+# Subtest: partial fulfilment lists only its items and says the rest will follow; the final shipment does not
+ok 41 - partial fulfilment lists only its items and says the rest will follow; the final shipment does not
+  ---
+  duration_ms: 1.062
+  type: 'test'
+  ...
+# Subtest: shipping email reuses the stored snapshot (name, subscription label, images)
+ok 42 - shipping email reuses the stored snapshot (name, subscription label, images)
+  ---
+  duration_ms: 0.580834
+  type: 'test'
+  ...
+# Subtest: shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address
+ok 43 - shipping email with no recipient anywhere is skipped; with the Admin API it recovers the address
+  ---
+  duration_ms: 0.414125
+  type: 'test'
+  ...
+# Subtest: a failing Admin or Storefront lookup never blocks the email
+ok 44 - a failing Admin or Storefront lookup never blocks the email
+  ---
+  duration_ms: 0.5215
+  type: 'test'
+  ...
+# Subtest: a database outage before the claim returns 503 and sends nothing
+ok 45 - a database outage before the claim returns 503 and sends nothing
+  ---
+  duration_ms: 0.135625
+  type: 'test'
+  ...
+# Subtest: REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email
+ok 46 - REGRESSION r1a B1: markSent lost, 3 days later a shipment_status update arrives: exactly one shipping email
+  ---
+  duration_ms: 0.357625
+  type: 'test'
+  ...
+# Subtest: markSent is retried once, so a single lost update still records `sent`
+ok 47 - markSent is retried once, so a single lost update still records `sent`
+  ---
+  duration_ms: 0.407875
+  type: 'test'
+  ...
+# Subtest: within Resend's window a stale `sending` row is retried with the same key and the same body
+ok 48 - within Resend's window a stale `sending` row is retried with the same key and the same body
+  ---
+  duration_ms: 0.801333
+  type: 'test'
+  ...
+# Subtest: an uncertain failure (timeout) is retried inside 23h but never after
+ok 49 - an uncertain failure (timeout) is retried inside 23h but never after
+  ---
+  duration_ms: 0.908291
+  type: 'test'
+  ...
+# Subtest: a certain rejection (Resend refused it) may be retried even after 23h
+ok 50 - a certain rejection (Resend refused it) may be retried even after 23h
+  ---
+  duration_ms: 0.213125
+  type: 'test'
+  ...
+# Subtest: uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h
+ok 51 - uncertainty is sticky: a stale reclaim followed by a certain rejection still never sends after 23h
+  ---
+  duration_ms: 1.064167
+  type: 'test'
+  ...
+# Subtest: a shipment_status only update for a fulfilment already sent is a duplicate
+ok 52 - a shipment_status only update for a fulfilment already sent is a duplicate
+  ---
+  duration_ms: 0.302208
+  type: 'test'
+  ...
+# Subtest: ledger writes after the claim are bounded by the budget
+ok 53 - ledger writes after the claim are bounded by the budget
+  ---
+  duration_ms: 1502.715958
+  type: 'test'
+  ...
+# Subtest: Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain
+ok 54 - Resend errors: setup problems retry, payload problems are permanent, server errors are uncertain
+  ---
+  duration_ms: 0.843083
+  type: 'test'
+  ...
+# Subtest: HMAC is computed over the raw bytes, not a re-encoded string
+ok 55 - HMAC is computed over the raw bytes, not a re-encoded string
+  ---
+  duration_ms: 0.402209
+  type: 'test'
+  ...
+# Subtest: a body that trickles in past the read deadline is refused with 408
+ok 56 - a body that trickles in past the read deadline is refused with 408
+  ---
+  duration_ms: 201.397458
+  type: 'test'
+  ...
+# Subtest: Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender
+ok 57 - Resend invalid_idempotent_request is reported as a conflict, never as sent, by the sender
+  ---
+  duration_ms: 0.861209
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent
+ok 58 - REGRESSION r2a N1: an idempotency conflict without an earlier uncertain attempt is uncertain, not sent
+  ---
+  duration_ms: 4.448084
+  type: 'test'
+  ...
+# Subtest: an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent
+ok 59 - an idempotency conflict after an uncertain attempt means Resend accepted it: recorded as sent
+  ---
+  duration_ms: 2.407625
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed
+ok 60 - REGRESSION r2b NB3: after an uncertain attempt the retry replays the stored body even if the payload changed
+  ---
+  duration_ms: 2.364875
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2a N2: after a certain rejection the retry renders the current data
+ok 61 - REGRESSION r2a N2: after a certain rejection the retry renders the current data
+  ---
+  duration_ms: 1.890833
+  type: 'test'
+  ...
+# Subtest: REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read
+ok 62 - REGRESSION r2b NB4: the 4s budget starts when the request arrived, not after the body read
+  ---
+  duration_ms: 0.396959
+  type: 'test'
+  ...
+# Subtest: the handler itself ignores a stored snapshot when the claim reports no uncertain attempt
+ok 63 - the handler itself ignores a stored snapshot when the claim reports no uncertain attempt
+  ---
+  duration_ms: 1.58875
+  type: 'test'
+  ...
+# Subtest: order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM
+ok 64 - order emails default to the owner approved sender and ignore the shared SUPPLEMENTS_EMAIL_FROM
+  ---
+  duration_ms: 0.14325
+  type: 'test'
+  ...
+# Subtest: a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal
+ok 65 - a subscription renewal order is skipped durably: no email, row skipped with reason subscription_renewal
+  ---
+  duration_ms: 0.337917
+  type: 'test'
+  ...
+# Subtest: a duplicate renewal webhook is still skipped and sends nothing
+ok 66 - a duplicate renewal webhook is still skipped and sends nothing
+  ---
+  duration_ms: 0.607917
+  type: 'test'
+  ...
+# Subtest: the first subscription order (checkout with a selling plan line) gets the thank you email
+ok 67 - the first subscription order (checkout with a selling plan line) gets the thank you email
+  ---
+  duration_ms: 0.596541
+  type: 'test'
+  ...
+# Subtest: a one time order gets the thank you email
+ok 68 - a one time order gets the thank you email
+  ---
+  duration_ms: 0.562708
+  type: 'test'
+  ...
+# Subtest: a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row
+ok 69 - a renewal shipment still gets its shipping email, using the snapshot stored with the skipped row
+  ---
+  duration_ms: 0.423042
+  type: 'test'
+  ...
+# Subtest: a renewal shipment with no stored order snapshot still sends from the fulfilment payload
+ok 70 - a renewal shipment with no stored order snapshot still sends from the fulfilment payload
+  ---
+  duration_ms: 0.212959
+  type: 'test'
+  ...
+# Subtest: isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals
+ok 71 - isSubscriptionRenewal: billing attempt source names and the recurring tag; checkout and API orders are not renewals
+  ---
+  duration_ms: 0.144041
+  type: 'test'
+  ...
+# Subtest: every paid order logs its origin (no PII) so the renewal rule can be checked on real orders
+ok 72 - every paid order logs its origin (no PII) so the renewal rule can be checked on real orders
+  ---
+  duration_ms: 0.825167
+  type: 'test'
+  ...
+# Subtest: REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival
+ok 73 - REGRESSION r3b NB2: body read deadline is 1s and the route measures the budget from request arrival
+  ---
+  duration_ms: 0.829041
+  type: 'test'
+  ...
+1..73
+# tests 73
+# suites 0
+# pass 73
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3520.156

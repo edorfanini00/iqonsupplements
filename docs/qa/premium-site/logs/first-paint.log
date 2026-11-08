@@ -1,0 +1,41 @@
+[
+  { route: '/', width: 390, cls: 0.00010730146011396012 },
+  {
+    route: '/collections/supplements',
+    width: 390,
+    cls: 0.07624253412867997
+  },
+  {
+    route: '/products/colostrum-powder',
+    width: 390,
+    cls: 0.00004467948717948718
+  },
+  { route: '/approach', width: 390, cls: 0.00004467948717948718 },
+  { route: '/help', width: 390, cls: 0.048994541785375115 },
+  { route: '/', width: 761, cls: 0.0006376020272626985 },
+  {
+    route: '/collections/supplements',
+    width: 761,
+    cls: 0.0017269488347852891
+  },
+  {
+    route: '/products/colostrum-powder',
+    width: 761,
+    cls: 0.0008453360486526824
+  },
+  { route: '/approach', width: 761, cls: 0.014457202288249704 },
+  { route: '/help', width: 761, cls: 0.06748540556407262 },
+  { route: '/', width: 1440, cls: 0.0026191872595432526 },
+  {
+    route: '/collections/supplements',
+    width: 1440,
+    cls: 0.0006946168917850865
+  },
+  {
+    route: '/products/colostrum-powder',
+    width: 1440,
+    cls: 0.00035293570729113085
+  },
+  { route: '/approach', width: 1440, cls: 0.00752597468707133 },
+  { route: '/help', width: 1440, cls: 0.017051900772073796 }
+]

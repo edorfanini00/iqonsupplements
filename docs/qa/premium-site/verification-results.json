@@ -1,0 +1,173 @@
+{
+  "application_head": "539d0b8",
+  "fixture_test_head": "a4969f8f572caf34d3c6a6abdd0804db5bd39f59",
+  "base": "468996c53d6fde2864a94d1b44a06a6868050335",
+  "note": "Suite results overlap. Do not sum reruns or represent reproduced baseline failures as passes. Final five journeys recapture after a test-only scroll-target adjustment.",
+  "results": {
+    "committed-visual": {
+      "log": "logs/committed-visual.log",
+      "tests": 43,
+      "pass": 43,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "https-assets-commerce": {
+      "log": "logs/https-assets-commerce.log",
+      "tests": 33,
+      "pass": 33,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "final-journeys": {
+      "log": "logs/final-journeys.log",
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "committed-spacing": {
+      "log": "logs/committed-spacing.log",
+      "tests": 60,
+      "pass": 60,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "committed-seo": {
+      "log": "logs/committed-seo.log",
+      "tests": 26,
+      "pass": 26,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "review-head-core": {
+      "log": "logs/review-head-core.log",
+      "tests": 66,
+      "pass": 66,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "final-orders-postgres": {
+      "log": "logs/final-orders-postgres.log",
+      "tests": 73,
+      "pass": 73,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "affiliate-integration": {
+      "log": "logs/affiliate-integration.log",
+      "tests": 205,
+      "pass": 188,
+      "fail": 13,
+      "cancelled": 0,
+      "skipped": 4,
+      "todo": 0
+    },
+    "release-account": {
+      "log": "logs/release-account.log",
+      "tests": 16,
+      "pass": 13,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "final-postgres-tests": {
+      "log": "logs/final-postgres-tests.log",
+      "tests": 142,
+      "pass": 140,
+      "fail": 0,
+      "cancelled": 2,
+      "skipped": 0,
+      "todo": 0
+    },
+    "committed-root": {
+      "log": "logs/committed-root.log",
+      "tests": 59,
+      "pass": 56,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "final-layout": {
+      "log": "logs/final-layout.log",
+      "tests": 56,
+      "pass": 53,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "base-account-final": {
+      "log": "logs/base-account-final.log",
+      "tests": 16,
+      "pass": 13,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "base-account-units": {
+      "log": "logs/base-account-units.log",
+      "tests": 69,
+      "pass": 67,
+      "fail": 0,
+      "cancelled": 2,
+      "skipped": 0,
+      "todo": 0
+    },
+    "base-affiliate-integration": {
+      "log": "logs/base-affiliate-integration.log",
+      "tests": 32,
+      "pass": 19,
+      "fail": 13,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "base-layout-reproduction": {
+      "log": "logs/base-layout-reproduction.log",
+      "tests": 6,
+      "pass": 3,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "base-root-complete": {
+      "log": "logs/base-root-complete.log",
+      "tests": 45,
+      "pass": 37,
+      "fail": 8,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "review-head-ui": {
+      "log": "logs/review-head-ui.log",
+      "summary": "Test Files  9 passed (9)\nTests  72 passed (72)"
+    },
+    "committed-ui-all": {
+      "log": "logs/committed-ui-all.log",
+      "summary": "Test Files  2 failed | 22 passed (24)\nTests  2 failed | 141 passed (143)"
+    },
+    "base-affiliate-ui-failures": {
+      "log": "logs/base-affiliate-ui-failures.log",
+      "summary": "Test Files  2 failed (2)\nTests  2 failed | 17 passed (19)"
+    }
+  }
+}

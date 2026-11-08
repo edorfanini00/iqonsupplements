@@ -29,7 +29,7 @@ export const galleryGuides: Record<string, GalleryGuide> = {
     items: [{value:"6–8 oz",label:"Cold liquid"},{value:"10 min",label:"Consume within"}], note: "Bovine colostrum is milk-derived. Review the ingredient statement for suitability."
   },
   "gut-health": {
-    eyebrow: "SELECTED LABEL AMOUNTS", title: "See what\ngoes into your serving.", design: "amounts", main: "1B CFU", unit: "L. acidophilus LA85",
+    eyebrow: "SELECTED LABEL AMOUNTS", title: "See what\ngoes into your serving.", design: "amounts", main: "1B CFU", unit: "L. acidophilus LA85 at manufacture",
     items: [{value:"200 mg",label:"Inulin · prebiotic fiber"},{value:"100 mg",label:"DigeZyme® · digestive enzymes"}], note: "Two capsules daily with water. Also contains 1,000 mg organic apple cider vinegar powder."
   },
   "keto-5": {

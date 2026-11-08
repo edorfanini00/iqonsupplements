@@ -10,7 +10,7 @@ import { ProductFactArt } from "./product-fact-art";
 import { galleryGuides, galleryPhotographs } from "@/lib/product-gallery-content";
 import { ProductGuideArt } from "./product-guide-art";
 
-export const galleryChapters = ["The packaging", "Formula focus", "The product", "How it fits"];
+export const galleryChapters = ["The packaging", "The product", "Formula focus", "How it fits"];
 
 function extraPhotographs(p: Product) {
   const used = new Set([p.image, galleryPhotographs[p.id]?.src, productArt[p.id]?.scene]);
@@ -26,8 +26,8 @@ export function ProductGalleryPanel({ product: p, index }: { product: Product; i
   const presentation = productPresentation[p.id];
   const contents = packageContents(p);
   const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : undefined);
-  if (presentation && index === 1) return <figure className="visual-panel visual-formula-fact"><ProductFactArt data={presentation}/></figure>;
-  if (photograph && index === 2) return <figure className="visual-panel visual-editorial">
+  if (presentation && index === 2) return <figure className="visual-panel visual-formula-fact"><ProductFactArt data={presentation}/></figure>;
+  if (photograph && index === 1) return <figure className="visual-panel visual-editorial">
     <div className="visual-image-frame"><img src={photograph.src} alt={photograph.alt} width={1254} height={1254} loading="lazy" /></div>
     <figcaption className="sr-only">{photograph.alt}</figcaption>
   </figure>;

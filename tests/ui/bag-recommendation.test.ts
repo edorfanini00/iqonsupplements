@@ -19,7 +19,11 @@ const item=(id:string,quantity=1):CartItem=>({id,lineId:`line-${id}`,quantity,pu
 function OpenBag(){const store=useStore();return React.createElement("button",{disabled:!store.ready,onClick:store.openBag},"Open test bag");}
 async function setup(items=[item(creatine.id)],discountCodes:{code:string;applicable:boolean}[]=[],catalog=[gut,creatine,liver]){
   const calls:Record<string,unknown>[]=[];
-  vi.stubGlobal("fetch",vi.fn(async(_url,init)=>{
+  vi.stubGlobal("fetch",vi.fn(async(url,init)=>{
+    // Checkout now prepares a native consent-aware link while the bag is open.
+    // Keep that read separate from cart mutations and retain exact cart assertions.
+    if(url==="/api/checkout")return Response.json({checkoutUrl:"https://nr9zd0-t5.myshopify.com/cart/c/synthetic?key=synthetic"});
+    if(url!=="/api/cart")throw new Error(`Unexpected test request: ${url}`);
     if(init?.body){
       const input=JSON.parse(init.body);calls.push(input);
       if(input.action==="add")items=[...items,item(input.id,input.quantity)];
@@ -32,6 +36,7 @@ async function setup(items=[item(creatine.id)],discountCodes:{code:string;applic
   await waitFor(()=>expect(open.hasAttribute("disabled")).toBe(false));
   fireEvent.click(open);
   await screen.findByRole("dialog");
+  await screen.findByRole("link",{name:/Secure checkout/});
   return calls;
 }
 const recommendation=()=>document.querySelector(".bag-recommend")!;

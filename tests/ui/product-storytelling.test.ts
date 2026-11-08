@@ -31,7 +31,7 @@ describe("visual product guides", () => {
     const { container } = render(React.createElement(ProductGallery, {product:p}));
     expect(screen.getByRole('button', {name:'Previous product panel'}).hasAttribute('disabled')).toBe(true);
     fireEvent.click(screen.getByRole('button', {name:'Next product panel'}));
-    expect(screen.getByRole('button', {name:'View formula focus'}).getAttribute('aria-current')).toBe('true');
+    expect(screen.getByRole('button', {name:'View the product'}).getAttribute('aria-current')).toBe('true');
     fireEvent.keyDown(screen.getByRole('region'), {key:'ArrowLeft'});
     expect(screen.getByRole('button', {name:'View the packaging'}).getAttribute('aria-current')).toBe('true');
     expect(container.querySelector('img[alt="Third Shopify image"]')?.getAttribute('src')).toBe('/third.webp');

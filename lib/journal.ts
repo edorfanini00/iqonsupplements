@@ -47,6 +47,16 @@ export const journalArticles:JournalArticle[]=[
         ]
       },
       {
+        "heading": "Does a jar’s weight tell me how long it lasts?",
+        "products": ["creatine-monohydrate", "colostrum-powder"],
+        "paragraphs": ["Net weight is the amount in the container. To calculate servings, you also need a verified serving size. A direction such as one scoop does not establish the scoop’s mass. Frequency can vary too, including between loading and maintenance directions. Use the current label rather than estimating supply from the product photo."]
+      },
+      {
+        "heading": "Did the study test this product?",
+        "products": ["hydrolyzed-collagen-peptides", "resveratrol"],
+        "paragraphs": ["An ingredient study, a trial of a finished formula and manufacturing testing answer different questions. Read which preparation was studied, in whom, for how long and what was measured. IQON research sections identify ingredient research separately and link to the sources; they do not describe those studies as trials of IQON products."]
+      },
+      {
         "heading": "Make a comparison you can use",
         "paragraphs": [
           "Put two labels side by side and compare the same things: ingredient form, amount per serving, servings per container and the full ingredient list. If you are comparing prices, cost per serving can be more useful than the price of the bottle alone. Keep a record of the supplements you use, including their amounts and frequency. It gives you a clear reference when shopping again or discussing your routine with a health professional."

@@ -1,0 +1,161 @@
+
+ RUN  v3.2.4 /Users/edorfanini/Projects/iqon-site-premium-20261107
+
+ ✓ tests/ui/command-settings.test.ts (1 test) 13ms
+ ❯ tests/ui/original-relay-reads.test.ts (19 tests | 2 failed) 39ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/orders without Body filtering 6ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/subscriptions without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/customers without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/summary without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/trends without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/inventory without Body filtering 2ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/purchases without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/sales without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/expenses without Body filtering 8ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/adjustments without Body filtering 1ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/orders without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET admin/accounting/items/item-1/history without Body filtering 0ms
+   ✓ original shared operational read parity > relays exact authorized GET orders/order-1 without Body filtering 1ms
+   × original shared operational read parity > keeps unsafe provider POST unavailable 7ms
+     → expected 400 to be 501 // Object.is equality
+   ✓ original shared operational read parity > keeps unsafe provider PATCH unavailable 2ms
+   ✓ original shared operational read parity > keeps unsafe provider DELETE unavailable 1ms
+   ✓ original shared operational read parity > keeps unsafe provider PUT unavailable 2ms
+   × original shared operational read parity > does not proxy unknown accounting reads or GET detail refresh mutations 1ms
+     → expected 403 to be 501 // Object.is equality
+   ✓ original shared operational read parity > preserves canonical auth rejection rather than an empty ledger 2ms
+ ✓ tests/ui/review-integrity.test.ts (2 tests) 49ms
+ ✓ tests/ui/original-pages.test.ts (11 tests) 1015ms
+   ✓ original page render contracts > admin/page preserves original sections and controls  478ms
+ ✓ tests/ui/category-revenue.test.ts (8 tests) 194ms
+ ✓ tests/ui/command-context.test.ts (1 test) 59ms
+ ✓ tests/ui/bulk-coupon.test.ts (2 tests) 269ms
+ ✓ tests/ui/native-rate-settings.test.ts (6 tests) 611ms
+   ✓ mounts separate rates in native admin Settings with explicit affiliate scope and no Health defaults  452ms
+ ✓ tests/ui/admin-create-command.test.ts (2 tests) 617ms
+   ✓ manual-create UI does not collect a password rejected by the canonical identity contract  607ms
+stderr | tests/ui/bundle-keyboard.test.ts > selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > held/repeated arrows do not trigger duplicate selection on focus
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/command-recovery.test.ts (1 test) 56ms
+ ✓ tests/ui/skincare-ingredient-explorer.test.ts (9 tests) 1133ms
+   ✓ skincare ingredient exploration > keeps all ingredient summaries visible and updates the selected artwork and explanation  309ms
+stderr | tests/ui/bundle-keyboard.test.ts > skips disabled radios and handles RTL horizontal navigation
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > leaves modified shortcuts and Tab alone, and pointer selection still changes once
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/bundle-keyboard.test.ts > keeps a quantity above three when navigation lands on its already selected 3+ tier
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/bundle-keyboard.test.ts (5 tests) 1255ms
+   ✓ selects and focuses each arrow, wrapping, Home/End and PageUp/PageDown synchronously once  705ms
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | tests/ui/purchase-options.test.ts > keeps the 3+ tier selected when the stepper goes past three and returns to one
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ tests/ui/purchase-clarity.test.ts (2 tests) 269ms
+ ✓ tests/ui/settings-reviewed-version.test.ts (1 test) 5ms
+ ✓ tests/ui/native-command-completion.test.ts (1 test) 14ms
+ ✓ tests/ui/payout-pending-contact.test.ts (8 tests) 2072ms
+   ✓ opens the clicked affiliate's contact details in place without any payout mutation  566ms
+   ✓ a late response for a previously opened affiliate cannot replace the current one  521ms
+ ✓ tests/ui/payout-outstanding.test.ts (7 tests) 2198ms
+   ✓ keeps currencies separate, blocks unknown/nonpositive, submits selected currency allocations  740ms
+   ✓ reopen after lost response retains original details amount allocations and key even after outstanding becomes zero  402ms
+ ✓ tests/ui/overview-category-isolation.test.ts (3 tests) 2413ms
+   ✓ only commits the latest month when requests finish out of order and Shopify independently fails  1359ms
+   ✓ keeps successful category data independent when original Overview fails and changes both period requests  613ms
+   ✓ does not relabel successful September totals as August after a rejected request  440ms
+ ✓ tests/ui/bag-recommendation.test.ts (7 tests) 2121ms
+   ✓ recommends eligible Gut Health to advance the active bundle tier and preserves quantity controls  1393ms
+ ✓ tests/ui/answer-html.test.ts (7 tests) 1447ms
+   ✓ answers in the initial HTML > keeps closed answers in the hydrated DOM with Radix open/close and ARIA relationships  348ms
+   ✓ answers in the initial HTML > includes every product FAQ answer and full label details in product HTML  1002ms
+ ✓ tests/ui/product-storytelling.test.ts (4 tests) 2742ms
+   ✓ visual product guides > keeps approved packaging, excludes rejected photos and expands exact facts  1980ms
+   ✓ visual product guides > uses product-specific guides with the relevant instructions in the expanded view  691ms
+ ✓ tests/ui/purchase-options.test.ts (22 tests) 2819ms
+   ✓ offers no subscription: one time is the only purchase, and the bag never receives a selling plan  699ms
+   ✓ shows both tiers with real per unit prices; choosing a tier sets the quantity that is added  381ms
+ ✓ tests/ui/supplement-product-story.test.ts (14 tests) 3171ms
+   ✓ the complete supplement range > renders creatine-monohydrate with its formula, directions, artwork and relevant comparisons  1020ms
+   ✓ the complete supplement range > renders collagen-peptides-chocolate with its formula, directions, artwork and relevant comparisons  319ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/settings-cross-portal.test.ts [ tests/ui/settings-cross-portal.test.ts ]
+Error: Failed to resolve import "../../../iqon-health-rate-settings/app/affiliates/admin/settings/page" from "tests/ui/settings-cross-portal.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/edorfanini/Projects/iqon-site-premium-20261107/tests/ui/settings-cross-portal.test.ts:7:27
+  3  |  import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+  4  |  import BodySettings from "../../app/affiliates/admin/settings/page";
+  5  |  import HealthSettings from "../../../iqon-health-rate-settings/app/affiliates/admin/settings/page";
+     |                              ^
+  6  |  import { validateCommand, commandHash } from "../../../iqon-health-rate-settings/lib/integrations/body/commands/valid...
+  7  |  import { canonicalActionFetch as bodySave } from "../../lib/affiliates/canonical-action-fetch";
+ ❯ TransformPluginContext._formatLog node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29079:43
+ ❯ TransformPluginContext.error node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:29076:14
+ ❯ normalizeUrl node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27199:18
+ ❯ node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27257:32
+ ❯ TransformPluginContext.transform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:27225:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:28877:14
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/config.js:22746:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/original-relay-reads.test.ts > original shared operational read parity > keeps unsafe provider POST unavailable
+AssertionError: expected 400 to be 501 // Object.is equality
+
+- Expected
++ Received
+
+- 501
++ 400
+
+ ❯ tests/ui/original-relay-reads.test.ts:7:344
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/original-relay-reads.test.ts > original shared operational read parity > does not proxy unknown accounting reads or GET detail refresh mutations
+AssertionError: expected 403 to be 501 // Object.is equality
+
+- Expected
++ Received
+
+- 501
++ 403
+
+ ❯ tests/ui/original-relay-reads.test.ts:8:337
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 22 passed (24)
+      Tests  2 failed | 141 passed (143)
+   Start at  19:41:43
+   Duration  6.64s (transform 3.65s, setup 0ms, collect 13.23s, tests 24.58s, environment 24.80s, prepare 3.81s)
+

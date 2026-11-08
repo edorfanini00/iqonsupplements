@@ -1,0 +1,31 @@
+TAP version 13
+# Subtest: home 390: real assets, stable reading layout and capture
+ok 1 - home 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1518.7835
+  type: 'test'
+  ...
+# Subtest: collection 390: real assets, stable reading layout and capture
+ok 2 - collection 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1552.467
+  type: 'test'
+  ...
+# Subtest: all 390: real assets, stable reading layout and capture
+ok 3 - all 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1607.9885
+  type: 'test'
+  ...
+# Subtest: skincare 390: real assets, stable reading layout and capture
+ok 4 - skincare 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1724.808041
+  type: 'test'
+  ...
+# Subtest: approach 390: real assets, stable reading layout and capture
+ok 5 - approach 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1210.485
+  type: 'test'
+  ...

@@ -1,0 +1,5 @@
+
+> iqon-supplements@0.1.0 build
+> bash scripts/build-verified.sh
+
+build-verified.sh requires GNU timeout.

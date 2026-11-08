@@ -1,0 +1,268 @@
+TAP version 13
+# Subtest: home 390: real assets, stable reading layout and capture
+ok 1 - home 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1859.73975
+  type: 'test'
+  ...
+# Subtest: collection 390: real assets, stable reading layout and capture
+ok 2 - collection 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1879.668917
+  type: 'test'
+  ...
+# Subtest: all 390: real assets, stable reading layout and capture
+ok 3 - all 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1955.090666
+  type: 'test'
+  ...
+# Subtest: skincare 390: real assets, stable reading layout and capture
+ok 4 - skincare 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1769.787041
+  type: 'test'
+  ...
+# Subtest: approach 390: real assets, stable reading layout and capture
+ok 5 - approach 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1531.911625
+  type: 'test'
+  ...
+# Subtest: help 390: real assets, stable reading layout and capture
+ok 6 - help 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1184.185833
+  type: 'test'
+  ...
+# Subtest: journal 390: real assets, stable reading layout and capture
+ok 7 - journal 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1592.041208
+  type: 'test'
+  ...
+# Subtest: colostrum 390: real assets, stable reading layout and capture
+ok 8 - colostrum 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 2115.561792
+  type: 'test'
+  ...
+# Subtest: creatine 390: real assets, stable reading layout and capture
+ok 9 - creatine 390: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1903.268875
+  type: 'test'
+  ...
+# Subtest: home 1440: real assets, stable reading layout and capture
+ok 10 - home 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1694.867875
+  type: 'test'
+  ...
+# Subtest: collection 1440: real assets, stable reading layout and capture
+ok 11 - collection 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1823.042709
+  type: 'test'
+  ...
+# Subtest: all 1440: real assets, stable reading layout and capture
+ok 12 - all 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 2118.105334
+  type: 'test'
+  ...
+# Subtest: skincare 1440: real assets, stable reading layout and capture
+ok 13 - skincare 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 2044.624625
+  type: 'test'
+  ...
+# Subtest: approach 1440: real assets, stable reading layout and capture
+ok 14 - approach 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1392.474666
+  type: 'test'
+  ...
+# Subtest: help 1440: real assets, stable reading layout and capture
+ok 15 - help 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1313.774375
+  type: 'test'
+  ...
+# Subtest: journal 1440: real assets, stable reading layout and capture
+ok 16 - journal 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 1641.913958
+  type: 'test'
+  ...
+# Subtest: colostrum 1440: real assets, stable reading layout and capture
+ok 17 - colostrum 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 2431.80375
+  type: 'test'
+  ...
+# Subtest: creatine 1440: real assets, stable reading layout and capture
+ok 18 - creatine 1440: real assets, stable reading layout and capture
+  ---
+  duration_ms: 2024.510167
+  type: 'test'
+  ...
+# Subtest: creatine-monohydrate: distinct complete story and original assets
+ok 19 - creatine-monohydrate: distinct complete story and original assets
+  ---
+  duration_ms: 2047.637041
+  type: 'test'
+  ...
+# Subtest: hydrolyzed-collagen-peptides: distinct complete story and original assets
+ok 20 - hydrolyzed-collagen-peptides: distinct complete story and original assets
+  ---
+  duration_ms: 2197.086375
+  type: 'test'
+  ...
+# Subtest: collagen-peptides-chocolate: distinct complete story and original assets
+ok 21 - collagen-peptides-chocolate: distinct complete story and original assets
+  ---
+  duration_ms: 2131.225459
+  type: 'test'
+  ...
+# Subtest: colostrum-powder: distinct complete story and original assets
+ok 22 - colostrum-powder: distinct complete story and original assets
+  ---
+  duration_ms: 2192.750666
+  type: 'test'
+  ...
+# Subtest: gut-health: distinct complete story and original assets
+ok 23 - gut-health: distinct complete story and original assets
+  ---
+  duration_ms: 1990.800084
+  type: 'test'
+  ...
+# Subtest: keto-5: distinct complete story and original assets
+ok 24 - keto-5: distinct complete story and original assets
+  ---
+  duration_ms: 2058.474459
+  type: 'test'
+  ...
+# Subtest: glp-1-support: distinct complete story and original assets
+ok 25 - glp-1-support: distinct complete story and original assets
+  ---
+  duration_ms: 2194.68675
+  type: 'test'
+  ...
+# Subtest: liver-support: distinct complete story and original assets
+ok 26 - liver-support: distinct complete story and original assets
+  ---
+  duration_ms: 2122.416
+  type: 'test'
+  ...
+# Subtest: nmn: distinct complete story and original assets
+ok 27 - nmn: distinct complete story and original assets
+  ---
+  duration_ms: 1974.597833
+  type: 'test'
+  ...
+# Subtest: resveratrol: distinct complete story and original assets
+ok 28 - resveratrol: distinct complete story and original assets
+  ---
+  duration_ms: 1988.103167
+  type: 'test'
+  ...
+# Subtest: hair-skin-nails-gummies: distinct complete story and original assets
+ok 29 - hair-skin-nails-gummies: distinct complete story and original assets
+  ---
+  duration_ms: 1889.698584
+  type: 'test'
+  ...
+# Subtest: anti-aging-cleanser-with-peptides: skincare preview stays complete and unavailable
+ok 30 - anti-aging-cleanser-with-peptides: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 1586.991917
+  type: 'test'
+  ...
+# Subtest: hydrating-tonic: skincare preview stays complete and unavailable
+ok 31 - hydrating-tonic: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 1664.52225
+  type: 'test'
+  ...
+# Subtest: exfoliating-pads: skincare preview stays complete and unavailable
+ok 32 - exfoliating-pads: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 1707.95275
+  type: 'test'
+  ...
+# Subtest: hydra-c-ferulic-serum: skincare preview stays complete and unavailable
+ok 33 - hydra-c-ferulic-serum: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 2005.599083
+  type: 'test'
+  ...
+# Subtest: retinol-rx: skincare preview stays complete and unavailable
+ok 34 - retinol-rx: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 1713.363792
+  type: 'test'
+  ...
+# Subtest: firming-peptide-eye-gel: skincare preview stays complete and unavailable
+ok 35 - firming-peptide-eye-gel: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 1587.208125
+  type: 'test'
+  ...
+# Subtest: copper-peptide-restore-cream: skincare preview stays complete and unavailable
+ok 36 - copper-peptide-restore-cream: skincare preview stays complete and unavailable
+  ---
+  duration_ms: 1641.711291
+  type: 'test'
+  ...
+# Subtest: 320: product and home containment
+ok 37 - 320: product and home containment
+  ---
+  duration_ms: 5992.443708
+  type: 'test'
+  ...
+# Subtest: 760: product and home containment
+ok 38 - 760: product and home containment
+  ---
+  duration_ms: 6313.993209
+  type: 'test'
+  ...
+# Subtest: 761: product and home containment
+ok 39 - 761: product and home containment
+  ---
+  duration_ms: 5345.623958
+  type: 'test'
+  ...
+# Subtest: skincare 390: frozen presentation, keyboard and pointer
+ok 40 - skincare 390: frozen presentation, keyboard and pointer
+  ---
+  duration_ms: 1392.981083
+  type: 'test'
+  ...
+# Subtest: skincare 1440: frozen presentation, keyboard and pointer
+ok 41 - skincare 1440: frozen presentation, keyboard and pointer
+  ---
+  duration_ms: 1352.311625
+  type: 'test'
+  ...
+# Subtest: mobile navigation, existing product search and gallery keyboard
+ok 42 - mobile navigation, existing product search and gallery keyboard
+  ---
+  duration_ms: 1015.602791
+  type: 'test'
+  ...
+# Subtest: 200 percent text is actually enlarged and remains contained
+ok 43 - 200 percent text is actually enlarged and remains contained
+  ---
+  duration_ms: 915.386667
+  type: 'test'
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 43
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89796.501917

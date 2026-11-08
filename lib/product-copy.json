@@ -1,11 +1,11 @@
 {
   "creatine-monohydrate": {
-    "descriptor": "Support the strength you build.",
+    "descriptor": "Single ingredient creatine for repeated intense exercise.*",
     "description": "Unflavored creatine monohydrate with a single-ingredient formula. Made in the USA and presented in a 281 g jar.",
     "highlights": [
       "Supports high-intensity exercise*",
       "One ingredient · No added caffeine",
-      "Unflavored · 281 g"
+      "Unflavored"
     ],
     "title": "Made for the work you put in.",
     "story": "Creatine monohydrate is the sole ingredient in this unflavored powder. Mix it with water or juice using the product’s scoop directions. The formula is gluten-free, lactose-free, non-GMO, corn-free and vegan. The full preparation instructions below distinguish the initial loading phase from ongoing use.",
@@ -45,7 +45,7 @@
       },
       {
         "question": "How many grams are in a scoop?",
-        "answer": "Use the serving weight printed on your jar. Scoop volume alone does not establish a weight in grams, and we do not substitute a generic serving size for the product label."
+        "answer": "The label lists one scoop as 5.6 g of powder, providing 5 g of creatine monohydrate. Each jar contains 50 servings. This is not a 50 day supply: the directions specify four servings daily for the first five days, then one or two daily thereafter."
       }
     ],
     "education": {
@@ -163,7 +163,7 @@
     }
   },
   "hydrolyzed-collagen-peptides": {
-    "descriptor": "Collagen that fits your everyday.",
+    "descriptor": "Unflavored bovine collagen. One ingredient.",
     "description": "Unflavored, grass-fed bovine hide collagen peptides in a 280 g jar. A single-ingredient powder made in the USA.",
     "highlights": [
       "Bovine hide collagen peptides",
@@ -318,12 +318,11 @@
     }
   },
   "collagen-peptides-chocolate": {
-    "descriptor": "Your collagen ritual, with a little chocolate.",
+    "descriptor": "Bovine collagen with cocoa and stevia.",
     "description": "Chocolate-flavored hydrolyzed collagen peptides from bovine hide, with cocoa and stevia. Made in the USA in a 378 g jar.",
     "highlights": [
       "Grass-fed bovine collagen",
-      "Chocolate flavor · With stevia",
-      "378 g powder"
+      "Chocolate flavor · With stevia"
     ],
     "title": "A daily scoop worth looking forward to.",
     "story": "Hydrolyzed bovine collagen peptides are paired with cocoa powder, acacia powder, natural flavor and stevia extract. The formula is described as containing collagen types I and III. Mix two scoops with a favorite beverage in a shaker cup or blender, following the preparation directions.",
@@ -479,12 +478,12 @@
     }
   },
   "colostrum-powder": {
-    "descriptor": "A clearly measured colostrum ritual.",
+    "descriptor": "Bovine colostrum, standardized to 25% IgG.",
     "description": "Bovine colostrum powder providing 2300 mg per serving, standardized to 25% Immunoglobulin G. Made in the USA in a 69 g jar.",
     "highlights": [
       "2300 mg bovine colostrum per serving",
       "25% IgG · 575 mg per serving",
-      "69 g powder · Adults only"
+      "Adults only"
     ],
     "title": "Know what goes into your scoop.",
     "story": "Each serving provides 2300 mg of bovine colostrum, standardized to 25% Immunoglobulin G, supplying 575 mg of IgG within that amount. This milk-derived powder is intended for adults. Mix one scoop with cold water or a favorite beverage and consume within ten minutes of mixing.",
@@ -521,6 +520,10 @@
       {
         "question": "Is it suitable if I have a milk allergy?",
         "answer": "No. Bovine colostrum is derived from milk. Review the allergen information and consult your clinician if you are uncertain about suitability."
+      },
+      {
+        "question": "How many servings are in a jar?",
+        "answer": "The 69 g jar contains 30 servings. One scoop is 2.3 g, providing 2,300 mg bovine colostrum, including 575 mg IgG. Mix with cold water or a favorite beverage and consume within ten minutes."
       }
     ],
     "education": {
@@ -637,12 +640,12 @@
     }
   },
   "gut-health": {
-    "descriptor": "Prebiotic fiber, a probiotic and digestive enzymes.",
+    "descriptor": "Inulin, L. acidophilus and digestive enzymes.",
     "description": "A capsule blend of organic apple cider vinegar, inulin prebiotic fiber, DigeZyme® digestive enzymes and Lactobacillus acidophilus. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
       "Supports digestive comfort*",
       "1 billion CFU probiotic with inulin",
-      "60 capsules · Two capsules daily"
+      "Two capsules daily"
     ],
     "title": "Four ingredients for a steady gut routine.",
     "story": "Gut Health pairs inulin, a prebiotic fiber from Jerusalem artichoke root, with Lactobacillus acidophilus LA85 at 1 billion CFU at the time of manufacture. DigeZyme® digestive enzymes and organic apple cider vinegar powder complete the formula. The adult directions specify two capsules daily with water.",
@@ -793,12 +796,11 @@
     "supplyDays": 30
   },
   "keto-5": {
-    "descriptor": "Five ingredients. A clear view of the blend.",
+    "descriptor": "Five ingredients in one blend. Contains caffeine.",
     "description": "Keto-5 combines raspberry ketone, green tea, caffeine anhydrous, green coffee bean and garcinia cambogia in a vegetable capsule. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
       "Five-ingredient Keto Blend",
-      "Contains caffeine",
-      "60 vegetable capsules"
+      "Contains caffeine"
     ],
     "title": "Know your formula before you begin.",
     "story": "Keto-5 contains a blend of raspberry ketone, green tea, caffeine anhydrous, green coffee bean and garcinia cambogia fruit, enclosed in a cellulose vegetable capsule. The directions specify one capsule twice daily, taken before a meal with water. Read the ingredient statement and cautions when considering it for your routine.",
@@ -943,12 +945,12 @@
     "supplyDays": 30
   },
   "glp-1-support": {
-    "descriptor": "Daily nutrition and digestive support, together.",
+    "descriptor": "Vitamins, minerals and digestive ingredients.",
     "description": "A capsule formula combining vitamins and minerals with ginger, peppermint, digestive enzymes, LactoSpore® and ashwagandha. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
       "Digestive enzymes, ginger & probiotic*",
       "Vitamins and minerals for daily nutrition*",
-      "2 capsules daily · 30-day supply"
+      "2 capsules daily"
     ],
     "title": "Support for a changing routine.",
     "story": "The formula brings together magnesium, vitamins D3, B6 and B12, folate, biotin, iron and zinc with digestive and botanical ingredients. Its named blends include ginger, peppermint, bromelain and DigeZyme®, alongside LactoSpore®, ashwagandha and BioPerine®. The full ingredient statement lists the individual nutrients and blends so you can review the formula in detail.",
@@ -1015,7 +1017,7 @@
       {
         "name": "LactoSpore®",
         "role": "Probiotic ingredient",
-        "detail": "LactoSpore® supplies Bacillus coagulans, the probiotic component of the formula. The ingredient statement lists 166 mg by weight; a CFU count is not provided.",
+        "detail": "LactoSpore® supplies Bacillus coagulans, the probiotic component of the formula. The label lists 166 mg and 6 billion CFU per serving. It does not specify a viability guarantee through expiry.",
         "amount": "166 mg"
       },
       {
@@ -1099,12 +1101,12 @@
     "supplyDays": 30
   },
   "liver-support": {
-    "descriptor": "A botanical blend for a thoughtful daily routine.",
+    "descriptor": "Milk thistle and botanicals with L cysteine.",
     "description": "A capsule blend with turmeric, beet root, dandelion, artichoke, ginger, milk thistle, alfalfa and L-cysteine hydrochloride. Made in the USA, with 60 capsules per bottle.",
     "highlights": [
       "Turmeric, artichoke and milk thistle",
       "Non-GMO",
-      "60 capsules · Two capsules daily"
+      "Two capsules daily"
     ],
     "title": "Eight ingredients, clearly introduced.",
     "story": "Liver Support combines root and leaf powders with artichoke extract standardized to 5% cynarin and L-cysteine hydrochloride. The ingredient list includes turmeric, beet root, dandelion, ginger, milk thistle and alfalfa. The adult directions specify two capsules daily with water.",
@@ -1132,7 +1134,7 @@
       },
       {
         "question": "What does 5% cynarin refer to?",
-        "answer": "The artichoke extract is standardized to 5% cynarin. The ingredient statement does not specify an amount in milligrams for the extract."
+        "answer": "The label lists 50 mg of artichoke extract per two capsule serving, standardized to 5% cynarin."
       },
       {
         "question": "How is it taken?",
@@ -1166,7 +1168,7 @@
       {
         "name": "Artichoke extract",
         "role": "Standardized botanical",
-        "detail": "Standardization identifies the proportion of a particular plant compound. Here, artichoke extract contains 5% cynarin; that percentage describes its composition rather than a milligram dose.",
+        "detail": "Standardization identifies the proportion of a particular plant compound. Here, each serving contains 50 mg of artichoke extract standardized to 5% cynarin.",
         "amount": "5% cynarin"
       },
       {
@@ -1238,7 +1240,7 @@
         },
         {
           "title": "Worth knowing",
-          "body": "Artichoke is standardized to 5% cynarin. That percentage describes the extract; it does not tell you how many milligrams of artichoke are in a serving."
+          "body": "Each two capsule serving contains 50 mg of artichoke extract, standardized to 5% cynarin. The percentage describes the extract’s composition."
         }
       ]
     },
@@ -1250,12 +1252,12 @@
     "supplyDays": 30
   },
   "nmn": {
-    "descriptor": "500 mg NMN for your daily longevity routine.",
+    "descriptor": "500 mg β NMN in a daily capsule.",
     "description": "β-Nicotinamide mononucleotide in a vegetable capsule, providing 500 mg per serving with a stated purity of 99.9%. Made in the USA, with 30 capsules per bottle.",
     "highlights": [
       "500 mg β-NMN per serving",
       "A precursor to NAD+*",
-      "1 capsule daily · 30-day supply"
+      "1 capsule daily"
     ],
     "title": "A focused approach to cellular nutrition.",
     "story": "This formula contains β-nicotinamide mononucleotide at 500 mg per serving, with a stated purity of 99.9%. HPMC forms the vegetable capsule, with microcrystalline cellulose, silicon dioxide and magnesium stearate also listed. The adult directions specify one capsule daily with water.",
@@ -1408,12 +1410,11 @@
     "supplyDays": 30
   },
   "resveratrol": {
-    "descriptor": "A plant polyphenol, clearly specified.",
+    "descriptor": "A root extract complex with 50% trans resveratrol.",
     "description": "A 600 mg resveratrol root complex standardized to 50% trans-resveratrol. Made in the USA in a bottle of 60 vegetable capsules.",
     "highlights": [
       "600 mg resveratrol complex",
-      "Standardized to 50% trans-resveratrol",
-      "60 vegetable capsules"
+      "Standardized to 50% trans-resveratrol"
     ],
     "title": "Look closely at the form you choose.",
     "story": "The resveratrol complex comes from Polygonum cuspidatum root and is standardized to 50% trans-resveratrol. The listed 600 mg describes the complex, rather than 600 mg of pure trans-resveratrol. The remaining ingredients are hypromellose for the vegetable capsule and microcrystalline cellulose.",
@@ -1576,12 +1577,12 @@
     "supplyDays": 30
   },
   "hair-skin-nails-gummies": {
-    "descriptor": "Daily nutrients, with a passion fruit finish.",
+    "descriptor": "Biotin and nutrients in passion fruit gummies.",
     "description": "Passion-fruit-flavored gummies with biotin, vitamins, zinc, iodine and fish-derived collagen. Made in the USA, with 60 gummies per bottle.",
     "highlights": [
       "Biotin, vitamins and minerals",
       "Passion fruit flavor",
-      "60 gummies · Two gummies daily"
+      "Two gummies daily"
     ],
     "title": "Make your nutrition routine a little easier.",
     "story": "This gummy formula brings together biotin, vitamins A, C, D, E, B6 and B12, folate, pantothenic acid, iodine and zinc, with PABA, collagen and silicon. The collagen is fish-derived. Glucose syrup, sugar and glucose are listed, alongside pectin and passion fruit flavor. The directions specify two gummies daily.",
@@ -1605,7 +1606,7 @@
     "faqs": [
       {
         "question": "Do the gummies contain biotin?",
-        "answer": "Yes. Biotin is listed with vitamins, minerals, fish-derived collagen and other ingredients. Individual vitamin and mineral amounts are not stated in the ingredient list."
+        "answer": "Yes. Each two gummy serving provides 6,000 mcg of biotin. The label also lists vitamins, minerals and 12 mg of fish derived collagen. See the complete amounts and allergen information."
       },
       {
         "question": "Are they vegan or sugar-free?",
@@ -1631,7 +1632,7 @@
       },
       {
         "title": "Know what is inside",
-        "body": "The formula includes fish-derived collagen and sugar. Check the full list against your dietary preferences."
+        "body": "Contains fish (tilapia) and tree nuts (coconut), with 4 g of added sugars per two gummies. Check the full ingredient list."
       }
     ],
     "ingredients": [
@@ -1643,7 +1644,7 @@
       {
         "name": "Vitamins & minerals",
         "role": "Daily nutrition",
-        "detail": "Vitamins A, C, D and E sit alongside zinc and iodine. They broaden the nutrient combination beyond biotin; individual nutrient amounts are not included in the ingredient statement."
+        "detail": "Vitamins A, C, D and E sit alongside zinc and iodine. They broaden the nutrient combination beyond biotin. The label lists individual nutrient amounts per two-gummy serving in the formula table below."
       },
       {
         "name": "Fish-derived collagen",

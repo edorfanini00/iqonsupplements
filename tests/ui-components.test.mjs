@@ -73,7 +73,7 @@ test("keeps skincare layout samples separate from publishable customer evidence"
   assert.equal(render(SkinResults,{results:[],products:[]}),"");
   const publicReviews=render(SkincareReviews,{reviews:[],products:[]});
   assert.doesNotMatch(publicReviews,/skin-review-stars|Design sample|Verified buyer/);
-  const draftResults=render(SkinResults,{results:[],products:[],designPreview:true});
+  const draftResults=render(SkinResults,{results:[],products:[],showIllustrations:true});
   assert.doesNotMatch(draftResults,/AI-GENERATED ILLUSTRATION|skin-comparison-sample-label/);
   assert.match(draftResults,/A CLOSER LOOK/);
   assert.match(draftResults,/Illustrative comparison. Not measured product results/);
@@ -114,12 +114,11 @@ test("keeps product rating samples out of published customer reviews", async () 
     const props = { productId:product.id, productName:product.name };
     assert.equal(render(ProductReviewLink, props), "");
     const published = render(CustomerReviews, props);
-    assert.match(published, /No customer ratings yet/);
+    assert.match(published, /There are no customer reviews/);
     assert.doesNotMatch(published, /Sample rating|\d+\+ reviews|Verified purchase/);
   }
   const preview = render(ProductReviewLink, { productId:"creatine-monohydrate", designPreview:true });
-  assert.match(preview, /Sample rating: 4.9 out of 5 stars/);
-  assert.match(preview, /400\+ reviews/);
+  assert.equal(preview, "");
   const review = { id:"render-test", productId:products[0].id, author:"Test customer", rating:3,
     title:"Test review", text:"Test review body", date:"2026-09-10", verifiedPurchase:false };
   customerReviews.push(review);

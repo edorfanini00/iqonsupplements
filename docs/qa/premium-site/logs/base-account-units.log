@@ -1,0 +1,458 @@
+account-test-db: owned cluster on 127.0.0.1:29469 database account_sessions_1794097933_6407
+TAP version 13
+# Subtest: customer responses are private, uncached and isolated between customers A and B
+ok 1 - customer responses are private, uncached and isolated between customers A and B
+  ---
+  duration_ms: 80.118375
+  type: 'test'
+  ...
+# Subtest: anti-IDOR: A cannot read or change B's order, address or subscription
+ok 2 - anti-IDOR: A cannot read or change B's order, address or subscription
+  ---
+  duration_ms: 60.874708
+  type: 'test'
+  ...
+# Subtest: mutations require same-origin JSON and the session's CSRF token
+ok 3 - mutations require same-origin JSON and the session's CSRF token
+  ---
+  duration_ms: 44.962916
+  type: 'test'
+  ...
+# Subtest: address book: validation, create with default, edit, set default, delete persist through the provider
+ok 4 - address book: validation, create with default, edit, set default, delete persist through the provider
+  ---
+  duration_ms: 26.829291
+  type: 'test'
+  ...
+# Subtest: subscriptions: provider eligibility gates actions; pause, resume, skip, unskip and confirmed cancel
+ok 5 - subscriptions: provider eligibility gates actions; pause, resume, skip, unskip and confirmed cancel
+  ---
+  duration_ms: 22.562125
+  type: 'test'
+  ...
+# Subtest: subscription management link appears only when the provider page is published
+ok 6 - subscription management link appears only when the provider page is published
+  ---
+  duration_ms: 19.591875
+  type: 'test'
+  ...
+# Subtest: a brand-new customer gets real empty states, not fabricated rows
+ok 7 - a brand-new customer gets real empty states, not fabricated rows
+  ---
+  duration_ms: 17.579875
+  type: 'test'
+  ...
+# Subtest: upstream failures are 'unavailable' and keep the session; nothing leaks tokens or customer data to logs
+ok 8 - upstream failures are 'unavailable' and keep the session; nothing leaks tokens or customer data to logs
+  ---
+  duration_ms: 15.20225
+  type: 'test'
+  ...
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# [customer-account] customer api errors: ACCESS_DENIED
+# Subtest: if Shopify denies the undocumented subscription fields, pages still work and nothing signs out
+ok 9 - if Shopify denies the undocumented subscription fields, pages still work and nothing signs out
+  ---
+  duration_ms: 40.605166
+  type: 'test'
+  ...
+# Subtest: address ids in another GID form still work, and writes use Shopify's exact id
+ok 10 - address ids in another GID form still work, and writes use Shopify's exact id
+  ---
+  duration_ms: 41.929083
+  type: 'test'
+  ...
+# Subtest: order summaries never present a truncated sum as the total (5 distinct lines, mixed quantities)
+ok 11 - order summaries never present a truncated sum as the total (5 distinct lines, mixed quantities)
+  ---
+  duration_ms: 126.171792
+  type: 'test'
+  ...
+# Subtest: configuration: absent is 'not configured', partial or weak is rejected
+ok 12 - configuration: absent is 'not configured', partial or weak is rejected
+  ---
+  duration_ms: 1.1725
+  type: 'test'
+  ...
+# Subtest: return destinations are a fixed same-origin allowlist (open redirect attempts)
+ok 13 - return destinations are a fixed same-origin allowlist (open redirect attempts)
+  ---
+  duration_ms: 4.458
+  type: 'test'
+  ...
+# Subtest: login builds a PKCE S256 authorization request and an encrypted single-use transaction cookie
+ok 14 - login builds a PKCE S256 authorization request and an encrypted single-use transaction cookie
+  ---
+  duration_ms: 51.504667
+  type: 'test'
+  ...
+# Subtest: prefetches never start a sign-in
+ok 15 - prefetches never start a sign-in
+  ---
+  duration_ms: 48.096166
+  type: 'test'
+  ...
+# Subtest: successful callback creates an encrypted HttpOnly session and returns to the allowlisted page
+ok 16 - successful callback creates an encrypted HttpOnly session and returns to the allowlisted page
+  ---
+  duration_ms: 26.041042
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: token request rejected (400)
+# Subtest: callback rejects tampered state, missing transaction, provider errors and replay
+ok 17 - callback rejects tampered state, missing transaction, provider errors and replay
+  ---
+  duration_ms: 21.662917
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: id_token nonce mismatch
+# [customer-account] sign-in rejected: id_token audience mismatch
+# [customer-account] sign-in rejected: id_token issuer mismatch
+# [customer-account] sign-in rejected: id_token expired
+# [customer-account] sign-in rejected: id_token signature invalid
+# [customer-account] sign-in rejected: id_token algorithm not allowed
+# Subtest: id_token must carry the transaction nonce, the shop issuer, this client and a valid signature
+ok 18 - id_token must carry the transaction nonce, the shop issuer, this client and a valid signature
+  ---
+  duration_ms: 299.098667
+  type: 'test'
+  ...
+# [customer-account] sign-in unavailable: token endpoint returned 503
+# Subtest: provider outage during sign-in is reported as unavailable, not as a failed sign-in
+ok 19 - provider outage during sign-in is reported as unavailable, not as a failed sign-in
+  ---
+  duration_ms: 20.321583
+  type: 'test'
+  ...
+# Subtest: forged, sibling, foreign-secret and malformed cookies are signed out, and nothing is ever cleared
+ok 20 - forged, sibling, foreign-secret and malformed cookies are signed out, and nothing is ever cleared
+  ---
+  duration_ms: 49.001167
+  type: 'test'
+  ...
+# Subtest: session absolute lifetime ends the session even with a valid refresh token
+ok 21 - session absolute lifetime ends the session even with a valid refresh token
+  ---
+  duration_ms: 34.0065
+  type: 'test'
+  ...
+# Subtest: expired access tokens refresh once for concurrent requests; the cookie is untouched
+ok 22 - expired access tokens refresh once for concurrent requests; the cookie is untouched
+  ---
+  duration_ms: 57.19675
+  type: 'test'
+  ...
+# [customer-account] upstream unavailable: token endpoint returned 503
+# Subtest: a revoked refresh token ends the session; a refresh outage does not
+ok 23 - a revoked refresh token ends the session; a refresh outage does not
+  ---
+  duration_ms: 35.336083
+  type: 'test'
+  ...
+# Subtest: an access token revoked before expiry gets exactly one refresh and retry
+ok 24 - an access token revoked before expiry gets exactly one refresh and retry
+  ---
+  duration_ms: 46.629208
+  type: 'test'
+  ...
+# Subtest: logout is POST + same-origin only, revokes the session and ends the Shopify session
+ok 25 - logout is POST + same-origin only, revokes the session and ends the Shopify session
+  ---
+  duration_ms: 20.447208
+  type: 'test'
+  ...
+# Subtest: not configured and misconfigured states are distinct from signed out
+ok 26 - not configured and misconfigured states are distinct from signed out
+  ---
+  duration_ms: 49.523625
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: token request rejected (400)
+# Subtest: an attacker's authorization code injected into a victim's callback fails PKCE at the provider
+ok 27 - an attacker's authorization code injected into a victim's callback fails PKCE at the provider
+  ---
+  duration_ms: 50.5575
+  type: 'test'
+  ...
+# Subtest: logout and sign-in never write tokens or the id_token_hint to logs
+ok 28 - logout and sign-in never write tokens or the id_token_hint to logs
+  ---
+  duration_ms: 29.231
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: id_token signature invalid
+# Subtest: an id_token with perfect claims but signed by a foreign key (same kid) is rejected
+ok 29 - an id_token with perfect claims but signed by a foreign key (same kid) is rejected
+  ---
+  duration_ms: 35.919042
+  type: 'test'
+  ...
+# Subtest: real-preview regression: an id_token without a usable sub signs in as the customer the Customer Account API reports
+ok 30 - real-preview regression: an id_token without a usable sub signs in as the customer the Customer Account API reports
+  ---
+  duration_ms: 76.091583
+  type: 'test'
+  ...
+# [customer-account] sign-in rejected: id_token nonce mismatch
+# Subtest: an id_token without sub is still fully verified: nonce, audience, issuer and signature failures still fail
+ok 31 - an id_token without sub is still fully verified: nonce, audience, issuer and signature failures still fail
+  ---
+  duration_ms: 12.601958
+  type: 'test'
+  ...
+# [customer-account] sign-in: id_token sub claim is absent; customer identity comes from the Customer Account API
+# [customer-account] sign-in unavailable: customer api returned 503
+# [customer-account] sign-in rejected: new access token rejected by the Customer Account API
+# Subtest: sign-in creates no session when the Customer Account API can't confirm the customer
+ok 32 - sign-in creates no session when the Customer Account API can't confirm the customer
+  ---
+  duration_ms: 48.847083
+  type: 'test'
+  ...
+# Subtest: late successful refresh (GraphQL held) after logout cannot restore the session
+ok 33 - late successful refresh (GraphQL held) after logout cannot restore the session
+  ---
+  duration_ms: 61.187916
+  type: 'test'
+  ...
+# Subtest: late refresh (token response held) after logout: the new tokens are discarded
+ok 34 - late refresh (token response held) after logout: the new tokens are discarded
+  ---
+  duration_ms: 48.985709
+  type: 'test'
+  ...
+# Subtest: A's held request completing after B signs in on the same browser leaves B signed in
+ok 35 - A's held request completing after B signs in on the same browser leaves B signed in
+  ---
+  duration_ms: 54.769459
+  type: 'test'
+  ...
+# Subtest: concurrent session checks under strict rotation: one refresh, both signed in, either delivery order
+ok 36 - concurrent session checks under strict rotation: one refresh, both signed in, either delivery order
+  ---
+  duration_ms: 145.235667
+  type: 'test'
+  ...
+# Subtest: a delayed rejection of A's dead grant arriving after B signs in does not touch B
+ok 37 - a delayed rejection of A's dead grant arriving after B signs in does not touch B
+  ---
+  duration_ms: 21.284792
+  type: 'test'
+  ...
+# Subtest: a delayed logout response arriving after a new sign-in does not sign the new session out
+ok 38 - a delayed logout response arriving after a new sign-in does not sign the new session out
+  ---
+  duration_ms: 19.220584
+  type: 'test'
+  ...
+# [customer-account] upstream unavailable: refresh coordination timed out
+# Subtest: a crashed refresher's lease lapses; waiting is bounded and honest
+ok 39 - a crashed refresher's lease lapses; waiting is bounded and honest
+  ---
+  duration_ms: 428.216833
+  type: 'test'
+  ...
+# Subtest: a hanging token endpoint is cut off by the refresh timeout and the lease is released
+not ok 40 - a hanging token endpoint is cut off by the refresh timeout and the lease is released
+  ---
+  duration_ms: 17.06375
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/customer-account/races.test.ts:1:6546'
+  failureType: 'cancelledByParent'
+  error: 'Promise resolution is still pending but the event loop has already resolved'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    process.emit (node:events:519:28)
+  ...
+# Subtest: database outage is 'unavailable', never 'signed out', and sets no cookie
+not ok 41 - database outage is 'unavailable', never 'signed out', and sets no cookie
+  ---
+  duration_ms: 0
+  type: 'test'
+  location: '/Users/edorfanini/Projects/iqon-site-premium-20261107/work/base-regression/tests/customer-account/races.test.ts:1:7415'
+  failureType: 'cancelledByParent'
+  error: 'Promise resolution is still pending but the event loop has already resolved'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    process.emit (node:events:519:28)
+  ...
+# Subtest: schema fixture is the pinned provider schema
+ok 42 - schema fixture is the pinned provider schema
+  ---
+  duration_ms: 0.843708
+  type: 'test'
+  ...
+# Subtest: SESSION_CUSTOMER is valid against the Customer Account API schema
+ok 43 - SESSION_CUSTOMER is valid against the Customer Account API schema
+  ---
+  duration_ms: 4.658583
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_OVERVIEW is valid against the Customer Account API schema
+ok 44 - ACCOUNT_OVERVIEW is valid against the Customer Account API schema
+  ---
+  duration_ms: 2.006583
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_PROFILE is valid against the Customer Account API schema
+ok 45 - ACCOUNT_PROFILE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.333375
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_ORDERS is valid against the Customer Account API schema
+ok 46 - ACCOUNT_ORDERS is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.73875
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_ORDER is valid against the Customer Account API schema
+ok 47 - ACCOUNT_ORDER is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.732458
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_ADDRESSES is valid against the Customer Account API schema
+ok 48 - ACCOUNT_ADDRESSES is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.421958
+  type: 'test'
+  ...
+# Subtest: ADDRESS_CREATE is valid against the Customer Account API schema
+ok 49 - ADDRESS_CREATE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.704792
+  type: 'test'
+  ...
+# Subtest: ADDRESS_UPDATE is valid against the Customer Account API schema
+ok 50 - ADDRESS_UPDATE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.581291
+  type: 'test'
+  ...
+# Subtest: ADDRESS_DELETE is valid against the Customer Account API schema
+ok 51 - ADDRESS_DELETE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.758708
+  type: 'test'
+  ...
+# Subtest: PROFILE_UPDATE is valid against the Customer Account API schema
+ok 52 - PROFILE_UPDATE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.407959
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_SUBSCRIPTIONS is valid against the Customer Account API schema
+ok 53 - ACCOUNT_SUBSCRIPTIONS is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.677917
+  type: 'test'
+  ...
+# Subtest: ACCOUNT_SUBSCRIPTION is valid against the Customer Account API schema
+ok 54 - ACCOUNT_SUBSCRIPTION is valid against the Customer Account API schema
+  ---
+  duration_ms: 1.582417
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_EXTRAS_LIST is valid against the Customer Account API schema
+ok 55 - SUBSCRIPTION_EXTRAS_LIST is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.219292
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_EXTRAS is valid against the Customer Account API schema
+ok 56 - SUBSCRIPTION_EXTRAS is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.34875
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_PAUSE is valid against the Customer Account API schema
+ok 57 - SUBSCRIPTION_PAUSE is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.190958
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_RESUME is valid against the Customer Account API schema
+ok 58 - SUBSCRIPTION_RESUME is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.194292
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_CANCEL is valid against the Customer Account API schema
+ok 59 - SUBSCRIPTION_CANCEL is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.1635
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_SKIP is valid against the Customer Account API schema
+ok 60 - SUBSCRIPTION_SKIP is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.288875
+  type: 'test'
+  ...
+# Subtest: SUBSCRIPTION_UNSKIP is valid against the Customer Account API schema
+ok 61 - SUBSCRIPTION_UNSKIP is valid against the Customer Account API schema
+  ---
+  duration_ms: 0.195709
+  type: 'test'
+  ...
+# Subtest: negative control: an invented frequency mutation is rejected by the schema
+ok 62 - negative control: an invented frequency mutation is rejected by the schema
+  ---
+  duration_ms: 1.802833
+  type: 'test'
+  ...
+# Subtest: customer-scoped roots only: no Admin API fields are used
+ok 63 - customer-scoped roots only: no Admin API fields are used
+  ---
+  duration_ms: 0.168834
+  type: 'test'
+  ...
+# Subtest: core documents avoid fields missing from Shopify's public 2026-10 reference
+ok 64 - core documents avoid fields missing from Shopify's public 2026-10 reference
+  ---
+  duration_ms: 0.317541
+  type: 'test'
+  ...
+# Subtest: a lease is exclusive until it lapses, and only for the current generation
+ok 65 - a lease is exclusive until it lapses, and only for the current generation
+  ---
+  duration_ms: 14.362583
+  type: 'test'
+  ...
+# Subtest: refreshed tokens are never installed on a revoked row, even by a live lease holder
+ok 66 - refreshed tokens are never installed on a revoked row, even by a live lease holder
+  ---
+  duration_ms: 2.182875
+  type: 'test'
+  ...
+# Subtest: revocation is permanent and generation-guarded when asked
+ok 67 - revocation is permanent and generation-guarded when asked
+  ---
+  duration_ms: 1.622667
+  type: 'test'
+  ...
+# Subtest: purge removes only expired or long-revoked rows
+ok 68 - purge removes only expired or long-revoked rows
+  ---
+  duration_ms: 3.537667
+  type: 'test'
+  ...
+# Subtest: two real processes, strict rotation: exactly one refresh, both signed in, no cookie writes
+ok 69 - two real processes, strict rotation: exactly one refresh, both signed in, no cookie writes
+  ---
+  duration_ms: 1642.127208
+  type: 'test'
+  ...
+1..69
+# tests 69
+# suites 0
+# pass 67
+# fail 0
+# cancelled 2
+# skipped 0
+# todo 0
+# duration_ms 1888.117584

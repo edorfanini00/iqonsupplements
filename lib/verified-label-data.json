@@ -1,0 +1,427 @@
+{
+  "creatine-monohydrate": {
+    "packSize": "281 g",
+    "servings": 50,
+    "serving": "1 scoop (5.6 g)",
+    "active": "5 g creatine monohydrate",
+    "durationNote": "Supply varies with loading and maintenance use.",
+    "nutrition": [
+      {
+        "name": "Creatine monohydrate",
+        "amount": "5,000 mg",
+        "dailyValue": "Not established"
+      }
+    ]
+  },
+  "hydrolyzed-collagen-peptides": {
+    "packSize": "280 g",
+    "servings": 14,
+    "serving": "1 scoop (20 g)",
+    "active": "20 g collagen peptides",
+    "nutrition": [
+      {
+        "name": "Hydrolyzed collagen peptides from bovine hide",
+        "amount": "20 g",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Protein",
+        "amount": "18 g"
+      },
+      {
+        "name": "Calories",
+        "amount": "70 kcal"
+      },
+      {
+        "name": "Calcium",
+        "amount": "26 mg",
+        "dailyValue": "2%"
+      }
+    ]
+  },
+  "collagen-peptides-chocolate": {
+    "packSize": "378 g · Chocolate",
+    "servings": 14,
+    "serving": "2 scoops (27 g)",
+    "active": "20 g collagen peptides",
+    "nutrition": [
+      {
+        "name": "Hydrolyzed collagen peptides from bovine hide",
+        "amount": "20 g",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Protein",
+        "amount": "18 g"
+      },
+      {
+        "name": "Calories",
+        "amount": "90 kcal"
+      },
+      {
+        "name": "Total carbohydrates",
+        "amount": "3 g",
+        "dailyValue": "1%"
+      },
+      {
+        "name": "Dietary fiber",
+        "amount": "2 g",
+        "dailyValue": "7%"
+      },
+      {
+        "name": "Calcium",
+        "amount": "26 mg",
+        "dailyValue": "2%"
+      },
+      {
+        "name": "Sodium",
+        "amount": "120 mg",
+        "dailyValue": "5%"
+      }
+    ]
+  },
+  "colostrum-powder": {
+    "packSize": "69 g",
+    "servings": 30,
+    "serving": "1 scoop (2.3 g)",
+    "active": "2,300 mg bovine colostrum",
+    "nutrition": [
+      {
+        "name": "Bovine colostrum",
+        "amount": "2,300 mg",
+        "dailyValue": "Not established",
+        "note": "25% Immunoglobulin G"
+      },
+      {
+        "name": "Immunoglobulin G",
+        "amount": "575 mg",
+        "dailyValue": "Not established",
+        "note": "Included within 2,300 mg colostrum, not additional"
+      },
+      {
+        "name": "Calories",
+        "amount": "10 kcal"
+      },
+      {
+        "name": "Calcium",
+        "amount": "20 mg",
+        "dailyValue": "2%"
+      },
+      {
+        "name": "Sodium",
+        "amount": "5 mg",
+        "dailyValue": "<1%"
+      },
+      {
+        "name": "Potassium",
+        "amount": "25 mg",
+        "dailyValue": "<1%"
+      }
+    ]
+  },
+  "gut-health": {
+    "packSize": "60 capsules",
+    "servings": 30,
+    "serving": "2 capsules",
+    "active": "1,000 mg ACV powder",
+    "nutrition": [
+      {
+        "name": "Organic apple cider vinegar powder (fruit)",
+        "amount": "1,000 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Inulin (Helianthus tuberosus, Jerusalem artichoke root)",
+        "amount": "200 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "DigeZyme",
+        "amount": "100 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Lactobacillus acidophilus LA85",
+        "amount": "10 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Lactobacillus acidophilus LA85 viable count",
+        "amount": "1 billion CFU",
+        "note": "At time of manufacture, as footnoted"
+      }
+    ]
+  },
+  "keto-5": {
+    "packSize": "60 capsules",
+    "servings": 60,
+    "serving": "1 capsule",
+    "active": "650 mg Keto Blend",
+    "durationNote": "60 servings provide 30 days at twice daily use.",
+    "nutrition": [
+      {
+        "name": "Keto Blend",
+        "amount": "650 mg",
+        "dailyValue": "Not established",
+        "note": "Raspberry ketone (98%); green tea leaf (98% polyphenols, 75% catechins, 45% EGCG, 6% caffeine); caffeine anhydrous (98%); green coffee bean seed (50% extract); garcinia cambogia fruit (50% extract). These percentages are printed ingredient descriptors, not component masses."
+      }
+    ]
+  },
+  "glp-1-support": {
+    "packSize": "60 capsules",
+    "servings": 30,
+    "serving": "2 capsules",
+    "active": "325 mg digestive blend",
+    "nutrition": [
+      {
+        "name": "Vitamin D3",
+        "amount": "50 mcg",
+        "dailyValue": "250%"
+      },
+      {
+        "name": "Vitamin B6",
+        "amount": "26 mg",
+        "dailyValue": "1500%"
+      },
+      {
+        "name": "Folate",
+        "amount": "400 mcg DFE",
+        "dailyValue": "100%"
+      },
+      {
+        "name": "Vitamin B12",
+        "amount": "525 mcg",
+        "dailyValue": "21875%"
+      },
+      {
+        "name": "Biotin",
+        "amount": "5 mcg",
+        "dailyValue": "17%"
+      },
+      {
+        "name": "Iron",
+        "amount": "18 mg",
+        "dailyValue": "100%"
+      },
+      {
+        "name": "Magnesium",
+        "amount": "200 mg",
+        "dailyValue": "48%"
+      },
+      {
+        "name": "Zinc",
+        "amount": "20 mg",
+        "dailyValue": "182%"
+      },
+      {
+        "name": "Digestive Comfort & Soothing Blend",
+        "amount": "325 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "LactoSpore (Bacillus coagulans)",
+        "amount": "166 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "LactoSpore viable count",
+        "amount": "6 billion CFU",
+        "note": "Explicit printed count; panel does not state at manufacture or through expiry"
+      },
+      {
+        "name": "Energy & Vitality Complex",
+        "amount": "126 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Nutrient Replenishment Matrix",
+        "amount": "22 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "BioPerine black pepper extract (fruit)",
+        "amount": "5 mg",
+        "dailyValue": "Not established"
+      }
+    ]
+  },
+  "liver-support": {
+    "packSize": "60 capsules",
+    "servings": 30,
+    "serving": "2 capsules",
+    "active": "Seven botanicals + L cysteine",
+    "nutrition": [
+      {
+        "name": "Turmeric powder (root)",
+        "amount": "300 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Beet root powder (Beta vulgaris, root)",
+        "amount": "200 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Dandelion powder (leaf)",
+        "amount": "100 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Artichoke extract (Cynara scolymus, whole herb, standardized to 5% cynarin)",
+        "amount": "50 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Ginger powder (root)",
+        "amount": "50 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Milk thistle powder",
+        "amount": "50 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Alfalfa powder (leaf)",
+        "amount": "20 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "L-Cysteine hydrochloride",
+        "amount": "10 mg",
+        "dailyValue": "Not established"
+      }
+    ]
+  },
+  "nmn": {
+    "packSize": "30 capsules",
+    "servings": 30,
+    "serving": "1 capsule",
+    "active": "500 mg β NMN",
+    "nutrition": [
+      {
+        "name": "Beta nicotinamide mononucleotide",
+        "amount": "500 mg",
+        "dailyValue": "Not established"
+      }
+    ]
+  },
+  "resveratrol": {
+    "packSize": "60 capsules",
+    "servings": 60,
+    "serving": "1 capsule",
+    "active": "600 mg root complex",
+    "durationNote": "60 servings provide 30 days at twice daily use.",
+    "nutrition": [
+      {
+        "name": "Resveratrol root complex (Polygonum cuspidatum)",
+        "amount": "600 mg",
+        "dailyValue": "Not established",
+        "note": "Complex containing 50% trans-resveratrol; not 600 mg pure trans-resveratrol"
+      }
+    ]
+  },
+  "hair-skin-nails-gummies": {
+    "packSize": "60 gummies · Passion fruit",
+    "servings": 30,
+    "serving": "2 gummies",
+    "active": "6,000 mcg biotin",
+    "nutrition": [
+      {
+        "name": "Calories",
+        "amount": "15 kcal"
+      },
+      {
+        "name": "Total carbohydrate",
+        "amount": "4 g",
+        "dailyValue": "1%"
+      },
+      {
+        "name": "Total sugars",
+        "amount": "4 g",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Added sugars",
+        "amount": "4 g",
+        "dailyValue": "8%"
+      },
+      {
+        "name": "Vitamin A (retinyl acetate)",
+        "amount": "1,200 mcg",
+        "dailyValue": "133%"
+      },
+      {
+        "name": "Vitamin C (ascorbic acid)",
+        "amount": "30 mg",
+        "dailyValue": "33%"
+      },
+      {
+        "name": "Vitamin D (cholecalciferol)",
+        "amount": "10 mcg",
+        "dailyValue": "50%"
+      },
+      {
+        "name": "Vitamin E (dl-alpha tocopheryl acetate)",
+        "amount": "18 mg",
+        "dailyValue": "120%"
+      },
+      {
+        "name": "Vitamin B6 (pyridoxine HCl)",
+        "amount": "2 mg",
+        "dailyValue": "118%"
+      },
+      {
+        "name": "Folate",
+        "amount": "670 mcg DFE",
+        "dailyValue": "167%",
+        "note": "400 mcg folic acid, printed in parentheses."
+      },
+      {
+        "name": "Vitamin B12 (cyanocobalamin)",
+        "amount": "8 mcg",
+        "dailyValue": "333%"
+      },
+      {
+        "name": "Biotin",
+        "amount": "6,000 mcg",
+        "dailyValue": "20,000%"
+      },
+      {
+        "name": "Pantothenic acid (calcium d-pantothenate)",
+        "amount": "10 mg",
+        "dailyValue": "200%"
+      },
+      {
+        "name": "Iodine (potassium iodide)",
+        "amount": "80 mcg",
+        "dailyValue": "53%"
+      },
+      {
+        "name": "Zinc (zinc citrate)",
+        "amount": "2.7 mg",
+        "dailyValue": "25%"
+      },
+      {
+        "name": "Sodium",
+        "amount": "10 mg",
+        "dailyValue": "<1%"
+      },
+      {
+        "name": "PABA",
+        "amount": "25 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Collagen (piscine)",
+        "amount": "12 mg",
+        "dailyValue": "Not established"
+      },
+      {
+        "name": "Silicon",
+        "amount": "2 mg",
+        "dailyValue": "Not established"
+      }
+    ]
+  }
+}
