@@ -259,7 +259,16 @@ test("production, live catalog, canonical and alias hosts", async t => {
       assert.deepEqual([...doc.querySelectorAll(".product-jump-links a")].map(a => a.getAttribute("href")), ["#product-formula", "#product-routine"], url);
       assert.ok(doc.getElementById("product-formula") && doc.getElementById("product-routine"), url);
     }
-    for (const url of PUBLIC) assert.deepEqual(brokenHashLinks(dom((await get(port, url)).body)), [], url);
+    for (const url of PUBLIC) {
+      const doc = dom((await get(port, url)).body);
+      // Shopify owns this action trigger, not an in-document section target.
+      // Its real banner interaction is covered by google-attribution.e2e.mjs.
+      const triggers = doc.querySelectorAll('footer a[href="#shopifyReshowConsentBanner"]');
+      assert.equal(triggers.length, 1, `${url}: native preferences entrypoint`);
+      assert.equal(triggers[0].textContent, "Cookie preferences");
+      triggers[0].remove();
+      assert.deepEqual(brokenHashLinks(doc), [], url);
+    }
   });
   await t.test("journal guides are titled as IQON Journal; H1 and citations unchanged", async () => {
     const doc = dom((await get(port, "/journal/reading-a-supplement-label")).body);

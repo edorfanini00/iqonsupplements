@@ -15,7 +15,7 @@ test.after(async()=>{fs.writeFileSync(path.join(out,'render-measurements.json'),
 const supplements=['creatine-monohydrate','hydrolyzed-collagen-peptides','collagen-peptides-chocolate','colostrum-powder','gut-health','keto-5','glp-1-support','liver-support','nmn','resveratrol','hair-skin-nails-gummies'];
 async function open(route,width=390){
  const context=await browser.newContext({viewport:{width,height:width===1440?900:844},reducedMotion:'reduce'});
- await context.route(/https:\/\/(connect\.facebook\.net|www\.facebook\.com)/,r=>r.abort());
+ await context.route('**/*',r=>new URL(r.request().url()).origin===new URL(base).origin?r.continue():r.abort());
  await context.addInitScript(()=>Object.defineProperty(navigator,'globalPrivacyControl',{value:true}));
  const page=await context.newPage();
  page.setDefaultTimeout(15000);

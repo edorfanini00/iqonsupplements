@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {chromium} from 'playwright-core';
 const base=process.env.QA_BASE||'http://localhost:3990';
-const out='docs/qa/premium-site/real-assets-commerce';fs.mkdirSync(out,{recursive:true});
+const out=process.env.E2E_SCREENSHOTS||'docs/qa/premium-site/real-assets-commerce';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch();test.after(()=>browser.close());
 async function open(route,width=390){
  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900},reducedMotion:'reduce'});
