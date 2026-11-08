@@ -31,3 +31,21 @@ test("official proxy forwards native cookies and GPC but no credentials or refer
   assert.equal(headers.get('Shopify-Storefront-Private-Token'),null);
   const wrong=req();wrong.headers.set('Origin','https://evil.invalid');assert.equal((await shopifyConsentProxy(wrong)).status,400);
 });
+
+test('native reads cannot persist stale consent; explicit native choices retain all provider headers',async t=>{
+  const cookies=['_shopify_essential=opaque-old; Path=/; HttpOnly; Secure',
+    '_shopify_cmp=opaque-cmp; Path=/; Secure','_tracking_consent=opaque-legacy; Path=/; Secure',
+    '__cf_bm=provider-protection; Path=/; HttpOnly; Secure',
+    '_shopify_analytics=provider-analytics; Path=/; HttpOnly; Secure'];
+  t.mock.method(globalThis,'fetch',async()=>{
+    const headers=new Headers();for(const cookie of cookies)headers.append('Set-Cookie',cookie);
+    return Response.json({data:{consentManagement:{cookies:{cookieDomain:'www.iqondaily.com'}}}},{headers});
+  });
+  const origin='https://www.iqondaily.com';
+  for(const prior of ['', '_shopify_essential=opaque-current'])for(const choice of ['','visitorConsent:{}','visitorConsent:{marketing:true,analytics:true,preferences:true}','visitorConsent:{marketing:false,analytics:false,preferences:false}']){
+    const result=await shopifyConsentProxy(new Request(origin+'/api/unstable/graphql.json',{method:'POST',headers:{Origin:origin,'content-type':'application/json',Cookie:prior,'Shopify-Storefront-Consent-Management':'1'},body:JSON.stringify({query:`{consentManagement{cookies${choice?'('+choice+')':''}{cookieDomain}}}`})}));
+    assert.equal(result.status,200);
+    assert.deepEqual(result.headers.getSetCookie(),choice.includes('marketing:')?cookies:cookies.slice(3));
+    assert.match(result.headers.get('cache-control')||'',/no-store/);
+  }
+});

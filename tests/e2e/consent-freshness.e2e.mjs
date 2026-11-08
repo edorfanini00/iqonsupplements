@@ -86,7 +86,7 @@ test('independent cross-tab native withdrawal must deny resumed page and checkou
   assert.equal(await second.evaluate(()=>Shopify.customerPrivacy.marketingAllowed()),true);
   await second.getByRole('link',{name:'Cookie preferences',exact:true}).click();
   await second.getByRole('button',{name:'Decline all',exact:true}).first().click();
-  await second.waitForFunction(()=>Shopify.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed());
+  await second.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed());
   await page.bringToFront();await resume(page);await page.waitForTimeout(500);
   const resumed=await page.evaluate(()=>({marketing:Shopify.customerPrivacy.marketingAllowed(),sale:Shopify.customerPrivacy.saleOfDataAllowed(),status:Shopify.customerPrivacy.consentStatus,google:typeof gtag,meta:typeof fbq}));
   await page.locator('.add-to-bag-row .button:enabled').click();
@@ -111,7 +111,7 @@ test('independent attribution storage lifecycle after native withdrawal',{timeou
   await page.evaluate(()=>localStorage.setItem('unrelated-shopping-state','keep'));
   const before=await page.evaluate(()=>Object.fromEntries(Object.keys(localStorage).map(k=>[k,localStorage.getItem(k)])));
   await page.getByRole('link',{name:'Cookie preferences',exact:true}).click();await page.getByRole('button',{name:'Decline all',exact:true}).first().click();
-  await page.waitForFunction(()=>Shopify.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed()&&typeof gtag==='undefined');
+  await page.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed()&&typeof gtag==='undefined');
   const after=await page.evaluate(()=>Object.fromEntries(Object.keys(localStorage).map(k=>[k,localStorage.getItem(k)])));
   await page.goto(source+'/products/creatine-monohydrate');await nativeReady(page);
   await page.getByRole('link',{name:'Cookie preferences',exact:true}).click();await page.getByRole('button',{name:'Accept all',exact:true}).first().click();
@@ -135,7 +135,7 @@ function gate(){const result={};result.arrived=new Promise(resolve=>result.notif
 async function withdraw(page){
  await page.getByRole('link',{name:'Cookie preferences',exact:true}).click();
  await page.getByRole('button',{name:'Decline all',exact:true}).first().click();
- await page.waitForFunction(()=>Shopify.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed());
+ await page.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed());
 }
 async function deniedCheckout(page,suspended=false,existingBag=false){
  if(!existingBag)await page.locator('.add-to-bag-row .button:enabled').click();

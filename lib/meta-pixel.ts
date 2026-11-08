@@ -1,5 +1,5 @@
 import type { CartItem } from "./catalog";
-import {nativeConsent} from "./shopify-consent";
+import {nativeConsent,nativeConsentReady} from "./shopify-consent";
 
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "1006368245818889";
 type Pixel = {
@@ -36,14 +36,20 @@ export function syncPixelConsent() {
   const consent=nativeConsent();
   if(consent.marketing&&consent.saleOfData)return false;
   lastPage=undefined;lastProduct=undefined;
-  if(!initialized||typeof window==="undefined")return false;
-  if(Array.isArray(window.fbq?.queue))window.fbq.queue.length=0;
-  window.fbq?.("consent","revoke");
-  if(typeof document!=="undefined")for(const name of ["_fbp","_fbc"]){
+  if(typeof window==="undefined")return false;
+  // Unready/stale permission pauses the runtime, but is not a refusal. Only a
+  // fresh native decision or GPC authorizes erasing previously consented IDs.
+  const refused=nativeConsentReady()||
+    (window.navigator as Navigator & {globalPrivacyControl?:boolean}).globalPrivacyControl===true;
+  if(initialized){
+    if(Array.isArray(window.fbq?.queue))window.fbq.queue.length=0;
+    window.fbq?.("consent","revoke");
+  }
+  if(refused&&typeof document!=="undefined")for(const name of ["_fbp","_fbc"]){
     for(const domain of ["","; Domain=www.iqondaily.com","; Domain=iqondaily.com"])
       document.cookie=`${name}=; Max-Age=0; Path=/; Secure; SameSite=Lax${domain}`;
   }
-  return true;
+  return initialized;
 }
 
 // The standard Meta queue. next/script owns the single external script load.

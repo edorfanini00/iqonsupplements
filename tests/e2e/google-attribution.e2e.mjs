@@ -121,7 +121,7 @@ test('native preferences link withdraws consent and removes attribution cookies'
   await page.getByRole('button',{name:'Decline all',exact:true}).first().waitFor();
   await page.screenshot({path:path.join(output,'native-preferences-desktop.png')});
   await page.getByRole('button',{name:'Decline all',exact:true}).first().click();
-  await page.waitForFunction(()=>Shopify.customerPrivacy.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed());
+  await page.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed()&&typeof window.gtag==='undefined');
   assert.equal((await context.cookies(source)).filter(c=>c.name.startsWith('_gcl_')).length,0);
   await page.reload();await nativeReady(page);assert.equal(tagRequests(requests).length,before);
   await addAndCheckout(page);await page.waitForURL(destination+'/**');assert.equal(new URL(page.url()).searchParams.has('_gl'),false);
@@ -161,7 +161,7 @@ test('late prepared checkout response cannot restore consent after native withdr
   const old=await gate.arrived;assert.equal(JSON.parse(new URL(old.checkoutUrl).searchParams.get('_cs')).marketing,true);
   assert.equal(await page.getByRole('link',{name:/Secure checkout/i}).count(),0);
   await page.evaluate(()=>Shopify.customerPrivacy.setTrackingConsent({marketing:false,analytics:false,preferences:false,sale_of_data:false},()=>{}));
-  await page.waitForFunction(()=>Shopify.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed());
+  await page.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed()&&typeof window.gtag==='undefined');
   gate.release();await page.waitForTimeout(200);
   assert.equal(requests.filter(r=>r.url.startsWith(destination)).length,0);
   await page.goto(source+'/checkout');await nativeReady(page);
