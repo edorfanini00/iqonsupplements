@@ -28,7 +28,7 @@ const executablePath=process.env.CHROME_PATH||(fs.existsSync('/Applications/Goog
 const browser=await chromium.launch({executablePath});
 test.after(async()=>{await browser.close();server.kill('SIGTERM')});
 const clickId='SYNTHETIC_OFFLINE_ONLY_0123456789abcdefghijklmnopqrstuvwxyz';
-async function open({gpc=false,consentFailure=false,tagFailure=false,metaRecorder=false,holdMeta,holdGoogle,holdCheckout,holdCart,holdNative,holdChoice,noChannel=false,viewport={width:390,height:844}}={}){
+async function open({gpc=false,consentFailure=false,tagFailure=false,metaRecorder=false,holdMeta,holdGoogle,holdCheckout,holdCart,holdNative,holdChoice,holdChunks,noChannel=false,viewport={width:390,height:844}}={}){
  const context=await browser.newContext({serviceWorkers:'block',viewport});const requests=[],errors=[],metaCalls=[];
  let closing=false;const pending=new Set(),closeContext=context.close.bind(context);
  context.close=async()=>{
@@ -51,6 +51,8 @@ async function open({gpc=false,consentFailure=false,tagFailure=false,metaRecorde
   if(holdGoogle&&u.hostname==='www.googletagmanager.com'&&!holdGoogle.used){holdGoogle.used=true;holdGoogle.notify();await holdGoogle.released;}
   const script=scripts.get(u.origin+u.pathname);if(script)return route.fulfill({body:script,contentType:'text/javascript',headers:{'Access-Control-Allow-Origin':'*'}});
   if(u.origin===source){
+   // Hold real application chunks without changing their content or native SDK.
+   if(holdChunks?.enabled&&u.pathname.startsWith('/_next/static/chunks/')){holdChunks.used=true;holdChunks.notify();await holdChunks.released;}
    if(consentFailure&&u.pathname==='/api/unstable/graphql.json')return route.fulfill({status:503,body:'unavailable'});
    const headers={...await r.allHeaders(),host:`127.0.0.1:${port}`,'x-forwarded-proto':'http'};
    // Translate only the isolated loopback transport origin; browser URLs stay canonical.
@@ -75,6 +77,38 @@ async function open({gpc=false,consentFailure=false,tagFailure=false,metaRecorde
 }
 const tagRequests=requests=>requests.filter(r=>r.url.startsWith('https://www.googletagmanager.com/gtag/js'));
 const googleRequests=requests=>requests.filter(r=>/google|doubleclick/.test(new URL(r.url).hostname));
+const metaCookies=async context=>(await context.cookies(source)).filter(c=>/^_fb[cp]$/.test(c.name));
+async function seedMetaCookies(context){
+ await context.addCookies(['_fbc','_fbp'].map(name=>({name,value:'SYNTHETIC_OFFLINE_EXISTING_META',url:source,secure:true,sameSite:'Lax'})));
+ return metaCookies(context);
+}
+async function hydratedShoppingBag(page){
+ // A working React interaction proves hydration; a loaded document alone does not.
+ await page.getByRole('button',{name:/Open shopping bag/}).click();
+ await page.locator('.bag-sheet').waitFor();await page.keyboard.press('Escape');
+ await page.locator('.bag-sheet').waitFor({state:'hidden'});
+}
+async function startupState(page,context){
+ return {cookies:await metaCookies(context),...await page.evaluate(()=>({
+  status:window.Shopify?.customerPrivacy?.consentStatus,
+  marketing:window.Shopify?.customerPrivacy?.marketingAllowed(),
+  gpc:navigator.globalPrivacyControl===true,meta:typeof window.fbq,
+  nativeEvents:window.__startupNativeEvents,
+ }))};
+}
+async function recordStartupEvents(context){
+ await context.addInitScript(()=>{
+  window.__startupNativeEvents=[];
+  for(const name of ['consentTrackingApiLoaded','visitorConsentCollected'])
+   document.addEventListener(name,()=>window.__startupNativeEvents.push({name,ms:performance.now()}));
+ });
+}
+function assertSingleMetaView(calls){
+ assert.equal(calls.filter(c=>c[0]==='init').length,1,'one init per granted document');
+ assert.equal(calls.filter(c=>c[0]==='trackSingle'&&c[2]==='PageView').length,1,'one PageView per granted document');
+ assert.equal(calls.filter(c=>c[0]==='trackSingle'&&c[2]==='ViewContent').length,1,'one ViewContent per product');
+ assert.equal(calls.filter(c=>c[0]==='trackSingle').length,2,'no extra startup tracking');
+}
 async function nativeReady(page){await page.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded');}
 
 async function grant(page){await nativeReady(page);await page.getByRole('button',{name:'Accept all',exact:true}).first().click();await page.waitForFunction(()=>Shopify.customerPrivacy.marketingAllowed());}
@@ -273,4 +307,88 @@ test('protected form held native read with missing notification channel',{timeou
   assert.equal(metaCalls.slice(afterDenial).filter(c=>c[0]==='trackSingle'||c[0]==='init'||(c[0]==='consent'&&c[1]==='grant')).length,0);
   assert.equal(fresh.meta,'undefined');
  }finally{held.release();await context.close()}
+});
+
+// Reproduce native readiness BEFORE React subscription by holding the actual
+// Next chunks. No synthetic native event replay or private SDK state changes.
+for(const gpc of [false,true])test(`startup reconciliation: native ${gpc?'GPC':'refusal'} before delayed hydration`,{timeout:30000},async()=>{
+ const chunks=gate();chunks.enabled=true;
+ const {page,context,requests,errors,metaCalls}=await open({gpc,holdChunks:chunks,metaRecorder:true});
+ const stages=[];
+ try{
+  await recordStartupEvents(context);await seedMetaCookies(context);
+  await page.goto(source+'/products/gut-health',{waitUntil:'commit'});
+  await chunks.arrived;await nativeReady(page);
+  const before=await startupState(page,context);stages.push({stage:'before-chunks',...before});
+  assert.equal(before.marketing,false);assert.equal(before.meta,'undefined');assert.equal(before.cookies.length,2);
+  assert.ok(before.nativeEvents.some(e=>e.name==='consentTrackingApiLoaded'));
+  chunks.release();await page.waitForLoadState('load');await hydratedShoppingBag(page);
+  await page.waitForFunction(()=>!document.cookie.match(/(?:^|;\s*)_fb[cp]=/));
+  const after=await startupState(page,context);stages.push({stage:'hydrated',...after});
+  assert.equal(after.cookies.length,0);assert.equal(after.meta,'undefined');assert.deepEqual(metaCalls,[]);
+  assert.equal(requests.filter(r=>new URL(r.url).hostname==='connect.facebook.net').length,0);
+  assert.deepEqual(errors,[]);
+ }finally{
+  stages.push({stage:'final',...await startupState(page,context)});
+  fs.writeFileSync(path.join(output,`startup-${gpc?'gpc':'refusal'}.json`),JSON.stringify({stages,metaCalls,errors,allRequestsIntercepted:true},null,2));
+  chunks.release();await context.close();
+ }
+});
+
+test('startup reconciliation: returning grant before delayed hydration, then revoke/regrant',{timeout:45000},async()=>{
+ const chunks=gate();const {page,context,metaCalls,errors}=await open({holdChunks:chunks,metaRecorder:true});const stages=[];
+ try{
+  await recordStartupEvents(context);
+  // Establish native persistence only through the real banner; seed Meta IDs only.
+  await page.goto(source+'/products/gut-health');await grant(page);await page.waitForFunction(()=>!!window.fbq?.callMethod);
+  const cookies=await seedMetaCookies(context);metaCalls.length=0;chunks.enabled=true;
+  await page.reload({waitUntil:'commit'});await chunks.arrived;await nativeReady(page);
+  const before=await startupState(page,context);stages.push({stage:'before-chunks',...before});
+  assert.equal(before.marketing,true);assert.equal(before.meta,'undefined');assert.deepEqual(before.cookies,cookies);
+  assert.ok(before.nativeEvents.some(e=>e.name==='consentTrackingApiLoaded'));
+  chunks.release();await page.waitForLoadState('load');await hydratedShoppingBag(page);
+  await page.waitForFunction(()=>!!window.fbq?.callMethod);await page.waitForTimeout(200);
+  assert.deepEqual(await metaCookies(context),cookies);assertSingleMetaView(metaCalls);
+  stages.push({stage:'hydrated-granted',...await startupState(page,context),metaCalls:[...metaCalls]});
+  await page.getByRole('link',{name:'Cookie preferences',exact:true}).click();
+  await page.getByRole('button',{name:'Decline all',exact:true}).first().click();
+  await page.waitForFunction(()=>window.Shopify?.customerPrivacy?.consentStatus==='loaded'&&!Shopify.customerPrivacy.marketingAllowed()&&typeof window.fbq==='undefined');
+  await hydratedShoppingBag(page);assert.deepEqual(await metaCookies(context),[]);
+  assertSingleMetaView(metaCalls);assert.ok(metaCalls.some(c=>c[0]==='consent'&&c[1]==='revoke'));
+  stages.push({stage:'revoked',...await startupState(page,context),metaCalls:[...metaCalls]});
+  metaCalls.length=0;
+  await page.getByRole('link',{name:'Cookie preferences',exact:true}).click();await grant(page);
+  await page.waitForFunction(()=>!!window.fbq?.callMethod);await page.waitForTimeout(200);
+  assertSingleMetaView(metaCalls);assert.deepEqual(await metaCookies(context),[]);
+  stages.push({stage:'regranted',...await startupState(page,context),metaCalls:[...metaCalls]});assert.deepEqual(errors,[]);
+ }finally{
+  fs.writeFileSync(path.join(output,'startup-granted-lifecycle.json'),JSON.stringify({stages,metaCalls,errors,allRequestsIntercepted:true},null,2));
+  chunks.release();await context.close();
+ }
+});
+
+for(const returningGrant of [false,true])test(`startup reconciliation: unresolved native state preserves IDs until ${returningGrant?'grant':'refusal'}`,{timeout:30000},async()=>{
+ const chunks=gate(),native=gate();const {page,context,metaCalls,errors}=await open({holdChunks:chunks,holdNative:native,metaRecorder:true});const stages=[];
+ try{
+  await recordStartupEvents(context);
+  if(returningGrant){await page.goto(source+'/products/gut-health');await grant(page);await page.waitForFunction(()=>!!window.fbq?.callMethod);}
+  const cookies=await seedMetaCookies(context);metaCalls.length=0;
+  chunks.enabled=true;native.enabled=true;native.page=page;
+  await page.goto(source+'/products/gut-health',{waitUntil:'commit'});await chunks.arrived;await native.arrived;
+  chunks.release();await page.waitForLoadState('load');await hydratedShoppingBag(page);
+  const unready=await startupState(page,context);stages.push({stage:'hydrated-unready',...unready});
+  assert.notEqual(unready.status,'loaded');assert.equal(unready.meta,'undefined');assert.deepEqual(unready.cookies,cookies);assert.deepEqual(metaCalls,[]);
+  native.release();await nativeReady(page);
+  if(returningGrant){
+   await page.waitForFunction(()=>!!window.fbq?.callMethod);await page.waitForTimeout(200);
+   assert.deepEqual(await metaCookies(context),cookies);assertSingleMetaView(metaCalls);
+  }else{
+   await page.waitForFunction(()=>!document.cookie.match(/(?:^|;\s*)_fb[cp]=/));
+   assert.deepEqual(await metaCookies(context),[]);assert.deepEqual(metaCalls,[]);assert.equal(await page.evaluate(()=>typeof window.fbq),'undefined');
+  }
+  stages.push({stage:'native-ready',...await startupState(page,context)});assert.deepEqual(errors,[]);
+ }finally{
+  fs.writeFileSync(path.join(output,`startup-unready-${returningGrant?'grant':'refusal'}.json`),JSON.stringify({stages,metaCalls,errors,allRequestsIntercepted:true},null,2));
+  native.release();chunks.release();await context.close();
+ }
 });

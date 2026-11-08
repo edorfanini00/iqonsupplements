@@ -15,6 +15,9 @@ const subscribe = (notify:()=>void) => {
   };
   for(const name of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED])document.addEventListener(name,update);
   for(const name of ["focus","pageshow"])window.addEventListener(name,update);
+  // Native readiness can precede hydration. Reconcile the current decision with
+  // the same refusal/unready policy used for subsequent consent changes.
+  update();
   return ()=>{
     for(const name of ["consentTrackingApiLoaded","visitorConsentCollected",NATIVE_CONSENT_INVALIDATED])document.removeEventListener(name,update);
     for(const name of ["focus","pageshow"])window.removeEventListener(name,update);
