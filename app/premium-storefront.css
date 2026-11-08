@@ -94,7 +94,10 @@
  .product-page.purchase-first .product-detail>.purchase-panel-info{order:2}
  .product-page.purchase-first .product-detail>.purchase-panel-buy{order:3}
  .product-page.purchase-first .product-detail>.purchase-panel-details{order:4}
- .product-page .product-summary-description{font-size:16px;line-height:1.65;margin-top:12px}
+ .product-page .product-summary-description{font-size:16px;line-height:1.65;margin-top:17px}
+ /* One gap owns the title-to-explanation rhythm; preserve generic/preview layouts. */
+ .product-page.purchase-first .product-detail:has(.product-summary-description) .product-summary{margin-bottom:0}
+ .product-page.purchase-first .product-summary-description{margin-top:16px}
  .product-page .product-highlights{font-size:14px;margin-bottom:16px}
  .product-page .product-essentials{margin-bottom:16px}
  .supplement-pdp-story .skin-story-section{padding-top:52px;padding-bottom:52px}
@@ -123,5 +126,22 @@
 
 .product-page .product-essentials dl{grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr))}
 .product-page .product-essentials dt,.product-page .product-essentials dd{overflow-wrap:anywhere}
-.verified-label-facts .supplement-amounts{table-layout:fixed;width:100%}
-.verified-label-facts .supplement-amounts th,.verified-label-facts .supplement-amounts td{overflow-wrap:anywhere}
+/* Formula tables only: two-column fallback and three-column recovered labels. */
+.supplement-formula{container-type:inline-size}
+.supplement-formula .supplement-amounts{table-layout:fixed;width:100%}
+.supplement-formula .supplement-amounts th,.supplement-formula .supplement-amounts td{white-space:normal;overflow-wrap:anywhere}
+.supplement-formula .supplement-amounts th:first-child{width:60%}
+.supplement-formula .supplement-amounts th:not(:last-child),.supplement-formula .supplement-amounts td:not(:last-child){padding-right:12px}
+.supplement-formula .verified-label-table th:first-child{width:44%}
+.supplement-formula .verified-label-table th:not(:first-child){width:28%}
+/* Narrow panels give each nutrient its own line, with amount and DV beneath.
+   Explicit table/row/cell roles preserve associations when CSS reflows the rows. */
+@container(max-width:34rem){
+ .supplement-formula .verified-label-table,.verified-label-table caption,.verified-label-table thead,.verified-label-table tbody{display:block}
+ .verified-label-table tr{display:flex;flex-wrap:wrap;column-gap:16px}
+ .supplement-formula .verified-label-table th:first-child,.supplement-formula .verified-label-table th:not(:first-child){width:auto}
+ .supplement-formula .verified-label-table th,.supplement-formula .verified-label-table td{min-width:0;padding-right:0}
+ .verified-label-table tr>:first-child{flex:0 0 100%;border-bottom:0;padding-bottom:0}
+ .verified-label-table tr>:nth-child(2){text-align:left}
+ .verified-label-table tr>:not(:first-child){flex:1 1 min-content;max-width:100%;overflow-wrap:break-word;padding-top:6px}
+}

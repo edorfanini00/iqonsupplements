@@ -1,0 +1,153 @@
+{
+  "verified_table_cases": 132,
+  "fallback_table_cases": 60,
+  "widths": [
+    320,
+    390,
+    1440
+  ],
+  "scales": [
+    1,
+    2
+  ],
+  "overlaps": 0,
+  "clipped": 0,
+  "broken_verified_words": 0,
+  "opening": [
+    {
+      "handle": "colostrum-powder",
+      "width": 320,
+      "opening": {
+        "gap": 16,
+        "font": 16,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "creatine-monohydrate",
+      "width": 320,
+      "opening": {
+        "gap": 16,
+        "font": 16,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "hair-skin-nails-gummies",
+      "width": 320,
+      "opening": {
+        "gap": 16,
+        "font": 16,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "colostrum-powder",
+      "width": 390,
+      "opening": {
+        "gap": 16,
+        "font": 16,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "creatine-monohydrate",
+      "width": 390,
+      "opening": {
+        "gap": 16,
+        "font": 16,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "hair-skin-nails-gummies",
+      "width": 390,
+      "opening": {
+        "gap": 16,
+        "font": 16,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "colostrum-powder",
+      "width": 1440,
+      "opening": {
+        "gap": 16,
+        "font": 17,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "creatine-monohydrate",
+      "width": 1440,
+      "opening": {
+        "gap": 16,
+        "font": 17,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    },
+    {
+      "handle": "hair-skin-nails-gummies",
+      "width": 1440,
+      "opening": {
+        "gap": 16,
+        "font": 17,
+        "order": [
+          "product-visual-gallery",
+          "purchase-panel purchase-panel-summary",
+          "purchase-panel purchase-panel-info",
+          "purchase-panel purchase-panel-buy",
+          "purchase-panel purchase-panel-details"
+        ]
+      }
+    }
+  ]
+}

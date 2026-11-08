@@ -391,7 +391,7 @@ body{background:#fcfdfd}
 .supplement-amounts th,.supplement-amounts td{padding:11px 0;border-bottom:1px solid var(--border);vertical-align:top}
 .supplement-amounts thead th{font-size:12px;font-weight:500;color:var(--text-secondary)}
 .supplement-amounts tbody th{font-size:14px;font-weight:500;padding-right:18px}
-.supplement-amounts th:last-child,.supplement-amounts td{text-align:right;white-space:nowrap}
+.supplement-amounts th:last-child,.supplement-amounts td{text-align:right}
 .supplement-amounts small{display:block;font-size:12px;font-weight:400;color:var(--text-secondary);line-height:1.5;margin-top:4px}
 .supplement-allergens{border-left:2px solid #929c91;padding-left:15px;margin:22px 0}
 .supplement-allergens strong{display:block;margin-bottom:8px;color:var(--text-primary)}

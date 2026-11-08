@@ -76,7 +76,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     mechanismTitle: "Three complementary parts of the formula.", mechanism: [
       { title: "Nutrient intake", body: "D3, B6, B12, folate, magnesium, iron and zinc complement dietary intake.*" },
       { title: "Digestive ingredients", body: "A 325 mg blend combines ginger, peppermint, bromelain and DigeZyme®." },
-      { title: "Probiotic component", body: "LactoSpore® adds Bacillus coagulans. The listed 166 mg is ingredient weight, not a CFU count." }], ritualTitle: "A daily moment to stay consistent."
+      { title: "Probiotic component", body: "LactoSpore® adds Bacillus coagulans. The label lists 166 mg by weight and separately states 6 billion CFU per serving. It does not specify whether the count applies at manufacture or through expiry." }], ritualTitle: "A daily moment to stay consistent."
   },
   "liver-support": {
     headline: "Botanicals for your daily routine.", lead: "Seven botanical ingredients and L-cysteine in a two-capsule formula. Includes milk thistle, turmeric and artichoke extract standardized to 5% cynarin.",
@@ -85,7 +85,7 @@ export const productVisuals: Record<string, ProductVisual> = {
     whyTitle: "Know the plants behind the formula.", whyBody: "A botanical blend is more useful when you can understand it. This formula pairs plant powders with standardized artichoke extract and an amino acid ingredient, L-cysteine hydrochloride.",
     mechanismTitle: "Three ways to read the ingredient list.", mechanism: [
       { title: "Plant powders", body: "Milk thistle, turmeric, beet root, dandelion, ginger and alfalfa make up the powder portion." },
-      { title: "Standardized extract", body: "Artichoke extract specifies 5% cynarin. This describes composition, not the milligram dose." },
+      { title: "Standardized extract", body: "The label lists 50 mg artichoke extract per serving, standardized to 5% cynarin. The percentage describes its composition." },
       { title: "L-cysteine", body: "L-cysteine hydrochloride is the amino acid ingredient alongside the botanicals." }], ritualTitle: "Two capsules. A familiar moment."
   },
   "nmn": {

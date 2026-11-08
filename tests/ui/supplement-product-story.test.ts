@@ -79,7 +79,7 @@ describe("the complete supplement range",()=>{
     expect(supplementVisualContent['colostrum-powder'].composition?.note).toContain('part of the total serving');
     expect(supplementVisualContent.resveratrol.composition?.percent).toBe(50);
     expect(supplementVisualContent.resveratrol.composition?.note).toContain('whole complex');
-    expect(supplementVisualContent['glp-1-support'].ingredients[1].summary).toContain('does not provide a CFU count');
+    expect(supplementVisualContent['glp-1-support'].ingredients[1].summary).toContain('separately states 6 billion CFU per serving');
   });
 
   it("keeps the approved skincare renderer for all seven skincare products",()=>{
