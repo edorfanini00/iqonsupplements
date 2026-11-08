@@ -41,8 +41,8 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   expect(one.closest("label")?.textContent).toContain("$48.97");
   expect(two.closest("label")?.textContent).toContain("$44.08");
   expect(three.closest("label")?.textContent).toContain("$36.73");
-  expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
-  expect(container.querySelector(".bundle-terms")?.textContent).toMatch(/Mix and match any eligible IQON supplements/);
+  expect(container.querySelector(".product-current-price")?.textContent).toContain("$48.97");
+  expect(container.querySelector(".bundle-terms")?.textContent).toMatch(/Mix eligible supplements/);
   expect(container.querySelector(".bundle-terms")?.textContent).not.toContain("Gut Health is not");
   fireEvent.click(three);
   await waitFor(()=>expect(three.getAttribute("aria-checked")).toBe("true"));
@@ -53,7 +53,7 @@ it("shows both tiers with real per unit prices; choosing a tier sets the quantit
   expect(store.add).toHaveBeenLastCalledWith(creatine.id,3,variant.id);
   fireEvent.click(two);
   await waitFor(()=>expect(addButtons()[0].textContent).toContain("$88.16"));
-  expect(container.querySelector(".product-title-row")?.textContent).toContain("$48.97");
+  expect(container.querySelector(".product-current-price")?.textContent).toContain("$48.97");
 });
 
 it("keeps the 3+ tier selected when the stepper goes past three and returns to one",async()=>{
@@ -114,8 +114,8 @@ for(const handle of BUNDLE_ELIGIBLE_HANDLES)it(`${handle}: gallery-first layout 
  expect([...overview.children].map(el=>el.className)).toEqual([
   "product-visual-gallery",
   "purchase-panel purchase-panel-summary",
-  "purchase-panel purchase-panel-buy",
   "purchase-panel purchase-panel-info",
+  "purchase-panel purchase-panel-buy",
   "purchase-panel purchase-panel-details",
  ]);
  // The gallery precedes every purchase control in the rendered DOM, so keyboard order matches.
@@ -128,7 +128,7 @@ for(const handle of BUNDLE_ELIGIBLE_HANDLES)it(`${handle}: gallery-first layout 
  fireEvent.click(addButtons()[0]);
  expect(store.add).toHaveBeenLastCalledWith(handle,2,variant.id);
 });
-it("orders the phone page gallery, name and price, purchase controls, product notes, then details",()=>{
+it("orders the phone page gallery, name, product purpose, price, purchase controls, then details",()=>{
  const {container}=render(React.createElement(ProductPage,{product:creatine}));
  const overview=container.querySelector(".purchase-first #overview")!;
  const gallery=overview.querySelector(".product-visual-gallery")!;
@@ -137,7 +137,7 @@ it("orders the phone page gallery, name and price, purchase controls, product no
  const info=overview.querySelector(".purchase-panel-info")!;
  const details=overview.querySelector(".purchase-panel-details")!;
  expect(summary.textContent).toContain("Creatine Monohydrate");
- expect(summary.textContent).toContain("$48.97");
+ expect(info.textContent).toContain("$48.97");
  expect(buy.querySelector(".bundle-choices")).toBeTruthy();
  expect(buy.querySelector(".add-to-bag-row")).toBeTruthy();
  expect(buy.querySelector(".purchase-assurance")).toBeTruthy();
@@ -145,10 +145,10 @@ it("orders the phone page gallery, name and price, purchase controls, product no
  expect(info.querySelector(".product-highlights")).toBeTruthy();
  expect(info.querySelector(".product-essentials")).toBeTruthy();
  expect(details.querySelector(".product-accordion")).toBeTruthy();
- const sequence=[gallery,summary,buy,info,details];
+ const sequence=[gallery,summary,info,buy,details];
  for(let i=1;i<sequence.length;i++)expect(sequence[i-1].compareDocumentPosition(sequence[i])&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
- // Product notes follow the purchase controls, not the title.
- expect(buy.compareDocumentPosition(info.querySelector(".product-summary-description")!)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ // The explanation must precede the purchase controls in the actual DOM.
+ expect(info.querySelector(".product-summary-description")!.compareDocumentPosition(buy)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 it("does not offer quantity choices for sold-out products or variants",()=>{
  for(const product of [{...creatine,available:false},{...creatine,variants:[{...variant,available:false}]}]){
@@ -167,4 +167,11 @@ it("keeps unapproved future products at full price while providing quantity choi
  expect(addButtons()[0].textContent).toContain("$146.91");
  expect(addButtons()[0].querySelector("s")).toBeNull();
  expect(container.textContent).toContain("Each quantity is charged at the regular price.");
+});
+
+it("does not attach a verified serving count or daily cost to an unverified single pack",()=>{
+ const nmn={...products.find(p=>p.id==="nmn")!,size:"60 capsules",variants:[{...variant,title:"60 capsules"}]};
+ const {container}=render(React.createElement(ProductPage,{product:nmn}));
+ expect(container.querySelector(".product-essentials")).toBeNull();
+ expect(dailyProductPrice(nmn)).toBeNull();
 });

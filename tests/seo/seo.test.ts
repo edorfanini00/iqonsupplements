@@ -23,7 +23,7 @@ for (const answer of otherGuideAnswers) {
   });
 }
 
-test("complete existing journal articles remain identical outside the two answers and AAD citation", () => {
+test("complete existing journal articles remain identical outside the approved added answers and AAD citation", () => {
   // SHA256(JSON.stringify(article)) from main 20828e514df5db135173bff5f2129d572c2a3280.
   // Includes every original paragraph, metadata field, source and product/format association.
   // The format guide's hash is from 3 November 2026: its Sachets section was removed with the retired Colon Gentle Cleanse.
@@ -34,6 +34,7 @@ test("complete existing journal articles remain identical outside the two answer
   ];
   const preserved = journalArticles.map(article => {
     const copy = structuredClone(article);
+    if(copy.slug==="reading-a-supplement-label") copy.sections=copy.sections.filter(s=>!["Does a jar’s weight tell me how long it lasts?","Did the study test this product?"].includes(s.heading));
     const answer = otherGuideAnswers.find(a => a.slug === copy.slug);
     if (answer) {
       assert.equal(copy.sections.filter(s => s.heading === answer.heading).length, 1);

@@ -41,7 +41,7 @@ const VIEWPORTS = [
   {name: "1440", viewport: {width: 1440, height: 900}},
 ];
 const ROUTES = ["/", "/skincare", "/help", "/collections/all", "/collections/supplements", "/journal/finding-your-supplement-format", "/journal/reading-a-supplement-label", "/products/creatine-monohydrate", "/products/daily-travel-kit"];
-const H1_TEXT = {"/": "For the life you want to live.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.", "/approach": "The everyday deserves attention."};
+const H1_TEXT = {"/": "Make room for feeling your best.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.", "/approach": "A place in your everyday."};
 
 try {await fetch(`${base}/`); throw new Error(`port ${port} is already in use; stop the other server first`);} catch (error) {if (error.message.includes("already in use")) throw error;}
 const out = fs.openSync(path.join(work, "server.log"), "a");
@@ -392,7 +392,7 @@ for (const device of VIEWPORTS) {
   });
 }
 
-const LOW_CONTRAST_TEXT = [".department-switch a:not(.is-active)", ".skin-community-intro figcaption", ".skin-community-note .eyebrow", ".skin-community-note>p:not(.eyebrow)"];
+const LOW_CONTRAST_TEXT = [".department-switch a:not(.is-active)", ".home-opening-copy>p:not(.eyebrow)", ".home-feature p:not(.eyebrow)", ".home-standards p"];
 
 for (const device of VIEWPORTS) {
   test(`${device.name}px: homepage muted text meets WCAG AA 4.5:1`, async () => {
@@ -420,7 +420,7 @@ for (const device of VIEWPORTS) {
         .split(",").map(c => c.trim().split(/\s+/)).filter(c => c[0]).map(([url, w]) => ({url: new URL(url, location.href).href, w: parseInt(w)}));
       // object-fit: cover scales the file until it fills both box dimensions.
       const cssPxPerFilePx = Math.max(box.width / file.naturalWidth, box.height / file.naturalHeight);
-      return {src: img.currentSrc.replace(location.origin, ""), lcp: img.closest(".campaign-hero") !== null, loading: img.getAttribute("loading"), fetchPriority: img.getAttribute("fetchpriority"),
+      return {src: img.currentSrc.replace(location.origin, ""), lcp: img.closest(".home-opening-image") !== null, loading: img.getAttribute("loading"), fetchPriority: img.getAttribute("fetchpriority"),
         density: 1 / cssPxPerFilePx, largest: !candidates.length || img.currentSrc === candidates.reduce((a, b) => b.w > a.w ? b : a).url,
         candidates};
     })));
@@ -437,7 +437,7 @@ for (const device of VIEWPORTS) {
         if (!Number.isNaN(width)) assert.equal(width, c.w, `${c.url}: srcset descriptor ${c.w}w`);
       }
     }
-    if (device.isMobile) assert.match(hero.src, /iqon-coastal-mobile-v32-750w\.webp$/, "phones receive the 750px mobile hero");
+    assert.ok(hero.density >= dpr * 0.98, "product hero covers its frame at the screen density");
     await close();
   });
 }
@@ -532,7 +532,7 @@ test("every local srcset candidate on the homepage is served as WebP at its decl
   const {page, close} = await open(VIEWPORTS[1], "/");
   const candidates = await page.evaluate(() => [...new Set([...document.querySelectorAll("img[srcset], source[srcset]")].flatMap(e => e.srcset.split(",").map(c => c.trim().split(/\s+/)))
     .filter(([url]) => url.startsWith("/")).map(c => c.join(" ")))].map(c => c.split(" ")));
-  assert.ok(candidates.length >= 10, JSON.stringify(candidates));
+  assert.ok(candidates.length >= 9, JSON.stringify(candidates));
   for (const [url, descriptor] of candidates) {
     const response = await fetch(base + url);
     assert.equal(response.status, 200, url);

@@ -1,0 +1,12 @@
+# Full generated QA artifacts stay in the local/external evidence directory.
+# Keep the immutable comparison baselines and machine-readable measurements in git.
+/screenshots/*.png
+!/screenshots/baseline-slider-390.png
+!/screenshots/baseline-slider-1440.png
+/base-account/
+/base-layout/
+/synthetic-account/
+/synthetic-layout/
+/synthetic-purchase/
+/real-assets-commerce/
+/spacing/

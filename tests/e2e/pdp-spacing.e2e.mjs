@@ -41,7 +41,7 @@ async function start(directory, serverPort, synthetic) {
   }
   throw Error(`Server did not start: ${serverPort}`);
 }
-const selectors = ['.product-visual-gallery', '.product-summary', '.product-title-row>span', '.product-summary-description', '.product-highlights', '.product-essentials', '.product-variant-picker', '.bundle-choices', '.commerce-message', '.add-to-bag-row', '.purchase-assurance', '.product-jump-links', '.product-accordion', '.product-guides', '.product-launch-note'];
+const selectors = ['.product-visual-gallery', '.product-summary', '.product-current-price', '.product-summary-description', '.product-highlights', '.product-essentials', '.product-variant-picker', '.bundle-choices', '.commerce-message', '.add-to-bag-row', '.purchase-assurance', '.product-jump-links', '.product-accordion', '.product-guides', '.product-launch-note'];
 async function geometry(page) {
   return page.evaluate(selectors => ({
     boxes: Object.fromEntries(selectors.map(selector => {
@@ -87,6 +87,8 @@ for (const [mode, handles] of [
   for (const width of [320, 390, 760, 761, 1440]) for (const handle of handles) {
     test(`${mode} ${width} ${handle}: ${width > 760 ? 'original desktop geometry' : 'gallery, focus and sticky order'}`, async () => {
       const context = await browser.newContext({viewport: {width, height: width === 320 ? 740 : width === 1440 ? 900 : 844}, reducedMotion: 'reduce'});
+      await context.route(/^https?:\/\/(?!localhost)/,r=>r.abort());
+      await context.addInitScript(()=>Object.defineProperty(navigator,"globalPrivacyControl",{value:true}));
       // Synthetic image URLs are deliberately nonexistent. No image replacements are used.
       const page = await context.newPage();
       const sample = {mode, width, handle};
@@ -108,7 +110,7 @@ for (const [mode, handles] of [
           assert.deepEqual(sample.actual, sample.reference, 'split panels must preserve original desktop geometry');
         } else {
           const boxes = sample.actual.boxes;
-          assert.ok(boxes['.product-visual-gallery'].y + boxes['.product-visual-gallery'].height <= boxes['.product-title-row>span'].y);
+          assert.ok(boxes['.product-visual-gallery'].y + boxes['.product-visual-gallery'].height <= boxes['.product-current-price'].y);
           assert.ok(sample.actual.scrollWidth <= width);
           assert.match(await page.locator('#overview>:first-child').getAttribute('class'), /product-visual-gallery/);
           assert.equal(await page.locator('[tabindex]').evaluateAll(elements => elements.filter(e => e.tabIndex > 0).length), 0);
@@ -126,7 +128,7 @@ for (const [mode, handles] of [
           assert.equal(zones[0], 'gallery');
           assert.equal(zones.at(-1), 'details');
           assert.equal(zones.filter(zone => zone === 'gallery').length, 1);
-          if (boxes['.add-to-bag-row']) {
+          if (await page.locator('.sticky-purchase').count()) {
             sample.sticky = [];
             for (const position of ['top', 'inline', 'reviews']) {
               if (position === 'top') await page.evaluate(() => {document.activeElement.blur(); scrollTo({top: 0, behavior: 'instant'});});
@@ -136,18 +138,19 @@ for (const [mode, handles] of [
               await page.waitForFunction(expected => {
                 const row = document.querySelector('.add-to-bag-row').getBoundingClientRect();
                 const inline = row.bottom > 0 && row.top < innerHeight;
-                return (expected === null || inline === expected) && document.querySelector('.sticky-purchase').classList.contains('inline-cta-in-view') === inline;
+                return (expected === null || inline === expected) && document.querySelector('.sticky-purchase').classList.contains('inline-cta-in-view') === (inline || row.top > 0);
               }, position === 'top' ? null : position === 'inline', {timeout: 2000});
               const state = await page.evaluate(() => {
                 const visible = selector => {const e = document.querySelector(selector), r = e.getBoundingClientRect(); return getComputedStyle(e).visibility !== 'hidden' && r.bottom > 0 && r.top < innerHeight;};
                 return {inline: visible('.add-to-bag-row .button'), sticky: visible('.sticky-purchase .button')};
               });
               sample.sticky.push({position, ...state});
-              assert.equal(Number(state.inline) + Number(state.sticky), 1);
+              assert.equal(Number(state.inline) + Number(state.sticky), position==='top'&&!state.inline?0:1);
             }
           } else {
-            assert.equal(await page.locator('.sticky-purchase,.bundle-choices,.add-to-bag-row').count(), 0);
-            assert.equal(await page.locator('.product-launch-note button').isDisabled(), true);
+            assert.equal(await page.locator('.sticky-purchase,.bundle-choices').count(), 0);
+            const action=page.locator('.product-launch-note button,.add-to-bag-row .button');
+            assert.equal(await action.isDisabled(), true);
           }
         }
       } finally { await context.close(); }

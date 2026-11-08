@@ -10,7 +10,7 @@ import {spawn} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {chromium} from 'playwright-core';
 import {checkBundleKeyboard} from './bundle-keyboard.mjs';
-const real=process.env.QA_REAL==='1';
+const real=process.env.QA_REAL==='1'||process.env.QA_LOCAL_ASSETS==='1';
 const port=Number(process.env.E2E_PORT||3981);
 const base=process.env.QA_BASE||(real?'http://localhost:3980':`http://localhost:${port}`);
 const shots=process.env.E2E_SCREENSHOTS||'/tmp/iqon-purchase-clarity';
@@ -24,7 +24,7 @@ if(!process.env.QA_BASE&&!real){
  process.on('exit',()=>server.kill('SIGTERM'));
  for(let i=0;;i++){try{if((await fetch(base)).status)break;}catch{}if(i===60)throw new Error('Synthetic preview did not start; see screenshot directory/server.log');await new Promise(r=>setTimeout(r,500));}
 }
-console.log(`Data source: ${real?'real Shopify catalog/cart':'synthetic catalog/cart'}; external tracking blocked.`);
+console.log(`Data source: ${process.env.QA_REAL==='1'?'real Shopify catalog/cart':process.env.QA_LOCAL_ASSETS==='1'?'synthetic catalog/cart with real local assets':'synthetic catalog/cart'}; external tracking blocked.`);
 const browser=await chromium.launch();
 test.after(async()=>{await browser.close();server?.kill('SIGTERM');});
 const handles=process.env.QA_CATALOG ? JSON.parse(fs.readFileSync(process.env.QA_CATALOG)).products.filter(p=>p.category==='supplements'&&p.available&&!p.requiresSellingPlan).map(p=>p.handle) : ['creatine-monohydrate','hydrolyzed-collagen-peptides','colostrum-powder','gut-health'];
@@ -63,17 +63,17 @@ for(const width of widths){
     const structure=await page.locator('#overview').evaluate(el=>[...el.children].map(e=>e.className));
     assert.match(structure[0],/product-visual-gallery/);
     assert.match(structure[1],/purchase-panel-summary/);
-    assert.match(structure[2],/purchase-panel-buy/);
-    assert.match(structure[3],/purchase-panel-info/);
+    assert.match(structure[2],/purchase-panel-info/);
+    assert.match(structure[3],/purchase-panel-buy/);
     assert.match(structure[4],/purchase-panel-details/);
     const gallery=await page.locator('.product-visual-gallery').boundingBox();
-    const priceBox=await page.locator('.product-title-row>span').boundingBox();
+    const priceBox=await page.locator('.product-current-price').boundingBox();
     const cta=await page.locator('.add-to-bag-row').boundingBox();
     const notes=await page.locator('.product-summary-description').boundingBox();
     if(width<761){
      assert.ok(gallery.y<priceBox.y,'phone gallery precedes the price');
      assert.ok(priceBox.y<cta.y,'phone price precedes the purchase action');
-     assert.ok(cta.y+cta.height<=notes.y,'phone purchase action precedes the product notes');
+     assert.ok(notes.y+notes.height<=cta.y,'phone explanation precedes the purchase action');
     }else{
      assert.ok(gallery.x<cta.x,'desktop keeps gallery on left');
      assert.ok(notes.y<cta.y,'desktop keeps the product notes above the purchase action');
@@ -87,7 +87,7 @@ for(const width of widths){
      await page.locator('.visual-pack img').first().scrollIntoViewIfNeeded();
      await page.waitForFunction(()=>{const i=document.querySelector('.visual-pack img');return i?.complete&&i.naturalWidth>0});
     }
-    const price=Number((await page.locator('.product-title-row>span').innerText()).replace(/[^\d.]/g,''));
+    const price=Number((await page.locator('.product-current-price').innerText()).replace(/[^\d.]/g,''));
     for(const qty of [1,2,3,4,3,2,1]){
      const current=Number(await page.locator('.add-to-bag-row .quantity span').innerText());
      if(current!==qty)await page.locator(`.add-to-bag-row button[aria-label^="${qty>current?'Increase':'Decrease'}"]`).click();

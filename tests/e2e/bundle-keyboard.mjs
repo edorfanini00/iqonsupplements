@@ -4,7 +4,7 @@ import fs from 'node:fs';
 // Every key is released after a fixed duration, independently of React/focus state.
 export async function checkBundleKeyboard(page,{evidence,loaded=false,delays=[30,50]}={}) {
  const results=[];
- const price=Number((await page.locator('.product-title-row>span').innerText()).replace(/[^\d.]/g,''));
+ const price=Number((await page.locator('.product-current-price').innerText()).replace(/[^\d.]/g,''));
  await page.evaluate(loaded=>{
   window.bundleKeyEvents=[];
   for(const type of ['keydown','keyup','focusin'])document.addEventListener(type,e=>{

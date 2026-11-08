@@ -76,8 +76,8 @@ const STORE_ANSWER = "IQON’s online store is www.iqondaily.com. Browse current
 /** In-page links whose target id is not in the server-rendered document. */
 const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute("href")).filter(h => h.length > 1 && !doc.getElementById(decodeURIComponent(h.slice(1))));
 /** Exact H1 copy: every `<br>` line break must still read as two words in textContent. */
-const H1_TEXT = {"/": "For the life you want to live.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.",
-  "/approach": "The everyday deserves attention.", "/reviews": "Your experience has a place here.", "/affiliates": "Good routines. Shared together."};
+const H1_TEXT = {"/": "Make room for feeling your best.", "/skincare": "A little care. A lot of you.", "/journal": "A little more understanding.",
+  "/approach": "A place in your everyday.", "/reviews": "Your experience has a place here.", "/affiliates": "Good routines. Shared together."};
 const h1s = doc => [...doc.querySelectorAll("h1")].map(h => h.textContent);
 const SHIPPING_NOTE = "Shipping usually takes 3 to 5 days. Available shipping options and costs are shown at checkout.";
 const SHOP_TRACKING_NOTE = "Tracking updates are available through Shop once your order is on its way.";
@@ -230,10 +230,10 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.deepEqual([...answer.querySelectorAll("a")].map(a => [a.textContent, a.getAttribute("href")]),
       [["www.iqondaily.com", `https://${WWW}/`], ["supplements collection", "/collections/supplements"]]);
     assert.doesNotMatch(STORE_ANSWER, /https?:|\/collections|iqondaily\.com.*iqondaily\.com/, "no bare URL, path or repeated domain");
-    // The new answer is appended: existing questions keep their order and the first stays open.
+    // Order help leads; the brand and store questions remain at the end.
     const questions = [...doc.querySelectorAll("main.help-wrap [data-slot=accordion-trigger]")].map(t => t.textContent.trim());
     assert.deepEqual(questions.slice(-2), ["What is IQON?", STORE_QUESTION]);
-    assert.equal(questions[0], "How do I place an order?");
+    assert.equal(questions[0], "Where can I track my order?");
     assert.doesNotMatch(r.body, /IQON\s+Daily/i, "the domain is never presented as a brand name");
     assert.doesNotMatch(STORE_ANSWER, /\b(only|exclusive(ly)?|official|retailers?|Amazon|in stores?|tested|clinically|best)\b/i, "no exclusivity, retail, testing or superiority claim");
     assertIndexable(r, "/help");
@@ -380,7 +380,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
     assert.match(format.querySelector('.guide-products a[href="/products/creatine-monohydrate"]').textContent, /Creatine Monohydrate.*281 g powder/);
     const label = dom((await get(port, "/journal/reading-a-supplement-label")).body);
     // Colostrum and both collagens are not in this mock catalog: their links fail closed.
-    assert.deepEqual(Object.values(sectionLinks(label)).flat(), ["/products/creatine-monohydrate"]);
+    assert.deepEqual([...new Set(Object.values(sectionLinks(label)).flat())], ["/products/creatine-monohydrate"]);
     assert.match(label.querySelector(".guide-products a").textContent, /Single-ingredient, unflavored powder/);
     assert.equal(dom((await get(port, "/journal/a-simple-skincare-routine")).body).querySelector(".guide-products"), null, "coming-soon skincare is never a purchase link");
     for (const href of ["/products/creatine-monohydrate", "/products/liver-support"]) {

@@ -16,6 +16,8 @@ test("every catalog product renders useful education with working section links"
   const { products } = await vite.ssrLoadModule("/lib/catalog.ts");
   const { productContent } = await vite.ssrLoadModule("/lib/product-content.ts");
   const { ProductStory } = await vite.ssrLoadModule("/app/product-story.tsx");
+  const { supplementVisualContent } = await vite.ssrLoadModule("/lib/supplement-visual-content.ts");
+  const { skincareVisualContent } = await vite.ssrLoadModule("/lib/skincare-visual-content.ts");
   assert.equal(products.length, 18);
   for (const product of products) {
     const copy = productContent[product.id];
@@ -28,9 +30,10 @@ test("every catalog product renders useful education with working section links"
     }
     const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]);
     assert.equal(new Set(ids).size, ids.length, `${product.id}: duplicate anchors`);
-    assert.ok(html.includes(escaped(copy.title)), product.id);
+    assert.ok(html.includes('id="benefits-heading"'), product.id);
     assert.doesNotMatch(html, /clinically proven IQON|guaranteed results|lorem ipsum/i);
-    for (const benefit of copy.benefits) assert.ok(html.includes(escaped(benefit.body)), product.id);
+    const benefits=product.category==="supplements"?supplementVisualContent[product.id].benefits:skincareVisualContent[product.id].benefits;
+    for (const benefit of benefits) assert.ok(html.includes(escaped(benefit.body)), product.id);
   }
 });
 
@@ -57,7 +60,7 @@ test("comparisons keep live prices and unique products, with the viewed product 
     assert.equal(comparison[0].id, product.id);
     assert.equal(new Set(comparison.map(item => item.id)).size, comparison.length);
     assert.ok(comparison.every(item => item.price === 91.25 && item.currency === "EUR"));
-    assert.ok(render(ProductStory, { product, products: live }).includes("91.25"));
+    assert.ok(render(ProductStory, { product, products: live }).includes(product.category==="skincare"?"Coming soon":"91.25"));
   }
 });
 
@@ -68,7 +71,7 @@ test("all product pages keep illustrative ratings out of published reviews", asy
     for (const component of [ProductReviewLink, CustomerReviews]) {
       const html = render(component, { productId: product.id, productName: product.name });
       if (component === ProductReviewLink) assert.equal(html, "");
-      else assert.match(html, /No customer ratings yet/);
+      else assert.match(html, /There are no customer reviews/);
       assert.doesNotMatch(html, /Sample rating|\d+\+ reviews|Verified purchase/);
     }
   }

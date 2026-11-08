@@ -39,7 +39,7 @@ describe("the complete supplement range",()=>{
     expect(container.querySelector('.supplement-pdp-story')).toBeTruthy();
     expect(screen.getByRole('heading',{name:visual.title})).toBeTruthy();
     expect(container.querySelector('.skin-benefits-photo img')?.getAttribute('src')).toBe(`/images/supplement-materials-v1/${id}.webp`);
-    expect(container.querySelectorAll('.skin-benefit-points article')).toHaveLength(4);
+    expect(container.querySelectorAll('.skin-benefit-points article')).toHaveLength(id==='colostrum-powder'?3:4);
     expect(container.querySelectorAll('.skin-application-steps li')).toHaveLength(3);
     for(const nav of container.querySelectorAll('.pdp-section-nav a')){
       const anchor=nav.getAttribute('href')!;
