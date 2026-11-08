@@ -83,7 +83,7 @@ for(const width of [320,390,1440])test(`live ${width}: focus, format, search, so
 });
 test('unknown focus defaults to All; focus never filters all-products or skincare collections',async()=>{
  for(const [route,expected,control]of [['/collections/supplements?focus=unsupported',11,true],['/collections/all?focus=training',18,false],['/collections/skincare?focus=training',7,false]]){
- const {page,context}=await open(390,'preview',route);try{await count(page,expected);assert.equal(await page.locator('.catalog-focus').count(),Number(control));if(control)assert.equal(await page.locator('.catalog-focus a[aria-current]').innerText(),'All');}finally{await context.close();}
+ const {page,context}=await open(390,'preview',route);try{await count(page,expected);assert.equal(await page.locator('.catalog-focus').count(),Number(control));if(control)assert.equal(await page.locator('.catalog-focus a[aria-current]').innerText(),'All');else{await page.getByRole('searchbox',{name:'Find a product'}).fill('no-match');await count(page,0);assert.ok(await page.getByText('Try another product name or clear your search.').isVisible());await page.getByRole('button',{name:'Show all products',exact:true}).click();await count(page,expected);assert.equal(page.url(),bases.preview+route);}}finally{await context.close();}
  }
 });
 for(const mode of ['preview','empty','down'])test(`${mode}: honest availability and empty state`,async()=>{

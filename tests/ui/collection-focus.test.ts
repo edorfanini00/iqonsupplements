@@ -49,6 +49,8 @@ it('focus and format links preserve each other and sort, and selected state foll
 });
 it.each(['all','skincare'] as const)('does not apply supplement focus to %s',category=>{
  setup({category,initialFocus:'training'});expect(screen.queryByRole('navigation',{name:'Browse by focus'})).toBeNull();expect(shown()).toHaveLength(category==='all'?18:7);
+ fireEvent.change(screen.getByRole('searchbox'),{target:{value:'no-match'}});expect(screen.getByText('Try another product name or clear your search.')).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Show all products'}));expect(shown()).toHaveLength(category==='all'?18:7);expect(state.push).not.toHaveBeenCalled();
 });
 it('keeps a filter intersection distinct from an empty or unavailable catalog',()=>{
  const view=setup({initialFocus:'training',initialFormat:'capsules'});expect(shown()).toHaveLength(0);expect(screen.getByText('No products found.')).toBeTruthy();
