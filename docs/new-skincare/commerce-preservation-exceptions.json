@@ -5,23 +5,23 @@
   "files": {
     "lib/commerce-policy.ts": {
       "baselineSha256": "a20ae21fd54b1a0ef8e14bd3f09f88fa383573cb7c7f698210f601255692982b",
-      "candidateSha256": "d3b173ee17a6bf92ecf5fdbd87282a36b1f1f73fcf44fc863b354ccd99c28ebb",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+      "candidateSha256": "8052f9d4b324afd3858ecf72641b4b2686a7efe409285df9dde6ea450672c62e",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
     },
     "lib/shopify.ts": {
       "baselineSha256": "694998dc5e09df451f923e01430ddc6633430ca9e3abd477a70d09cfdef64449",
-      "candidateSha256": "5421a22358a2b6f08a26a1539559a09ff2daa5563e7a0107d4fc843850f7b27d",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+      "candidateSha256": "50c9c5d74f25635ad4e88a95e575f2a0219b3a4aa1d2445954c310946f366cff",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
     },
     "lib/shopify.server.ts": {
       "baselineSha256": "e300446f8f53b1d06f417fcf901633e20962bd51e752fcda45357dea2b135adc",
-      "candidateSha256": "ceceff6518fb7beccd1242abeca752c0eb34ed65466e957bca0ef6fd0455f2a1",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+      "candidateSha256": "84280cf3c39b4bb9b26992fd522d5c7fccb5f18635a7f28f1cecee4baa61f964",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
     },
     "lib/catalog.ts": {
       "baselineSha256": "899adf096eca34230450ebae1bb449d1a4f5ecd1ab90b92e7f501ca6bd2367fc",
-      "candidateSha256": "dfd9b06e76e8f52d136f1468451060a928898ecd71fce6a4f1b056d50d4b0900",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+      "candidateSha256": "31594f52908f11af58e0e0097d373244b663627c55706116fb8c8215fd326fe7",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
     },
     "lib/skincare-range.json": {
       "baselineSha256": "7f21ff066bdbf96959d659b664c143adb9359cf5807e303be79a2638f99608a9",
@@ -40,8 +40,8 @@
     },
     "lib/seo.ts": {
       "baselineSha256": "f2ebdddc656b8975fe226aab694b88ba313ec5b3a296845c526bcd61d104f725",
-      "candidateSha256": "bd2023e1761d626df20d95cbbbf5fcbcc0dfff45ffef2ec112005763f4a04293",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+      "candidateSha256": "6c27ed1ea900b52378b64124eb67daf2b226342e330eebe9e60ab8196574778c",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
     }
   }
 }

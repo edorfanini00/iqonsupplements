@@ -11,6 +11,8 @@ export type Product = {
   image: string; campaign: string; tone: string; ritual: string;
   currency?: string; available?: boolean; pricePending?: boolean; variants?: ProductVariant[];
   images?: {src:string; alt:string}[]; requiresSellingPlan?: boolean;
+  /** Set only by the server-side S8939 qualification (exact store/product/variant, live price and stock). */
+  launchQualified?: boolean; stockLimit?: number;
 };
 export type StoreCatalog = {mode:"preview"|"live"|"unavailable"; products:Product[]; currency:string};
 

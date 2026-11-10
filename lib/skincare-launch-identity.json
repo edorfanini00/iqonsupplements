@@ -1,0 +1,63 @@
+{
+  "_comment": "S8939 launch identity. Exact store + handle + supplier SKU -> Shopify product/variant GIDs, generated programmatically (never by hand) from the private ops provisioning manifest provision-resume/manifest.json (sha256 fdac7afbb14275166fbae98c413096b102985c8a7d1175b4d151a6e722275de7; state DRAFT_PROVISIONING_COMPLETE_COORDINATED_RELEASE_NOT_EXECUTED; captured 2026-11-10T13:58:42.541252+00:00, completed 2026-11-10T14:05:14.081379+00:00). The five pre-existing ids are unchanged; enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream were bound from that manifest. That snapshot records all eight as DRAFT and unpublished with no stock written (three new products 0 on hand); it is NOT a fresh live inventory or publication qualification. A configured id is not activation: every product stays Coming soon until a fresh Storefront read proves it ACTIVE, published to this channel, one-time, at the approved price, with positive quantityAvailable. Approved one-time USD prices per owner decision 2026-11-10. Rebind only from the next proven manifest.",
+  "store": "nr9zd0-t5.myshopify.com",
+  "currency": "USD",
+  "products": [
+    {
+      "handle": "enzyme-gel-cleanser",
+      "supplierSku": "81310702C",
+      "approvedPriceUsd": "55.00",
+      "productId": "gid://shopify/Product/10554590560551",
+      "variantId": "gid://shopify/ProductVariant/52574511104295"
+    },
+    {
+      "handle": "exfoliating-pads",
+      "supplierSku": "12410503C",
+      "approvedPriceUsd": "80.00",
+      "productId": "gid://shopify/Product/10393655345447",
+      "variantId": "gid://shopify/ProductVariant/52052013744423"
+    },
+    {
+      "handle": "hyaluronic-serum",
+      "supplierSku": "33230103C",
+      "approvedPriceUsd": "90.00",
+      "productId": "gid://shopify/Product/10554590789927",
+      "variantId": "gid://shopify/ProductVariant/52574511366439"
+    },
+    {
+      "handle": "retinol-rx",
+      "supplierSku": "82730103C",
+      "approvedPriceUsd": "98.34",
+      "productId": "gid://shopify/Product/10393656656167",
+      "variantId": "gid://shopify/ProductVariant/52052015710503"
+    },
+    {
+      "handle": "hydra-c-ferulic-serum",
+      "supplierSku": "40730103C",
+      "approvedPriceUsd": "90.00",
+      "productId": "gid://shopify/Product/10393656066343",
+      "variantId": "gid://shopify/ProductVariant/52052014727463"
+    },
+    {
+      "handle": "peptide-anti-wrinkle-day-cream",
+      "supplierSku": "61730172C",
+      "approvedPriceUsd": "100.00",
+      "productId": "gid://shopify/Product/10554590855463",
+      "variantId": "gid://shopify/ProductVariant/52574511431975"
+    },
+    {
+      "handle": "copper-peptide-restore-cream",
+      "supplierSku": "11530173C",
+      "approvedPriceUsd": "68.00",
+      "productId": "gid://shopify/Product/10393657737511",
+      "variantId": "gid://shopify/ProductVariant/52052017971495"
+    },
+    {
+      "handle": "firming-peptide-eye-gel",
+      "supplierSku": "11330052C",
+      "approvedPriceUsd": "76.67",
+      "productId": "gid://shopify/Product/10393657245991",
+      "variantId": "gid://shopify/ProductVariant/52052016955687"
+    }
+  ]
+}
