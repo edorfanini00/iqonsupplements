@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {products,productPrice,validateCart} from '../lib/catalog';
 import {productContent} from '../lib/product-content';
-import {newSkincareProducts,newSkincareIds,newSkincareFor,newSkincareImage,localNewSkincareProduct,localNewSkincareDepartment,withLocalNewSkincareCards} from '../lib/new-skincare';
+import {newSkincareProducts,newSkincareIds,newSkincareFor,newSkincareImage,comingSoonSkincareProduct,comingSoonSkincareDepartment,withComingSoonSkincareCards} from '../lib/new-skincare';
 import {newSkincareStories,newSkincareVisualContent,newSkincarePresentation,newSkincareGalleryGuides} from '../lib/new-skincare-editorial';
 import {isOrderable} from '../lib/commerce-policy';
 import {productJsonLd} from '../lib/seo';
@@ -31,25 +31,26 @@ test('every pre-existing image/CSS, catalog/model, pricing, redirect, auth/accou
 });
 test('the shell changes only exact new preview route classification, never existing navigation or cart/privacy logic',()=>{
  const before=original('app/store-shell.tsx').toString();
- const expected=before.replace('import { shopifySrcSet } from "@/lib/responsive-images";', 'import { shopifySrcSet } from "@/lib/responsive-images";\nimport { localNewSkincareDepartment } from "@/lib/new-skincare";').replace('products.find(p=>pathname===`/products/${p.id}`)?.category;', 'products.find(p=>pathname===`/products/${p.id}`)?.category||localNewSkincareDepartment(pathname,mode);');
+ const expected=before.replace('import { shopifySrcSet } from "@/lib/responsive-images";', 'import { shopifySrcSet } from "@/lib/responsive-images";\nimport { comingSoonSkincareDepartment } from "@/lib/new-skincare";').replace('products.find(p=>pathname===`/products/${p.id}`)?.category;', 'products.find(p=>pathname===`/products/${p.id}`)?.category||comingSoonSkincareDepartment(pathname);');
  assert.equal(readFileSync('app/store-shell.tsx','utf8'),expected);
- for(const id of ids){assert.equal(localNewSkincareDepartment(`/products/${id}`,'preview'),'skincare');assert.equal(localNewSkincareDepartment(`/products/${id}`,'live'),undefined);assert.equal(localNewSkincareDepartment(`/products/${id}/extra`,'preview'),undefined)}
- for(const p of products)assert.equal(localNewSkincareDepartment(`/products/${p.id}`,'preview'),undefined);
- for(const path of ['/','/account','/checkout','/affiliates','/products/unknown'])assert.equal(localNewSkincareDepartment(path,'preview'),undefined);
+ for(const id of ids){assert.equal(comingSoonSkincareDepartment(`/products/${id}`),'skincare');assert.equal(comingSoonSkincareDepartment(`/products/${id}/extra`),undefined)}
+ for(const p of products)assert.equal(comingSoonSkincareDepartment(`/products/${p.id}`),undefined);
+ for(const path of ['/','/account','/checkout','/affiliates','/products/unknown'])assert.equal(comingSoonSkincareDepartment(path),undefined);
 });
-test('new products cannot leak into live/unavailable catalogs or gain stock, prices, variants, offers or cart lines',()=>{
+test('only the three approved informational records are public in every mode; never gain stock, prices, variants, offers or cart lines',()=>{
  for(const p of newSkincareProducts){
   assert.equal(newSkincareFor(p.id)!.retailPrice,null);assert.equal(p.pricePending,true);assert.equal(p.available,false);assert.deepEqual(p.variants,[]);
   assert.equal(productPrice(p),'Coming soon');assert.equal(isOrderable(p,'live'),false);assert.equal(productJsonLd(p,true),null);
   assert.deepEqual(validateCart([{id:p.id,quantity:1,purchase:'once',frequency:'once'}]),[]);
-  assert.equal(localNewSkincareProduct({mode:'live',products:[]},p.id),undefined);
-  assert.equal(localNewSkincareProduct({mode:'unavailable',products:[]},p.id),undefined);
-  assert.equal(localNewSkincareProduct({mode:'preview',products},p.id),p);
+  for(const mode of ['live','unavailable','preview'] as const)assert.equal(comingSoonSkincareProduct({mode,products},p.id),p);
  }
- assert.equal(localNewSkincareProduct({mode:'preview',products},'invented-product'),undefined);
- assert.equal(withLocalNewSkincareCards(products,'live'),products);assert.equal(withLocalNewSkincareCards(products,'unavailable'),products);
- const added=withLocalNewSkincareCards(products,'preview');assert.deepEqual(added.slice(0,products.length),products);assert.equal(added.length,products.length+3);
- assert.deepEqual(withLocalNewSkincareCards(added,'preview'),added);
+ assert.equal(comingSoonSkincareProduct({mode:'preview',products},'invented-product'),undefined);
+ {
+  const added=withComingSoonSkincareCards(products);assert.deepEqual(added.slice(0,products.length),products);assert.equal(added.length,products.length+3);
+  assert.deepEqual(withComingSoonSkincareCards(added),added);
+  const collision={...newSkincareProducts[0],available:true,price:999,pricePending:false,variants:[{id:'unverified',title:'Default',price:999,currency:'USD',available:true}]};
+  assert.deepEqual(withComingSoonSkincareCards([collision]).find(p=>p.id===collision.id),newSkincareProducts[0],'unverified external record cannot bypass the informational hold');
+ }
 });
 test('each new page has complete product-specific story, ingredients, routine, FAQs and four gallery panels',()=>{
  for(const p of newSkincareProducts){

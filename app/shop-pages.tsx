@@ -19,7 +19,7 @@ import { ProductSwitcher } from "./product-navigation";
 import { ProductRail } from "./product-rail";
 import { CustomerReviews, ProductReviewLink } from "./customer-reviews";
 import skincareRange from "@/lib/skincare-range.json";
-import { newSkincareFor, newSkincareIds, withLocalNewSkincareCards } from "@/lib/new-skincare";
+import { newSkincareFor, newSkincareIds, withComingSoonSkincareCards } from "@/lib/new-skincare";
 import { supplementDetails } from "@/lib/supplement-details";
 import { SupplementFormula, SupplementDirections } from "./supplement-information";
 import { ProductGuides } from "./buyer-paths";
@@ -30,7 +30,7 @@ export { CollectionPage } from "./collection-page";
 
 export function ProductPage({product:p,designPreview=false}:{product:Product;designPreview?:boolean}){
  const {add,products:storeProducts,mode,busy,ready}=useStore();
- const products=newSkincareIds.has(p.id)?withLocalNewSkincareCards(storeProducts,mode):storeProducts;
+ const products=newSkincareIds.has(p.id)?withComingSoonSkincareCards(storeProducts):storeProducts;
  const live=mode==="live";
  const comingSoon=isComingSoon(p)||!!p.pricePending;
  const skin=skincareRange.find(item=>item.id===p.id)||newSkincareFor(p.id);

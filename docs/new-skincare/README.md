@@ -1,38 +1,46 @@
-# New-products-only local candidate
+# Three approved skincare pages — publication candidate
 
-State: **PR-ready / local preview candidate**, not approved to publish.
+State: **PR-ready**, not merged or deployed. Owner approved the three page visuals after exact-head reviews of `91af947aed8edfd43d772d292b0a3cad93770c2d`. This follow-up is the explicit publication delta; parent must obtain two independent reviews of the final release head before merging/deploying.
 
-Adds only Enzyme Gel Cleanser, Hyaluronic Serum, and Peptide Anti-Wrinkle Day Cream. The existing seven skincare products—including Anti-Aging Cleanser with Peptides and Hydrating Tonic—remain unchanged. No retirements, replacements, redirects, price approvals, inventory claims, Shopify helper/plan or external writes are part of this patch.
+## Scope and public behavior
+Adds only Enzyme Gel Cleanser, Hyaluronic Serum, and Peptide Anti-Wrinkle Day Cream as informational **Coming soon** pages. All seven existing skincare products—including Anti-Aging Cleanser with Peptides and Hydrating Tonic—remain unchanged. No retirements, replacements, redirects, price approvals, inventory claims or Shopify writes.
 
-## Preservation boundary
-- Original catalog and all original product JSON, editorial maps, photography, CSS, global navigation, accounts, affiliates, checkout/payment/privacy and API files remain unchanged.
-- New products live in separate `lib/new-skincare*` modules, not the shared catalog. Only `/collections/skincare` in **preview mode** appends their cards; existing PDP switchers and related grids keep their exact original data.
-- Existing UI components resolve new-ID-only content fallbacks. The store shell has only an import and exact-new-route preview department fallback, so these new pages correctly select Skincare without changing any existing route/navigation behavior; a strict source-transform test protects the rest of that file. This deliberately reuses the current gallery, formula infographics, benefits, interactive ingredient spotlight, routine, compare and FAQ structure rather than creating a new design.
-- New pages are available only with the existing unconfigured `mode=preview` catalog. Live/unavailable modes cannot discover the new candidates. SEO remains noindex, with no Product/Offer JSON-LD.
+- `lib/new-skincare*` remains separate from the shared catalog. Only the skincare collection appends these three cards; old PDP switchers, related grids, global catalog/search and navigation lists remain unchanged.
+- An exact three-ID allowlist resolves their pages in live, empty, unconfigured and unavailable catalog states. Unknown routes and all other pages retain their original behavior.
+- These static informational records take precedence over a same-handle Shopify response for their own route/cards. An incidental catalog publication cannot turn them into offers.
+- The existing Coming soon presentation remains: no displayed price, variants, buy control, stock claim, shipping promise or review samples. The disabled button says **Not available to order yet**.
+- Their own canonical metadata and sitemap entries are indexable only on production `www.iqondaily.com`; alias hosts and preview deployments remain noindex. Only BreadcrumbList is emitted, never Product/Offer/review markup. Existing sitewide indexing rules are unchanged.
+- Shopify remains the commerce source of truth for existing products. No environment/preview flags, checkout/account/affiliate/consent logic or Shopify helper was changed.
 
-## Prices and availability
-`retailPrice` is explicitly `null`; no stock is recorded. The existing `Product` interface needs a numeric price, so the adapter supplies a zero sentinel behind mandatory `pricePending=true`, `available=false`, empty variants and the existing skincare launch hold. Tests prove it is never displayed as a free offer or accepted into a cart. This is not launch authorization.
+## Price and stock boundary
+`retailPrice` stays `null`; no stock is recorded. The existing Product interface requires a numeric price, so a zero sentinel remains behind `pricePending=true`, `available=false`, and empty variants. Tests prove that it is never shown as a free offer or admitted as a new cart line. An invoice quantity ordered is not sellable inventory. Future order activation requires separately verified current price, stock, variant and compliance facts and an explicit reviewed change; this informational publication does not authorize it.
 
-## Approved source facts
-Source index: `source-facts.json`. Approved artwork is the October 16 complete-set approval of `IQON-SO8939-Proofs.pdf`, SHA256 `903cc271e6d8923cba303e338863d5c3e39714b8f110086855f65a1589d77395`.
-- Enzyme: proof p8, distinct from the existing peptide cleanser; no peptide/panthenol transfer or replacement statement.
-- Hyaluronic: proof p5 exact INCI, not a mixture with the supplier website list. Preservative/color additives remain disclosed; market/batch review is still required.
-- Day cream: proof p7 visible directions include face, neck, décolleté and morning SPF. No stale PDF text-layer, nighttime balm, spatula/steam/post-procedure directions, invented signal peptide or sunscreen protection claim.
+## Preservation and approved source facts
+All original product JSON, editorial maps, assets, CSS, accounts, affiliates, payments/privacy and API files remain unchanged against current main `a4c4b12d8d29608adecfea48609a00db298b7ff7`. No newer main changes were dropped; it was the frozen candidate's exact ancestor and was re-fetched during release preparation.
 
-## Local media integration; publication hold
-Three parent-accepted 4:5 packshot WebPs are integrated for **local preview only**, verified against `creative/page-assets/MANIFEST.json`. Visible gallery copy identifies them as packaging visualizations, not supplier photographs. This is not owner publication approval.
+Source index: `source-facts.json`. Approved artwork: October 16 complete-set approval of `IQON-SO8939-Proofs.pdf`, SHA256 `903cc271e6d8923cba303e338863d5c3e39714b8f110086855f65a1589d77395`.
+- Enzyme: proof p8, distinct from the original peptide cleanser; no peptide/panthenol transfer or replacement claim.
+- Hyaluronic: proof p5 exact INCI, not a mixture with supplier website copy. Preservative/color additives remain disclosed; market/batch review is still required before commerce activation.
+- Day cream: proof p7 directions include face, neck, décolleté and morning SPF. No stale PDF text-layer, nighttime balm, spatula/steam/post-procedure directions, invented signal peptide or sunscreen protection claim.
 
-Three existing own-brand abstract closeups are referenced in place without altering their files: cleanser foam from `product-details`, serum/dropper from Hydra material artwork, and cream/spatula from Copper material artwork. Each carries the ordinary visible caption **“Illustrative texture study, not the finished formula”** and descriptive alt text. They do not establish finished-formula color, viscosity, application method or efficacy; no old-formula copy is reused. The old cleanser material photograph containing a hand was rejected in favor of the generic foam closeup. Exact paths, hashes and pixel-inspection findings are recorded in `media-integration.json`.
+## Media provenance (unchanged pixels)
+All six approved packshot/editorial WebPs retain the frozen candidate hashes. No rerender/redesign. Packaging is visibly described as visualization, not supplier photography. Editorial alt text identifies the glass prop as empty, not formula.
 
-Three parent-accepted `editorial-light-final` WebPs now occupy the gallery and routine modules, byte-matched to their source manifest. Descriptive alt text identifies CGI packaging beside an empty glass cylinder, not the finished formula. All six rejected generated supporting images remain excluded. Unused SVG placeholders remain on disk, but no new page renders them. No existing photography or product page was replaced; no before/after results or fabricated reviews were added. Source release-hold metadata is retained: this acceptance permits local insertion, not publication.
+Three existing abstract closeups remain referenced in place without file changes. The ordinary visible caption is **Illustrative texture study, not the finished formula**. These images do not establish the new formula's color, viscosity, application method or efficacy. Exact paths/hashes are in `media-integration.json`. The manifest's earlier local-only source-release holds are historical provenance and have not been rewritten; owner visual approval and this explicit frontend release candidate supersede only the site-publication hold after parent review. No authority to repurpose source files elsewhere is implied.
 
-## Local verification
-Node 22 required. `npm ci --ignore-scripts`; `npx prisma generate`; `npm run build:vercel`.
-- `node --import tsx --test tests/new-skincare-only.test.ts`
-- `npx vitest run --config tests/ui/vitest.config.mjs tests/ui/new-skincare-media.test.ts tests/ui/product-storytelling.test.ts`
-- `npx tsc -p tsconfig.next.json --noEmit`
+Unused SVG placeholders remain on disk but are not rendered. No fabricated before/after results or reviews were added. The inherited shared-gallery zoom focus-restoration P2 remains intentionally unchanged and out of scope.
 
-External task evidence (not shipped in this repository): `/Users/edorfanini/.hermes/runtime/iqon-skincare-catalog-refresh/new-products-only/site/` (original candidate), `../integration1/` (packshot/texture integration), and `../integration2/` (final local editorial integration). Integration 2 contains build/focused-test receipts, real-browser 320/390/1440px new-page checks including all gallery panels and zoom, strict software-raster comparisons for the original seven at 390/1440px, source/asset preservation, screenshots and contact sheets. Earlier evidence remains frozen.
+## Reproduction
+Node 22. `npm ci --ignore-scripts`; `npm run build:vercel`; `npm run typecheck:next`.
+- `node --import tsx --test tests/new-skincare-only.test.ts tests/seo/seo.test.ts tests/seo/buyer-paths.test.ts tests/seo/store-policies.test.ts`
+- `npx vitest run --config tests/ui/vitest.config.mjs tests/ui/new-skincare-media.test.ts tests/ui/product-storytelling.test.ts tests/ui/skincare-ingredient-explorer.test.ts tests/ui/purchase-options.test.ts tests/ui/purchase-clarity.test.ts`
+- `node --test --test-concurrency=1 tests/e2e/new-skincare-release.e2e.mjs`
 
-## Remaining gates
-Two independent final exact-commit reviews owned by parent (max two bounded correction rounds), then owner preview approval. No PR push, merge, deployment or publication is authorized by this task. Eventual live activation is a separate explicit change; preview-only gating must not be silently removed.
+The route matrix starts owned servers on 3194–3198, using synthetic Shopify fixtures and zero external writes. Test modes: live, empty, unavailable, unconfigured production and preview; each also checks alias metadata. Keep these ports free, or set `RELEASE_MATRIX_PORT`. `RELEASE_EVIDENCE` optionally sets the receipt directory.
+
+Broad UI/SEO/lint suites have independently reproduced current-main failures; see the runtime release report, not an assertion that the entire repository is green. Normal rendered-image QA is separate from mocked-catalog routing tests.
+
+## Evidence and release gates
+Runtime evidence: `/Users/edorfanini/.hermes/runtime/iqon-skincare-catalog-refresh/new-products-only/release/REPORT.md`. Original `site`, `integration1`, `integration2` and final-review-A/B evidence are preserved.
+
+Parent owns two independent exact-final-head release-delta reviews, bounded correction (at most two rounds), PR/merge/deployment and live verification. Do not deploy this candidate directly or write Shopify records. No migration, tier change, purchase or credential change is required. Rollback is a reviewed revert of this additions-only release, preserving any newer unrelated work; never reset the whole site to the old baseline.
