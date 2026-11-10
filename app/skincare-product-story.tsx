@@ -8,12 +8,14 @@ import skincareRange from "@/lib/skincare-range.json";
 import { skincareVisualContent } from "@/lib/skincare-visual-content";
 import { SkincareIngredientExplorer } from "./skincare-ingredient-explorer";
 import { SkincareVisualBenefits, SkincareVisualRoutine } from "./skincare-visual-sections";
+import { newSkincareFor } from "@/lib/new-skincare";
+import { newSkincareStories, newSkincareVisualContent } from "@/lib/new-skincare-editorial";
 
 export function SkincareProductStory({product:p,comparison}:{product:Product;comparison:Product[]}) {
-  const story=skincareStories[p.id];
+  const story=skincareStories[p.id] || newSkincareStories[p.id];
   const copy=productContent[p.id];
-  const skin=skincareRange.find(s=>s.id===p.id);
-  const visual=skincareVisualContent[p.id];
+  const skin=skincareRange.find(s=>s.id===p.id)||newSkincareFor(p.id);
+  const visual=skincareVisualContent[p.id]||newSkincareVisualContent[p.id];
   if(!story||!copy||!skin||!visual) return null;
   return <div className="product-experience skincare-pdp-story skin-visual-story">
     <nav className="pdp-section-nav" aria-label="Product information">
@@ -27,7 +29,7 @@ export function SkincareProductStory({product:p,comparison}:{product:Product;com
     <section id="product-formula" className="skin-story-section skin-story-formula" aria-labelledby="formula-heading">
       <header className="skin-section-title"><p className="skin-kicker">INSIDE THE FORMULA</p><h2 id="formula-heading">{story.formulaTitle}</h2></header>
       <SkincareIngredientExplorer key={p.id} ingredients={visual.ingredientOrder.map(index=>copy.ingredients![index])} visuals={visual.ingredientOrder.map(index=>visual.ingredients[index])}/>
-      <Accordion type="single" collapsible className="skin-formulation-accordion"><AccordionItem value="formula"><AccordionTrigger>Ingredients & formulation details</AccordionTrigger><AccordionContent><p><strong>Key ingredients:</strong> {skin.ingredients}.</p><p>{copy.formulaNote}</p></AccordionContent></AccordionItem></Accordion>
+      <Accordion type="single" collapsible className="skin-formulation-accordion"><AccordionItem value="formula"><AccordionTrigger>Ingredients & formulation details</AccordionTrigger><AccordionContent><p><strong>Key ingredients:</strong> {skin.ingredients}.</p><p>{copy.formulaNote}</p>{newSkincareFor(p.id)&&<p><strong>Full ingredient list (approved label):</strong> {newSkincareFor(p.id)!.inci}</p>}</AccordionContent></AccordionItem></Accordion>
     </section>
 
     <section id="product-routine" className="skin-story-section skin-story-routine" aria-labelledby="routine-heading">

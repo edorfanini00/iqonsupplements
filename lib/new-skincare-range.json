@@ -1,0 +1,53 @@
+[
+  {
+    "id": "enzyme-gel-cleanser",
+    "name": "Enzyme Gel Cleanser",
+    "type": "Cleanser",
+    "size": "7 fl oz (207 mL)",
+    "retailPrice": null,
+    "pricePending": true,
+    "ritual": "Cleanse",
+    "descriptor": "A fresh start. A smooth finish.",
+    "description": "A gel facial cleanser with papaya fruit extract and salicylic acid. Massage onto damp skin and rinse well, morning or evening.",
+    "ingredients": "Papaya fruit extract, Salicylic acid, Glycerin",
+    "directions": "Apply a small amount to pre-moistened skin and gently massage. Rinse well with water. May be used twice daily.",
+    "inci": "Water, Ammonium Lauryl Sulfate, PPG-2 Hydroxyethyl Cocoamide, Butylene Glycol, Cocamidopropyl Betaine, PPG-2 Hydroxyethyl Isostearamide, Propanediol, Acrylates Copolymer, Glycerin, PEG/PPG-8/3 Laurate, Phenoxyethanol, Carica Papaya (Papaya) Fruit Extract, Citrus Aurantium Dulcis (Orange) Peel Oil, Salicylic Acid, Sodium Chloride, Benzoic Acid, Dehydroacetic Acid, Sodium Hydroxide, Disodium EDTA",
+    "source": "https://www.globalbeauty.net/product/enzyme-gel-cleanser/",
+    "image": "/images/skincare/new-products-only/enzyme-gel-cleanser/packshot.svg",
+    "number": "19"
+  },
+  {
+    "id": "hyaluronic-serum",
+    "name": "Hyaluronic Serum",
+    "type": "Serum",
+    "size": "1 fl oz (30 mL)",
+    "retailPrice": null,
+    "pricePending": true,
+    "ritual": "Hydrate",
+    "descriptor": "A light layer of hydration.",
+    "description": "A lightweight aloe-based serum with glycerin, panthenol and sodium hyaluronate, for skin that feels dehydrated. Apply after cleansing, before moisturizer.",
+    "ingredients": "Sodium hyaluronate, Glycerin, Aloe & panthenol",
+    "directions": "After cleansing and toning, apply to entire face and neck. Once absorbed, follow with moisturizer and/or sun protection products (SPF). May be used twice daily.",
+    "inci": "Water, Aloe Barbadensis Leaf, Propylene Glycol, Glycerin, Hydroxyethylcellulose, Phenoxyethanol, Panax Ginseng Root Extract, Allantoin, Panthenol, Chamomilla Recutita (Matricaria) Flower Extract, Symphytum Officinale Leaf Extract, Cucumis Sativus (Cucumber) Fruit Extract, Equisetum Hiemale Extract, Methylisothiazolinone, Sodium Hyaluronate, Yellow 5, Blue 1",
+    "source": "https://www.globalbeauty.net/product/hyaluronic-serum/",
+    "image": "/images/skincare/new-products-only/hyaluronic-serum/packshot.svg",
+    "number": "20"
+  },
+  {
+    "id": "peptide-anti-wrinkle-day-cream",
+    "name": "Peptide Anti-Wrinkle Day Cream",
+    "type": "Moisturizer",
+    "size": "1.7 fl oz (50 mL)",
+    "retailPrice": null,
+    "pricePending": true,
+    "ritual": "Moisturize",
+    "descriptor": "Morning moisture. A softer finish.",
+    "description": "A rich morning cream with aloe, sodium hyaluronate, panthenol and squalane, for dull, dry-feeling skin. Follow with sun protection.",
+    "ingredients": "Aloe leaf, Sodium hyaluronate & glycerin, Squalane",
+    "directions": "Warm a small amount between your fingertips and massage into face, neck and décolleté. Follow with sun protection (SPF) in the morning.",
+    "inci": "Water, Aloe Barbadensis Leaf, PPG-2 Myristyl Ether Propionate, Butylene Glycol, Glycerin, Cetyl Esters, Hydroxyethyl Acrylate/Sodium Acryloyldimethyl Taurate Copolymer, Sodium Hyaluronate, Panthenol, Olive Oil PEG-7 Esters, Ethylhexyl Stearate, Cetearyl Alcohol, Tocopheryl Acetate, Cyclomethicone, Sodium Lactate, PEG-120 Methyl Glucose Dioleate, Phenoxyethanol, Glyceryl Stearate, PEG-100 Stearate, Squalane, Hydrolyzed Wheat Protein, Silk Amino Acids, Panax Ginseng Root Extract, Dimethicone, Chamomilla Recutita (Matricaria) Flower Extract, Chondrus Crispus (Carrageenan), Glucose, Fragrance, Disodium EDTA, Retinyl Palmitate, Camellia Oleifera Leaf Extract, Methylisothiazolinone, Ascorbyl Palmitate",
+    "source": "https://www.globalbeauty.net/product/peptide-anti-wrinkle-day-cream/",
+    "image": "/images/skincare/new-products-only/peptide-anti-wrinkle-day-cream/packshot.svg",
+    "number": "21"
+  }
+]

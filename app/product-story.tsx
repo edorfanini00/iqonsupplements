@@ -14,10 +14,13 @@ import { formulaSpotlights, skincareNotes } from "@/lib/product-story-detail";
 import { ProductFormulaVisual } from "./product-formula-visual";
 import { SkincareProductStory } from "./skincare-product-story";
 import { skincareStories } from "@/lib/skincare-stories";
+import { newSkincareFor, newSkincareIds } from "@/lib/new-skincare";
+import { newSkincareStories } from "@/lib/new-skincare-editorial";
 import { SupplementProductStory } from "./supplement-product-story";
 import { supplementVisualContent } from "@/lib/supplement-visual-content";
 
 export function comparisonFor(product: Product, products: Product[]) {
+  if (newSkincareIds.has(product.id)) return [product, ...products.filter(p=>newSkincareIds.has(p.id)&&p.id!==product.id)].slice(0,3);
   const choices = product.category === "skincare"
     ? ["hydra-c-ferulic-serum", "retinol-rx", "exfoliating-pads"].includes(product.id)
       ? ["hydra-c-ferulic-serum", "retinol-rx", "exfoliating-pads"]
@@ -44,9 +47,9 @@ export function ProductStory({ product: p, products }: { product: Product; produ
   const content = productContent[p.id];
   if (!content) return null;
   const supplement = supplementDetails[p.id];
-  const skin = skincareRange.find(item => item.id === p.id);
+  const skin = skincareRange.find(item => item.id === p.id) || newSkincareFor(p.id);
   const comparison = comparisonFor(p, products);
-  if (skin && skincareStories[p.id]) return <SkincareProductStory product={p} comparison={comparison}/>;
+  if (skin && (skincareStories[p.id] || newSkincareStories[p.id])) return <SkincareProductStory product={p} comparison={comparison}/>;
   if (supplement && supplementVisualContent[p.id]) return <SupplementProductStory product={p} comparison={comparison}/>;
   const research = content.education;
   const visual = productVisuals[p.id];

@@ -1,4 +1,5 @@
 import content from "./product-copy.json";
+import newSkincareCopy from "./new-skincare-copy.json";
 /** Catalog copy based on supplied packaging and supplier specifications, with separate ingredient research.
  * Live Shopify product descriptions remain authoritative. */
 export type ProductContent = {
@@ -18,4 +19,4 @@ export type ProductContent = {
   supplyDays?: number;
   education?: { eyebrow: string; title: string; body: string; scope: string; sources: { label: string; url: string }[] };
 };
-export const productContent: Record<string, ProductContent> = content;
+export const productContent: Record<string, ProductContent> = {...content, ...newSkincareCopy};

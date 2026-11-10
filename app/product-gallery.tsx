@@ -9,6 +9,8 @@ import { productPresentation } from "@/lib/product-presentation";
 import { ProductFactArt } from "./product-fact-art";
 import { galleryGuides, galleryPhotographs } from "@/lib/product-gallery-content";
 import { ProductGuideArt } from "./product-guide-art";
+import { newSkincarePresentation, newSkincareGalleryGuides } from "@/lib/new-skincare-editorial";
+import { newSkincareImage } from "@/lib/new-skincare";
 
 export const galleryChapters = ["The packaging", "Formula focus", "The product", "How it fits"];
 
@@ -23,18 +25,19 @@ function extraPhotographs(p: Product) {
 
 export function ProductGalleryPanel({ product: p, index }: { product: Product; index: number }) {
   const art = productArt[p.id];
-  const presentation = productPresentation[p.id];
+  const presentation = productPresentation[p.id] || newSkincarePresentation[p.id];
   const contents = packageContents(p);
-  const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : undefined);
+  const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : newSkincareImage(p.id,'editorial') ? {src:newSkincareImage(p.id,'editorial')!,alt:`${p.name} editorial image pending approval — local preview only`} : undefined);
   if (presentation && index === 1) return <figure className="visual-panel visual-formula-fact"><ProductFactArt data={presentation}/></figure>;
   if (photograph && index === 2) return <figure className="visual-panel visual-editorial">
     <div className="visual-image-frame"><img src={photograph.src} alt={photograph.alt} width={1254} height={1254} loading="lazy" /></div>
     <figcaption className="sr-only">{photograph.alt}</figcaption>
   </figure>;
-  if (galleryGuides[p.id] && index === 3) return <figure className="visual-panel visual-guide"><ProductGuideArt data={galleryGuides[p.id]}/></figure>;
+  const guide = galleryGuides[p.id] || newSkincareGalleryGuides[p.id];
+  if (guide && index === 3) return <figure className="visual-panel visual-guide"><ProductGuideArt data={guide}/></figure>;
   const extra = index > 3 ? extraPhotographs(p)[index - 4] : undefined;
   return <figure className="visual-panel visual-pack">
-    <div className="visual-image-frame"><img src={extra?.src || p.image} alt={extra?.alt || `IQON ${p.name} packaging, ${contents}`} width={1122} height={1402} loading={index === 0 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : undefined} /></div>
+    <div className="visual-image-frame"><img src={extra?.src || p.image} alt={extra?.alt || (newSkincareImage(p.id,'packshot') ? p.images?.[0]?.alt : undefined) || `IQON ${p.name} packaging, ${contents}`} width={1122} height={1402} loading={index === 0 ? "eager" : "lazy"} fetchPriority={index === 0 ? "high" : undefined} /></div>
     <figcaption className="sr-only">{extra ? extra.alt : contents}</figcaption>
   </figure>;
 }
@@ -44,7 +47,7 @@ export function ProductGallery({ product }: { product: Product }) {
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState<number | null>(null);
   const extras = extraPhotographs(product);
-  const chapters = productPresentation[product.id] ? [...galleryChapters, ...extras.map((_, i) => `Product detail ${i + 2}`)] : ["The packaging"];
+  const chapters = (productPresentation[product.id] || newSkincarePresentation[product.id]) ? [...galleryChapters, ...extras.map((_, i) => `Product detail ${i + 2}`)] : ["The packaging"];
   const count = chapters.length;
   const go = (index: number) => {
     const next = Math.min(count - 1, Math.max(0, index));
