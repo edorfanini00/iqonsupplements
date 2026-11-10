@@ -1,0 +1,66 @@
+{
+  "scope": "Three new LOCAL preview pages only",
+  "assets": [
+    {
+      "id": "enzyme-gel-cleanser",
+      "role": "packshot",
+      "path": "/images/skincare/new-products-only/enzyme-gel-cleanser/packshot.webp",
+      "sha256": "a56bff84ca635e698929d28eb4172f8688d08c19a2145210150980a1cc300414",
+      "sourceManifest": "creative/page-assets/MANIFEST.json",
+      "sourceManifestSha256": "e97d0e10d3d3b8a86be7c6dbc0c11d32dc500cdc964d8b643c1d1ad6f976193d",
+      "approval": "Parent accepted for LOCAL preview insertion only; no owner publication approval",
+      "provenance": "CGI from saved supplier-grounded packaging"
+    },
+    {
+      "id": "hyaluronic-serum",
+      "role": "packshot",
+      "path": "/images/skincare/new-products-only/hyaluronic-serum/packshot.webp",
+      "sha256": "bc7c2d4255a79064658114717a0504e55a506a3578bdfb8d46670e1bb8ddbb13",
+      "sourceManifest": "creative/page-assets/MANIFEST.json",
+      "sourceManifestSha256": "e97d0e10d3d3b8a86be7c6dbc0c11d32dc500cdc964d8b643c1d1ad6f976193d",
+      "approval": "Parent accepted for LOCAL preview insertion only; no owner publication approval",
+      "provenance": "CGI from saved supplier-grounded packaging"
+    },
+    {
+      "id": "peptide-anti-wrinkle-day-cream",
+      "role": "packshot",
+      "path": "/images/skincare/new-products-only/peptide-anti-wrinkle-day-cream/packshot.webp",
+      "sha256": "ed001b978b0d603764a3ba54c870b6f658f942fe544a5d2d3bb0808215e96a68",
+      "sourceManifest": "creative/page-assets/MANIFEST.json",
+      "sourceManifestSha256": "e97d0e10d3d3b8a86be7c6dbc0c11d32dc500cdc964d8b643c1d1ad6f976193d",
+      "approval": "Parent accepted for LOCAL preview insertion only; no owner publication approval",
+      "provenance": "CGI from saved supplier-grounded packaging"
+    },
+    {
+      "id": "enzyme-gel-cleanser",
+      "role": "texture",
+      "path": "/images/product-details/anti-aging-cleanser-with-peptides.webp",
+      "sha256": "ffa49c4c907a0ab45c19fbdb1faf1534b9d309ac6498b22b2dc7955ef7ba2386",
+      "approval": "Parent-authorized analogous-category own-brand texture study; pixels inspected by builder",
+      "pixelFinding": "Foam bubbles on a reflective surface; no pack, people, lettering or results. The pdp-materials-v6 old cleanser photograph was rejected because a hand/person is visible.",
+      "caption": "Illustrative texture study, not the finished formula",
+      "limitations": "Not evidence of new formula color, viscosity, application method or efficacy. Source file referenced unchanged; no inherited old-formula copy."
+    },
+    {
+      "id": "hyaluronic-serum",
+      "role": "texture",
+      "path": "/images/pdp-materials-v6/hydra-c-ferulic-serum.webp",
+      "sha256": "3d22a155340738bf537d6e67f98d8f38e00b4b1eb706918de272e4499dbdbd6c",
+      "approval": "Parent-authorized analogous-category own-brand texture study; pixels inspected by builder",
+      "pixelFinding": "Clear liquid pool and glass dropper; no bottle, people, lettering or results.",
+      "caption": "Illustrative texture study, not the finished formula",
+      "limitations": "Not evidence of new formula color, viscosity, application method or efficacy. Source file referenced unchanged; no inherited old-formula copy."
+    },
+    {
+      "id": "peptide-anti-wrinkle-day-cream",
+      "role": "texture",
+      "path": "/images/pdp-materials-v6/copper-peptide-restore-cream.webp",
+      "sha256": "f33035bc2f98955998ae409afddfbea52ac8a0e62ad75b25381595fa49e4735a",
+      "approval": "Parent-authorized analogous-category own-brand texture study; pixels inspected by builder",
+      "pixelFinding": "Cream-colored smear and metal spatula; no pack, people, lettering or results.",
+      "caption": "Illustrative texture study, not the finished formula",
+      "limitations": "Not evidence of new formula color, viscosity, application method or efficacy. Source file referenced unchanged; no inherited old-formula copy."
+    }
+  ],
+  "editorial": "All three editorial slots retain approved pending placeholders. All six generated page-assets supporting images rejected and excluded. No unreviewed editorial-light-final images integrated."
+}

@@ -65,6 +65,7 @@ export function ProductGallery({ product }: { product: Product }) {
       </article>)}
     </div>
     <div className="visual-gallery-controls"><button aria-label="Previous product panel" disabled={active === 0} onClick={() => go(active - 1)}><ArrowLeft size={18} /></button><div><span aria-live="polite">{chapters[active]}</span><div className="visual-gallery-dots">{chapters.map((chapter, i) => <button key={chapter} aria-label={`View ${chapter.toLowerCase()}`} aria-current={active === i ? "true" : undefined} onClick={() => go(i)} />)}</div></div><button aria-label="Next product panel" disabled={active === count - 1} onClick={() => go(active + 1)}><ArrowRight size={18} /></button></div>
+    {newSkincareImage(product.id,'packshot')&&<p className="product-preview-note">Packaging visualization based on approved artwork and supplier container references; not a supplier photograph.</p>}
     <Dialog open={zoom !== null} onOpenChange={open => { if (!open) setZoom(null); }}><DialogContent className="visual-gallery-dialog"><DialogTitle className="sr-only">{product.name} — {chapters[zoom || 0]}</DialogTitle><DialogDescription className="sr-only">Expanded product photograph and information</DialogDescription><ProductGalleryPanel product={product} index={zoom || 0} /></DialogContent></Dialog>
   </div>;
 }

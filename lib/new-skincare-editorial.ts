@@ -6,7 +6,7 @@ import type { GalleryGuide } from './product-gallery-content';
 export const newSkincareStories: Record<string,SkincareStory> = {"enzyme-gel-cleanser": {
     eyebrow:"THE FIRST STEP",title:"Start clean. Finish smooth.",
     introduction:"A rinse-off gel cleanser with papaya fruit extract, salicylic acid and glycerin. Massage onto damp skin, rinse well and move on to the rest of your routine.",
-    imageAlt:"Texture image pending approval — local preview only",photoCaption:"A small amount. Damp skin. A thorough rinse.",
+    imageAlt:"Foam bubbles on a reflective surface. Illustrative texture study, not the finished formula",photoCaption:"Illustrative texture study, not the finished formula",
     benefits:[{title:"A rinse-off gel",body:"Massage onto damp skin as the first step of your morning or evening routine."},{title:"Papaya + salicylic acid",body:"Papaya fruit extract and salicylic acid sit alongside glycerin in the cleansing gel."},{title:"Prepare for what follows",body:"Rinse well, then continue with your serum and moisturizer."}],
     facts:[{value:"01",label:"The first step",detail:"Begin with cleansing."},{value:"207 mL",label:"Gel cleanser",detail:"7 fl oz, a rinse-off facial formula."},{value:"AM / PM",label:"Up to twice daily",detail:"Massage onto damp skin, then rinse."}],
     formulaTitle:"A gel cleanse, with papaya.",formulaIntro:"A rinse-off formula that brings papaya fruit extract and salicylic acid into your first skincare step.",
@@ -16,7 +16,7 @@ export const newSkincareStories: Record<string,SkincareStory> = {"enzyme-gel-cle
 "hyaluronic-serum": {
     eyebrow:"LIGHTWEIGHT HYDRATION",title:"Hydration, in a lighter layer.",
     introduction:"An aloe-based serum with glycerin, panthenol and sodium hyaluronate, for skin that feels dehydrated. Apply after cleansing and before moisturizer.",
-    imageAlt:"Texture image pending approval — local preview only",photoCaption:"A light layer, before your moisturizer.",
+    imageAlt:"Clear liquid and a glass dropper on a grey surface. Illustrative texture study, not the finished formula",photoCaption:"Illustrative texture study, not the finished formula",
     benefits:[{title:"For dehydrated-feeling skin",body:"Humectants attract and hold water in a lightweight serum."},{title:"An aloe-based formula",body:"Aloe leaf comes straight after water, with glycerin and panthenol."},{title:"Layers before cream",body:"Once absorbed, follow with moisturizer and SPF by day."}],
     facts:[{value:"30 mL",label:"Serum format",detail:"1 fl oz, for the face and neck."},{value:"AM / PM",label:"Up to twice daily",detail:"After cleansing and toning."},{value:"02",label:"Humectants",detail:"Glycerin and sodium hyaluronate."}],
     formulaTitle:"Water-binding care, kept light.",formulaIntro:"Humectants and conditioning ingredients share this hydration step.",
@@ -26,7 +26,7 @@ export const newSkincareStories: Record<string,SkincareStory> = {"enzyme-gel-cle
 "peptide-anti-wrinkle-day-cream": {
     eyebrow:"YOUR MORNING CREAM",title:"A richer start to the day.",
     introduction:"A rich day cream for dull, dry-feeling skin, with aloe, sodium hyaluronate, panthenol and squalane. Massage in each morning, then follow with sun protection.",
-    imageAlt:"Texture image pending approval — local preview only",photoCaption:"Warm a small amount between your fingertips.",
+    imageAlt:"Cream-colored smear with a metal spatula on a grey surface. Illustrative texture study, not the finished formula",photoCaption:"Illustrative texture study, not the finished formula",
     benefits:[{title:"Moisture for dry-feeling skin",body:"Aloe, glycerin and sodium hyaluronate bring water-binding care."},{title:"A softer feel",body:"Squalane and cetyl esters help skin feel soft and look smoother."},{title:"Made for mornings",body:"Face, neck and décolleté, then sun protection."}],
     facts:[{value:"AM",label:"Morning care",detail:"Follow with SPF."},{value:"50 mL",label:"Cream format",detail:"1.7 fl oz, for face, neck and décolleté."},{value:"SPF",label:"Your daytime partner",detail:"Sun protection completes the step."}],
     formulaTitle:"Humectants. Emollients. A rich finish.",formulaIntro:"Water-binding and softening ingredients play different roles within the same cream.",
@@ -34,24 +34,24 @@ export const newSkincareStories: Record<string,SkincareStory> = {"enzyme-gel-cle
     routineIntro:"Apply each morning after cleansing and any serum, then follow with sun protection.",routineNote:"Contains fragrance, hydrolyzed wheat protein and retinyl palmitate, a vitamin A ester. Consider your other vitamin A products and stop use if irritation occurs."
   }};
 export const newSkincareVisualContent: Record<string,SkinVisualContent> = {"enzyme-gel-cleanser": {
-    photoLabel:"THE CLEANSE", ingredientOrder:[0,1,2], routineEyebrow:"YOUR FIRST STEP", timingIcon:"day-night",
-    texture:"Rinse-off gel / AM + PM",
+    photoLabel:"TEXTURE STUDY", ingredientOrder:[0,1,2], routineEyebrow:"YOUR FIRST STEP", timingIcon:"day-night",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"A rinse-off gel",body:"Massage onto damp skin, then rinse well.",icon:"rinse"},{title:"Papaya fruit extract",body:"Papaya fruit extract is listed in the formula.",icon:"spark"},{title:"Salicylic acid",body:"A beta hydroxy acid in the cleansing gel.",icon:"layers"},{title:"Ready for what follows",body:"Clean skin before serum and moisturizer.",icon:"face"}],
     ingredients:[{label:"Papaya fruit extract",art:"botanical",artLabel:"Carica papaya fruit extract",kind:"botanical",summary:"The label names Carica Papaya (Papaya) Fruit Extract.",tags:["BOTANICAL","PAPAYA"]},{art:"salicylic-acid",artLabel:"Salicylic acid / BHA",kind:"molecule",summary:"A beta hydroxy acid, rinsed away with the gel.",tags:["BHA","RINSE-OFF"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"A humectant alongside the cleansing ingredients.",tags:["HUMECTANT","COMFORT"]}],
     routineTitle:"Dampen. Massage. Rinse.",timing:"AM + PM / FIRST STEP",
     steps:[{title:"Dampen skin",body:"Begin with damp skin.",icon:"cleanse"},{title:"Massage gently",body:"Work a small amount over the face.",icon:"apply"},{title:"Rinse well",body:"Rinse with water, then continue your routine.",icon:"layers"}]
   },
 "hyaluronic-serum": {
-    photoLabel:"THE APPLICATION", ingredientOrder:[0,1,2], routineEyebrow:"YOUR HYDRATION STEP", timingIcon:"layers",
-    texture:"Lightweight serum / before moisturizer",
+    photoLabel:"TEXTURE STUDY", ingredientOrder:[0,1,2], routineEyebrow:"YOUR HYDRATION STEP", timingIcon:"layers",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"Light hydration",body:"For skin that feels dehydrated.",icon:"droplet"},{title:"Two humectants",body:"Glycerin and sodium hyaluronate hold water.",icon:"layers"},{title:"Aloe-based",body:"Aloe leaf, panthenol and allantoin condition.",icon:"feather"},{title:"Twice-daily step",body:"After cleansing and toning, before cream.",icon:"face"}],
     ingredients:[{label:"Sodium hyaluronate",art:"moisture",artLabel:"Moisture binding",kind:"moisture",summary:"The salt form of hyaluronic acid, binding water at the surface.",tags:["HUMECTANT","HYDRATION"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"A second humectant that attracts water.",tags:["HUMECTANT","LIGHT LAYER"]},{label:"Aloe + panthenol",art:"panthenol",artLabel:"Panthenol / provitamin B5",kind:"molecule",summary:"Conditioning care in an aloe-based serum.",tags:["ALOE","CONDITIONING"]}],
     routineTitle:"Apply. Absorb. Moisturize.",timing:"AM + PM / BEFORE MOISTURIZER",
     steps:[{title:"Cleanse + tone",body:"Start with clean skin.",icon:"cleanse"},{title:"Apply",body:"Smooth over the face and neck.",icon:"apply"},{title:"Moisturize + SPF",body:"Follow with cream; SPF by day.",icon:"sun"}]
   },
 "peptide-anti-wrinkle-day-cream": {
-    photoLabel:"THE APPLICATION", ingredientOrder:[0,1,2], routineEyebrow:"YOUR MORNING STEP", timingIcon:"layers",
-    texture:"Rich cream / mornings, before SPF",
+    photoLabel:"TEXTURE STUDY", ingredientOrder:[0,1,2], routineEyebrow:"YOUR MORNING STEP", timingIcon:"layers",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"Morning moisture",body:"A rich cream for dry-feeling skin.",icon:"droplet"},{title:"Softer-feeling skin",body:"Squalane and cetyl esters soften.",icon:"feather"},{title:"For dull-looking skin",body:"A rich cream for skin that looks dull and feels dry.",icon:"face"},{title:"Then sun protection",body:"Follow with SPF in the morning.",icon:"sun"}],
     ingredients:[{label:"Aloe leaf",art:"botanical",artLabel:"Aloe barbadensis leaf",kind:"botanical",summary:"Listed straight after water as the cream’s base.",tags:["BOTANICAL","BASE"]},{label:"Hyaluronate + glycerin",art:"moisture",artLabel:"Moisture binding",kind:"moisture",summary:"Two humectants that attract and hold water.",tags:["HUMECTANTS","HYDRATION"]},{art:"squalane",artLabel:"Squalane",kind:"molecule",summary:"An emollient that softens the feel of skin.",tags:["EMOLLIENT","SOFTNESS"]}],
     routineTitle:"Warm. Massage. Protect.",timing:"AM / BEFORE SPF",

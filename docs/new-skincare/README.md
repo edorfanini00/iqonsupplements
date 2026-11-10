@@ -1,6 +1,6 @@
 # New-products-only local candidate
 
-State: **In development / local review candidate**, not approved to publish.
+State: **PR-ready / local preview candidate**, not approved to publish.
 
 Adds only Enzyme Gel Cleanser, Hyaluronic Serum, and Peptide Anti-Wrinkle Day Cream. The existing seven skincare products—including Anti-Aging Cleanser with Peptides and Hydrating Tonic—remain unchanged. No retirements, replacements, redirects, price approvals, inventory claims, Shopify helper/plan or external writes are part of this patch.
 
@@ -19,16 +19,20 @@ Source index: `source-facts.json`. Approved artwork is the October 16 complete-s
 - Hyaluronic: proof p5 exact INCI, not a mixture with the supplier website list. Preservative/color additives remain disclosed; market/batch review is still required.
 - Day cream: proof p7 visible directions include face, neck, décolleté and morning SPF. No stale PDF text-layer, nighttime balm, spatula/steam/post-procedure directions, invented signal peptide or sunscreen protection claim.
 
-## Asset hold
-All nine newly added SVGs are unmistakable **image-pending-approval / local-preview-only placeholders**, not finished product photography or label cards. Real full pages and product-specific information are implemented, but this is NOT a final visual deliverable. Approved 4:5 cool-grey/silver packshot, editorial and texture images are pending parent/owner approval. Existing photography is never replaced or borrowed to represent the new products. No before/after results or fabricated reviews were added.
+## Local media integration; editorial hold
+Three parent-accepted 4:5 packshot WebPs are integrated for **local preview only**, verified against `creative/page-assets/MANIFEST.json`. Visible gallery copy identifies them as packaging visualizations, not supplier photographs. This is not owner publication approval.
+
+Three existing own-brand abstract closeups are referenced in place without altering their files: cleanser foam from `product-details`, serum/dropper from Hydra material artwork, and cream/spatula from Copper material artwork. Each carries the ordinary visible caption **“Illustrative texture study, not the finished formula”** and descriptive alt text. They do not establish finished-formula color, viscosity, application method or efficacy; no old-formula copy is reused. The old cleanser material photograph containing a hand was rejected in favor of the generic foam closeup. Exact paths, hashes and pixel-inspection findings are recorded in `media-integration.json`.
+
+**Three editorial slots remain unfinished**, retaining their pending SVGs in the gallery and routine modules. All six rejected generated supporting images remain excluded. Unreviewed `editorial-light-final` artwork is not integrated. The unused packshot/texture SVG placeholders remain on disk, but no new page renders them. No existing photography or product page was replaced; no before/after results or fabricated reviews were added.
 
 ## Local verification
 Node 22 required. `npm ci --ignore-scripts`; `npx prisma generate`; `npm run build:vercel`.
 - `node --import tsx --test tests/new-skincare-only.test.ts`
-- `npx vitest run --config tests/ui/vitest.config.mjs tests/ui/skincare-ingredient-explorer.test.ts tests/ui/product-storytelling.test.ts tests/ui/purchase-options.test.ts`
+- `npx vitest run --config tests/ui/vitest.config.mjs tests/ui/new-skincare-media.test.ts tests/ui/product-storytelling.test.ts`
 - `npx tsc -p tsconfig.next.json --noEmit`
 
-External task evidence (not shipped in this repository): `/Users/edorfanini/.hermes/runtime/iqon-skincare-catalog-refresh/new-products-only/site/`. Includes baseline source/asset hashes, archived upstream, live/baseline/candidate desktop/mobile captures, browser interactions and result report.
+External task evidence (not shipped in this repository): `/Users/edorfanini/.hermes/runtime/iqon-skincare-catalog-refresh/new-products-only/site/` (original accepted candidate) and `../integration1/` (media integration). The latter includes build/focused-test receipts, real-browser 320/390/1440px new-page checks, strict software-raster comparisons for the original seven at 390/1440px, source/asset preservation, top/full-page screenshots and contact sheets.
 
 ## Remaining gates
 Final asset approval/integration and repeat visual QA; two independent exact-commit reviews owned by parent (max two bounded correction rounds); owner preview approval. No PR push, merge, deployment or publication is authorized by this task. Eventual live activation is a separate explicit change; preview-only gating must not be silently removed.

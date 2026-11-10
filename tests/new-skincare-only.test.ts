@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {products,productPrice,validateCart} from '../lib/catalog';
 import {productContent} from '../lib/product-content';
-import {newSkincareProducts,newSkincareIds,newSkincareFor,localNewSkincareProduct,localNewSkincareDepartment,withLocalNewSkincareCards} from '../lib/new-skincare';
+import {newSkincareProducts,newSkincareIds,newSkincareFor,newSkincareImage,localNewSkincareProduct,localNewSkincareDepartment,withLocalNewSkincareCards} from '../lib/new-skincare';
 import {newSkincareStories,newSkincareVisualContent,newSkincarePresentation,newSkincareGalleryGuides} from '../lib/new-skincare-editorial';
 import {isOrderable} from '../lib/commerce-policy';
 import {productJsonLd} from '../lib/seo';
@@ -51,15 +51,35 @@ test('new products cannot leak into live/unavailable catalogs or gain stock, pri
  const added=withLocalNewSkincareCards(products,'preview');assert.deepEqual(added.slice(0,products.length),products);assert.equal(added.length,products.length+3);
  assert.deepEqual(withLocalNewSkincareCards(added,'preview'),added);
 });
-test('each new page has complete product-specific story, ingredients, routine, FAQs and four gallery panels without borrowed photography',()=>{
+test('each new page has complete product-specific story, ingredients, routine, FAQs and four gallery panels',()=>{
  for(const p of newSkincareProducts){
   const c=productContent[p.id],s=newSkincareStories[p.id],v=newSkincareVisualContent[p.id];
   assert(c&&s&&v&&newSkincarePresentation[p.id]&&newSkincareGalleryGuides[p.id]);assert.equal(c.ingredients!.length,3);assert.equal(v.ingredients.length,3);assert.equal(v.steps.length,3);assert(c.faqs.length>=4);assert.equal(v.benefits.length,4);
-  for(const role of ['packshot','texture','editorial']){
-   const file=`public/images/skincare/new-products-only/${p.id}/${role}.svg`;assert(existsSync(file));assert.match(readFileSync(file,'utf8'),/Image pending approval/);
-  }
+  const editorial=newSkincareImage(p.id,'editorial')!;
+  assert.equal(editorial,`/images/skincare/new-products-only/${p.id}/editorial.svg`);
+  assert.match(readFileSync(`public${editorial}`,'utf8'),/Image pending approval/);
   for(const art of v.ingredients)if(art.kind==='molecule')assert(existsSync(`public/images/skincare-ingredients/${art.art}.svg`));
  }
+});
+test('accepted local packshots match pinned hashes and texture references stay byte-identical with explicit visible disclosure',()=>{
+ const packHashes=['a56bff84ca635e698929d28eb4172f8688d08c19a2145210150980a1cc300414','bc7c2d4255a79064658114717a0504e55a506a3578bdfb8d46670e1bb8ddbb13','ed001b978b0d603764a3ba54c870b6f658f942fe544a5d2d3bb0808215e96a68'];
+ const textures=['/images/product-details/anti-aging-cleanser-with-peptides.webp','/images/pdp-materials-v6/hydra-c-ferulic-serum.webp','/images/pdp-materials-v6/copper-peptide-restore-cream.webp'];
+ ids.forEach((id,i)=>{
+  const p=newSkincareProducts.find(p=>p.id===id)!;
+  assert.equal(p.image,`/images/skincare/new-products-only/${id}/packshot.webp`);
+  assert.equal(newSkincareImage(id,'packshot'),p.image);
+  assert.match(p.images![0].alt,/CGI packaging visualization/);
+  assert.equal(createHash('sha256').update(readFileSync(`public${p.image}`)).digest('hex'),packHashes[i]);
+  assert.equal(newSkincareImage(id,'texture'),textures[i]);
+  assert.deepEqual(readFileSync(`public${textures[i]}`),original(`public${textures[i]}`));
+  assert.match(newSkincareStories[id].imageAlt,/Illustrative texture study, not the finished formula/);
+  assert.equal(newSkincareVisualContent[id].texture,'Illustrative texture study, not the finished formula');
+  assert.equal(newSkincareVisualContent[id].photoLabel,'TEXTURE STUDY');
+ });
+ for(const p of products)for(const role of ['packshot','texture','editorial'] as const)assert.equal(newSkincareImage(p.id,role),undefined);
+ assert.equal(newSkincareImage('invented-product','texture'),undefined);
+ const comparison=readFileSync('app/skincare-product-story.tsx','utf8');
+ assert(comparison.includes('skincareRange.find(s=>s.id===q.id)?.size||newSkincareFor(q.id)?.size'));
 });
 test('full INCI and directions are byte-exact approved-label transcriptions, independently pinned from the research manifest',()=>{
  const expected=[
