@@ -60,7 +60,40 @@
       "pixelFinding": "Cream-colored smear and metal spatula; no pack, people, lettering or results.",
       "caption": "Illustrative texture study, not the finished formula",
       "limitations": "Not evidence of new formula color, viscosity, application method or efficacy. Source file referenced unchanged; no inherited old-formula copy."
+    },
+    {
+      "id": "enzyme-gel-cleanser",
+      "role": "editorial",
+      "path": "/images/skincare/new-products-only/enzyme-gel-cleanser/editorial.webp",
+      "sha256": "45cd93cda5e4b27fcba95384e309c4445e32b51cc9df195ab777bf7918f51efc",
+      "sourceManifest": "creative/editorial-light-final/MANIFEST.json",
+      "sourceManifestSha256": "27aa9bd0714a8fae0c5236a73a7c360c7e94cd2080a244d140d14a7d43ba91ea",
+      "approval": "Parent accepted contact-sheet pixels for LOCAL preview insertion only; release hold and owner publication gate remain",
+      "provenance": "CGI packaging visualization beside an empty glass cylinder on a light grey surface; not a finished-formula photograph",
+      "limitations": "Empty glass is a styling prop, not formula or application evidence. No render edits."
+    },
+    {
+      "id": "hyaluronic-serum",
+      "role": "editorial",
+      "path": "/images/skincare/new-products-only/hyaluronic-serum/editorial.webp",
+      "sha256": "ab2198bfc4561f877f694e0aeaa49c490d4354d0e1fc5598cd70484cfccaeb10",
+      "sourceManifest": "creative/editorial-light-final/MANIFEST.json",
+      "sourceManifestSha256": "27aa9bd0714a8fae0c5236a73a7c360c7e94cd2080a244d140d14a7d43ba91ea",
+      "approval": "Parent accepted contact-sheet pixels for LOCAL preview insertion only; release hold and owner publication gate remain",
+      "provenance": "CGI packaging visualization beside an empty glass cylinder on a light grey surface; not a finished-formula photograph",
+      "limitations": "Empty glass is a styling prop, not formula or application evidence. No render edits."
+    },
+    {
+      "id": "peptide-anti-wrinkle-day-cream",
+      "role": "editorial",
+      "path": "/images/skincare/new-products-only/peptide-anti-wrinkle-day-cream/editorial.webp",
+      "sha256": "2f0fabebccf95be2eb58c2d52c43a796730e11aae3c4dda0c9d9dcdcbb80791a",
+      "sourceManifest": "creative/editorial-light-final/MANIFEST.json",
+      "sourceManifestSha256": "27aa9bd0714a8fae0c5236a73a7c360c7e94cd2080a244d140d14a7d43ba91ea",
+      "approval": "Parent accepted contact-sheet pixels for LOCAL preview insertion only; release hold and owner publication gate remain",
+      "provenance": "CGI packaging visualization beside an empty glass cylinder on a light grey surface; not a finished-formula photograph",
+      "limitations": "Empty glass is a styling prop, not formula or application evidence. No render edits."
     }
   ],
-  "editorial": "All three editorial slots retain approved pending placeholders. All six generated page-assets supporting images rejected and excluded. No unreviewed editorial-light-final images integrated."
+  "editorial": "Three parent-accepted editorial-light-final WebPs integrated unchanged for LOCAL preview only. Six rejected page-assets supporting images remain excluded. Release hold, final independent reviews and owner publication approval remain."
 }

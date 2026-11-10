@@ -24,6 +24,12 @@ describe('new-only media integration',()=>{
    expect(Array.from(container.querySelectorAll('.skin-compare-product p span')).map(el=>el.textContent)).toEqual(newSkincareProducts.map(p=>p.size));
    expect(container.querySelector('.skin-application-photo img')?.getAttribute('src')).toBe(newSkincareImage(product.id,'editorial'));
    expect(container.querySelector('.visual-editorial img')?.getAttribute('src')).toBe(newSkincareImage(product.id,'editorial'));
+   for(const selector of ['.visual-editorial img','.skin-application-photo img']){
+    const image=container.querySelector(selector)!;
+    expect(image.getAttribute('src')).toBe(`/images/skincare/new-products-only/${product.id}/editorial.webp`);
+    expect(image.getAttribute('alt')).toBe(`IQON ${product.name} packaging beside an empty glass cylinder on a light grey surface — CGI visualization`);
+   }
+   expect(container.innerHTML).not.toMatch(/image pending|editorial\.svg/i);
   });
  }
  it('does not introduce the new packaging disclosure on any existing gallery',()=>{

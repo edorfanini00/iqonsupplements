@@ -26,8 +26,8 @@ export const newSkincareImage = (id:string, role:'packshot'|'editorial'|'texture
   if (!newSkincareIds.has(id)) return undefined;
   if (role === 'packshot') return newSkincareFor(id)!.image;
   if (role === 'texture') return textureReferences[id];
-  // Editorial art remains unapproved; never substitute the rejected supporting renders.
-  return `/images/skincare/new-products-only/${id}/editorial.svg`;
+  // Parent-accepted editorial render for local preview only; publication remains gated.
+  return `/images/skincare/new-products-only/${id}/editorial.webp`;
 };
 
 /** Deliberately fail closed outside the unconfigured local preview catalog. */

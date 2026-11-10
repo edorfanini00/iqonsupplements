@@ -56,8 +56,13 @@ test('each new page has complete product-specific story, ingredients, routine, F
   const c=productContent[p.id],s=newSkincareStories[p.id],v=newSkincareVisualContent[p.id];
   assert(c&&s&&v&&newSkincarePresentation[p.id]&&newSkincareGalleryGuides[p.id]);assert.equal(c.ingredients!.length,3);assert.equal(v.ingredients.length,3);assert.equal(v.steps.length,3);assert(c.faqs.length>=4);assert.equal(v.benefits.length,4);
   const editorial=newSkincareImage(p.id,'editorial')!;
-  assert.equal(editorial,`/images/skincare/new-products-only/${p.id}/editorial.svg`);
-  assert.match(readFileSync(`public${editorial}`,'utf8'),/Image pending approval/);
+  assert.equal(editorial,`/images/skincare/new-products-only/${p.id}/editorial.webp`);
+  const editorialHashes:Record<string,string>={
+   'enzyme-gel-cleanser':'45cd93cda5e4b27fcba95384e309c4445e32b51cc9df195ab777bf7918f51efc',
+   'hyaluronic-serum':'ab2198bfc4561f877f694e0aeaa49c490d4354d0e1fc5598cd70484cfccaeb10',
+   'peptide-anti-wrinkle-day-cream':'2f0fabebccf95be2eb58c2d52c43a796730e11aae3c4dda0c9d9dcdcbb80791a',
+  };
+  assert.equal(createHash('sha256').update(readFileSync(`public${editorial}`)).digest('hex'),editorialHashes[p.id]);
   for(const art of v.ingredients)if(art.kind==='molecule')assert(existsSync(`public/images/skincare-ingredients/${art.art}.svg`));
  }
 });

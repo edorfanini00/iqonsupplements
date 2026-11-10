@@ -27,7 +27,7 @@ export function ProductGalleryPanel({ product: p, index }: { product: Product; i
   const art = productArt[p.id];
   const presentation = productPresentation[p.id] || newSkincarePresentation[p.id];
   const contents = packageContents(p);
-  const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : newSkincareImage(p.id,'editorial') ? {src:newSkincareImage(p.id,'editorial')!,alt:`${p.name} editorial image pending approval — local preview only`} : undefined);
+  const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : newSkincareImage(p.id,'editorial') ? {src:newSkincareImage(p.id,'editorial')!,alt:`IQON ${p.name} packaging beside an empty glass cylinder on a light grey surface — CGI visualization`} : undefined);
   if (presentation && index === 1) return <figure className="visual-panel visual-formula-fact"><ProductFactArt data={presentation}/></figure>;
   if (photograph && index === 2) return <figure className="visual-panel visual-editorial">
     <div className="visual-image-frame"><img src={photograph.src} alt={photograph.alt} width={1254} height={1254} loading="lazy" /></div>
