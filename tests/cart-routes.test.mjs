@@ -1,3 +1,4 @@
+import {sourceModuleUrl} from './helpers/source-module.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -19,12 +20,15 @@ const bindingsUrl = dataUrl(`
   export const headers = async () => new Headers();
 `);
 const { jar, cookieOptions } = await import(bindingsUrl);
-const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
+const policyUrl = sourceModuleUrl("lib/commerce-policy.ts");
+const identityUrl = sourceModuleUrl("lib/skincare-identity.ts");
 const redirectsUrl = dataUrl(compile("../lib/legacy-redirects.ts"));
-const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)).replace('"./legacy-redirects"', JSON.stringify(redirectsUrl)));
+const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)).replace('"./skincare-identity"', JSON.stringify(identityUrl)).replace('"./legacy-redirects"', JSON.stringify(redirectsUrl)));
 const imports = {
   "./shopify-consent": dataUrl(compile("../lib/shopify-consent.ts")),
   "./commerce-policy": policyUrl,
+  "./skincare-identity": identityUrl,
+  "./new-skincare": sourceModuleUrl("lib/new-skincare.ts"),
   react: dataUrl("export const cache = fn => fn;"),
   "next/headers": bindingsUrl,
   "./catalog": dataUrl("export const products = [];"),
@@ -375,7 +379,7 @@ test("an old bag with skincare and Colon removes both and shows both notices", a
   const state=fixture(t);await add(fixtureProducts[0]);insertOldSkincare(state);insertOldColon(state);
   const bag=await (await routes.getCartResponse()).json();
   assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);
-  assert.match(bag.notice,/coming soon/i);assert.match(bag.notice,/Colon Gentle Cleanse has been discontinued/);
+  assert.match(bag.notice,/skincare items are not available to order/i);assert.match(bag.notice,/Colon Gentle Cleanse has been discontinued/);
 });
 
 test("skincare cannot be added, even when Shopify reports available stock", async t => {
@@ -388,7 +392,7 @@ test("loading an old bag removes skincare and preserves supplements", async t =>
   const state=fixture(t);await add(fixtureProducts[0]);insertOldSkincare(state);
   const bag=await (await routes.getCartResponse()).json();
   assert.equal(bag.items.length,1);assert.equal(bag.items[0].id,fixtureProducts[0].handle);assert.equal(bag.subtotal,29);
-  assert.match(bag.notice,/coming soon/i);assert.ok(state.operations.includes("IQONCartRemove"));
+  assert.match(bag.notice,/skincare items are not available to order/i);assert.ok(state.operations.includes("IQONCartRemove"));
 });
 
 test("checkout removes old skincare and requires review before handing off to Shopify", async t => {

@@ -1,8 +1,10 @@
 import type { Product, StoreCatalog } from './catalog';
 import range from './new-skincare-range.json';
+import historicalRange from './skincare-range.json';
+import { productContent } from './product-content';
+import { activeSkincareIds, isHeldSkincareHandle, isLegacySkincareHandle } from './skincare-identity';
 
-/** Owner-approved informational pages only. Do not merge into the shared catalog:
- * doing so would change the existing seven PDP switchers/related grids/navigation.
+/** Owner-approved informational pages. The active range is the invoice eight.
  * The numeric zero is an internal sentinel; pricePending always suppresses prices.
  * There is no approved retail price, stock count, variant or selling plan. */
 export const newSkincareProducts: Product[] = range.map(p => ({
@@ -14,7 +16,7 @@ export const newSkincareProducts: Product[] = range.map(p => ({
 export const newSkincareIds = new Set(range.map(p => p.id));
 export const newSkincareFor = (id:string) => range.find(p => p.id === id);
 export const comingSoonSkincareDepartment = (pathname:string) =>
-  range.some(p=>pathname===`/products/${p.id}`) ? 'skincare' as const : undefined;
+  pathname.startsWith('/products/') && isHeldSkincareHandle(pathname.slice('/products/'.length)) ? 'skincare' as const : undefined;
 // Existing own-brand abstract studies, referenced in place without altering the source.
 // These do not represent the color or viscosity of any new finished formula.
 const textureReferences: Record<string,string> = {
@@ -31,10 +33,21 @@ export const newSkincareImage = (id:string, role:'packshot'|'editorial'|'texture
 };
 
 /** Explicit allowlist independent of Shopify availability; always non-orderable. */
+const historicalProducts: Product[] = historicalRange.map(p=>({
+  ...p, category:'skincare', available:false, price:0, pricePending:true, currency:'USD',
+  tone:'silver', campaign:p.image, variants:[], requiresSellingPlan:false,
+  descriptor:productContent[p.id]?.descriptor||p.descriptor,
+  description:productContent[p.id]?.description||p.description,
+  images:[{src:p.image,alt:`IQON ${p.name}, ${p.size} — illustrative product image; not batch verification`}],
+}));
+export const activeSkincareProducts: Product[] = activeSkincareIds.map(id=>
+  [...newSkincareProducts,...historicalProducts].find(p=>p.id===id)!
+);
+export const legacySkincareProduct = (id:string) => isLegacySkincareHandle(id) ? historicalProducts.find(p=>p.id===id) : undefined;
 export function comingSoonSkincareProduct(_catalog: Pick<StoreCatalog,'mode'|'products'>, id:string) {
-  return newSkincareProducts.find(p => p.id === id);
+  return activeSkincareProducts.find(p => p.id === id);
 }
 export function withComingSoonSkincareCards(products:Product[]) {
-  // Preserve every unrelated record and hold these three even on an external collision.
-  return [...products.map(p=>newSkincareProducts.find(held=>held.id===p.id)||p),...newSkincareProducts.filter(p=>!products.some(existing=>existing.id===p.id))];
+  // Preserve ordinary supplements. Neither legacy identities nor unapproved skincare can leak in.
+  return [...products.filter(p=>p.category!=='skincare'&&!isHeldSkincareHandle(p.id)),...activeSkincareProducts];
 }

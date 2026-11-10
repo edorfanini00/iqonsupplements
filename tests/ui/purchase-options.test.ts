@@ -83,8 +83,8 @@ it("a subscription only product cannot be added",()=>{
   expect(screen.queryByRole("radiogroup",{name:"Bundle quantity"})).toBeNull();
 });
 
-it("keeps all seven skincare pages browseable with no purchase controls, even if live availability is stale",()=>{
-  const skincare=products.filter(p=>p.category==="skincare");expect(skincare).toHaveLength(7);
+it("keeps all eight skincare pages browseable with no purchase controls, even if live availability is stale",()=>{
+  const skincare=products.filter(p=>p.category==="skincare");expect(skincare).toHaveLength(8);
   for(const p of skincare){
     const product={...p,available:true,pricePending:false,variants:creatine.variants};
     const {container}=render(React.createElement(ProductPage,{product}));

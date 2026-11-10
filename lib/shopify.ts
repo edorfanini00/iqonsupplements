@@ -1,5 +1,6 @@
+import { isHeldSkincareHandle } from "./skincare-identity";
 import type { CartItem, Product } from "./catalog";
-import { isComingSoon, isReservedSkincareHandle } from "./commerce-policy";
+import { isComingSoon } from "./commerce-policy";
 import { isRetiredProductHandle } from "./legacy-redirects";
 
 export type ShopifyConfig = {domain:string; token:string; version:string};
@@ -40,7 +41,7 @@ export type ShopifyProduct = {
 };
 export function mapProduct(p:ShopifyProduct, index:number):Product|null {
   // Informational handles never carry external prices, variants or stock into commerce.
-  if(isReservedSkincareHandle(p.handle)) return null;
+  if(isHeldSkincareHandle(p.handle)) return null;
   // Explicit merchandising tags prevent unrelated products entering this catalog.
   const category=p.tags.includes("iqon-supplements")?"supplements":p.tags.includes("iqon-skincare")?"skincare":null;
   if(!category || isRetiredProductHandle(p.handle)) return null;
@@ -82,7 +83,7 @@ function discountLines(allocations:ShopifyDiscountAllocation[]):DiscountLine[] {
 export function publicCart(cart:ShopifyCart|null):CartSnapshot {
   if(!cart) return {items:[],subtotal:0,currency:"USD",count:0,discountCodes:[],merchandise:0,lineDiscounts:[],orderDiscounts:[],total:0};
   // Never serialize priced informational lines, including mutation error payloads.
-  if(cart.lines.nodes.some(line=>isReservedSkincareHandle(line.merchandise.product.handle)))
+  if(cart.lines.nodes.some(line=>isHeldSkincareHandle(line.merchandise.product.handle)))
     throw new CommerceError("Skincare is coming soon. We couldn’t safely refresh your bag. Please try again.");
   if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.");
   const lineSubtotal=(line:ShopifyCart["lines"]["nodes"][number])=>Number((line.cost.subtotalAmount||line.cost.totalAmount).amount);

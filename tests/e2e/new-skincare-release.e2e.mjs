@@ -10,7 +10,11 @@ import {spawn} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {JSDOM} from 'jsdom';
 const root=fileURLToPath(new URL('../..',import.meta.url));
-const range=JSON.parse(fs.readFileSync(path.join(root,'lib/new-skincare-range.json'),'utf8'));
+const expected=JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/approved-skincare-labels.json'),'utf8'));
+const historical=JSON.parse(fs.readFileSync(path.join(root,'lib/skincare-range.json'),'utf8'));
+const additions=JSON.parse(fs.readFileSync(path.join(root,'lib/new-skincare-range.json'),'utf8'));
+const range=Object.keys(expected).map(id=>[...historical,...additions].find(p=>p.id===id));
+const legacy=['anti-aging-cleanser-with-peptides','hydrating-tonic'];
 const www='www.iqondaily.com';
 const work=process.env.RELEASE_EVIDENCE||fs.mkdtempSync(path.join(os.tmpdir(),'iqon-release-'));
 fs.mkdirSync(work,{recursive:true});
@@ -31,7 +35,7 @@ const doc=html=>new JSDOM(html).window.document;
 const ld=d=>[...d.querySelectorAll('script[type="application/ld+json"]')].flatMap(s=>[JSON.parse(s.textContent)].flat());
 const sitemapUrls=body=>[...body.matchAll(/<loc>(.*?)<\/loc>/g)].map(m=>m[1]);
 for(const [name,env] of Object.entries({live:{},empty:{FAKE_SHOPIFY:'empty'},unavailable:{FAKE_SHOPIFY:'down'},unconfigured:{SHOPIFY_STORE_DOMAIN:'',SHOPIFY_STOREFRONT_PRIVATE_TOKEN:''},preview:{VERCEL_ENV:'preview',SHOPIFY_STORE_DOMAIN:'',SHOPIFY_STOREFRONT_PRIVATE_TOKEN:''}})){
- test(`three informational pages: ${name}`,async t=>{
+ test(`eight informational pages: ${name}`,async t=>{
   const server=await start(name,env);t.after(server.stop);const {port}=server;
   const index=name!=='preview';
   for(const p of range){
@@ -47,6 +51,8 @@ for(const [name,env] of Object.entries({live:{},empty:{FAKE_SHOPIFY:'empty'},una
    assert(!ld(d).some(n=>['Product','Offer','AggregateRating','Review'].includes(n['@type'])));
    assert(ld(d).some(n=>n['@type']==='BreadcrumbList'));
    assert.equal(d.querySelectorAll('.visual-gallery-item').length,4);
+   assert.match(d.querySelector('.product-switcher')?.textContent||'',/All skincare8/);
+   for(const id of legacy)assert(!d.querySelector(`#main a[href="/products/${id}"]`));
    assert.equal(d.querySelector('.visual-pack img')?.getAttribute('src'),p.image);
    const alias=await get(port,url,'iqondaily.com'),a=doc(alias.body);
    assert.equal(alias.status,200);assert.equal(a.querySelector('meta[name="robots"]')?.getAttribute('content'),'noindex, follow');
@@ -59,14 +65,27 @@ for(const [name,env] of Object.entries({live:{},empty:{FAKE_SHOPIFY:'empty'},una
   }
   const collection=doc((await get(port,'/collections/skincare')).body);
   for(const p of range)assert(collection.querySelector(`.product-grid a[href="/products/${p.id}"]`),`${name}: discoverable ${p.id}`);
+  assert.equal(collection.querySelectorAll('.product-grid > *').length,8);
+  assert.equal(collection.querySelector('meta[name="robots"]')?.getAttribute('content'),index?'index, follow':'noindex, follow');
+  for(const id of legacy){
+   assert(!collection.querySelector(`a[href="/products/${id}"]`));
+   const r=await get(port,`/products/${id}`),d=doc(r.body);
+   assert.equal(r.status,200);assert.equal(r.headers.location,undefined);
+   assert.equal(d.querySelector('meta[name="robots"]')?.getAttribute('content'),'noindex, follow');
+   assert.match(d.querySelector('.product-launch-note')?.textContent||'',/Not part of the current range/);
+   assert.equal(d.querySelectorAll('.add-to-bag-row,.sticky-purchase').length,0);
+   assert(!ld(d).some(n=>['Product','Offer'].includes(n['@type'])));
+  }
   const sitemap=sitemapUrls((await get(port,'/sitemap.xml')).body);
   for(const p of range)assert.equal(sitemap.includes(`https://${www}/products/${p.id}`),index);
+  for(const path of ['/skincare','/collections/skincare'])assert.equal(sitemap.includes(`https://${www}${path}`),index);
   assert.deepEqual(sitemapUrls((await get(port,'/sitemap.xml','iqondaily.com')).body),[]);
+  for(const id of legacy)assert(!sitemap.includes(`https://${www}/products/${id}`));
   if(name==='live'){
    assert.equal((await get(port,'/products/not-a-product')).status,404);
    const old=doc((await get(port,'/products/hydrating-tonic')).body);
    assert.equal(old.querySelector('h1')?.textContent,'Hydrating Tonic');
-   for(const p of range)assert(!old.querySelector(`#main a[href="/products/${p.id}"]`),'old PDP switcher/related list unchanged');
+   for(const p of range)assert(old.querySelector(`#main a[href="/products/${p.id}"]`),'legacy navigation points to current range');
    const supplement=doc((await get(port,'/products/creatine-monohydrate')).body);
    assert(supplement.querySelector('.add-to-bag-row'));assert(ld(supplement).some(n=>n['@type']==='Product'));
   }

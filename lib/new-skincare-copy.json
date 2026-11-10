@@ -33,7 +33,7 @@
       },
       {
         "question": "Is this the Anti-Aging Cleanser with Peptides?",
-        "answer": "No. These are distinct formulas. Enzyme Gel Cleanser contains papaya fruit extract and salicylic acid; the Anti-Aging Cleanser with Peptides remains a separate product. Review each product’s own ingredient list."
+        "answer": "No. These are distinct formulas. Enzyme Gel Cleanser contains papaya fruit extract and salicylic acid; the earlier Anti-Aging Cleanser with Peptides is a distinct formula and is not part of the current range or available to order. Review each product’s own ingredient list."
       },
       {
         "question": "Does it contain fragrance?",
@@ -42,6 +42,10 @@
       {
         "question": "Can I use it with other exfoliating products?",
         "answer": "The formula lists salicylic acid. If you also use Exfoliating Pads or Retinol Rx, introduce new steps one at a time and stop use if irritation occurs."
+      },
+      {
+        "question": "Which skin types does the supplier recommend it for?",
+        "answer": "The supplier recommends this cleanser for normal, oily or combination skin. Individual tolerance varies; stop use if irritation occurs."
       }
     ],
     "benefits": [

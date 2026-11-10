@@ -1,9 +1,11 @@
+import { isHeldSkincareHandle } from "./skincare-identity";
 import { parseVisitorConsent, type VisitorConsent } from "./shopify-consent";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
-import { isComingSoon, isReservedSkincareHandle, SKINCARE_COMING_SOON } from "./commerce-policy";
+import { withComingSoonSkincareCards } from "./new-skincare";
+import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
 import { CATALOG_QUERY, CART_QUERY, CHECKOUT_CONSENT_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 import { isRetiredProductHandle } from "./legacy-redirects";
@@ -29,12 +31,12 @@ async function readCatalog():Promise<StoreCatalog> {
     after=data.products.pageInfo.hasNextPage?data.products.pageInfo.endCursor:null;
     if(data.products.pageInfo.hasNextPage&&!after) throw new CommerceError("The collection is temporarily unavailable.");
   } while(after);
-  return {mode:"live",products:mergeCatalogMerchandise(list,products),currency:list[0]?.currency||"USD"};
+  return {mode:"live",products:withComingSoonSkincareCards(mergeCatalogMerchandise(list,products)),currency:list[0]?.currency||"USD"};
 }
 // Request-scoped memoization only; no buyer-specific data in global caches.
 export const getStoreCatalog=cache(async():Promise<StoreCatalog>=>{
   try {return await readCatalog();}
-  catch {return {mode:"unavailable",products:[],currency:"USD"};}
+  catch {return {mode:"unavailable",products:withComingSoonSkincareCards([]),currency:"USD"};}
 });
 
 const CART_COOKIE="iqon_shopify_cart";
@@ -67,7 +69,7 @@ function fail(error:unknown) {
     ...(error instanceof CommerceError&&error.cart?{cart:error.cart}:{})},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
 }
 function blockedSkincareLines(cart:ShopifyCart) {
-  return cart.lines.nodes.filter(line=>isReservedSkincareHandle(line.merchandise.product.handle)||(SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p)))));
+  return cart.lines.nodes.filter(line=>isHeldSkincareHandle(line.merchandise.product.handle)||(SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p)))));
 }
 // Retired supplements (still published in Shopify) can linger in bags created before they were retired.
 function retiredLines(cart:ShopifyCart) {
@@ -83,12 +85,12 @@ async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<Refreshed> 
   const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
   // A successful mutation envelope is not proof that the reserved lines were removed.
   // Validate before any subsequent purchase mutation or checkout handoff.
-  if((skincare.some(line=>isReservedSkincareHandle(line.merchandise.product.handle))&&result.cart!.lines.pageInfo.hasNextPage)||result.cart!.lines.nodes.some(line=>isReservedSkincareHandle(line.merchandise.product.handle)))
+  if((skincare.some(line=>isHeldSkincareHandle(line.merchandise.product.handle))&&result.cart!.lines.pageInfo.hasNextPage)||result.cart!.lines.nodes.some(line=>isHeldSkincareHandle(line.merchandise.product.handle)))
     throw new CommerceError("Skincare is coming soon. We couldn’t safely refresh your bag. Please try again.");
   const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];
   return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};
 }
-const skincareNotice="Skincare is coming soon. Those items have been removed from your bag; supplements can still be ordered.";
+const skincareNotice="These skincare items are not available to order and have been removed from your bag; supplements can still be ordered.";
 const retiredNotice="Colon Gentle Cleanse has been discontinued and was removed from your bag. Gut Health replaces it.";
 export async function getCartResponse() {
   try {const {cart,removed,notices}=await removeUpcomingProducts(await readCart());return Response.json({...publicCart(cart),...(removed?{notice:notices.join(" ")}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
@@ -102,7 +104,7 @@ export async function mutateCartResponse(request:Request) {
     let input:Record<string,unknown>;
     try {input=JSON.parse(text);}catch {throw new CommerceError("Invalid request.",400);}
     if(!input||typeof input!=="object"||Array.isArray(input)) throw new CommerceError("Invalid request.",400);
-    if(input.action==="add"&&isReservedSkincareHandle(input.id))
+    if(input.action==="add"&&isHeldSkincareHandle(input.id))
       throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422);
     const refreshed=await removeUpcomingProducts(await readCart());
     let current=refreshed.cart;

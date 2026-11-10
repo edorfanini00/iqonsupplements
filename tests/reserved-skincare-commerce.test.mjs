@@ -1,3 +1,4 @@
+import {sourceModuleUrl} from './helpers/source-module.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -19,12 +20,15 @@ const bindingsUrl = dataUrl(`
   export const headers = async () => new Headers();
 `);
 const { jar, cookieOptions } = await import(bindingsUrl);
-const policyUrl = dataUrl(compile("../lib/commerce-policy.ts"));
+const policyUrl = sourceModuleUrl("lib/commerce-policy.ts");
+const identityUrl = sourceModuleUrl("lib/skincare-identity.ts");
 const redirectsUrl = dataUrl(compile("../lib/legacy-redirects.ts"));
-const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)).replace('"./legacy-redirects"', JSON.stringify(redirectsUrl)));
+const withPolicy = file => dataUrl(compile(file).replace('"./commerce-policy"', JSON.stringify(policyUrl)).replace('"./skincare-identity"', JSON.stringify(identityUrl)).replace('"./legacy-redirects"', JSON.stringify(redirectsUrl)));
 const imports = {
   "./shopify-consent": dataUrl(compile("../lib/shopify-consent.ts")),
   "./commerce-policy": policyUrl,
+  "./skincare-identity": identityUrl,
+  "./new-skincare": sourceModuleUrl("lib/new-skincare.ts"),
   react: dataUrl("export const cache = fn => fn;"),
   "next/headers": bindingsUrl,
   "./catalog": dataUrl("export const products = [];"),
@@ -42,7 +46,7 @@ const request = (body, path = "cart") => new Request(`${origin}/api/${path}`, {
 });
 const {mapProduct} = await import(imports['./shopify']);
 const {isComingSoon,isOrderable} = await import(policyUrl);
-const held = ['enzyme-gel-cleanser','hyaluronic-serum','peptide-anti-wrinkle-day-cream'];
+const held = [...Object.keys(JSON.parse(fs.readFileSync('tests/fixtures/approved-skincare-labels.json','utf8'))),'anti-aging-cleanser-with-peptides','hydrating-tonic'];
 const makeProduct = (handle,tags,id='101') => ({handle,title:handle,description:'Synthetic only',productType:'',tags,availableForSale:true,requiresSellingPlan:false,images:{nodes:[]},variants:{pageInfo:{hasNextPage:false},nodes:[{id:`gid://shopify/ProductVariant/${id}`,title:'Default Title',availableForSale:true,price:{amount:'99.00',currencyCode:'USD'}}]}});
 test('reserved handles never enter the purchase catalog, regardless of merchandising tags', () => {
   for(const handle of held) for(const tags of [['iqon-supplements'],['iqon-skincare'],['iqon-supplements','iqon-skincare'],[],undefined]) {
@@ -129,7 +133,7 @@ for(const mode of ['live','empty','preview','unavailable'])test(`direct reserved
 for(const [i,tags] of tagCases.entries())test(`catalog/direct variant rejection with tag case ${i}`,async t=>{
   // An explicit undefined models absent tags, not the fixture default.
   const state=fixture(t,{tags});
-  const c=await routes.getStoreCatalog();assert.equal(c.mode,'live');assert.deepEqual(c.products.map(p=>p.id),[ordinary.handle]);
+  const c=await routes.getStoreCatalog();assert.equal(c.mode,'live');assert.deepEqual(c.products.filter(p=>p.category==='supplements').map(p=>p.id),[ordinary.handle]);assert.equal(c.products.filter(p=>p.category==='skincare').length,8);
   for(const [j,id] of held.entries()){
     for(const suppliedId of [id,ordinary.handle,undefined,'absent-product']){
       const r=await add(suppliedId,`gid://shopify/ProductVariant/${101+j}`);assert.equal(r.status,422);await safe(r);
@@ -182,7 +186,7 @@ for(const mode of ['preview','unavailable'])test(`ordinary products fail closed 
   assert.deepEqual(state.writes,[]);
 });
 test('reserved handles stay held if the broader category launch flag is ever disabled',async()=>{
-  const policy=await import(dataUrl(compile('../lib/commerce-policy.ts').replace('SKINCARE_COMING_SOON = true','SKINCARE_COMING_SOON = false')));
+  const policy=await import(dataUrl(compile('../lib/commerce-policy.ts').replace('"./skincare-identity"',JSON.stringify(identityUrl)).replace('SKINCARE_COMING_SOON = true','SKINCARE_COMING_SOON = false')));
   assert.equal(policy.SKINCARE_COMING_SOON,false);
   for(const id of held)assert.equal(policy.isComingSoon({id,category:'supplements'}),true);
   assert.equal(policy.isComingSoon({id:'ordinary-skincare',category:'skincare'}),false);

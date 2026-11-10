@@ -1,0 +1,16 @@
+{
+  "proofSha256": "903cc271e6d8923cba303e338863d5c3e39714b8f110086855f65a1589d77395",
+  "invoiceSha256": "0f86ede88b8747b0b35fc36f6bfb46c4809bcf9b482b0a80d761beff35d4330e",
+  "fixtureSha256": "25602e194e0f2017ccf9e323599afb6ae0db1909c2c82d8e2a9fba9ce43f236d",
+  "method": "Transcribed from visible approved proof pages 2\u20139, corroborated against independent lane-A/B audit captures, not generated from implementation. Eye uses lane-B actual-pixel transcription, not erroneous old manifest; Day Cream uses visible artwork, not stale selectable PDF text. Label approval does not establish batch composition.",
+  "pages": {
+    "enzyme-gel-cleanser": 8,
+    "exfoliating-pads": 4,
+    "hyaluronic-serum": 5,
+    "retinol-rx": 9,
+    "hydra-c-ferulic-serum": 6,
+    "peptide-anti-wrinkle-day-cream": 7,
+    "copper-peptide-restore-cream": 3,
+    "firming-peptide-eye-gel": 2
+  }
+}

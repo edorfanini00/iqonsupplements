@@ -14,20 +14,17 @@ import { formulaSpotlights, skincareNotes } from "@/lib/product-story-detail";
 import { ProductFormulaVisual } from "./product-formula-visual";
 import { SkincareProductStory } from "./skincare-product-story";
 import { skincareStories } from "@/lib/skincare-stories";
-import { newSkincareFor, newSkincareIds } from "@/lib/new-skincare";
+import { newSkincareFor, withComingSoonSkincareCards } from "@/lib/new-skincare";
 import { newSkincareStories } from "@/lib/new-skincare-editorial";
 import { SupplementProductStory } from "./supplement-product-story";
 import { supplementVisualContent } from "@/lib/supplement-visual-content";
 
 export function comparisonFor(product: Product, products: Product[]) {
-  if (newSkincareIds.has(product.id)) return [product, ...products.filter(p=>newSkincareIds.has(p.id)&&p.id!==product.id)].slice(0,3);
-  const choices = product.category === "skincare"
-    ? ["hydra-c-ferulic-serum", "retinol-rx", "exfoliating-pads"].includes(product.id)
-      ? ["hydra-c-ferulic-serum", "retinol-rx", "exfoliating-pads"]
-      : ["anti-aging-cleanser-with-peptides", "hydrating-tonic", "copper-peptide-restore-cream"].includes(product.id)
-        ? ["anti-aging-cleanser-with-peptides", "hydrating-tonic", "copper-peptide-restore-cream"]
-        : ["firming-peptide-eye-gel", "hydrating-tonic", "copper-peptide-restore-cream"]
-    : ["nmn", "resveratrol"].includes(product.id)
+  if (product.category === "skincare") {
+    const active=withComingSoonSkincareCards(products).filter(p=>p.category==="skincare");
+    return [...active.filter(p=>p.id===product.id),...active.filter(p=>p.id!==product.id)].slice(0,3);
+  }
+  const choices = ["nmn", "resveratrol"].includes(product.id)
       ? ["nmn", "resveratrol"]
       : ["hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"].includes(product.id)
         ? ["hydrolyzed-collagen-peptides", "collagen-peptides-chocolate"]
