@@ -55,7 +55,11 @@ test('protected files remain byte-identical except exact hash-pinned approved in
 test('the shell changes only exact new preview route classification, never existing navigation or cart/privacy logic',()=>{
  const before=original('app/store-shell.tsx').toString();
  const expected=before.replace('import { shopifySrcSet } from "@/lib/responsive-images";', 'import { shopifySrcSet } from "@/lib/responsive-images";\nimport { comingSoonSkincareDepartment } from "@/lib/new-skincare";').replace('products.find(p=>pathname===`/products/${p.id}`)?.category;', 'products.find(p=>pathname===`/products/${p.id}`)?.category||comingSoonSkincareDepartment(pathname);');
- assert.equal(readFileSync('app/store-shell.tsx','utf8'),expected);
+ // Exact owner-authorized skincare bundle changes (10 Nov 2026): per-family bag nudges and recommendation only.
+ const bundleShell=json('tests/fixtures/skincare-bundle-shell.json').replacements as [string,string][];
+ assert.equal(bundleShell.length,3);
+ const withBundle=bundleShell.reduce((text,[from,to])=>{assert.equal(text.split(from).length-1,1,`exact authorized shell change: ${from.slice(0,60)}`);return text.replace(from,()=>to);},expected);
+ assert.equal(readFileSync('app/store-shell.tsx','utf8'),withBundle);
  for(const id of ids){assert.equal(comingSoonSkincareDepartment(`/products/${id}`),'skincare');assert.equal(comingSoonSkincareDepartment(`/products/${id}/extra`),undefined)}
  for(const p of products)assert.equal(comingSoonSkincareDepartment(`/products/${p.id}`),p.category==='skincare'?'skincare':undefined);
  for(const path of ['/','/account','/checkout','/affiliates','/products/unknown'])assert.equal(comingSoonSkincareDepartment(path),undefined);

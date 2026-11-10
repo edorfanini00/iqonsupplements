@@ -4,7 +4,7 @@ import type { KeyboardEvent } from "react";
 import { flushSync } from "react-dom";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { money } from "@/lib/catalog";
-import { BUNDLE_TIERS, tierUnitPrice } from "@/lib/bundle-offer";
+import { BUNDLE_OFFERS, tierUnitPrice, type BundleFamily } from "@/lib/bundle-offer";
 
 function navigateBundle(event: KeyboardEvent<HTMLButtonElement>) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -35,14 +35,18 @@ function navigateBundle(event: KeyboardEvent<HTMLButtonElement>) {
   radios[next].focus();
 }
 
-/** Quick quantity choices for every purchasable product, with savings only for approved bundles. */
-export function ProductBundleOptions({ quantity, setQuantity, price, currency, bundleEligible = true }: {
+/** Quick quantity choices for every purchasable product, with savings only for approved bundles.
+ * `family` selects that product's own bundle (supplements or skincare); its tiers, terms and
+ * counting never mix with the other family. */
+export function ProductBundleOptions({ quantity, setQuantity, price, currency, bundleEligible = true, family = "supplements" }: {
   quantity: number;
   setQuantity: (value: number) => void;
   price: number;
   currency: string;
   bundleEligible?: boolean;
+  family?: BundleFamily;
 }) {
+  const { tiers: BUNDLE_TIERS, terms } = BUNDLE_OFFERS[family];
   const options = [
     {quantity: 1, label: "Buy 1", detail: "One time purchase", unit: price},
     ...BUNDLE_TIERS.map((tier, i) => ({quantity: tier.minQuantity, label: `Buy ${tier.minQuantity}${i === BUNDLE_TIERS.length - 1 ? "+" : ""}`,
@@ -59,6 +63,6 @@ export function ProductBundleOptions({ quantity, setQuantity, price, currency, b
         <b>{money(option.unit, currency)}<small>each</small></b>
       </label>)}
     </RadioGroup>
-    {bundleEligible ? <p className="bundle-terms">Mix and match any eligible IQON supplements: every eligible item in your bag counts toward the bundle. Savings apply automatically in your bag and at checkout, and can’t be combined with discount codes.</p> : <p className="bundle-terms">This product is not part of the bundle offer. Each quantity is charged at the regular price.</p>}
+    {bundleEligible ? <p className="bundle-terms">{terms}</p> : <p className="bundle-terms">This product is not part of the bundle offer. Each quantity is charged at the regular price.</p>}
   </div>;
 }

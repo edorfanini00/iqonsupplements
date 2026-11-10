@@ -12,7 +12,7 @@ const dataUrl = source => "data:text/javascript;base64," + Buffer.from(source).t
 const compile = file => ts.transpile(fs.readFileSync(new URL(file, import.meta.url), "utf8"), {module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022});
 const STORE = "s8939-fixture.myshopify.com";
 const ACTIVE = ["enzyme-gel-cleanser","exfoliating-pads","hyaluronic-serum","retinol-rx","hydra-c-ferulic-serum","peptide-anti-wrinkle-day-cream","copper-peptide-restore-cream","firming-peptide-eye-gel"];
-const PRICES = {"enzyme-gel-cleanser":"55.00","exfoliating-pads":"80.00","hyaluronic-serum":"90.00","retinol-rx":"98.34","hydra-c-ferulic-serum":"90.00","peptide-anti-wrinkle-day-cream":"100.00","copper-peptide-restore-cream":"68.00","firming-peptide-eye-gel":"76.67"};
+const PRICES = {"enzyme-gel-cleanser":"55.00","exfoliating-pads":"80.00","hyaluronic-serum":"90.00","retinol-rx":"99.00","hydra-c-ferulic-serum":"90.00","peptide-anti-wrinkle-day-cream":"100.00","copper-peptide-restore-cream":"68.00","firming-peptide-eye-gel":"77.00"};
 const LEGACY = ["anti-aging-cleanser-with-peptides","hydrating-tonic"];
 const pid = i => `gid://shopify/Product/99000000000${100+i}`, vid = i => `gid://shopify/ProductVariant/99000000000${200+i}`;
 const fixtureIdentity = {store: STORE, currency: "USD", products: ACTIVE.map((handle, i) => ({handle, supplierSku: `SYNTH${i}`, approvedPriceUsd: PRICES[handle], productId: pid(i), variantId: vid(i)}))};
@@ -46,7 +46,7 @@ const launch = await import(launchUrl);
 const {isComingSoon, isOrderable} = await import(policyUrl);
 const {publicCart} = await import(imports["./shopify"]);
 const {productJsonLd, isListedProduct} = await import(sourceModuleUrl("lib/seo.ts"));
-const {isBundleEligible, BUNDLE_ELIGIBLE_HANDLES} = await import(sourceModuleUrl("lib/bundle-offer.ts"));
+const {isBundleEligible, bundleFamily, BUNDLE_ELIGIBLE_HANDLES, SKINCARE_BUNDLE_ELIGIBLE_HANDLES} = await import(sourceModuleUrl("lib/bundle-offer.ts"));
 const {activeSkincareProducts} = await import(newSkincareUrl);
 
 const origin = "https://iqon.example";
@@ -115,11 +115,11 @@ const EXPECTED_IDENTITY = [
   ["enzyme-gel-cleanser", "81310702C", "55.00", "gid://shopify/Product/10554590560551", "gid://shopify/ProductVariant/52574511104295"],
   ["exfoliating-pads", "12410503C", "80.00", "gid://shopify/Product/10393655345447", "gid://shopify/ProductVariant/52052013744423"],
   ["hyaluronic-serum", "33230103C", "90.00", "gid://shopify/Product/10554590789927", "gid://shopify/ProductVariant/52574511366439"],
-  ["retinol-rx", "82730103C", "98.34", "gid://shopify/Product/10393656656167", "gid://shopify/ProductVariant/52052015710503"],
+  ["retinol-rx", "82730103C", "99.00", "gid://shopify/Product/10393656656167", "gid://shopify/ProductVariant/52052015710503"],
   ["hydra-c-ferulic-serum", "40730103C", "90.00", "gid://shopify/Product/10393656066343", "gid://shopify/ProductVariant/52052014727463"],
   ["peptide-anti-wrinkle-day-cream", "61730172C", "100.00", "gid://shopify/Product/10554590855463", "gid://shopify/ProductVariant/52574511431975"],
   ["copper-peptide-restore-cream", "11530173C", "68.00", "gid://shopify/Product/10393657737511", "gid://shopify/ProductVariant/52052017971495"],
-  ["firming-peptide-eye-gel", "11330052C", "76.67", "gid://shopify/Product/10393657245991", "gid://shopify/ProductVariant/52052016955687"],
+  ["firming-peptide-eye-gel", "11330052C", "77.00", "gid://shopify/Product/10393657245991", "gid://shopify/ProductVariant/52052016955687"],
 ];
 test("D-MAP-1: committed identity binds exactly the eight manifest ids for the exact store", () => {
   assert.equal(committed.store, "nr9zd0-t5.myshopify.com");
@@ -166,6 +166,33 @@ test("D-MAP-2: all eight ids configured is not activation — DRAFT/unpublished/
   assert.equal(launch.qualifySkincare(bindings, bindings.slice(1).map(b => node(b))).status, "unavailable", "short answer is unavailable, not partial");
 });
 
+test("D-PRICE-1: whole-dollar approved prices qualify; the superseded and any other price holds (owner decision 10 Nov 2026)", () => {
+  const bindings = launch.launchBindings("nr9zd0-t5.myshopify.com", committed);
+  assert.deepEqual(Object.fromEntries(bindings.map(b => [b.handle, b.priceCents])), {"enzyme-gel-cleanser": 5500, "exfoliating-pads": 8000, "hyaluronic-serum": 9000,
+    "retinol-rx": 9900, "hydra-c-ferulic-serum": 9000, "peptide-anti-wrinkle-day-cream": 10000, "copper-peptide-restore-cream": 6800, "firming-peptide-eye-gel": 7700});
+  const node = (b, amount) => ({id: b.variantId, title: "Default Title", availableForSale: true, currentlyNotInStock: false, quantityAvailable: 28,
+    price: money(amount ?? (b.priceCents / 100).toFixed(2)), product: {id: b.productId, handle: b.handle, tags: ["iqon-skincare"], availableForSale: true, requiresSellingPlan: false}});
+  const qualifiedWith = (handle, amount) => launch.qualifySkincare(bindings, bindings.map(b => node(b, b.handle === handle ? amount : undefined))).qualified;
+  const all = qualifiedWith();
+  assert.equal(all.size, 8);
+  assert.equal(all.get("retinol-rx").price, 99); assert.equal(all.get("firming-peptide-eye-gel").price, 77);
+  for (const [handle, accepted] of [["retinol-rx", ["99.00", "99.0", "99"]], ["firming-peptide-eye-gel", ["77.00", "77.0", "77"]]])
+    for (const amount of accepted) assert.equal(qualifiedWith(handle, amount).get(handle)?.price, Number(amount), `${handle} at ${amount}`);
+  for (const [handle, rejected] of [["retinol-rx", ["98.34", "98.99", "99.01", "100.00", "0.99", "9900"]], ["firming-peptide-eye-gel", ["76.67", "76.99", "77.01", "78.00", "7700"]]])
+    for (const amount of rejected) {
+      const q = qualifiedWith(handle, amount);
+      assert.equal(q.has(handle), false, `${handle} at ${amount} must hold`);
+      assert.equal(q.size, 7, "only the drifted product holds");
+    }
+  // Unchanged prices stay exact.
+  for (const [handle, amount] of [["enzyme-gel-cleanser", "55.01"], ["exfoliating-pads", "79.99"], ["hyaluronic-serum", "90.01"], ["hydra-c-ferulic-serum", "89.00"],
+    ["peptide-anti-wrinkle-day-cream", "99.00"], ["copper-peptide-restore-cream", "68.34"]]) assert.equal(qualifiedWith(handle, amount).has(handle), false, `${handle} at ${amount}`);
+  // A committed identity still carrying a superseded price would hold against a 99.00 Storefront answer.
+  const stale = structuredClone(committed); stale.products.find(p => p.handle === "retinol-rx").approvedPriceUsd = "98.34";
+  const staleBindings = launch.launchBindings("nr9zd0-t5.myshopify.com", stale);
+  assert.equal(launch.qualifySkincare(staleBindings, staleBindings.map(b => node(b, b.handle === "retinol-rx" ? "99.00" : undefined))).qualified.has("retinol-rx"), false);
+});
+
 test("D-HOLD-3: identity collisions disqualify every entry that shares an id", () => {
   const dup = structuredClone(fixtureIdentity); dup.products[1].variantId = dup.products[0].variantId;
   assert.deepEqual(launch.launchBindings(STORE, dup).map(b => b.handle), ACTIVE.slice(2));
@@ -190,11 +217,13 @@ test("D-HOLD-1/D-HOLD-4: all eight qualify with live approved prices and approve
     const ld = productJsonLd(p, isComingSoon(p) || !!p.pricePending);
     assert.equal(ld.offers.price, Number(PRICES[p.id]).toFixed(2)); assert.equal(ld.offers.availability, "https://schema.org/InStock");
     assert.equal(isListedProduct(c, p), true);
-    assert.equal(isBundleEligible(p.id), false, "skincare is never bundle eligible");
+    assert.equal(isBundleEligible(p.id), false, "skincare never joins the supplement bundle");
+    assert.equal(isBundleEligible(p.id, "skincare"), true, "qualified skincare joins its own skincare bundle"); assert.equal(bundleFamily(p.id), "skincare");
   }
   assert.ok(!c.products.some(p => LEGACY.includes(p.id)));
   assert.equal(c.products.find(p => p.id === supplement.handle).available, true);
   assert.equal(BUNDLE_ELIGIBLE_HANDLES.length, 11);
+  assert.deepEqual([...SKINCARE_BUNDLE_ELIGIBLE_HANDLES].sort(), [...ACTIVE].sort());
 });
 
 const {productVisuals} = await import(sourceModuleUrl("lib/product-visuals.ts"));
@@ -220,7 +249,7 @@ test("D-CONT-2: qualified activation keeps every approved content field, incl. R
     if (id !== "retinol-rx") assert.doesNotMatch(JSON.stringify(launched), /0\.75%|Retinol strength as stated/, id);
   }
   const retinol = c.products.find(p => p.id === "retinol-rx");
-  assert.equal(retinol.price, 98.34); assert.equal(retinol.variants[0].price, 98.34);
+  assert.equal(retinol.price, 99); assert.equal(retinol.variants[0].price, 99);
   assert.equal(retinol.description, RETINOL_DESCRIPTION);
   assert.equal(retinol.ingredients, "0.75% encapsulated retinol, niacinamide and squalane");
   assert.doesNotMatch(retinol.inci, /0\.75%/, "approved INCI is not rewritten");
@@ -233,7 +262,7 @@ test("D-CONT-2: qualified activation keeps every approved content field, incl. R
   const meta = pageMetadata({path: `/products/${retinol.id}`, title: `${retinol.name} | IQON`, description: retinol.description, image: retinol.image, indexable: true});
   assert.deepEqual([meta.description, meta.openGraph.description, meta.twitter.description], [RETINOL_DESCRIPTION, RETINOL_DESCRIPTION, RETINOL_DESCRIPTION]);
   const ld = productJsonLd(retinol, isComingSoon(retinol) || !!retinol.pricePending);
-  assert.equal(ld.name, retinol.name); assert.equal(ld.offers.price, "98.34");
+  assert.equal(ld.name, retinol.name); assert.equal(ld.offers.price, "99.00");
 });
 
 const holdCases = [
@@ -313,7 +342,8 @@ test("D-CART-3: mixed supplement + skincare cart checks out; 10% code applies to
 });
 
 for (const [name, drift] of [
-  ["price drift", s => { s.price[ACTIVE[3]] = "99.00"; }],
+  // The superseded 98.34 Retinol Rx price is now drift from the approved whole-dollar 99.00.
+  ["price drift", s => { s.price[ACTIVE[3]] = "98.34"; }],
   ["stock reaches zero", s => { s.stock[ACTIVE[3]] = 0; }],
 ]) test(`D-CART-1: a previously qualified line is removed after ${name} and checkout returns no URL`, async t => {
   const state = storefront(t, {seed: [["gid://shopify/ProductVariant/1", 1], [vid(3), 1]]});

@@ -21,7 +21,7 @@ const labels = JSON.parse(fs.readFileSync(path.join(repo, 'tests/fixtures/approv
 const historical = JSON.parse(fs.readFileSync(path.join(repo, 'lib/skincare-range.json'), 'utf8'));
 const additions = JSON.parse(fs.readFileSync(path.join(repo, 'lib/new-skincare-range.json'), 'utf8'));
 const ACTIVE = Object.keys(labels);
-const PRICES = {"enzyme-gel-cleanser":"$55","exfoliating-pads":"$80","hyaluronic-serum":"$90","retinol-rx":"$98.34","hydra-c-ferulic-serum":"$90","peptide-anti-wrinkle-day-cream":"$100","copper-peptide-restore-cream":"$68","firming-peptide-eye-gel":"$76.67"};
+const PRICES = {"enzyme-gel-cleanser":"$55","exfoliating-pads":"$80","hyaluronic-serum":"$90","retinol-rx":"$99","hydra-c-ferulic-serum":"$90","peptide-anti-wrinkle-day-cream":"$100","copper-peptide-restore-cream":"$68","firming-peptide-eye-gel":"$77"};
 const LEGACY = ['anti-aging-cleanser-with-peptides', 'hydrating-tonic'];
 // Retinol Rx strength copy (PR45) taken from its own exact fixture, not re-typed here.
 const strength = JSON.parse(fs.readFileSync(path.join(repo, 'tests/fixtures/retinol-strength-copy.json'), 'utf8'));
@@ -77,7 +77,13 @@ test('S8939 launch: eight PDPs, legacy holds, mixed cart, code, checkout handoff
       const addBtn = page.locator('.add-to-bag-row button.button-dark');
       await page.waitForFunction(() => !document.querySelector('.add-to-bag-row button.button-dark')?.disabled, null, {timeout: 15000});
       record(`D-HOLD-1:${label}:${id}:add-enabled`, await addBtn.isEnabled());
-      record(`D-CART-3:${label}:${id}:no-bundle-or-subscription`, (await page.locator('.product-detail').getByText(/Bundle and save|save \d+%/i).count()) === 0 && (await page.locator('.product-detail').getByText(/subscri|auto-?refill/i).count()) === 0);
+      // Owner decision 10 Nov 2026: qualified skincare offers its own bundle (10% / 15%); never a subscription.
+      const bundle = await page.locator('.product-detail .bundle-choices').evaluate(n => ({heading: n.querySelector('.bundle-heading strong')?.textContent, tiers: n.querySelector('.bundle-heading span')?.textContent,
+        rows: [...n.querySelectorAll('.bundle-option')].map(r => r.innerText.replace(/\s+/g, ' ').trim()), terms: n.querySelector('.bundle-terms')?.textContent})).catch(() => null);
+      record(`D-BUNDLE-1:${label}:${id}:skincare-bundle`, bundle?.heading === 'Bundle and save' && bundle.tiers === 'Buy 2, save 10% · Buy 3+, save 15%' && bundle.rows.length === 3
+        && /Save 10% on each/.test(bundle.rows[1]) && /Save 15% on each/.test(bundle.rows[2]) && /^Mix and match any IQON skincare: every skincare item in your bag counts toward the bundle\./.test(bundle.terms)
+        && (await page.locator('.product-detail').getByText(/save 25%/i).count()) === 0, JSON.stringify(bundle).slice(0, 260));
+      record(`D-CART-3:${label}:${id}:no-subscription`, (await page.locator('.product-detail').getByText(/subscri|auto-?refill/i).count()) === 0);
       const ld = await page.$$eval('script[type="application/ld+json"]', s => s.flatMap(x => [JSON.parse(x.textContent)].flat()));
       const product = ld.find(n => n['@type'] === 'Product');
       record(`D-HOLD-4:${label}:${id}:offer`, Number(product?.offers?.price) === Number(PRICES[id].slice(1)) && product?.offers?.availability === 'https://schema.org/InStock', JSON.stringify(product?.offers));
@@ -136,6 +142,33 @@ test('S8939 launch: eight PDPs, legacy holds, mixed cart, code, checkout handoff
   await page.waitForFunction(() => !document.querySelector('.add-to-bag-row button.button-dark')?.disabled);
   const qty = await page.evaluate(async () => (await fetch('/api/cart', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'add', id: 'creatine-monohydrate', variantId: 'gid://shopify/ProductVariant/1', quantity: 2})})).json());
   record('D-CART-3:bundle-supplements-only', qty.lineDiscounts?.some(d => /Bundle: Buy 2/.test(d.title)) && qty.items.find(i => i.id === 'retinol-rx')?.compareAmount === undefined, JSON.stringify(qty.lineDiscounts));
+  // Families never cross: 1 skincare + 2 supplements earns only the supplement Buy 2 tier.
+  record('D-BUNDLE-2:one-skincare-no-skincare-discount', qty.lineDiscounts?.length === 1 && qty.lineDiscounts[0].title === 'Bundle: Buy 2, save 10%', JSON.stringify(qty.lineDiscounts));
+  const mixed = await page.evaluate(async () => (await fetch('/api/cart', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'add', id: 'firming-peptide-eye-gel', variantId: 'gid://shopify/ProductVariant/99000000000207', quantity: 1})})).json());
+  const titles = Object.fromEntries((mixed.lineDiscounts || []).map(d => [d.title, d.amount]));
+  // 2 skincare (99 + 77) at 10% = 9.90 + 7.70; 2 supplements stay at Buy 2 (not Buy 3) although the bag holds 4 units.
+  record('D-BUNDLE-2:two-skincare-two-supplements', titles['Skincare bundle: Buy 2, save 10%'] === 17.6 && titles['Bundle: Buy 2, save 10%'] === 9.78 && Object.keys(titles).length === 2,
+    JSON.stringify(mixed.lineDiscounts));
+  record('D-BUNDLE-2:skincare-lines-discounted', mixed.items?.find(i => i.id === 'retinol-rx')?.amount === 89.1 && mixed.items?.find(i => i.id === 'firming-peptide-eye-gel')?.amount === 69.3, JSON.stringify(mixed.items?.map(i => [i.id, i.amount, i.compareAmount])));
+  for (const [vp, w, h] of [['desktop', 1440, 900], ['mobile', 390, 844]]) {
+    const bagCtx = await context(browser, {width: w, height: h}); const bp = await bagCtx.newPage();
+    await bagCtx.addCookies(await ctx.cookies());
+    await bp.goto(`${base}/products/retinol-rx`, {waitUntil: 'networkidle'});
+    await bp.waitForFunction(() => !document.querySelector('.add-to-bag-row button.button-dark')?.disabled);
+    await bp.locator('.bag-button').first().click();
+    await bp.locator('.bag-sheet .bag-lines').waitFor();
+    await bp.waitForFunction(() => /Skincare bundle: Buy 2, save 10%/.test(document.querySelector('.bag-sheet')?.textContent || ''));
+    const nudges = await bp.locator('.bag-sheet .bundle-nudge').allTextContents();
+    record(`D-BUNDLE-3:${vp}:bag-nudges-per-family`, JSON.stringify(nudges) === JSON.stringify(['Add 1 more eligible supplement to save 25%.', 'Add 1 more skincare product to save 15%.']), JSON.stringify(nudges));
+    const bagText = (await bp.locator('.bag-sheet').innerText()).replace(/\s+/g, ' ');
+    record(`D-BUNDLE-3:${vp}:bag-shopify-rows`, /Skincare bundle: Buy 2, save 10% −\$17\.60/.test(bagText) && /Bundle: Buy 2, save 10% −\$9\.78/.test(bagText) && !/save 15% −|save 25% −/.test(bagText), bagText.slice(0, 400));
+    const overflow = await bp.evaluate(() => ({doc: document.documentElement.scrollWidth, vw: innerWidth, sheet: (() => { const s = document.querySelector('.bag-sheet'); return s ? s.scrollWidth - s.clientWidth : -1; })()}));
+    record(`D-BUNDLE-3:${vp}:bag-no-overflow`, overflow.doc <= overflow.vw && overflow.sheet <= 0, JSON.stringify(overflow));
+    await shot(bp, `bag-mixed-family-${vp}`);
+    await bp.locator('.bag-sheet .bag-summary').scrollIntoViewIfNeeded();
+    await shot(bp, `bag-mixed-family-${vp}-summary`);
+    await bagCtx.close();
+  }
   const coded = await page.evaluate(async () => (await fetch('/api/cart', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'discount', discountCodes: ['iqon10']})})).json());
   record('D-CART-3:code-10pct-cart-wide-after-bundles', coded.orderDiscounts?.[0]?.title === 'IQON10' && Math.abs(coded.orderDiscounts[0].amount - Math.round(coded.subtotal * 10) / 100) < 0.011, JSON.stringify({subtotal: coded.subtotal, orderDiscounts: coded.orderDiscounts, total: coded.total}));
   await page.reload({waitUntil: 'networkidle'});

@@ -1,0 +1,17 @@
+{
+ "_comment": "Owner decision 2026-11-10: independent skincare bundle. The ONLY authorized app/store-shell.tsx changes on top of the S8939 baseline transform: per-family bag nudges and a family-scoped bag recommendation. Each 'before' must occur exactly once.",
+ "replacements": [
+  [
+   "import { bagSummary, bundleNudge, isBundleEligible, type DiscountLine } from \"@/lib/bundle-offer\";",
+   "import { bagSummary, bundleNudges, isBundleEligible, type DiscountLine } from \"@/lib/bundle-offer\";"
+  ],
+  [
+   "(!activeBundleNudge||isBundleEligible(p.id))",
+   "(!activeBundleNudge.length||activeBundleNudge.some(n=>isBundleEligible(p.id,n.family)))"
+  ],
+  [
+   "// Next bundle tier for the eligible supplements in the bag. Hidden while a discount code is entered,\n// because bundle savings do not combine with codes.\nfunction cartBundleNudge({cart,mode,discountCodes}:Pick<StoreContextType,\"cart\"|\"mode\"|\"discountCodes\">) {\n if(mode!==\"live\"||discountCodes.length)return null;\n return bundleNudge(cart.filter(item=>item.purchase===\"once\"&&isBundleEligible(item.id)).reduce((n,item)=>n+item.quantity,0));\n}\nexport function BundleNudge() {\n const message=cartBundleNudge(useStore());\n return message?<p className=\"bundle-nudge\" role=\"status\">{message}</p>:null;\n}\n",
+   "// Next bundle tier for each family in the bag (supplements and skincare are counted separately).\n// Hidden while a discount code is entered, because bundle savings do not combine with codes.\nfunction cartBundleNudge({cart,mode,discountCodes}:Pick<StoreContextType,\"cart\"|\"mode\"|\"discountCodes\">) {\n if(mode!==\"live\"||discountCodes.length)return [];\n return bundleNudges(cart);\n}\nexport function BundleNudge() {\n const nudges=cartBundleNudge(useStore());\n return <>{nudges.map(nudge=><p key={nudge.family} className=\"bundle-nudge\" role=\"status\">{nudge.message}</p>)}</>;\n}\n"
+  ]
+ ]
+}

@@ -9,7 +9,7 @@ import { StoreNavigation } from "./store-navigation";
 import { departmentHome } from "@/lib/departments";
 import type { Category } from "@/lib/catalog";
 import { money, productPrice, unitPrice, lineKey, validateCart, type CartItem, type Product, type StoreCatalog } from "@/lib/catalog";
-import { bagSummary, bundleNudge, isBundleEligible, type DiscountLine } from "@/lib/bundle-offer";
+import { bagSummary, bundleNudges, isBundleEligible, type DiscountLine } from "@/lib/bundle-offer";
 import { isComingSoon } from "@/lib/commerce-policy";
 import { DEFAULT_SUPPORT_EMAIL } from "@/lib/orders/emails/format";
 import { STORE_POLICY_LINKS } from "@/lib/store-policies";
@@ -147,7 +147,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
     <StoreNavigation key={`${pathname}:${department}`} department={department} setDepartment={setPreferredDepartment} products={products} currency={currency} count={count} logo={<Wordmark/>} openSearch={()=>setSearch(true)} openBag={()=>setBag(true)}/>
     {children}
     <Footer/>
-    <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&(!activeBundleNudge||isBundleEligible(p.id))&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<BundleNudge/><BagSavings/><div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><OrderSavings/><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<CheckoutLink active={bag}>Secure checkout <ArrowRight size={18}/></CheckoutLink>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
+    <Sheet open={bag} onOpenChange={setBag}><SheetContent className="bag-sheet"><div className="sheet-heading"><SheetTitle>Your bag <span>({count})</span></SheetTitle><SheetDescription>A little more intention, every day.</SheetDescription></div>{error&&<div className="commerce-message" role="alert"><p>{error}</p><button className="under-link" disabled={busy} onClick={()=>void retryCart()}>Refresh bag</button></div>}{busy&&<p className="commerce-message" role="status">Updating your bag…</p>}{cart.length?<><div className="bag-lines">{cart.map(item=><CartLine key={lineKey(item)} item={item}/>)}</div><div className="bag-recommend"><p className="eyebrow">COMPLETE YOUR ROUTINE</p>{(()=>{const p=products.find(p=>!isComingSoon(p)&&!p.requiresSellingPlan&&!p.pricePending&&p.available!==false&&(!activeBundleNudge.length||activeBundleNudge.some(n=>isBundleEligible(p.id,n.family)))&&!cart.some(i=>i.id===p.id));return p?<div><img src={p.image} alt={p.name}/><span><strong>{p.name}</strong><small>{productPrice(p)}</small></span><button aria-label={`Add ${p.name} to bag`} className="icon-button" onClick={()=>add(p.id)}><Plus size={20}/></button></div>:null;})()}</div><div className="bag-summary">{live&&<DiscountCodes/>}<BundleNudge/><BagSavings/><div><span>Subtotal</span><strong>{money(subtotal,currency)}</strong></div><OrderSavings/><p>{live?"Shipping and tax calculated at checkout.":"Orders are not enabled yet."}</p>{live&&<CheckoutLink active={bag}>Secure checkout <ArrowRight size={18}/></CheckoutLink>}<Link className={live?"under-link bag-review-link":"button button-dark full-width"} href="/checkout" onClick={()=>setBag(false)}>Review your bag <ArrowRight size={18}/></Link><button className="quiet-button" onClick={()=>setBag(false)}>Continue shopping</button></div></>:!hydrated?<p className="commerce-message" role="status">{error?"Refresh your bag to try again.":"Loading your bag…"}</p>:<div className="empty-bag"><ShoppingBag size={42} strokeWidth={1}/><h3>Your daily ritual starts here.</h3><p>Explore supplements and skincare, made for a more considered routine.</p><Link className="button button-dark" href="/collections/all" onClick={()=>setBag(false)}>Explore the collection <ArrowRight size={17}/></Link></div>}</SheetContent></Sheet>
     <Sheet open={search} onOpenChange={setSearch}><SheetContent side="top" className="search-sheet"><SheetTitle>Find your essential.</SheetTitle><SheetDescription>Search the IQON collection</SheetDescription><div className="search-field"><Search size={22}/><input aria-label="Search the collection" placeholder="Search products, formats, collections…" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={18}/></button>}</div><div className="search-results">{results.map(p=><Link href={`/products/${p.id}`} key={p.id} onClick={()=>setSearch(false)}><img src={p.image} alt={p.name}/><span>{p.name}<small>{p.type} · {productPrice(p)}</small></span><ArrowRight size={18}/></Link>)}{!results.length&&<p className="no-results">No products match “{query}”. Try “collagen”, “creatine” or “skincare”.</p>}</div></SheetContent></Sheet>
 
   </StoreContext.Provider>;
@@ -165,15 +165,15 @@ export function DiscountCodes() {
  </div>;
 }
 
-// Next bundle tier for the eligible supplements in the bag. Hidden while a discount code is entered,
-// because bundle savings do not combine with codes.
+// Next bundle tier for each family in the bag (supplements and skincare are counted separately).
+// Hidden while a discount code is entered, because bundle savings do not combine with codes.
 function cartBundleNudge({cart,mode,discountCodes}:Pick<StoreContextType,"cart"|"mode"|"discountCodes">) {
- if(mode!=="live"||discountCodes.length)return null;
- return bundleNudge(cart.filter(item=>item.purchase==="once"&&isBundleEligible(item.id)).reduce((n,item)=>n+item.quantity,0));
+ if(mode!=="live"||discountCodes.length)return [];
+ return bundleNudges(cart);
 }
 export function BundleNudge() {
- const message=cartBundleNudge(useStore());
- return message?<p className="bundle-nudge" role="status">{message}</p>:null;
+ const nudges=cartBundleNudge(useStore());
+ return <>{nudges.map(nudge=><p key={nudge.family} className="bundle-nudge" role="status">{nudge.message}</p>)}</>;
 }
 // Shopify's product discount allocations (bundle tiers), shown only when they reconcile to its subtotal.
 export function BagSavings() {

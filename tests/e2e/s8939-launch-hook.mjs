@@ -16,19 +16,23 @@ const SUPPLEMENTS = [
 const catalog = SUPPLEMENTS.map(([handle, title, price, type], i) => ({handle, title, description: `${title} synthetic test description.`, productType: type, tags: ["iqon-supplements"],
   availableForSale: true, requiresSellingPlan: false, images: {nodes: []}, variants: {pageInfo: {hasNextPage: false}, nodes: [{id: `gid://shopify/ProductVariant/${i + 1}`, title: "Default Title", availableForSale: true, price: money(price)}]}}));
 const ACTIVE = ["enzyme-gel-cleanser","exfoliating-pads","hyaluronic-serum","retinol-rx","hydra-c-ferulic-serum","peptide-anti-wrinkle-day-cream","copper-peptide-restore-cream","firming-peptide-eye-gel"];
-const PRICES = ["55.00","80.00","90.00","98.34","90.00","100.00","68.00","76.67"];
+// Approved whole-dollar prices (owner decision 10 Nov 2026: Retinol Rx 99.00, Eye Gel 77.00).
+const PRICES = ["55.00","80.00","90.00","99.00","90.00","100.00","68.00","77.00"];
 const NAMES = ["Enzyme Gel Cleanser","Exfoliating Pads","Hyaluronic Serum","Retinol Rx","Hydra C + Ferulic Serum","Peptide Anti-Wrinkle Day Cream","Copper Peptide Restore Cream","Firming Peptide Eye Gel"];
 const pid = i => `gid://shopify/Product/99000000000${100 + i}`, vid = i => `gid://shopify/ProductVariant/99000000000${200 + i}`;
-// FAKE_SKINCARE=qualified (default) | held-retinol (Retinol price drift) | down (qualification outage)
+// FAKE_SKINCARE=qualified (default) | held-retinol (Retinol at the superseded 98.34: price drift) | down (qualification outage)
 const stock = Object.fromEntries(ACTIVE.map(h => [h, Number(process.env.S8939_STOCK || 28)]));
 const skincareNode = i => {
   const mode = process.env.FAKE_SKINCARE || "qualified";
   return {id: vid(i), title: "Default Title", availableForSale: true, currentlyNotInStock: false, quantityAvailable: stock[ACTIVE[i]],
-    price: money(mode === "held-retinol" && ACTIVE[i] === "retinol-rx" ? "99.00" : PRICES[i]),
+    price: money(mode === "held-retinol" && ACTIVE[i] === "retinol-rx" ? "98.34" : PRICES[i]),
     product: {id: pid(i), handle: ACTIVE[i], tags: ["iqon-skincare"], availableForSale: true, requiresSellingPlan: false}};
 };
-const BUNDLE = new Set(SUPPLEMENTS.map(s => s[0]));
-const TIERS = [{min: 3, rate: 25, title: "Bundle: Buy 3, save 25%"}, {min: 2, rate: 10, title: "Bundle: Buy 2, save 10%"}];
+// Two independent automatic discounts, like Shopify: each counts only its own family's units.
+const FAMILIES = [
+  {handles: new Set(SUPPLEMENTS.map(s => s[0])), tiers: [{min: 3, rate: 25, title: "Bundle: Buy 3, save 25%"}, {min: 2, rate: 10, title: "Bundle: Buy 2, save 10%"}]},
+  {handles: new Set(ACTIVE), tiers: [{min: 3, rate: 15, title: "Skincare bundle: Buy 3, save 15%"}, {min: 2, rate: 10, title: "Skincare bundle: Buy 2, save 10%"}]},
+];
 const carts = new Map();
 const variantInfo = id => {
   const s = catalog.find(p => p.variants.nodes[0].id === id);
@@ -38,11 +42,16 @@ const variantInfo = id => {
 };
 function cartShape(id) {
   const {lines, codes} = carts.get(id);
-  const units = lines.filter(l => BUNDLE.has(variantInfo(l.merchandiseId).handle)).reduce((n, l) => n + l.quantity, 0);
-  const tier = TIERS.find(t => units >= t.min);
+  const tierFor = handle => {
+    const family = FAMILIES.find(f => f.handles.has(handle));
+    if (!family) return undefined;
+    const units = lines.filter(l => family.handles.has(variantInfo(l.merchandiseId).handle)).reduce((n, l) => n + l.quantity, 0);
+    return family.tiers.find(t => units >= t.min);
+  };
   const nodes = lines.map((l, i) => {
     const v = variantInfo(l.merchandiseId), unit = Math.round(Number(v.price) * 100), gross = unit * l.quantity;
-    const saved = tier && BUNDLE.has(v.handle) ? Math.floor(unit * tier.rate / 100) * l.quantity : 0;
+    const tier = tierFor(v.handle);
+    const saved = tier ? Math.floor(unit * tier.rate / 100) * l.quantity : 0;
     return {id: `gid://shopify/CartLine/${i + 1}`, quantity: l.quantity, cost: {subtotalAmount: money((gross / 100).toFixed(2)), totalAmount: money(((gross - saved) / 100).toFixed(2))},
       discountAllocations: saved ? [{discountedAmount: money((saved / 100).toFixed(2)), title: tier.title}] : [], sellingPlanAllocation: null,
       merchandise: {id: l.merchandiseId, title: "Default Title", image: null, product: {handle: v.handle, title: v.title, tags: v.tags}}};

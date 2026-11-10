@@ -77,3 +77,40 @@ it("does not offer an unapproved substitute when no eligible recommendation is a
   expect(nudge()?.textContent).toContain("save 10%");
   expect(recommendation().querySelector("button")).toBeNull();
 });
+
+// Owner decision 10 Nov 2026: skincare has its own bundle, counted separately from supplements.
+const qualifiedSkincare=(id:string,price:number):Product=>({...products.find(p=>p.id===id)!,available:true,pricePending:false,launchQualified:true,requiresSellingPlan:false,
+  price,currency:"USD",variants:[{id:`variant-${id}`,title:"Default Title",available:true,price,currency:"USD"}]});
+const retinol=qualifiedSkincare("retinol-rx",99),eye=qualifiedSkincare("firming-peptide-eye-gel",77);
+const nudges=()=>[...document.querySelectorAll(".bag-sheet .bundle-nudge")].map(n=>n.textContent);
+
+it("a skincare-only bag nudges toward the skincare tiers and recommends only qualified skincare",async()=>{
+  const heldSkincare=products.find(p=>p.id==="hyaluronic-serum")!;
+  await setup([item(retinol.id)],[],[gut,creatine,heldSkincare,retinol,eye]);
+  expect(nudges()).toEqual(["Add 1 more skincare product to save 10%."]);
+  expect(recommendation().textContent).toContain("Firming Peptide Eye Gel");
+  fireEvent.click(screen.getByRole("button",{name:"Add Firming Peptide Eye Gel to bag"}));
+  await waitFor(()=>expect(nudges()).toEqual(["Add 1 more skincare product to save 15%."]));
+  const increase=screen.getByRole("button",{name:"Increase Retinol Rx quantity"});
+  await waitFor(()=>expect(increase.hasAttribute("disabled")).toBe(false));
+  fireEvent.click(increase);
+  await waitFor(()=>expect(nudges()).toEqual([]));
+});
+
+it("a mixed bag counts each family separately: one of each reaches neither tier",async()=>{
+  await setup([item(retinol.id),item(creatine.id)],[],[gut,creatine,liver,retinol,eye]);
+  expect(nudges()).toEqual(["Add 1 more eligible supplement to save 10%.","Add 1 more skincare product to save 10%."]);
+  // Two skincare units and one supplement: three units in the bag, but no family reaches Buy 3.
+  const increase=screen.getByRole("button",{name:"Increase Retinol Rx quantity"});
+  await waitFor(()=>expect(increase.hasAttribute("disabled")).toBe(false));
+  fireEvent.click(increase);
+  await waitFor(()=>expect(nudges()).toEqual(["Add 1 more eligible supplement to save 10%.","Add 1 more skincare product to save 15%."]));
+});
+
+it("skincare subscriptions, legacy and unknown handles never count toward the skincare bundle; a code hides every nudge",async()=>{
+  await setup([{...item(retinol.id,2),purchase:"subscription"},item("hydrating-tonic"),item("unapproved-test-skincare",3)],[],[gut,creatine,retinol,eye]);
+  expect(nudges()).toEqual([]);
+  cleanup();
+  await setup([item(retinol.id),item(creatine.id)],[{code:"IQON10",applicable:true}],[gut,creatine,retinol,eye]);
+  expect(nudges()).toEqual([]);
+});

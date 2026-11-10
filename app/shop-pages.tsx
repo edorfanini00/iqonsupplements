@@ -4,7 +4,7 @@ import { trackViewContent } from "@/lib/meta-pixel";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, ChevronRight, RotateCcw, Truck } from "lucide-react";
 import { ProductBundleOptions } from "./product-bundle-options";
-import { bundleEstimate, isBundleEligible } from "@/lib/bundle-offer";
+import { bundleEstimate, bundleFamily } from "@/lib/bundle-offer";
 import { SHIPPING_NOTE, isComingSoon, isOrderable } from "@/lib/commerce-policy";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { ProductGallery } from "./product-gallery";
@@ -44,9 +44,11 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  const supplement=supplementDetails[p.id];
  const price=variant?.price??unitPrice(p);
  const currency=variant?.currency||p.currency||"USD";
- // Bundle eligible products show the tiers; the add button shows this selection's own estimate.
- const bundle=p.category==="supplements"&&isBundleEligible(p.id);
- const estimate=bundle?bundleEstimate(price,quantity):{gross:Math.round(price*100)*quantity/100,total:Math.round(price*100)*quantity/100,saved:0};
+ // Bundle eligible products show their own family's tiers (supplements or skincare, never mixed);
+ // the add button shows this selection's own estimate.
+ const family=bundleFamily(p.id);
+ const bundle=!!family&&p.category===family;
+ const estimate=bundle?bundleEstimate(price,quantity,family):{gross:Math.round(price*100)*quantity/100,total:Math.round(price*100)*quantity/100,saved:0};
  useEffect(()=>{
   const track=()=>{if(live&&variantId&&!comingSoon)trackViewContent({variantId,name:p.name,price,currency});};
   track();
@@ -70,7 +72,7 @@ export function ProductPage({product:p,designPreview=false}:{product:Product;des
  const summary=<><div className="product-summary"><p className="eyebrow">{p.category.toUpperCase()} / {p.type.toUpperCase()}</p><div className="product-title-row"><h1>{p.name}</h1><span className={comingSoon?"price-pending":""}>{legacy?"Not part of the current range":comingSoon?"Coming soon":money(price,currency)}</span></div>{<p className="product-size">{variant?.title&&variant.title!=="Default Title"?variant.title:packageContents(p)}{p.ritual&&<> <span>·</span> {p.ritual}</>}</p>}</div><ProductReviewLink productId={p.id} designPreview={designPreview&&mode==="preview"}/></>;
  const productInfo=<>{content&&<p className="product-summary-description">{productVisuals[p.id]?.lead || content.description}</p>}{content&&<ul className="product-highlights">{content.highlights.map(highlight=><li key={highlight}><Check size={15}/><span>{highlight}</span></li>)}</ul>}<ProductEssentials product={p} price={price} currency={currency}/></>;
  const purchaseControls=<>{!comingSoon&&p.variants&&p.variants.length>1?<div className="product-variant-picker"><label htmlFor="product-variant">Select option</label><select id="product-variant" value={variantId} onChange={e=>setVariantId(e.target.value)}>{p.variants.map(v=><option key={v.id} value={v.id}>{v.title}{!v.available?", sold out":""}</option>)}</select></div>:p.size&&<div className="product-format"><span>FORMAT</span><strong>{p.size}</strong><Check size={15}/></div>}{!comingSoon&&<>
- {available&&<ProductBundleOptions quantity={quantity} setQuantity={setQuantity} price={price} currency={currency} bundleEligible={bundle}/>}
+ {available&&<ProductBundleOptions quantity={quantity} setQuantity={setQuantity} price={price} currency={currency} bundleEligible={bundle} family={bundle?family:undefined}/>}
  <CartConnectionNotice/>
  <div className="add-to-bag-row" ref={inlineCta}><Quantity value={quantity} setValue={setQuantity} label={p.name} disabled={busy||!available}/><button className="button button-dark" disabled={busy||!ready||!available} onClick={addSelection}>{addLabel}</button></div>
  {!live&&<p className="product-preview-note">Orders will open shortly.</p>}
