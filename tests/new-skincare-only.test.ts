@@ -82,22 +82,22 @@ test('each new page has complete product-specific story, ingredients, routine, F
   const editorial=newSkincareImage(p.id,'editorial')!;
   assert.equal(editorial,`/images/skincare/new-products-only/${p.id}/editorial.webp`);
   const editorialHashes:Record<string,string>={
-   'enzyme-gel-cleanser':'45cd93cda5e4b27fcba95384e309c4445e32b51cc9df195ab777bf7918f51efc',
-   'hyaluronic-serum':'ab2198bfc4561f877f694e0aeaa49c490d4354d0e1fc5598cd70484cfccaeb10',
-   'peptide-anti-wrinkle-day-cream':'2f0fabebccf95be2eb58c2d52c43a796730e11aae3c4dda0c9d9dcdcbb80791a',
+   'enzyme-gel-cleanser':'d3e6895806280c5b9baaf5d4a1c8b9f506b613d57ac615abbab9db09549d1af0',
+   'hyaluronic-serum':'294bc41e361fb57eb38d6f2fdc65c54c63623b3096a06c1e9fcd149e21b67bdc',
+   'peptide-anti-wrinkle-day-cream':'f3e849a752a0e99d4fc2d8a5aa2bd2ecc8b60da488486b610c53cab64a107cd4',
   };
   assert.equal(createHash('sha256').update(readFileSync(`public${editorial}`)).digest('hex'),editorialHashes[p.id]);
   for(const art of v.ingredients)if(art.kind==='molecule')assert(existsSync(`public/images/skincare-ingredients/${art.art}.svg`));
  }
 });
 test('accepted local packshots match pinned hashes and texture references stay byte-identical with explicit visible disclosure',()=>{
- const packHashes=['a56bff84ca635e698929d28eb4172f8688d08c19a2145210150980a1cc300414','bc7c2d4255a79064658114717a0504e55a506a3578bdfb8d46670e1bb8ddbb13','ed001b978b0d603764a3ba54c870b6f658f942fe544a5d2d3bb0808215e96a68'];
+ const packHashes=['fef97cc06ef8db86e90276cef24121f48157d5847f80416f18b2d83e4eaafd50','fb8bfa0a29124c2c2974e705ea98b6422070d4e5803adc2be7ddcb8ed6634d22','72dc9506a48141653ddd9ff53883626008751097f46c034e3ed5a650b88adbc1'];
  const textures=['/images/product-details/anti-aging-cleanser-with-peptides.webp','/images/pdp-materials-v6/hydra-c-ferulic-serum.webp','/images/pdp-materials-v6/copper-peptide-restore-cream.webp'];
  ids.forEach((id,i)=>{
   const p=newSkincareProducts.find(p=>p.id===id)!;
   assert.equal(p.image,`/images/skincare/new-products-only/${id}/packshot.webp`);
   assert.equal(newSkincareImage(id,'packshot'),p.image);
-  assert.match(p.images![0].alt,/CGI packaging visualization/);
+  assert.match(p.images![0].alt,/AI-generated packaging visualization/);
   assert.equal(createHash('sha256').update(readFileSync(`public${p.image}`)).digest('hex'),packHashes[i]);
   assert.equal(newSkincareImage(id,'texture'),textures[i]);
   assert.deepEqual(readFileSync(`public${textures[i]}`),original(`public${textures[i]}`));

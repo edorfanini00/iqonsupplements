@@ -12,10 +12,18 @@ export const newSkincareProducts: Product[] = range.map(p => ({
   ...p, category: 'skincare', available: false, price: 0, pricePending: true,
   currency: 'USD', tone: 'silver', campaign: p.image,
   variants: [], requiresSellingPlan: false,
-  images: [{src:p.image, alt:`IQON ${p.name}, ${p.size} — CGI packaging visualization based on approved artwork`}],
+  images: [{src:p.image, alt:`IQON ${p.name}, ${p.size} — AI-generated packaging visualization based on approved artwork`}],
 }));
 export const newSkincareIds = new Set(range.map(p => p.id));
 export const newSkincareFor = (id:string) => range.find(p => p.id === id);
+// Shared by the gallery, zoom and routine; props are styling, not formula evidence.
+const editorialPackaging: Record<string,string> = {
+  'enzyme-gel-cleanser':'white bottle on a grey counter with a folded white towel and cropped metal tray',
+  'hyaluronic-serum':'silver bottle on a reflective metal pedestal beside an empty shallow glass dish',
+  'peptide-anti-wrinkle-day-cream':'silver bottle on a grey counter with folded white towels and a cropped metal tray',
+};
+export const newSkincareEditorialAlt = (id:string, name:string) => editorialPackaging[id]
+  ? `IQON ${name} ${editorialPackaging[id]} — AI-generated packaging visualization` : undefined;
 export const comingSoonSkincareDepartment = (pathname:string) =>
   pathname.startsWith('/products/') && isHeldSkincareHandle(pathname.slice('/products/'.length)) ? 'skincare' as const : undefined;
 // Existing own-brand abstract studies, referenced in place without altering the source.

@@ -10,7 +10,7 @@ import { ProductFactArt } from "./product-fact-art";
 import { galleryGuides, galleryPhotographs } from "@/lib/product-gallery-content";
 import { ProductGuideArt } from "./product-guide-art";
 import { newSkincarePresentation, newSkincareGalleryGuides } from "@/lib/new-skincare-editorial";
-import { newSkincareImage } from "@/lib/new-skincare";
+import { newSkincareImage, newSkincareEditorialAlt } from "@/lib/new-skincare";
 
 export const galleryChapters = ["The packaging", "Formula focus", "The product", "How it fits"];
 
@@ -27,7 +27,7 @@ export function ProductGalleryPanel({ product: p, index }: { product: Product; i
   const art = productArt[p.id];
   const presentation = productPresentation[p.id] || newSkincarePresentation[p.id];
   const contents = packageContents(p);
-  const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : newSkincareImage(p.id,'editorial') ? {src:newSkincareImage(p.id,'editorial')!,alt:`IQON ${p.name} packaging beside an empty glass cylinder on a light grey surface — CGI visualization`} : undefined);
+  const photograph = galleryPhotographs[p.id] || (art ? {src:art.scene,alt:art.sceneAlt} : newSkincareImage(p.id,'editorial') ? {src:newSkincareImage(p.id,'editorial')!,alt:newSkincareEditorialAlt(p.id,p.name)} : undefined);
   if (presentation && index === 1) return <figure className="visual-panel visual-formula-fact"><ProductFactArt data={presentation}/></figure>;
   if (photograph && index === 2) return <figure className="visual-panel visual-editorial">
     <div className="visual-image-frame"><img src={photograph.src} alt={photograph.alt} width={1254} height={1254} loading="lazy" /></div>
@@ -65,7 +65,7 @@ export function ProductGallery({ product }: { product: Product }) {
       </article>)}
     </div>
     <div className="visual-gallery-controls"><button aria-label="Previous product panel" disabled={active === 0} onClick={() => go(active - 1)}><ArrowLeft size={18} /></button><div><span aria-live="polite">{chapters[active]}</span><div className="visual-gallery-dots">{chapters.map((chapter, i) => <button key={chapter} aria-label={`View ${chapter.toLowerCase()}`} aria-current={active === i ? "true" : undefined} onClick={() => go(i)} />)}</div></div><button aria-label="Next product panel" disabled={active === count - 1} onClick={() => go(active + 1)}><ArrowRight size={18} /></button></div>
-    {product.category==='skincare'&&<p className="product-preview-note">{newSkincareImage(product.id,'packshot')?'Packaging visualization based on approved artwork and supplier container references; not a supplier photograph.':'Illustrative product imagery, not verification of the supplied packaging, color or texture.'}</p>}
+    {product.category==='skincare'&&<p className="product-preview-note">{newSkincareImage(product.id,'packshot')?'AI-generated packaging visualization based on approved artwork and supplier container references; not a supplier photograph.':'Illustrative product imagery, not verification of the supplied packaging, color or texture.'}</p>}
     <Dialog open={zoom !== null} onOpenChange={open => { if (!open) setZoom(null); }}><DialogContent className="visual-gallery-dialog"><DialogTitle className="sr-only">{product.name} — {chapters[zoom || 0]}</DialogTitle><DialogDescription className="sr-only">Expanded product image and information</DialogDescription><ProductGalleryPanel product={product} index={zoom || 0} /></DialogContent></Dialog>
   </div>;
 }
