@@ -36,6 +36,8 @@ const imports = {
   "./shopify-operations": dataUrl(compile("../lib/shopify-operations.ts")),
   "./shopify": withPolicy("../lib/shopify.ts"),
   "./legacy-redirects": redirectsUrl,
+  // S8939: committed launch identity (its store differs from this fixture's store, so nothing qualifies here).
+  "./skincare-launch": sourceModuleUrl("lib/skincare-launch.ts"),
 };
 const serverSource = compile("../lib/shopify.server.ts").replace(/from "([^"]+)"/g,
   (match, name) => imports[name] ? `from "${imports[name]}"` : match);

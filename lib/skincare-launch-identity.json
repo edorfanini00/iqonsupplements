@@ -1,0 +1,63 @@
+{
+  "_comment": "S8939 launch identity. Exact store + handle + supplier SKU -> Shopify product/variant GIDs. Ids are copied ONLY from the proven read-only provisioning manifest (provision/manifest.json, captured 2026-11-10T07:35Z) and eight-sku-provenance.json; null = not yet created/proven, which keeps that product on hold. Approved one-time USD prices per owner decision 2026-11-10. Never edit ids by hand: rebind from the next proven manifest.",
+  "store": "nr9zd0-t5.myshopify.com",
+  "currency": "USD",
+  "products": [
+    {
+      "handle": "enzyme-gel-cleanser",
+      "supplierSku": "81310702C",
+      "approvedPriceUsd": "55.00",
+      "productId": null,
+      "variantId": null
+    },
+    {
+      "handle": "exfoliating-pads",
+      "supplierSku": "12410503C",
+      "approvedPriceUsd": "80.00",
+      "productId": "gid://shopify/Product/10393655345447",
+      "variantId": "gid://shopify/ProductVariant/52052013744423"
+    },
+    {
+      "handle": "hyaluronic-serum",
+      "supplierSku": "33230103C",
+      "approvedPriceUsd": "90.00",
+      "productId": null,
+      "variantId": null
+    },
+    {
+      "handle": "retinol-rx",
+      "supplierSku": "82730103C",
+      "approvedPriceUsd": "98.34",
+      "productId": "gid://shopify/Product/10393656656167",
+      "variantId": "gid://shopify/ProductVariant/52052015710503"
+    },
+    {
+      "handle": "hydra-c-ferulic-serum",
+      "supplierSku": "40730103C",
+      "approvedPriceUsd": "90.00",
+      "productId": "gid://shopify/Product/10393656066343",
+      "variantId": "gid://shopify/ProductVariant/52052014727463"
+    },
+    {
+      "handle": "peptide-anti-wrinkle-day-cream",
+      "supplierSku": "61730172C",
+      "approvedPriceUsd": "100.00",
+      "productId": null,
+      "variantId": null
+    },
+    {
+      "handle": "copper-peptide-restore-cream",
+      "supplierSku": "11530173C",
+      "approvedPriceUsd": "68.00",
+      "productId": "gid://shopify/Product/10393657737511",
+      "variantId": "gid://shopify/ProductVariant/52052017971495"
+    },
+    {
+      "handle": "firming-peptide-eye-gel",
+      "supplierSku": "11330052C",
+      "approvedPriceUsd": "76.67",
+      "productId": "gid://shopify/Product/10393657245991",
+      "variantId": "gid://shopify/ProductVariant/52052016955687"
+    }
+  ]
+}
