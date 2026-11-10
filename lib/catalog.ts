@@ -1,5 +1,5 @@
 import { productContent } from "./product-content";
-import skincareRange from "./skincare-range.json";
+import { activeSkincareProducts } from "./new-skincare";
 import approvedPrices from "./approved-prices.json";
 import { isComingSoon } from "./commerce-policy";
 export type Category = "supplements" | "skincare";
@@ -68,8 +68,7 @@ const previewProducts: Product[] = [
   supplement("hair-skin-nails-gummies", "Hair, Skin & Nails Gummies", "Gummies", "60 gummies · Passion fruit",
     "A different kind of daily ritual.", "Passion-fruit-flavored Hair, Skin & Nails Gummies in a clear bottle of 60 gummies.",
     "10_pack_hair_and_skin_gummies", "14_hero_gummies_falling", 10),
-  ...skincareRange.map(p => ({...p, category: "skincare" as const, available: false, currency: "USD", tone: "silver", campaign: p.image,
-    images: [{src:p.image, alt:`IQON ${p.name}, ${p.size}`}]})),
+  ...activeSkincareProducts,
 ];
 
 export const products: Product[] = previewProducts.map(p => ({...p, descriptor: productContent[p.id]?.descriptor || p.descriptor, description: productContent[p.id]?.description || p.description}));

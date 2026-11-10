@@ -32,10 +32,11 @@ describe('new-only media integration',()=>{
    expect(container.innerHTML).not.toMatch(/image pending|editorial\.svg/i);
   });
  }
- it('does not introduce the new packaging disclosure on any existing gallery',()=>{
+ it('keeps supplement galleries unchanged and distinguishes skincare image provenance',()=>{
   for(const product of products){
    const {container}=render(React.createElement(ProductGallery,{product}));
-   expect(container.querySelector('.product-preview-note')).toBeNull();
+   if(product.category==='supplements')expect(container.querySelector('.product-preview-note')).toBeNull();
+   else expect(container.querySelector('.product-preview-note')?.textContent).toMatch(/not a supplier photograph|not verification/);
    cleanup();
   }
  });

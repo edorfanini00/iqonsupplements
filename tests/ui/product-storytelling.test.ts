@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { products } from "../../lib/catalog";
 import { productPresentation } from "../../lib/product-presentation";
+import { newSkincarePresentation, newSkincareGalleryGuides } from "../../lib/new-skincare-editorial";
 import { galleryGuides } from "../../lib/product-gallery-content";
 import { ProductGallery } from "../../app/product-gallery";
 import { ProductFormulaExplorer } from "../../app/product-formula-explorer";
@@ -20,7 +21,7 @@ describe("visual product guides", () => {
       expect(sources.every(src => !/product-details|product-campaign-v2|17_hero_nmn_hand/.test(src || ''))).toBe(true);
       for (const image of view.container.querySelectorAll('img')) expect(image.getAttribute('src')).toBeTruthy();
       fireEvent.click(screen.getByRole('button', { name: `Enlarge formula focus for ${product.name}` }));
-      expect(screen.getByRole('dialog').textContent).toContain(productPresentation[product.id].note);
+      expect(screen.getByRole('dialog').textContent).toContain((productPresentation[product.id]||newSkincarePresentation[product.id]).note);
       cleanup();
     }
   });
@@ -41,7 +42,7 @@ describe("visual product guides", () => {
     for (const product of products) {
       render(React.createElement(ProductGallery, { product }));
       fireEvent.click(screen.getByRole('button', {name:`Enlarge how it fits for ${product.name}`}));
-      expect(screen.getByRole('dialog').textContent).toContain(galleryGuides[product.id].note);
+      expect(screen.getByRole('dialog').textContent).toContain((galleryGuides[product.id]||newSkincareGalleryGuides[product.id]).note);
       cleanup();
     }
   });

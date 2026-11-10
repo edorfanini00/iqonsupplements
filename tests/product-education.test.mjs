@@ -16,7 +16,8 @@ test("every catalog product renders useful education with working section links"
   const { products } = await vite.ssrLoadModule("/lib/catalog.ts");
   const { productContent } = await vite.ssrLoadModule("/lib/product-content.ts");
   const { ProductStory } = await vite.ssrLoadModule("/app/product-story.tsx");
-  assert.equal(products.length, 18);
+  assert.equal(products.filter(p=>p.category==="supplements").length, 11);
+  assert.equal(products.filter(p=>p.category==="skincare").length, 8);
   for (const product of products) {
     const copy = productContent[product.id];
     assert.ok(copy.benefits.length >= 3, product.id);
@@ -48,7 +49,7 @@ test("full supplement information preserves ingredients, allergens and label dir
   }
 });
 
-test("comparisons keep live prices and unique products, with the viewed product first", async () => {
+test("comparisons preserve supplement prices while skincare stays unpriced and current-only", async () => {
   const { products } = await vite.ssrLoadModule("/lib/catalog.ts");
   const { comparisonFor, ProductStory } = await vite.ssrLoadModule("/app/product-story.tsx");
   const live = products.map(product => ({ ...product, price: 91.25, currency: "EUR" }));
@@ -56,8 +57,15 @@ test("comparisons keep live prices and unique products, with the viewed product 
     const comparison = comparisonFor(product, live);
     assert.equal(comparison[0].id, product.id);
     assert.equal(new Set(comparison.map(item => item.id)).size, comparison.length);
-    assert.ok(comparison.every(item => item.price === 91.25 && item.currency === "EUR"));
-    assert.ok(render(ProductStory, { product, products: live }).includes("91.25"));
+    const html=render(ProductStory, { product, products: live });
+    if(product.category==='skincare'){
+      assert.ok(comparison.every(item=>item.pricePending&&item.price===0&&!item.available));
+      assert.ok(!comparison.some(item=>['hydrating-tonic','anti-aging-cleanser-with-peptides'].includes(item.id)));
+      assert.doesNotMatch(html,/91\.25/);assert.match(html,/Coming soon/);
+    }else{
+      assert.ok(comparison.every(item => item.price === 91.25 && item.currency === "EUR"));
+      assert.ok(html.includes("91.25"));
+    }
   }
 });
 

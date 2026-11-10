@@ -5,18 +5,43 @@
   "files": {
     "lib/commerce-policy.ts": {
       "baselineSha256": "a20ae21fd54b1a0ef8e14bd3f09f88fa383573cb7c7f698210f601255692982b",
-      "candidateSha256": "89b4799fead162c95e484e988aeb5e9bf5103b1b1487551562e864b9346a2205",
-      "reason": "Reserve three exact informational handles independent of merchandising category; retain ordinary purchase policy."
+      "candidateSha256": "d3b173ee17a6bf92ecf5fdbd87282a36b1f1f73fcf44fc863b354ccd99c28ebb",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
     },
     "lib/shopify.ts": {
       "baselineSha256": "694998dc5e09df451f923e01430ddc6633430ca9e3abd477a70d09cfdef64449",
-      "candidateSha256": "418cf046ef0413827d5f4129bd4a807ecb1fafc3a4806830a2b4c1c358f9317c",
-      "reason": "Exclude reserved records before mapping external prices/variants and refuse reserved-line public serialization including partial mutation errors."
+      "candidateSha256": "5421a22358a2b6f08a26a1539559a09ff2daa5563e7a0107d4fc843850f7b27d",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
     },
     "lib/shopify.server.ts": {
       "baselineSha256": "e300446f8f53b1d06f417fcf901633e20962bd51e752fcda45357dea2b135adc",
-      "candidateSha256": "9e42ce42cf07fff552809430141e35084a27d7071f3d72c08b099d0cb7c2fa4d",
-      "reason": "Reject reserved direct additions before transport; sanitize reserved stale lines independent of tags, verify cleanup, and validate before cookie/checkout handoff."
+      "candidateSha256": "ceceff6518fb7beccd1242abeca752c0eb34ed65466e957bca0ef6fd0455f2a1",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+    },
+    "lib/catalog.ts": {
+      "baselineSha256": "899adf096eca34230450ebae1bb449d1a4f5ecd1ab90b92e7f501ca6bd2367fc",
+      "candidateSha256": "dfd9b06e76e8f52d136f1468451060a928898ecd71fce6a4f1b056d50d4b0900",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+    },
+    "lib/skincare-range.json": {
+      "baselineSha256": "7f21ff066bdbf96959d659b664c143adb9359cf5807e303be79a2638f99608a9",
+      "candidateSha256": "eecebf0466691a1c059a9cee64bde83f28ecd3ee9fb2849544036c5b5e771409",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+    },
+    "lib/product-copy.json": {
+      "baselineSha256": "fe5db0c78afda04c6ef84ddd23898a129d5c01ac553ac13f11aafbdab5b65bd2",
+      "candidateSha256": "e4a37d9b1165953b119d51af46b23afa261895105e6b3275a7dc33f17d8c5bb7",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+    },
+    "lib/skincare-visual-content.ts": {
+      "baselineSha256": "5216289ba7a3e01ec20f4d0785e5f0afe1484798313ab2d1cc7f89363f304cc4",
+      "candidateSha256": "88b50b0e04047c415b6145bd50e7e82be08bceca06432effecc50d8c7e1d2ede",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
+    },
+    "lib/seo.ts": {
+      "baselineSha256": "f2ebdddc656b8975fe226aab694b88ba313ec5b3a296845c526bcd61d104f725",
+      "candidateSha256": "bd2023e1761d626df20d95cbbbf5fcbcc0dfff45ffef2ec112005763f4a04293",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved."
     }
   }
 }

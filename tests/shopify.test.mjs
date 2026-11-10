@@ -1,3 +1,4 @@
+import {sourceModuleUrl} from './helpers/source-module.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -5,8 +6,8 @@ import ts from "typescript";
 
 const source=fs.readFileSync(new URL("../lib/shopify.ts",import.meta.url),"utf8");
 const policy=ts.transpile(fs.readFileSync(new URL("../lib/commerce-policy.ts",import.meta.url),"utf8"),{module:ts.ModuleKind.ESNext});
-const policyUrl="data:text/javascript;base64,"+Buffer.from(policy).toString("base64");
-const js=ts.transpile(source,{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}).replace('"./commerce-policy"',JSON.stringify(policyUrl));
+const policyUrl="data:text/javascript;base64,"+Buffer.from(policy.replace('"./skincare-identity"',JSON.stringify(sourceModuleUrl('lib/skincare-identity.ts')))).toString("base64");
+const js=ts.transpile(source,{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}).replace('"./commerce-policy"',JSON.stringify(policyUrl)).replace('"./skincare-identity"',JSON.stringify(sourceModuleUrl('lib/skincare-identity.ts'))).replace('"./legacy-redirects"',JSON.stringify(sourceModuleUrl('lib/legacy-redirects.ts')));
 const {shopifyConfig,shopifyRequest,mapProduct,publicCart,sameOrigin,validQuantity}=await import("data:text/javascript;base64,"+Buffer.from(js).toString("base64"));
 const config={domain:"iqon-test.myshopify.com",token:"test-token",version:"2026-07"};
 const product={handle:"actual-product",title:"Actual product",description:"Merchant supplied description",productType:"Capsules",tags:["iqon-supplements"],availableForSale:true,requiresSellingPlan:false,

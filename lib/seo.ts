@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Category, Product, StoreCatalog } from "./catalog";
+import { isHeldSkincareHandle } from "./skincare-identity";
 import { isRedirectedProductHandle } from "./legacy-redirects";
 import type { JournalArticle } from "./journal";
 import { DEFAULT_SUPPORT_EMAIL } from "./orders/emails/format";
@@ -28,7 +29,7 @@ export function isCanonicalProduction({vercelEnv, host}: IndexContext) {
 /** A product page is genuine only when Shopify returned it (editorial-only entries have no variants)
  * and its URL is not a redirect source. */
 export function isListedProduct(catalog: StoreCatalog | undefined, product: Product | undefined): product is Product {
-  return catalog?.mode === "live" && !!product && (product.variants?.length ?? 0) > 0 && !isRedirectedProductHandle(product.id);
+  return catalog?.mode === "live" && !!product && (product.variants?.length ?? 0) > 0 && !isRedirectedProductHandle(product.id) && !isHeldSkincareHandle(product.id);
 }
 
 /** Shopify-returned products. A successful but empty Shopify response leaves only editorial placeholders: none listed. */

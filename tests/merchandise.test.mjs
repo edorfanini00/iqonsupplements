@@ -1,3 +1,4 @@
+import {sourceModuleUrl} from './helpers/source-module.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -5,8 +6,8 @@ import ts from "typescript";
 
 const source=fs.readFileSync(new URL("../lib/merchandise.ts",import.meta.url),"utf8");
 const policy=ts.transpile(fs.readFileSync(new URL("../lib/commerce-policy.ts",import.meta.url),"utf8"),{module:ts.ModuleKind.ESNext});
-const policyUrl="data:text/javascript;base64,"+Buffer.from(policy).toString("base64");
-const js=ts.transpile(source,{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}).replace('"./commerce-policy"',JSON.stringify(policyUrl));
+const policyUrl="data:text/javascript;base64,"+Buffer.from(policy.replace('"./skincare-identity"',JSON.stringify(sourceModuleUrl('lib/skincare-identity.ts')))).toString("base64");
+const js=ts.transpile(source,{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}).replace('"./commerce-policy"',JSON.stringify(policyUrl)).replace('"./skincare-identity"',JSON.stringify(sourceModuleUrl('lib/skincare-identity.ts')));
 const {mergeCatalogMerchandise}=await import("data:text/javascript;base64,"+Buffer.from(js).toString("base64"));
 const upcoming={id:"skin",category:"skincare",price:68,currency:"USD",available:true,variants:[{id:"stale",available:true}],descriptor:"Editorial",ritual:"Hydrate"};
 
@@ -32,7 +33,7 @@ test("a live Shopify record owns price, currency, stock and variants without dup
   assert.deepEqual(result[0].variants,live.variants);
 });
 
-test("all seven current skincare prices match the owner-approved higher prices",()=>{
+test("historical seven skincare prices remain archived, not active retail facts",()=>{
   const read=file=>JSON.parse(fs.readFileSync(new URL(file,import.meta.url),"utf8"));
   const range=read("../lib/skincare-range.json");
   const prices=read("../lib/approved-prices.json");

@@ -15,7 +15,7 @@ export type SkinVisualContent = {
 export const skincareVisualContent: Record<string, SkinVisualContent> = {
   "copper-peptide-restore-cream": {
     photoLabel:"THE CREAM TEXTURE", ingredientOrder:[0,1,2], routineEyebrow:"YOUR MOISTURIZING STEP", timingIcon:"layers",
-    texture: "Rich cream / soft finish",
+    texture:"Illustrative texture study, not the finished formula",
     benefits: [
       {title:"Multi-peptide care",body:"GHK-Cu with three supporting peptides.",icon:"layers"},
       {title:"Cushioned moisture",body:"Shea butter adds richness and softness.",icon:"feather"},
@@ -28,31 +28,31 @@ export const skincareVisualContent: Record<string, SkinVisualContent> = {
       {art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Water-binding ingredients complement the cream’s emollients.",tags:["HUMECTANTS","HYDRATION"]}
     ],
     routineTitle:"Finish with richer care.",timing:"AFTER YOUR SERUM",
-    steps:[{title:"Prepare",body:"Cleanse, then apply your chosen serum.",icon:"cleanse"},{title:"Smooth",body:"Apply the cream to your face and neck.",icon:"apply"},{title:"Complete",body:"Account for other retinol products. Use SPF by day.",icon:"sun"}]
+    steps:[{title:"Prepare",body:"Cleanse, then apply your chosen serum.",icon:"cleanse"},{title:"Smooth",body:"Apply to face and neck. May be used twice daily.",icon:"apply"},{title:"Complete",body:"Account for other retinol products. Use SPF by day.",icon:"sun"}]
   },
   "retinol-rx": {
     photoLabel:"THE EVENING STEP", ingredientOrder:[0,1,2], routineEyebrow:"YOUR EVENING RITUAL", timingIcon:"moon",
-    texture:"Evening serum / targeted care",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"Refine texture",body:"For the appearance of uneven skin texture.",icon:"face"},{title:"Softer-looking lines",body:"Retinol care for the appearance of fine lines.",icon:"spark"},{title:"Encapsulated retinol",body:"A delivery system that protects retinol and releases it gradually.",icon:"layers"},{title:"Softness + hydration",body:"Squalane softens. Hyaluronate binds water.",icon:"droplet"}],
     ingredients:[{art:"retinol",artLabel:"Retinol",kind:"molecule",summary:"Encapsulated to help protect retinol and allow gradual release.",tags:["ENCAPSULATED","TEXTURE + FINE LINES"]},{art:"niacinamide",artLabel:"Niacinamide / vitamin B3",kind:"molecule",summary:"Vitamin B3 complements the retinol treatment.",tags:["VITAMIN B3","FORMULA SUPPORT"]},{label:"Squalane + hyaluronate",art:"squalane",artLabel:"Squalane",kind:"molecule",summary:"Emollient softness pairs with water-binding hydration.",tags:["SOFTNESS","MOISTURE"]}],
     routineTitle:"An evening ritual, at your pace.",timing:"PM / INTRODUCE GRADUALLY",
-    steps:[{title:"Evening care",body:"Apply as directed in a simple evening routine.",icon:"moon"},{title:"Build gradually",body:"Adjust frequency to your skin’s tolerance.",icon:"layers"},{title:"Protect by day",body:"Use SPF 30 or higher during the day.",icon:"sun"}]
+    steps:[{title:"Evening care",body:"PM only. Use sparingly around the eye area.",icon:"moon"},{title:"Build gradually",body:"Apply 3-4 times per week, gradually increasing to daily use as tolerated.",icon:"layers"},{title:"Protect by day",body:"Use SPF 30 or higher during the day.",icon:"sun"}]
   },
   "hydra-c-ferulic-serum": {
     photoLabel:"THE SERUM TEXTURE", ingredientOrder:[0,1,2], routineEyebrow:"YOUR ANTIOXIDANT STEP", timingIcon:"day-night",
-    texture:"Daily serum / lightweight hydration",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"A brighter look",body:"Ascorbic acid care for a dull-looking complexion.",icon:"spark"},{title:"C + ferulic acid",body:"Two complementary antioxidants in one formula.",icon:"layers"},{title:"A hydration layer",body:"Sodium hyaluronate binds water.",icon:"droplet"},{title:"Before moisturizer",body:"A light serum layer for morning or evening.",icon:"sun"}],
     ingredients:[{art:"vitamin-c",artLabel:"Ascorbic acid / vitamin C",kind:"molecule",summary:"The vitamin C form in the serum, for antioxidant care and radiance.",tags:["ANTIOXIDANT","BRIGHTNESS"]},{art:"ferulic-acid",artLabel:"Ferulic acid",kind:"molecule",summary:"A complementary antioxidant that helps stabilize vitamin C.",tags:["ANTIOXIDANT PARTNER","FORMULA SUPPORT"]},{art:"moisture",artLabel:"Water-binding care",kind:"moisture",summary:"A humectant that adds hydration alongside the antioxidants.",tags:["HUMECTANT","HYDRATION"]}],
     routineTitle:"Your daily antioxidant step.",timing:"AM + PM / BEFORE MOISTURIZER",
-    steps:[{title:"Prepare",body:"Cleanse and apply your tonic if you use one.",icon:"cleanse"},{title:"Apply",body:"Smooth a small amount over the face and neck.",icon:"apply"},{title:"Layer",body:"Follow with moisturizer and sunscreen by day.",icon:"sun"}]
+    steps:[{title:"Prepare",body:"Cleanse and apply your tonic if you use one.",icon:"cleanse"},{title:"Apply",body:"Smooth a small amount over the face and neck.",icon:"apply"},{title:"Layer",body:"Once absorbed, follow with moisturizer and sunscreen by day.",icon:"sun"}]
   },
   "exfoliating-pads": {
     photoLabel:"THE PAD IN DETAIL", ingredientOrder:[0,1,2], routineEyebrow:"YOUR EXFOLIATION STEP", timingIcon:"moon",
-    texture:"Pre-moistened pads / focused application",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"Refined texture",body:"Surface exfoliation for uneven texture and dull-looking skin.",icon:"face"},{title:"Two acid families",body:"Mandelic and lactic AHAs, with salicylic BHA.",icon:"layers"},{title:"Targeted application",body:"Sweep over the areas you want to exfoliate.",icon:"feather"},{title:"Ready to use",body:"50 pre-moistened pads. Follow the label for frequency.",icon:"pad"}],
     ingredients:[{label:"Mandelic + lactic acids",art:"mandelic-acid",artLabel:"Mandelic acid / AHA",kind:"molecule",summary:"Two alpha hydroxy acids for surface exfoliation.",tags:["AHA","SURFACE TEXTURE"]},{art:"salicylic-acid",artLabel:"Salicylic acid / BHA",kind:"molecule",summary:"The beta hydroxy acid component for congested-looking skin.",tags:["BHA","TARGETED CARE"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Moisture-binding care alongside chamomile, licorice and green tea.",tags:["HUMECTANT","SUPPORTING BOTANICALS"]}],
     routineTitle:"Sweep. Refine. Follow with care.",timing:"PM / FOLLOW LABEL FREQUENCY",
-    steps:[{title:"Cleanse first",body:"Begin with clean skin in your evening routine.",icon:"cleanse"},{title:"Sweep a pad",body:"Pass over your chosen areas, avoiding the eyes.",icon:"pad"},{title:"Care + protect",body:"Moisturize afterwards. Use sunscreen during the day.",icon:"sun"}]
+    steps:[{title:"Cleanse first",body:"Begin with clean skin in your evening routine.",icon:"cleanse"},{title:"Sweep a pad",body:"Gently sweep one pad over the entire face or targeted face and body areas, avoiding the eyes.",icon:"pad"},{title:"Care + protect",body:"Moisturize afterwards. Use sunscreen during the day.",icon:"sun"}]
   },
   "hydrating-tonic": {
     photoLabel:"A WATER-LIGHT LAYER", ingredientOrder:[1,0,2], routineEyebrow:"YOUR HYDRATION STEP", timingIcon:"day-night",
@@ -64,7 +64,7 @@ export const skincareVisualContent: Record<string, SkinVisualContent> = {
   },
   "firming-peptide-eye-gel": {
     photoLabel:"THE GEL TEXTURE", ingredientOrder:[0,1,2], routineEyebrow:"YOUR EYE-CARE RITUAL", timingIcon:"day-night",
-    texture:"Light gel / targeted eye care",
+    texture:"Illustrative texture study, not the finished formula",
     benefits:[{title:"Smoother-looking skin",body:"Peptide care for visible fine lines around the eyes.",icon:"face"},{title:"A cooling gel",body:"A light, refreshing feel for the eye area.",icon:"feather"},{title:"Three-peptide blend",body:"Tripeptide-5, tripeptide-1 and tetrapeptide-7.",icon:"layers"},{title:"Moisture support",body:"Glycerin and sodium PCA add hydration.",icon:"droplet"}],
     ingredients:[{art:"palmitoyl-tripeptide",artLabel:"Palmitoyl tripeptide-1",kind:"molecule",summary:"Palmitoyl tripeptide-5, tripeptide-1 and tetrapeptide-7.",tags:["PEPTIDE CARE","EYE-AREA FOCUS"]},{label:"Aloe + cucumber water",art:"botanical",artLabel:"Botanical conditioning",kind:"botanical",summary:"Botanical conditioning complements the light gel texture.",tags:["ALOE + CUCUMBER WATER","CONDITIONING"]},{art:"glycerin",artLabel:"Glycerin",kind:"molecule",summary:"Water-binding humectants bring hydration to the eye step.",tags:["HUMECTANTS","LIGHT HYDRATION"]}],
     routineTitle:"A small amount. A gentle touch.",timing:"AM + PM / AFTER CLEANSING",

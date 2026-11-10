@@ -13,22 +13,23 @@ const BASE='a4c4b12d8d29608adecfea48609a00db298b7ff7';
 const original=(file:string)=>execFileSync('git',['show',`${BASE}:${file}`],{maxBuffer:64*1024*1024});
 const ids=['enzyme-gel-cleanser','hyaluronic-serum','peptide-anti-wrinkle-day-cream'];
 const json=(file:string)=>JSON.parse(readFileSync(file,'utf8'));
-test('exactly three distinct additions; original seven skincare records and all original copy remain exact',()=>{
+test('three additions join the approved eight; legacy records and unrelated copy are preserved',()=>{
  assert.deepEqual([...newSkincareIds],ids);
  const range=JSON.parse(original('lib/skincare-range.json').toString());assert.equal(range.length,7);
- assert.deepEqual(json('lib/skincare-range.json'),range);
- assert.equal(products.filter(p=>p.category==='skincare').length,7);
- for(const [id,copy] of Object.entries(JSON.parse(original('lib/product-copy.json').toString())))assert.deepEqual(productContent[id],copy,id);
- for(const p of range)assert(products.find(x=>x.id===p.id),p.id);
- assert(!products.some(p=>newSkincareIds.has(p.id)),'global navigation/catalog remain original');
+ const current=json('lib/skincare-range.json');
+ const retained=['exfoliating-pads','retinol-rx','hydra-c-ferulic-serum','copper-peptide-restore-cream','firming-peptide-eye-gel'];
+ for(const p of range){const actual=current.find((q:any)=>q.id===p.id);if(retained.includes(p.id)){const {inci,directions,...rest}=actual;const {directions:prior,...originalRest}=p;assert.deepEqual(rest,originalRest);}else assert.deepEqual(actual,p);}
+ assert.equal(products.filter(p=>p.category==='skincare').length,8);
+ for(const [id,copy] of Object.entries(JSON.parse(original('lib/product-copy.json').toString())))if(!retained.includes(id))assert.deepEqual(productContent[id],copy,id);
+ for(const id of ['anti-aging-cleanser-with-peptides','hydrating-tonic'])assert(!products.find(p=>p.id===id));
 });
-test('protected files remain byte-identical except three exact hash-pinned A1 commerce corrections',()=>{
+test('protected files remain byte-identical except exact hash-pinned approved invoice content/catalog/commerce corrections',()=>{
  const files=execFileSync('git',['ls-tree','-r','--name-only',BASE],{encoding:'utf8'}).trim().split('\n');
  const exact=files.filter(p=>p.startsWith('public/')||p.endsWith('.css')||p.startsWith('app/api/')||p.startsWith('app/account/')||p.startsWith('app/checkout/')||p.startsWith('lib/affiliates/')||p.startsWith('lib/accounting/')||/lib\/(catalog|skincare-range|product-copy|skincare-stories|skincare-visual-content|product-art|product-presentation|product-gallery-content|product-visuals|approved-prices|merchandise|commerce-policy|legacy-redirects|shopify|seo|google-attribution|meta-pixel)/.test(p)||['app/layout.tsx','app/collections/[slug]/page.tsx','next.config.ts','package.json','package-lock.json'].includes(p));
  const hash=(b:Buffer)=>createHash('sha256').update(b).digest('hex');
  const exceptions=json('docs/new-skincare/commerce-preservation-exceptions.json');
  assert.equal(exceptions.base,BASE);
- assert.deepEqual(Object.keys(exceptions.files).sort(),['lib/commerce-policy.ts','lib/shopify.server.ts','lib/shopify.ts']);
+ assert.deepEqual(Object.keys(exceptions.files).sort(),["lib/catalog.ts", "lib/commerce-policy.ts", "lib/product-copy.json", "lib/seo.ts", "lib/shopify.server.ts", "lib/shopify.ts", "lib/skincare-range.json", "lib/skincare-visual-content.ts"]);
  assert.equal(exceptions.regressionTest,'tests/reserved-skincare-commerce.test.mjs');
  assert(existsSync(exceptions.regressionTest));
  for(const file of exact){
@@ -39,14 +40,14 @@ test('protected files remain byte-identical except three exact hash-pinned A1 co
      assert(exception.reason.length>30);
    }else assert.equal(hash(readFileSync(file)),hash(original(file)),file);
  }
- console.log(`Verified ${exact.length-3} protected pre-existing files byte-identical and 3 exact hash-pinned commerce corrections`);
+ console.log(`Verified ${exact.length-Object.keys(exceptions.files).length} protected pre-existing files byte-identical and ${Object.keys(exceptions.files).length} exact hash-pinned corrections`);
 });
 test('the shell changes only exact new preview route classification, never existing navigation or cart/privacy logic',()=>{
  const before=original('app/store-shell.tsx').toString();
  const expected=before.replace('import { shopifySrcSet } from "@/lib/responsive-images";', 'import { shopifySrcSet } from "@/lib/responsive-images";\nimport { comingSoonSkincareDepartment } from "@/lib/new-skincare";').replace('products.find(p=>pathname===`/products/${p.id}`)?.category;', 'products.find(p=>pathname===`/products/${p.id}`)?.category||comingSoonSkincareDepartment(pathname);');
  assert.equal(readFileSync('app/store-shell.tsx','utf8'),expected);
  for(const id of ids){assert.equal(comingSoonSkincareDepartment(`/products/${id}`),'skincare');assert.equal(comingSoonSkincareDepartment(`/products/${id}/extra`),undefined)}
- for(const p of products)assert.equal(comingSoonSkincareDepartment(`/products/${p.id}`),undefined);
+ for(const p of products)assert.equal(comingSoonSkincareDepartment(`/products/${p.id}`),p.category==='skincare'?'skincare':undefined);
  for(const path of ['/','/account','/checkout','/affiliates','/products/unknown'])assert.equal(comingSoonSkincareDepartment(path),undefined);
 });
 test('only the three approved informational records are public in every mode; never gain stock, prices, variants, offers or cart lines',()=>{
@@ -58,7 +59,7 @@ test('only the three approved informational records are public in every mode; ne
  }
  assert.equal(comingSoonSkincareProduct({mode:'preview',products},'invented-product'),undefined);
  {
-  const added=withComingSoonSkincareCards(products);assert.deepEqual(added.slice(0,products.length),products);assert.equal(added.length,products.length+3);
+  const added=withComingSoonSkincareCards(products);assert.deepEqual(added,products);assert.equal(added.filter(p=>p.category==='skincare').length,8);
   assert.deepEqual(withComingSoonSkincareCards(added),added);
   const collision={...newSkincareProducts[0],available:true,price:999,pricePending:false,variants:[{id:'unverified',title:'Default',price:999,currency:'USD',available:true}]};
   assert.deepEqual(withComingSoonSkincareCards([collision]).find(p=>p.id===collision.id),newSkincareProducts[0],'unverified external record cannot bypass the informational hold');
@@ -94,7 +95,7 @@ test('accepted local packshots match pinned hashes and texture references stay b
   assert.equal(newSkincareVisualContent[id].texture,'Illustrative texture study, not the finished formula');
   assert.equal(newSkincareVisualContent[id].photoLabel,'TEXTURE STUDY');
  });
- for(const p of products)for(const role of ['packshot','texture','editorial'] as const)assert.equal(newSkincareImage(p.id,role),undefined);
+ for(const p of products.filter(p=>!newSkincareIds.has(p.id)))for(const role of ['packshot','texture','editorial'] as const)assert.equal(newSkincareImage(p.id,role),undefined);
  assert.equal(newSkincareImage('invented-product','texture'),undefined);
  const comparison=readFileSync('app/skincare-product-story.tsx','utf8');
  assert(comparison.includes('skincareRange.find(s=>s.id===q.id)?.size||newSkincareFor(q.id)?.size'));

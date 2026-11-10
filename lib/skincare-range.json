@@ -39,10 +39,11 @@
     "descriptor": "A smoother-looking surface.",
     "description": "Pre-moistened pads with mandelic, lactic and salicylic acids. A focused exfoliating step for uneven texture and congested-looking skin.",
     "ingredients": "Mandelic, lactic and salicylic acids",
-    "directions": "Sweep a pad over the areas you want to exfoliate, avoiding eyes. Follow the product label for frequency. Use sunscreen and limit sun exposure during use and for a week afterwards.",
+    "directions": "After cleansing, gently sweep one pad over the entire face or targeted areas of the face and body, then follow with moisturizer. Recommended for nighttime use. Avoid the eye area. Sunburn Alert: This product contains an alpha hydroxy acid (AHA) that may increase your skin’s sensitivity to the sun and particularly the possibility of sunburn. Use a sunscreen, wear protective clothing, and limit sun exposure while using this product and for a week afterwards.",
     "source": "https://www.globalbeauty.net/product/exfoliating-pads/",
     "image": "/images/skincare/products/exfoliating-pads.webp",
-    "number": "14"
+    "number": "14",
+    "inci": "Water (Aqua), Butylene Glycol, Lactic Acid, Mandelic Acid, Glycerin, Polysorbate 20, Phenoxyethanol, Sodium Hydroxide, Salicylic Acid, Ethylhexylglycerin, Disodium EDTA, Hamamelis Virginiana (Witch Hazel) Water, Propanediol, Chamomilla Recutita (Matricaria) Flower Extract, Glycyrrhiza Glabra (Licorice) Root Extract, Camellia Sinensis Leaf Extract, Sodium Carbonate, Sodium Chloride, Salix Alba (Willow) Bark Extract, Arctostaphylos Uva-Ursi Leaf Extract, Benzoic Acid, Linalool, Linalyl Acetate, Citrus Aurantium Bergamia Peel Oil, Limonene, Lavandula Oil Extract"
   },
   {
     "id": "hydra-c-ferulic-serum",
@@ -54,10 +55,11 @@
     "descriptor": "Your daily moment of brightness.",
     "description": "A vitamin C and ferulic acid serum with sodium hyaluronate. Designed to bring antioxidant care and hydration to a routine for dull or uneven-looking skin.",
     "ingredients": "Vitamin C, ferulic acid and sodium hyaluronate",
-    "directions": "Apply a small amount to the face and neck after cleansing and toning. Follow with moisturizer and daytime SPF. May be used morning and evening.",
+    "directions": "After cleansing and toning, apply a small amount to entire face and neck. Once absorbed, follow with moisturizer and/or sun protection products (SPF). May be used twice daily.",
     "source": "https://www.globalbeauty.net/product/hydra-c-plus-ferulic-serum/",
     "image": "/images/skincare/products/hydra-c-ferulic-serum.webp",
-    "number": "15"
+    "number": "15",
+    "inci": "Propylene Glycol, Ascorbic Acid, Butylene Glycol, Ethoxydiglycol, Hydroxypropyl Cellulose, Ferulic Acid, Sodium Hyaluronate, Allyl Methacrylates Crosspolymer, Fragrance"
   },
   {
     "id": "retinol-rx",
@@ -69,10 +71,11 @@
     "descriptor": "An evening ritual. A renewed look.",
     "description": "An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
     "ingredients": "Encapsulated retinol, niacinamide and squalane",
-    "directions": "Use in the evening, introducing gradually as tolerated and following the product label. Wear SPF 30 or higher during the day. Do not use when pregnant or breastfeeding.",
+    "directions": "Apply 3-4 times per week and gradually increase to daily use. Use sparingly around the eye area. Recommended for PM use only. Wear sunscreen of SPF 30 or higher. Do not use if pregnant or breastfeeding.",
     "source": "https://www.globalbeauty.net/product/retinol-rx/",
     "image": "/images/skincare/products/retinol-rx.webp",
-    "number": "16"
+    "number": "16",
+    "inci": "Purified Water, Propanediol, Glyceryl Oleate Citrate, Glycerin, Caprylic/Capric Triglyceride, C13-15 Alkane, Squalane, Sodium Stearoyl Lactylate, Niacinamide, Retinol, Camellia Sinensis (Green Tea) Leaf Culture Conditioned Media, Sodium Hyaluronate, Tocopheryl Acetate, Sorbitan Oleate Decylglucoside Crosspolymer, Acrylates/C10-30 Alkyl Acrylate Crosspolymer, Allyl Methacrylate Crosspolymer, Sclerotium Gum, Phenylethyl Resorcinol, Polyglutamic Acid, Cetyl Alcohol, Polysorbate 20, Copper Tripeptide-1, Hydroxymethoxyphenyl Decanone, Thioctic Acid, Jania Rubens Extract, Disodium EDTA, Phenoxyethanol, Ethylhexylglycerin"
   },
   {
     "id": "firming-peptide-eye-gel",
@@ -84,10 +87,11 @@
     "descriptor": "Care for the finer details.",
     "description": "A cooling peptide eye gel with aloe and cucumber water. A light, targeted step for smoother-looking skin around the eyes.",
     "ingredients": "Peptides, aloe and cucumber water",
-    "directions": "Gently apply a small amount around the eye area after cleansing, avoiding direct contact with eyes. Use morning and evening.",
+    "directions": "Gently apply around the eye area after cleansing, avoiding direct contact with eyes. May be used twice daily.",
     "source": "https://www.globalbeauty.net/product/firming-peptide-eye-gel/",
     "image": "/images/skincare/products/firming-peptide-eye-gel.webp",
-    "number": "17"
+    "number": "17",
+    "inci": "Water, Aloe Barbadensis Leaf Juice, Palmitoyl Tripeptide-5, Palmitoyl Tripeptide-1, Palmitoyl Tetrapeptide-7, Glycyrrhiza Glabra (Licorice) Root Extract, Vinca Minor (Periwinkle) Extract, Centella Asiatica Extract, Equisetum Arvense (Horsetail) Extract, Geranium Maculatum (Geranium) Extract, Taraxacum Officinale (Dandelion) Root Extract, Cucumis Sativus (Cucumber) Fruit Water, Simmondsia Chinensis (Jojoba) Seed Oil, Methyl Sulfonyl Methane, Tocopheryl Acetate, Glycerin, Cassia Angustifolia (Alexandrian Senna) Seed Polysaccharide, Sodium PCA, Sodium Lactate, Arginine, Aspartic Acid, PCA, Glycine, Alanine, Serine, Valine, Isoleucine, Proline, Threonine, Histidine, Phenylalanine, Hydroxyethylcellulose, Carrageenan, Acrylates/C10-30 Alkyl Acrylate Crosspolymer, Butylene Glycol, Carbomer, Polysorbate 20, Ethylhexylglycerin, Phenoxyethanol"
   },
   {
     "id": "copper-peptide-restore-cream",
@@ -99,9 +103,10 @@
     "descriptor": "Lasting comfort. A considered finish.",
     "description": "A rich multi-peptide moisturizer with copper peptide, shea butter and sodium hyaluronate. Delivers moisture for dry-feeling skin and a smoother, firmer-looking finish.",
     "ingredients": "Copper peptide, shea butter and sodium hyaluronate",
-    "directions": "Apply to face and neck after cleansing and serum. Follow with SPF in the morning. Contains retinol; consider your other active products when building a routine.",
+    "directions": "After cleansing and serum application, apply to the face and neck. May be used twice daily. Follow with sun protection (SPF) in the morning.",
     "source": "https://www.globalbeauty.net/product/copper-peptide-restore-cream/",
     "image": "/images/skincare/products/copper-peptide-restore-cream.webp",
-    "number": "18"
+    "number": "18",
+    "inci": "Water (Aqua), Propanediol, Caprylic/Capric Triglyceride, Glyceryl Stearate SE, Helianthus Annuus (Sunflower) Seed Oil, Butyrospermum Parkii (Shea) Butter, Cetearyl Octanoate, Cetyl Alcohol, Palmitoyl Tripeptide-5, Copper Tripeptide-1, Acetyl Hexapeptide-8, Palmitoyl Dipeptide-5, Sodium Hyaluronate, Tetrahexyldecyl Ascorbate, Retinol, Niacinamide, Hydrogenated Lecithin, Centella Asiatica Leaf Extract, Jojoba Oil/Macadamia Seed Oil Esters, Squalene, Tocopherol, Phytosteryl Macadamiate, Phytosterols, Stearic Acid, Betaine, Glycerin, Phenoxyethanol, Ethylhexylglycerin, Potassium Hydroxide"
   }
 ]

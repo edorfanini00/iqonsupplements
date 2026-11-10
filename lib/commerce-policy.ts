@@ -1,3 +1,4 @@
+import { isHeldSkincareHandle } from "./skincare-identity";
 /** Keep skincare visible for discovery, but closed to every purchase entry point. */
 export const SKINCARE_COMING_SOON = true;
 /** Informational releases: exact handles are reserved independently of Shopify tags/stock
@@ -6,7 +7,7 @@ export function isReservedSkincareHandle(handle:unknown):boolean {
   return handle === "enzyme-gel-cleanser" || handle === "hyaluronic-serum" || handle === "peptide-anti-wrinkle-day-cream";
 }
 export function isComingSoon(product:{id?:string;category?:string}) {
-  return isReservedSkincareHandle(product.id) || (SKINCARE_COMING_SOON && product.category === "skincare");
+  return isHeldSkincareHandle(product.id) || (SKINCARE_COMING_SOON && product.category === "skincare");
 }
 /** The storefront's shipping statement, shared by /help and every product page. The typical window is the owner's
  * (21 October 2026): "3 to 5 days", not business days, with no guarantee or start point. Methods and costs come

@@ -20,7 +20,7 @@ export function ProductSwitcher({product,products}:{product:Product;products:Pro
   const next=collection[(index+1)%collection.length];
   return <><nav className="product-switcher section-pad" aria-label="Browse the collection">
     <button onClick={()=>setOpen(true)}><LayoutGrid size={17}/>All {product.category}<span>{collection.length}</span></button>
-    <div>{collection.length>1&&<><Link href={`/products/${previous.id}`} aria-label={`Previous product: ${previous.name}`}><ChevronLeft size={18}/><span>Previous</span></Link><span className="switcher-position">{index+1} / {collection.length}</span><Link href={`/products/${next.id}`} aria-label={`Next product: ${next.name}`}><span>Next</span><ChevronRight size={18}/></Link></>}</div>
+    <div>{collection.length>1&&index>=0&&<><Link href={`/products/${previous.id}`} aria-label={`Previous product: ${previous.name}`}><ChevronLeft size={18}/><span>Previous</span></Link><span className="switcher-position">{index+1} / {collection.length}</span><Link href={`/products/${next.id}`} aria-label={`Next product: ${next.name}`}><span>Next</span><ChevronRight size={18}/></Link></>}</div>
   </nav><Sheet open={open} onOpenChange={setOpen}><SheetContent className="product-browse-sheet"><SheetTitle>Explore {product.category}</SheetTitle><SheetDescription>Choose a product to take a closer look.</SheetDescription><ProductLinks products={collection} activeId={product.id} onSelect={()=>setOpen(false)}/><Link className="button button-dark" href={`/collections/${product.category}`} onClick={()=>setOpen(false)}>View the full collection<ArrowRight size={17}/></Link></SheetContent></Sheet></>;
 }
 
