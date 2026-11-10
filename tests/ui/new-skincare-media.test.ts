@@ -15,7 +15,8 @@ describe('new-only media integration',()=>{
     React.createElement(ProductGallery,{product}),
     React.createElement(SkincareProductStory,{product,comparison:newSkincareProducts})));
    expect(container.querySelector('.visual-pack img')?.getAttribute('src')).toBe(product.image);
-   expect(container.querySelector('.product-preview-note')?.textContent).toContain('not a supplier photograph');
+   expect(container.querySelector('.product-preview-note')?.textContent).toBe('Main packshot: AI-generated packaging visualization based on approved artwork and supplier container references; not a supplier photograph.');
+   expect(container.querySelector('.visual-pack img')?.getAttribute('alt')).toContain('AI-generated packaging visualization');
    expect(container.querySelector('.skin-benefits-photo img')?.getAttribute('src')).toBe(newSkincareImage(product.id,'texture'));
    const caption=container.querySelector('.skin-benefits-photo figcaption')!;
    expect(caption.textContent).toBe('Illustrative texture study, not the finished formula');

@@ -1,35 +1,62 @@
 {
-  "scope": "Three new LOCAL preview pages only",
+  "scope": "Only three main packshot replacements: enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream. All secondary assets and records, other products and commerce are unchanged from upstream base.",
   "assets": [
     {
       "id": "enzyme-gel-cleanser",
       "role": "packshot",
       "path": "/images/skincare/new-products-only/enzyme-gel-cleanser/packshot.webp",
-      "sha256": "a56bff84ca635e698929d28eb4172f8688d08c19a2145210150980a1cc300414",
-      "sourceManifest": "creative/page-assets/MANIFEST.json",
-      "sourceManifestSha256": "e97d0e10d3d3b8a86be7c6dbc0c11d32dc500cdc964d8b643c1d1ad6f976193d",
-      "approval": "Parent accepted for LOCAL preview insertion only; no owner publication approval",
-      "provenance": "CGI from saved supplier-grounded packaging"
+      "sha256": "fef97cc06ef8db86e90276cef24121f48157d5847f80416f18b2d83e4eaafd50",
+      "sourceManifest": "approved-packshot-manifest.json",
+      "sourceManifestSha256": "bc46989d8d3ac5afdda00ae3d66db4e9d3272dbe63aaf8cdd7cde701412a3cdb",
+      "approval": "Draft review candidate only; explicit owner final visual approval and publication approval remain outstanding",
+      "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
+      "jobId": "486fb767-dba9-48b1-92f9-eb40c88efc38",
+      "nativeDimensions": [
+        2560,
+        3200
+      ],
+      "webDimensions": [
+        1600,
+        2000
+      ]
     },
     {
       "id": "hyaluronic-serum",
       "role": "packshot",
       "path": "/images/skincare/new-products-only/hyaluronic-serum/packshot.webp",
-      "sha256": "bc7c2d4255a79064658114717a0504e55a506a3578bdfb8d46670e1bb8ddbb13",
-      "sourceManifest": "creative/page-assets/MANIFEST.json",
-      "sourceManifestSha256": "e97d0e10d3d3b8a86be7c6dbc0c11d32dc500cdc964d8b643c1d1ad6f976193d",
-      "approval": "Parent accepted for LOCAL preview insertion only; no owner publication approval",
-      "provenance": "CGI from saved supplier-grounded packaging"
+      "sha256": "fb8bfa0a29124c2c2974e705ea98b6422070d4e5803adc2be7ddcb8ed6634d22",
+      "sourceManifest": "approved-packshot-manifest.json",
+      "sourceManifestSha256": "bc46989d8d3ac5afdda00ae3d66db4e9d3272dbe63aaf8cdd7cde701412a3cdb",
+      "approval": "Draft review candidate only; explicit owner final visual approval and publication approval remain outstanding",
+      "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
+      "jobId": "2f065532-54c3-4c87-b003-a3bcfcd2649a",
+      "nativeDimensions": [
+        2560,
+        3200
+      ],
+      "webDimensions": [
+        1600,
+        2000
+      ]
     },
     {
       "id": "peptide-anti-wrinkle-day-cream",
       "role": "packshot",
       "path": "/images/skincare/new-products-only/peptide-anti-wrinkle-day-cream/packshot.webp",
-      "sha256": "ed001b978b0d603764a3ba54c870b6f658f942fe544a5d2d3bb0808215e96a68",
-      "sourceManifest": "creative/page-assets/MANIFEST.json",
-      "sourceManifestSha256": "e97d0e10d3d3b8a86be7c6dbc0c11d32dc500cdc964d8b643c1d1ad6f976193d",
-      "approval": "Parent accepted for LOCAL preview insertion only; no owner publication approval",
-      "provenance": "CGI from saved supplier-grounded packaging"
+      "sha256": "72dc9506a48141653ddd9ff53883626008751097f46c034e3ed5a650b88adbc1",
+      "sourceManifest": "approved-packshot-manifest.json",
+      "sourceManifestSha256": "bc46989d8d3ac5afdda00ae3d66db4e9d3272dbe63aaf8cdd7cde701412a3cdb",
+      "approval": "Draft review candidate only; explicit owner final visual approval and publication approval remain outstanding",
+      "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
+      "jobId": "5591ba7c-537a-46d6-ad5d-00e06b7c4357",
+      "nativeDimensions": [
+        2560,
+        3200
+      ],
+      "webDimensions": [
+        1600,
+        2000
+      ]
     },
     {
       "id": "enzyme-gel-cleanser",

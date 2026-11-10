@@ -12,7 +12,7 @@ export const newSkincareProducts: Product[] = range.map(p => ({
   ...p, category: 'skincare', available: false, price: 0, pricePending: true,
   currency: 'USD', tone: 'silver', campaign: p.image,
   variants: [], requiresSellingPlan: false,
-  images: [{src:p.image, alt:`IQON ${p.name}, ${p.size} — CGI packaging visualization based on approved artwork`}],
+  images: [{src:p.image, alt:`IQON ${p.name}, ${p.size} — AI-generated packaging visualization based on approved artwork`}],
 }));
 export const newSkincareIds = new Set(range.map(p => p.id));
 export const newSkincareFor = (id:string) => range.find(p => p.id === id);
