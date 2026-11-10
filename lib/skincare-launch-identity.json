@@ -1,5 +1,5 @@
 {
-  "_comment": "S8939 launch identity. Exact store + handle + supplier SKU -> Shopify product/variant GIDs, generated programmatically (never by hand) from the private ops provisioning manifest provision-resume/manifest.json (sha256 fdac7afbb14275166fbae98c413096b102985c8a7d1175b4d151a6e722275de7; state DRAFT_PROVISIONING_COMPLETE_COORDINATED_RELEASE_NOT_EXECUTED; captured 2026-11-10T13:58:42.541252+00:00, completed 2026-11-10T14:05:14.081379+00:00). The five pre-existing ids are unchanged; enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream were bound from that manifest. That snapshot records all eight as DRAFT and unpublished with no stock written (three new products 0 on hand); it is NOT a fresh live inventory or publication qualification. A configured id is not activation: every product stays Coming soon until a fresh Storefront read proves it ACTIVE, published to this channel, one-time, at the approved price, with positive quantityAvailable. Approved one-time USD prices per owner decision 2026-11-10. Rebind only from the next proven manifest.",
+  "_comment": "S8939 launch identity. Exact store + handle + supplier SKU -> Shopify product/variant GIDs, generated programmatically (never by hand) from the private ops provisioning manifest provision-resume/manifest.json (sha256 fdac7afbb14275166fbae98c413096b102985c8a7d1175b4d151a6e722275de7; state DRAFT_PROVISIONING_COMPLETE_COORDINATED_RELEASE_NOT_EXECUTED; captured 2026-11-10T13:58:42.541252+00:00, completed 2026-11-10T14:05:14.081379+00:00). The five pre-existing ids are unchanged; enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream were bound from that manifest. That snapshot records all eight as DRAFT and unpublished with no stock written (three new products 0 on hand); it is NOT a fresh live inventory or publication qualification. A configured id is not activation: every product stays Coming soon until a fresh Storefront read proves it ACTIVE, published to this channel, one-time, at the approved price, with positive quantityAvailable. Approved one-time USD prices per owner decision 2026-11-10, with retinol-rx (98.34 -> 99.00) and firming-peptide-eye-gel (76.67 -> 77.00) rounded to whole dollars by the final owner pricing decision of 2026-11-10; every other price is unchanged. Rebind only from the next proven manifest.",
   "store": "nr9zd0-t5.myshopify.com",
   "currency": "USD",
   "products": [
@@ -27,7 +27,7 @@
     {
       "handle": "retinol-rx",
       "supplierSku": "82730103C",
-      "approvedPriceUsd": "98.34",
+      "approvedPriceUsd": "99.00",
       "productId": "gid://shopify/Product/10393656656167",
       "variantId": "gid://shopify/ProductVariant/52052015710503"
     },
@@ -55,7 +55,7 @@
     {
       "handle": "firming-peptide-eye-gel",
       "supplierSku": "11330052C",
-      "approvedPriceUsd": "76.67",
+      "approvedPriceUsd": "77.00",
       "productId": "gid://shopify/Product/10393657245991",
       "variantId": "gid://shopify/ProductVariant/52052016955687"
     }

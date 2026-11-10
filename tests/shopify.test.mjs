@@ -104,3 +104,23 @@ test("bundle discount allocations are summed per discount and keep Shopify's lin
   const coded=publicCart({...cart,discountAllocations:[{discountedAmount:m("5.00"),code:"CREATOR"}],cost:{...cart.cost,totalAmount:m("105.18")}});
   assert.deepEqual(coded.orderDiscounts,[{title:"CREATOR",amount:5}]);assert.equal(coded.total,105.18);
 });
+test("mixed skincare and supplement bundles keep each exact Shopify title and amount; codes never merge with a bundle row",()=>{
+  // Owner decision 10 Nov 2026: separate automatic discounts per family. The bag shows Shopify's own
+  // allocation titles and amounts; nothing is relabelled or claimed client side.
+  const m=(amount)=>({amount,currencyCode:"USD"});
+  const line=(id,qty,sub,total,allocations)=>({id,quantity:qty,cost:{subtotalAmount:m(sub),totalAmount:m(total)},discountAllocations:allocations,merchandise:{id:`v-${id}`,title:"Default Title",product:{handle:id,title:id}}});
+  const skin=(amount)=>[{discountedAmount:m(amount),title:"Skincare bundle: Buy 3, save 15%"}];
+  const cart={id:"gid://shopify/Cart/x?key=secret",checkoutUrl:"https://x.myshopify.com/c",totalQuantity:5,
+    cost:{subtotalAmount:m("343.23"),totalAmount:m("343.23")},discountAllocations:[],
+    lines:{pageInfo:{hasNextPage:false},nodes:[line("retinol-rx",2,"198.00","168.30",skin("29.70")),line("firming-peptide-eye-gel",1,"77.00","65.45",skin("11.55")),
+      line("creatine-monohydrate",1,"48.97","44.08",[{discountedAmount:m("4.89"),title:"Bundle: Buy 2, save 10%"}]),line("gut-health",1,"29.99","26.99",[{discountedAmount:m("3.00"),title:"Bundle: Buy 2, save 10%"}]),
+      line("unapproved-test-supplement",1,"38.41","38.41",[])]}};
+  const out=publicCart(cart,()=>true);
+  assert.deepEqual(out.lineDiscounts,[{title:"Skincare bundle: Buy 3, save 15%",amount:41.25},{title:"Bundle: Buy 2, save 10%",amount:7.89}]);
+  assert.equal(out.merchandise,392.37);assert.equal(out.subtotal,343.23);
+  assert.deepEqual(out.items.map(i=>[i.id,i.amount,i.compareAmount]),[["retinol-rx",168.3,198],["firming-peptide-eye-gel",65.45,77],["creatine-monohydrate",44.08,48.97],["gut-health",26.99,29.99],["unapproved-test-supplement",38.41,undefined]]);
+  // An entered code is reported by its own (upper-case) code, so it cannot pose as a mixed-case bundle title.
+  const coded=publicCart({...cart,discountAllocations:[{discountedAmount:m("34.32"),code:"SKINCARE BUNDLE: BUY 3, SAVE 15%"}],cost:{...cart.cost,totalAmount:m("308.91")}},()=>true);
+  assert.deepEqual(coded.orderDiscounts,[{title:"SKINCARE BUNDLE: BUY 3, SAVE 15%",amount:34.32}]);
+  assert.deepEqual(coded.lineDiscounts,out.lineDiscounts);
+});
