@@ -36,7 +36,8 @@ async function retinolCopy(page, prefix) {
   const fact = await page.locator('.product-fact-art').evaluateAll(n => n.map(e => e.textContent.replace(/\s+/g, ' ')));
   record(`${prefix}:key-fact`, fact.some(f => f.includes('0.75%') && f.includes('encapsulated retinol')), fact.join('|').slice(0, 120));
   const summaries = await page.locator('.skin-ingredient-summary').allTextContents();
-  record(`${prefix}:ingredient-summary`, summaries.includes(RETINOL.summary), summaries.join('|').slice(0, 120));
+  const summaryVisible = await page.locator('.skin-ingredient-summary').first().isVisible();
+  record(`${prefix}:ingredient-summary`, summaries.includes(RETINOL.summary), `visible=${summaryVisible} ${summaries.join('|').slice(0, 110)}`);
 }
 const matrix = [];
 const record = (id, ok, detail = '') => { matrix.push({id, ok: !!ok, detail}); };
@@ -91,7 +92,7 @@ test('S8939 launch: eight PDPs, legacy holds, mixed cart, code, checkout handoff
       await shot(page, `pdp-${label}-${id}-top`);
       if (id === 'retinol-rx') {
         await retinolCopy(page, `D-CONT-2:${label}:qualified:retinol-rx`);
-        await page.locator('.skin-ingredient-summary').first().scrollIntoViewIfNeeded();
+        await page.locator('.skin-ingredient-selections').first().scrollIntoViewIfNeeded(); // summaries are display:none at mobile widths by existing design
         await shot(page, `pdp-${label}-retinol-rx-strength`);
       }
       // Approved INCI and directions, each accordion opened separately.
