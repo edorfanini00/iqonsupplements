@@ -23,3 +23,25 @@ test('FAQ complete directions and brief routine remain coherent',()=>{
  assert.match(JSON.stringify(skincareVisualContent['hydra-c-ferulic-serum'].steps),/Once absorbed/);
  assert.match(JSON.stringify(skincareVisualContent['copper-peptide-restore-cream'].steps),/twice daily/);
 });
+
+
+import {productPresentation} from '../lib/product-presentation';
+import {productVisuals} from '../lib/product-visuals';
+const attribution='Retinol strength as stated by the formulating laboratory.';
+test('Retinol Rx discloses supplier strength in summary, key fact and ingredient copy',()=>{
+ const retinol=oldRange.find(p=>p.id==='retinol-rx')!;
+ assert.match(retinol.description,/0\.75% encapsulated retinol/);
+ assert.match(retinol.ingredients,/0\.75% encapsulated retinol/);
+ assert.match(productVisuals['retinol-rx'].lead,/0\.75% encapsulated retinol/);
+ assert.equal(productVisuals['retinol-rx'].lead.split(attribution).length-1,1);
+ assert.equal(productPresentation['retinol-rx'].fact,'0.75%');
+ assert.equal(productPresentation['retinol-rx'].factLabel,'encapsulated retinol');
+ assert.match(skincareVisualContent['retinol-rx'].ingredients[0].summary,/0\.75% encapsulated retinol/);
+ assert.doesNotMatch(retinol.inci,/0\.75%/);
+});
+test('strength and attribution are confined to Retinol Rx content',()=>{
+ for(const p of [...oldRange,...newRange])if(p.id!=='retinol-rx')assert.doesNotMatch(JSON.stringify(p),/0\.75%|Retinol strength as stated/);
+ for(const contentMap of [productVisuals,productPresentation,skincareVisualContent,productContent]){
+  for(const [id,content] of Object.entries(contentMap))if(id!=='retinol-rx')assert.doesNotMatch(JSON.stringify(content),/0\.75%|Retinol strength as stated/,id);
+ }
+});

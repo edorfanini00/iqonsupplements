@@ -1,0 +1,30 @@
+{
+  "lib/skincare-range.json": [
+    [
+      "An encapsulated retinol serum with niacinamide and squalane.",
+      "A 0.75% encapsulated retinol serum with niacinamide and squalane."
+    ],
+    [
+      "\"ingredients\": \"Encapsulated retinol, niacinamide and squalane\"",
+      "\"ingredients\": \"0.75% encapsulated retinol, niacinamide and squalane\""
+    ]
+  ],
+  "lib/product-presentation.ts": [
+    [
+      "fact:'Retinol',factLabel:'in an encapsulated formula'",
+      "fact:'0.75%',factLabel:'encapsulated retinol'"
+    ]
+  ],
+  "lib/product-visuals.ts": [
+    [
+      "lead: \"Encapsulated retinol with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.\"",
+      "lead: \"0.75% encapsulated retinol with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture. Retinol strength as stated by the formulating laboratory.\""
+    ]
+  ],
+  "lib/skincare-visual-content.ts": [
+    [
+      "summary:\"Encapsulated to help protect retinol and allow gradual release.\"",
+      "summary:\"0.75% encapsulated retinol, with niacinamide and squalane alongside it.\""
+    ]
+  ]
+}

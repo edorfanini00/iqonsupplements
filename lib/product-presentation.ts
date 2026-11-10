@@ -68,7 +68,7 @@ export const productPresentation: Record<string, ProductPresentation> = {
     focus:{eyebrow:'THE ANTIOXIDANT PAIRING',title:'Brightness meets moisture.',body:'Vitamin C and ferulic acid provide antioxidant care. Sodium hyaluronate adds a separate hydration role.',layout:'specification',rows:[{label:'VITAMIN C',value:'Ascorbic acid',detail:'The vitamin C form in the serum, for antioxidant care and brighter-looking skin.'},{label:'FERULIC ACID',value:'Antioxidant partner',detail:'Complements vitamin C in the formula.'},{label:'SODIUM HYALURONATE',value:'Moisture binding',detail:'A humectant that helps keep skin hydrated. This serum does not replace sunscreen.'}]}
   },
   'retinol-rx': {
-    kicker:'TREATMENT + MOISTURE CARE',title:'Renewal, with supporting care.',fact:'Retinol',factLabel:'in an encapsulated formula',diagram:'pair',labels:['Niacinamide','Squalane','Sodium hyaluronate'],note:'For the appearance of fine lines and uneven texture.',
+    kicker:'TREATMENT + MOISTURE CARE',title:'Renewal, with supporting care.',fact:'0.75%',factLabel:'encapsulated retinol',diagram:'pair',labels:['Niacinamide','Squalane','Sodium hyaluronate'],note:'For the appearance of fine lines and uneven texture.',
     focus:{eyebrow:'PLAN THE WHOLE ROUTINE',title:'Give retinol room.',body:'Introduce the treatment gradually. More active products do not automatically make a better routine.',layout:'compare',rows:[{label:'EVENING',value:'Retinol + moisture',detail:'Follow the label and build frequency as tolerated. Do not increase use through irritation.'},{label:'MORNING',value:'SPF 30 or higher',detail:'Protect skin by day. Copper Peptide Restore Cream also contains retinol; account for both products.'}]}
   },
   'firming-peptide-eye-gel': {

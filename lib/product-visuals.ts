@@ -159,7 +159,7 @@ export const productVisuals: Record<string, ProductVisual> = {
       { title: "Sodium hyaluronate", body: "A moisture-binding ingredient for hydration alongside treatment." }], ritualTitle: "Your serum step. Before cream and SPF."
   },
   "retinol-rx": {
-    headline: "Make room for renewal.", lead: "Encapsulated retinol with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.",
+    headline: "Make room for renewal.", lead: "0.75% encapsulated retinol with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture. Retinol strength as stated by the formulating laboratory.",
     benefitTitle: "Care for texture and fine lines.", benefits: ["For the appearance of fine lines", "Targets uneven-looking texture", "Encapsulated retinol with moisture support"],
     fact: { value: "PM", label: "an evening treatment step.", body: "Introduce gradually as tolerated, following the label. Use SPF 30 or higher in the daytime." },
     whyTitle: "An evening step with a clear purpose.", whyBody: "Retinol is the focus; the supporting ingredients matter too. This serum pairs encapsulated retinol with niacinamide, squalane and sodium hyaluronate to bring moisture-focused care into your treatment routine.",
