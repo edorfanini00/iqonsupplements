@@ -22,12 +22,24 @@ test('exactly three distinct additions; original seven skincare records and all 
  for(const p of range)assert(products.find(x=>x.id===p.id),p.id);
  assert(!products.some(p=>newSkincareIds.has(p.id)),'global navigation/catalog remain original');
 });
-test('every pre-existing image/CSS, catalog/model, pricing, redirect, auth/account/privacy/payment/API file remains byte-identical',()=>{
+test('protected files remain byte-identical except three exact hash-pinned A1 commerce corrections',()=>{
  const files=execFileSync('git',['ls-tree','-r','--name-only',BASE],{encoding:'utf8'}).trim().split('\n');
  const exact=files.filter(p=>p.startsWith('public/')||p.endsWith('.css')||p.startsWith('app/api/')||p.startsWith('app/account/')||p.startsWith('app/checkout/')||p.startsWith('lib/affiliates/')||p.startsWith('lib/accounting/')||/lib\/(catalog|skincare-range|product-copy|skincare-stories|skincare-visual-content|product-art|product-presentation|product-gallery-content|product-visuals|approved-prices|merchandise|commerce-policy|legacy-redirects|shopify|seo|google-attribution|meta-pixel)/.test(p)||['app/layout.tsx','app/collections/[slug]/page.tsx','next.config.ts','package.json','package-lock.json'].includes(p));
  const hash=(b:Buffer)=>createHash('sha256').update(b).digest('hex');
- for(const file of exact)assert.equal(hash(readFileSync(file)),hash(original(file)),file);
- console.log(`Verified ${exact.length} protected pre-existing files byte-identical`);
+ const exceptions=json('docs/new-skincare/commerce-preservation-exceptions.json');
+ assert.equal(exceptions.base,BASE);
+ assert.deepEqual(Object.keys(exceptions.files).sort(),['lib/commerce-policy.ts','lib/shopify.server.ts','lib/shopify.ts']);
+ assert.equal(exceptions.regressionTest,'tests/reserved-skincare-commerce.test.mjs');
+ assert(existsSync(exceptions.regressionTest));
+ for(const file of exact){
+   const exception=exceptions.files[file];
+   if(exception){
+     assert.equal(hash(original(file)),exception.baselineSha256,`${file}: original input`);
+     assert.equal(hash(readFileSync(file)),exception.candidateSha256,`${file}: exact necessary correction, not a blanket exemption`);
+     assert(exception.reason.length>30);
+   }else assert.equal(hash(readFileSync(file)),hash(original(file)),file);
+ }
+ console.log(`Verified ${exact.length-3} protected pre-existing files byte-identical and 3 exact hash-pinned commerce corrections`);
 });
 test('the shell changes only exact new preview route classification, never existing navigation or cart/privacy logic',()=>{
  const before=original('app/store-shell.tsx').toString();

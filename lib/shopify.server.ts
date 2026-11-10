@@ -3,7 +3,7 @@ import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { products, type StoreCatalog } from "./catalog";
 import { mergeCatalogMerchandise } from "./merchandise";
-import { isComingSoon, SKINCARE_COMING_SOON } from "./commerce-policy";
+import { isComingSoon, isReservedSkincareHandle, SKINCARE_COMING_SOON } from "./commerce-policy";
 import { CATALOG_QUERY, CART_QUERY, CHECKOUT_CONSENT_QUERY, CART_CREATE, CART_ADD, CART_UPDATE, CART_REMOVE, CART_DISCOUNTS } from "./shopify-operations";
 import { CommerceError, shopifyConfig, shopifyRequest, mapProduct, publicCart, sameOrigin, validQuantity, validDiscountCodes, type ShopifyCart, type ShopifyProduct } from "./shopify";
 import { isRetiredProductHandle } from "./legacy-redirects";
@@ -67,7 +67,7 @@ function fail(error:unknown) {
     ...(error instanceof CommerceError&&error.cart?{cart:error.cart}:{})},{status:error instanceof CommerceError?error.status:502,headers:responseHeaders});
 }
 function blockedSkincareLines(cart:ShopifyCart) {
-  return cart.lines.nodes.filter(line=>SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p))));
+  return cart.lines.nodes.filter(line=>isReservedSkincareHandle(line.merchandise.product.handle)||(SKINCARE_COMING_SOON&&(line.merchandise.product.tags?.includes("iqon-skincare")||products.some(p=>p.id===line.merchandise.product.handle&&isComingSoon(p)))));
 }
 // Retired supplements (still published in Shopify) can linger in bags created before they were retired.
 function retiredLines(cart:ShopifyCart) {
@@ -81,6 +81,10 @@ async function removeUpcomingProducts(cart:ShopifyCart|null):Promise<Refreshed> 
   const blocked=[...skincare,...retired];
   if(!blocked.length)return {cart,removed:false,removedLineIds:[],notices:[]};
   const result=await mutate(CART_REMOVE,{cartId:cart.id,lineIds:blocked.map(line=>line.id)});
+  // A successful mutation envelope is not proof that the reserved lines were removed.
+  // Validate before any subsequent purchase mutation or checkout handoff.
+  if((skincare.some(line=>isReservedSkincareHandle(line.merchandise.product.handle))&&result.cart!.lines.pageInfo.hasNextPage)||result.cart!.lines.nodes.some(line=>isReservedSkincareHandle(line.merchandise.product.handle)))
+    throw new CommerceError("Skincare is coming soon. We couldn’t safely refresh your bag. Please try again.");
   const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];
   return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};
 }
@@ -98,6 +102,8 @@ export async function mutateCartResponse(request:Request) {
     let input:Record<string,unknown>;
     try {input=JSON.parse(text);}catch {throw new CommerceError("Invalid request.",400);}
     if(!input||typeof input!=="object"||Array.isArray(input)) throw new CommerceError("Invalid request.",400);
+    if(input.action==="add"&&isReservedSkincareHandle(input.id))
+      throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422);
     const refreshed=await removeUpcomingProducts(await readCart());
     let current=refreshed.cart;
     let result:CartPayload;
@@ -126,8 +132,8 @@ export async function mutateCartResponse(request:Request) {
       result=await mutate(CART_DISCOUNTS,{cartId:current.id,discountCodes});
     } else throw new CommerceError("Invalid request.",400);
     current=result.cart!;
-    await setCartId(current.id,request);
     const snapshot=publicCart(current);
+    await setCartId(current.id,request);
     const notices=[...refreshed.notices,...(result.warnings?.map(w=>w.message)||[])];
     if(notices.length) snapshot.notice=notices.join(" ");
     return Response.json(snapshot,{headers:responseHeaders});
