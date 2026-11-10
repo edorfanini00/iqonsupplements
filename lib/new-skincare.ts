@@ -2,7 +2,8 @@ import type { Product, StoreCatalog } from './catalog';
 import range from './new-skincare-range.json';
 import historicalRange from './skincare-range.json';
 import { productContent } from './product-content';
-import { activeSkincareIds, isHeldSkincareHandle, isLegacySkincareHandle } from './skincare-identity';
+import { activeSkincareIds, isActiveSkincareHandle, isHeldSkincareHandle, isLegacySkincareHandle } from './skincare-identity';
+import type { QualifiedSkincare } from './skincare-launch';
 
 /** Owner-approved informational pages. The active range is the invoice eight.
  * The numeric zero is an internal sentinel; pricePending always suppresses prices.
@@ -44,10 +45,24 @@ export const activeSkincareProducts: Product[] = activeSkincareIds.map(id=>
   [...newSkincareProducts,...historicalProducts].find(p=>p.id===id)!
 );
 export const legacySkincareProduct = (id:string) => isLegacySkincareHandle(id) ? historicalProducts.find(p=>p.id===id) : undefined;
-export function comingSoonSkincareProduct(_catalog: Pick<StoreCatalog,'mode'|'products'>, id:string) {
+const isLaunched = (p:Product) => p.category === 'skincare' && p.launchQualified === true && isActiveSkincareHandle(p.id);
+/** Informational page unless the live catalog holds a qualified purchasable product for this exact handle. */
+export function comingSoonSkincareProduct(catalog: Pick<StoreCatalog,'mode'|'products'>, id:string) {
+  if (catalog.mode === 'live' && catalog.products.some(p => p.id === id && isLaunched(p))) return undefined;
   return activeSkincareProducts.find(p => p.id === id);
 }
+/** The approved page record with ONLY commerce facts taken from the fresh qualification:
+ * approved name, size, copy, INCI, directions and imagery are kept unchanged. */
+export function launchedSkincareProduct(q: QualifiedSkincare): Product | undefined {
+  const approved = activeSkincareProducts.find(p => p.id === q.handle);
+  if (!approved) return undefined;
+  return {...approved, available: true, pricePending: false, price: q.price, currency: q.currency, launchQualified: true, stockLimit: q.quantityAvailable,
+    variants: [{id: q.variantId, title: q.title && q.title !== 'Default Title' ? q.title : approved.size, price: q.price, currency: q.currency, available: true}],
+    requiresSellingPlan: false};
+}
 export function withComingSoonSkincareCards(products:Product[]) {
-  // Preserve ordinary supplements. Neither legacy identities nor unapproved skincare can leak in.
-  return [...products.filter(p=>p.category!=='skincare'&&!isHeldSkincareHandle(p.id)),...activeSkincareProducts];
+  // Preserve ordinary supplements. Neither legacy identities nor unapproved skincare can leak in;
+  // a server-qualified launched record replaces its informational card in place (same order).
+  const launched = products.filter(isLaunched);
+  return [...products.filter(p=>p.category!=='skincare'&&!isHeldSkincareHandle(p.id)),...activeSkincareProducts.map(p => launched.find(l => l.id === p.id) ?? p)];
 }

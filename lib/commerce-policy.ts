@@ -1,4 +1,4 @@
-import { isHeldSkincareHandle } from "./skincare-identity";
+import { isActiveSkincareHandle, isHeldSkincareHandle, isLegacySkincareHandle } from "./skincare-identity";
 /** Keep skincare visible for discovery, but closed to every purchase entry point. */
 export const SKINCARE_COMING_SOON = true;
 /** Informational releases: exact handles are reserved independently of Shopify tags/stock
@@ -6,7 +6,14 @@ export const SKINCARE_COMING_SOON = true;
 export function isReservedSkincareHandle(handle:unknown):boolean {
   return handle === "enzyme-gel-cleanser" || handle === "hyaluronic-serum" || handle === "peptide-anti-wrinkle-day-cream";
 }
-export function isComingSoon(product:{id?:string;category?:string}) {
+/** The category-wide hold and exact-handle holds stay in force. The single exception is
+ * one of the eight active handles whose server-built product carries launchQualified=true,
+ * which only the fresh Storefront qualification in lib/skincare-launch.ts can set (each
+ * cart/checkout mutation re-qualifies independently; this flag is never trusted there).
+ * Legacy handles are permanently held. */
+export function isComingSoon(product:{id?:string;category?:string;launchQualified?:boolean}) {
+  if (isLegacySkincareHandle(product.id)) return true;
+  if (product.launchQualified === true && product.category === "skincare" && isActiveSkincareHandle(product.id)) return false;
   return isHeldSkincareHandle(product.id) || (SKINCARE_COMING_SOON && product.category === "skincare");
 }
 /** The storefront's shipping statement, shared by /help and every product page. The typical window is the owner's
