@@ -69,6 +69,7 @@ const POLICY = slug => `/policies/${slug}`;
 // Shopify's own page titles; the subscription policy page is titled "Cancellation policy".
 const STORE_POLICY_LINKS = [["Shipping policy", POLICY("shipping-policy")], ["Refund policy", POLICY("refund-policy")], ["Cancellation policy", POLICY("subscription-policy")],
   ["Terms of service", POLICY("terms-of-service")], ["Contact information", POLICY("contact-information")]];
+const INFORMATIONAL = ["/products/enzyme-gel-cleanser", "/products/hyaluronic-serum", "/products/peptide-anti-wrinkle-day-cream"];
 const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"];
 const dom = html => new JSDOM(html).window.document;
 const STORE_QUESTION = "Where can I buy IQON products?";
@@ -156,7 +157,7 @@ test("production, live catalog, canonical and alias hosts", async t => {
     for (const page of ["/", "/help", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/approach", "/journal", "/journal/reading-a-supplement-label"])
       assert.ok(urls.includes(`https://${WWW}${page === "/" ? "/" : page}`), page);
     assert.deepEqual(urls.filter(u => u.includes("/products/")).map(u => new URL(u).pathname).sort(),
-      ["/products/anti-aging-cleanser-with-peptides", "/products/creatine-monohydrate", "/products/daily-travel-kit", "/products/liver-support", "/products/nmn"]);
+      ["/products/anti-aging-cleanser-with-peptides", "/products/creatine-monohydrate", "/products/daily-travel-kit", "/products/liver-support", "/products/nmn", ...INFORMATIONAL].sort());
     for (const handle of ["gentle-cleanser", "peptide-serum", "barrier-cream", "colon-gentle-cleanse"]) {
       assert.equal((await get(port, `/products/${handle}`)).status, 308, `${handle} redirects`);
       if (handle === "colon-gentle-cleanse") assert.equal((await get(port, `/products/${handle}`)).headers.location, "/products/gut-health");
@@ -441,7 +442,7 @@ test("production, successful but empty Shopify response: editorial placeholders 
   }
   for (const url of ["/approach", "/journal"]) assertIndexable(await get(server.port, url), url);
   const urls = locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname);
-  assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal")), urls.join(","));
+  assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal") || INFORMATIONAL.includes(p)), urls.join(","));
 });
 
 test("production, Shopify outage: shopping pages fail closed, static pages stay indexable", async t => {
@@ -467,7 +468,7 @@ test("production, Shopify outage: shopping pages fail closed, static pages stay 
   // Guides stay indexable but offer no product as a next purchase step while Shopify is down.
   for (const url of ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format"]) assert.equal(dom((await get(server.port, url)).body).querySelector(".guide-products"), null, url);
   const urls = locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname);
-  assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal")), urls.join(","));
+  assert.ok(urls.length > 0 && urls.every(p => p === "/approach" || p.startsWith("/journal") || INFORMATIONAL.includes(p)), urls.join(","));
 });
 
 test("production without Shopify configuration: preview fixtures are never indexed or enumerated", async t => {
@@ -478,7 +479,7 @@ test("production without Shopify configuration: preview fixtures are never index
   for (const [, path] of STORE_POLICY_LINKS) assertIndexable(await get(server.port, path), path);
   // Preview-fixture homepage modes render the same hero headings.
   for (const url of ["/", "/skincare"]) assert.deepEqual(h1s(dom((await get(server.port, url)).body)), [H1_TEXT[url]], url);
-  assert.ok(!(await get(server.port, "/sitemap.xml")).body.includes("/products/"));
+  assert.deepEqual(locs((await get(server.port, "/sitemap.xml")).body).map(u => new URL(u).pathname).filter(p => p.startsWith("/products/")).sort(), [...INFORMATIONAL].sort());
   // Preview fixtures are never linked as orderable; the preview help answer gives the window but no Shop tracking claim.
   for (const url of ["/journal/reading-a-supplement-label", "/journal/finding-your-supplement-format", "/collections/supplements"])
     assert.equal(dom((await get(server.port, url)).body).querySelector(".guide-products, .catalog-formats"), null, url);

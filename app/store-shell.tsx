@@ -20,6 +20,7 @@ import { StorefrontMetaPixel } from "./meta-pixel";
 import { trackCartAddition } from "@/lib/meta-pixel";
 import type { CartSnapshot } from "@/lib/shopify";
 import { shopifySrcSet } from "@/lib/responsive-images";
+import { comingSoonSkincareDepartment } from "@/lib/new-skincare";
 
 type StoreContextType = {department:Category; products:Product[]; mode:StoreCatalog["mode"]; currency:string; busy:boolean; ready:boolean; error:string; prepareCheckout:(consent:VisitorConsent,signal:AbortSignal)=>Promise<string>; cartRevision:number; checkoutCurrent:(revision:number)=>boolean; retryCart:()=>void; discountCodes:CartSnapshot["discountCodes"]; applyDiscounts:(codes:string[])=>Promise<boolean>; cart: CartItem[]; add: (id:string,quantity?:number,variantId?:string)=>void; costs:BagCosts; update:(key:string,quantity:number)=>void; openBag:()=>void; closeBag:()=>void; subtotal:number; count:number};
 // Shopify's own figures for the bag: merchandise before product discounts, the discount allocations and its cart total.
@@ -39,7 +40,7 @@ export function StoreShell({children,catalog}:{children:ReactNode;catalog:StoreC
   const [bag,setBag]=useState(false);
   const [search,setSearch]=useState(false);
   const [preferredDepartment,setPreferredDepartment]=useState<Category>("supplements");
-  const routeDepartment:Category|undefined=pathname==="/"?"supplements":pathname.startsWith("/skincare")||pathname.startsWith("/collections/skincare")?"skincare":pathname.startsWith("/collections/supplements")?"supplements":products.find(p=>pathname===`/products/${p.id}`)?.category;
+  const routeDepartment:Category|undefined=pathname==="/"?"supplements":pathname.startsWith("/skincare")||pathname.startsWith("/collections/skincare")?"skincare":pathname.startsWith("/collections/supplements")?"supplements":products.find(p=>pathname===`/products/${p.id}`)?.category||comingSoonSkincareDepartment(pathname);
   const department=routeDepartment||preferredDepartment;
   if(routeDepartment&&preferredDepartment!==routeDepartment)setPreferredDepartment(routeDepartment);
   const [query,setQuery]=useState("");

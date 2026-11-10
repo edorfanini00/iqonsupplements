@@ -10,10 +10,11 @@ import { formatHref, formatSlug, formatLabel } from "@/lib/departments";
 import { isComingSoon, isOrderable } from "@/lib/commerce-policy";
 import { FORMAT_GUIDE, LABEL_GUIDE, orderableFormats } from "@/lib/buyer-paths";
 import type { Category } from "@/lib/catalog";
+import { withComingSoonSkincareCards } from "@/lib/new-skincare";
 
 export function CollectionPage({category,initialFormat="all",initialSort="featured"}:{category:Category|"all";initialFormat?:string;initialSort?:string}) {
  const {products,mode}=useStore();const router=useRouter();const [query,setQuery]=useState("");const skin=category==="skincare";
- const base=products.filter(p=>category==="all"||p.category===category);const filter=base.find(p=>formatSlug(p.type)===initialFormat)?.type||"all";
+ const base=(skin?withComingSoonSkincareCards(products):products).filter(p=>category==="all"||p.category===category);const filter=base.find(p=>formatSlug(p.type)===initialFormat)?.type||"all";
  const sort=["featured","low","high","name"].includes(initialSort)?initialSort:"featured";
  const visible=base.filter(p=>(filter==="all"||p.type===filter)&&`${p.name} ${p.descriptor}`.toLowerCase().includes(query.trim().toLowerCase())).sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="low"||sort==="high"?(a.pricePending!==b.pricePending?Number(!!a.pricePending)-Number(!!b.pricePending):sort==="low"?a.price-b.price:b.price-a.price):Number(a.number)-Number(b.number));
  // Derived from the current catalog, never a fixed count: what can be ordered now, and what is a preview.

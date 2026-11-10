@@ -1,0 +1,38 @@
+{
+  "enzyme-gel-cleanser": {
+    "supplierSku": "81310702C",
+    "proofPage": 8,
+    "proofSha256": "903cc271e6d8923cba303e338863d5c3e39714b8f110086855f65a1589d77395",
+    "source": "https://www.globalbeauty.net/product/enzyme-gel-cleanser/",
+    "conflicts": [],
+    "constraints": [
+      "Different formula from Anti-Aging Cleanser with Peptides. No palmitoyl peptides or panthenol in approved cleanser INCI. Papaya extract, orange peel oil and salicylic acid are present. Label text is outlined/not captured by pdftotext."
+    ]
+  },
+  "hyaluronic-serum": {
+    "supplierSku": "33230103C",
+    "proofPage": 5,
+    "proofSha256": "903cc271e6d8923cba303e338863d5c3e39714b8f110086855f65a1589d77395",
+    "source": "https://www.globalbeauty.net/product/hyaluronic-serum/",
+    "conflicts": [
+      "Approved label INCI differs from current supplier web: Aloe Barbadensis Leaf vs Aloe Vera Leaf Juice; Sodium Hyaluronate near end vs earlier; Comfrey/Cucumber order; Equisetum Hiemale vs Equisetum Arvense. Preserve approved list separately; do not merge."
+    ],
+    "constraints": [
+      "Both sources list methylisothiazolinone, Yellow 5 and Blue 1. Do not claim preservative-free, dye-free or universally suitable; market/batch review remains required."
+    ]
+  },
+  "peptide-anti-wrinkle-day-cream": {
+    "supplierSku": "61730172C",
+    "proofPage": 7,
+    "proofSha256": "903cc271e6d8923cba303e338863d5c3e39714b8f110086855f65a1589d77395",
+    "source": "https://www.globalbeauty.net/product/peptide-anti-wrinkle-day-cream/",
+    "conflicts": [
+      "Visible approved proof directions differ from public supplier page: approved label says warm between fingertips, massage face/neck/décolleté, morning SPF; website describes a nighttime balm/spatula/steam/post-procedure routine. Use visible approved artwork wording and retain conflict.",
+      "CRITICAL PDF extraction discrepancy: invisible/stale text extraction omits décolleté and SPF and instead says massage into face, neck in the morning. Visible rendered proof is the controlling transcription.",
+      "Invoice name has Anti Wrinkle without hyphen; approved proof and official page have Anti-Wrinkle. Both exact versions retained."
+    ],
+    "constraints": [
+      "Lists methylisothiazolinone, fragrance, hydrolyzed wheat protein, silk amino acids and retinyl palmitate. No individually named signal peptide in INCI; do not invent Matrixyl, GHK-Cu or peptide concentrations."
+    ]
+  }
+}

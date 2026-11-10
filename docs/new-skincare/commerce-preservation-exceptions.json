@@ -1,0 +1,22 @@
+{
+  "base": "a4c4b12d8d29608adecfea48609a00db298b7ff7",
+  "authorization": "Correction R1 for release review A1: explicit narrow shared-commerce exceptions only. All other protected files remain byte-identical.",
+  "regressionTest": "tests/reserved-skincare-commerce.test.mjs",
+  "files": {
+    "lib/commerce-policy.ts": {
+      "baselineSha256": "a20ae21fd54b1a0ef8e14bd3f09f88fa383573cb7c7f698210f601255692982b",
+      "candidateSha256": "89b4799fead162c95e484e988aeb5e9bf5103b1b1487551562e864b9346a2205",
+      "reason": "Reserve three exact informational handles independent of merchandising category; retain ordinary purchase policy."
+    },
+    "lib/shopify.ts": {
+      "baselineSha256": "694998dc5e09df451f923e01430ddc6633430ca9e3abd477a70d09cfdef64449",
+      "candidateSha256": "418cf046ef0413827d5f4129bd4a807ecb1fafc3a4806830a2b4c1c358f9317c",
+      "reason": "Exclude reserved records before mapping external prices/variants and refuse reserved-line public serialization including partial mutation errors."
+    },
+    "lib/shopify.server.ts": {
+      "baselineSha256": "e300446f8f53b1d06f417fcf901633e20962bd51e752fcda45357dea2b135adc",
+      "candidateSha256": "9e42ce42cf07fff552809430141e35084a27d7071f3d72c08b099d0cb7c2fa4d",
+      "reason": "Reject reserved direct additions before transport; sanitize reserved stale lines independent of tags, verify cleanup, and validate before cookie/checkout handoff."
+    }
+  }
+}
