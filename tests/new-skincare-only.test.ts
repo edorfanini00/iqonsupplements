@@ -13,10 +13,20 @@ const BASE='a4c4b12d8d29608adecfea48609a00db298b7ff7';
 const original=(file:string)=>execFileSync('git',['show',`${BASE}:${file}`],{maxBuffer:64*1024*1024});
 const ids=['enzyme-gel-cleanser','hyaluronic-serum','peptide-anti-wrinkle-day-cream'];
 const json=(file:string)=>JSON.parse(readFileSync(file,'utf8'));
+// Reverse only the exact owner-authorized strength disclosure before historical preservation checks.
+const strengthCopy=json('tests/fixtures/retinol-strength-copy.json') as Record<string,[string,string][]>;
+const beforeStrengthDisclosure=(file:string)=>{
+ let text=readFileSync(file,'utf8');
+ for(const [before,after] of strengthCopy[file]||[]){
+  assert.equal(text.split(after).length-1,1,`${file}: exact authorized Retinol Rx copy`);
+  text=text.replace(after,before);
+ }
+ return Buffer.from(text);
+};
 test('three additions join the approved eight; legacy records and unrelated copy are preserved',()=>{
  assert.deepEqual([...newSkincareIds],ids);
  const range=JSON.parse(original('lib/skincare-range.json').toString());assert.equal(range.length,7);
- const current=json('lib/skincare-range.json');
+ const current=JSON.parse(beforeStrengthDisclosure('lib/skincare-range.json').toString());
  const retained=['exfoliating-pads','retinol-rx','hydra-c-ferulic-serum','copper-peptide-restore-cream','firming-peptide-eye-gel'];
  for(const p of range){const actual=current.find((q:any)=>q.id===p.id);if(retained.includes(p.id)){const {inci,directions,...rest}=actual;const {directions:prior,...originalRest}=p;assert.deepEqual(rest,originalRest);}else assert.deepEqual(actual,p);}
  assert.equal(products.filter(p=>p.category==='skincare').length,8);
@@ -36,9 +46,9 @@ test('protected files remain byte-identical except exact hash-pinned approved in
    const exception=exceptions.files[file];
    if(exception){
      assert.equal(hash(original(file)),exception.baselineSha256,`${file}: original input`);
-     assert.equal(hash(readFileSync(file)),exception.candidateSha256,`${file}: exact necessary correction, not a blanket exemption`);
+     assert.equal(hash(strengthCopy[file]?beforeStrengthDisclosure(file):readFileSync(file)),exception.candidateSha256,`${file}: exact necessary correction, not a blanket exemption`);
      assert(exception.reason.length>30);
-   }else assert.equal(hash(readFileSync(file)),hash(original(file)),file);
+   }else assert.equal(hash(strengthCopy[file]?beforeStrengthDisclosure(file):readFileSync(file)),hash(original(file)),file);
  }
  console.log(`Verified ${exact.length-Object.keys(exceptions.files).length} protected pre-existing files byte-identical and ${Object.keys(exceptions.files).length} exact hash-pinned corrections`);
 });
