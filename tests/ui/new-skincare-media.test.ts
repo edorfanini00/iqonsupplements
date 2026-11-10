@@ -15,7 +15,7 @@ describe('new-only media integration',()=>{
     React.createElement(ProductGallery,{product}),
     React.createElement(SkincareProductStory,{product,comparison:newSkincareProducts})));
    expect(container.querySelector('.visual-pack img')?.getAttribute('src')).toBe(product.image);
-   expect(container.querySelector('.product-preview-note')?.textContent).toBe('AI-generated packaging visualization based on approved artwork and supplier container references; not a supplier photograph.');
+   expect(container.querySelector('.product-preview-note')?.textContent).toBe('Main packshot: AI-generated packaging visualization based on approved artwork and supplier container references; not a supplier photograph.');
    expect(container.querySelector('.visual-pack img')?.getAttribute('alt')).toContain('AI-generated packaging visualization');
    expect(container.querySelector('.skin-benefits-photo img')?.getAttribute('src')).toBe(newSkincareImage(product.id,'texture'));
    const caption=container.querySelector('.skin-benefits-photo figcaption')!;
@@ -28,11 +28,7 @@ describe('new-only media integration',()=>{
    for(const selector of ['.visual-editorial img','.skin-application-photo img']){
     const image=container.querySelector(selector)!;
     expect(image.getAttribute('src')).toBe(`/images/skincare/new-products-only/${product.id}/editorial.webp`);
-    expect(image.getAttribute('alt')).toBe({
-     'enzyme-gel-cleanser':'IQON Enzyme Gel Cleanser white bottle on a grey counter with a folded white towel and cropped metal tray — AI-generated packaging visualization',
-     'hyaluronic-serum':'IQON Hyaluronic Serum silver bottle on a reflective metal pedestal beside an empty shallow glass dish — AI-generated packaging visualization',
-     'peptide-anti-wrinkle-day-cream':'IQON Peptide Anti-Wrinkle Day Cream silver bottle on a grey counter with folded white towels and a cropped metal tray — AI-generated packaging visualization',
-    }[product.id]);
+    expect(image.getAttribute('alt')).toBe(`IQON ${product.name} packaging beside an empty glass cylinder on a light grey surface — CGI visualization`);
    }
    expect(container.innerHTML).not.toMatch(/image pending|editorial\.svg/i);
   });

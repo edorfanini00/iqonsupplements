@@ -1,5 +1,5 @@
 {
-  "scope": "Image-only replacement for enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream; existing eight-product commerce activation unchanged",
+  "scope": "Only three main packshot replacements: enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream. All secondary assets and records, other products and commerce are unchanged from upstream base.",
   "assets": [
     {
       "id": "enzyme-gel-cleanser",
@@ -8,7 +8,7 @@
       "sha256": "fef97cc06ef8db86e90276cef24121f48157d5847f80416f18b2d83e4eaafd50",
       "sourceManifest": "approved-packshot-manifest.json",
       "sourceManifestSha256": "bc46989d8d3ac5afdda00ae3d66db4e9d3272dbe63aaf8cdd7cde701412a3cdb",
-      "approval": "Parent visually accepted for image-only integration and review; no merge or publication approval",
+      "approval": "Draft review candidate only; explicit owner final visual approval and publication approval remain outstanding",
       "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
       "jobId": "486fb767-dba9-48b1-92f9-eb40c88efc38",
       "nativeDimensions": [
@@ -27,7 +27,7 @@
       "sha256": "fb8bfa0a29124c2c2974e705ea98b6422070d4e5803adc2be7ddcb8ed6634d22",
       "sourceManifest": "approved-packshot-manifest.json",
       "sourceManifestSha256": "bc46989d8d3ac5afdda00ae3d66db4e9d3272dbe63aaf8cdd7cde701412a3cdb",
-      "approval": "Parent visually accepted for image-only integration and review; no merge or publication approval",
+      "approval": "Draft review candidate only; explicit owner final visual approval and publication approval remain outstanding",
       "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
       "jobId": "2f065532-54c3-4c87-b003-a3bcfcd2649a",
       "nativeDimensions": [
@@ -46,7 +46,7 @@
       "sha256": "72dc9506a48141653ddd9ff53883626008751097f46c034e3ed5a650b88adbc1",
       "sourceManifest": "approved-packshot-manifest.json",
       "sourceManifestSha256": "bc46989d8d3ac5afdda00ae3d66db4e9d3272dbe63aaf8cdd7cde701412a3cdb",
-      "approval": "Parent visually accepted for image-only integration and review; no merge or publication approval",
+      "approval": "Draft review candidate only; explicit owner final visual approval and publication approval remain outstanding",
       "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
       "jobId": "5591ba7c-537a-46d6-ad5d-00e06b7c4357",
       "nativeDimensions": [
@@ -92,62 +92,35 @@
       "id": "enzyme-gel-cleanser",
       "role": "editorial",
       "path": "/images/skincare/new-products-only/enzyme-gel-cleanser/editorial.webp",
-      "sha256": "d3e6895806280c5b9baaf5d4a1c8b9f506b613d57ac615abbab9db09549d1af0",
-      "sourceManifest": "editorials/output-manifest.json",
-      "sourceManifestSha256": "18ffd0a2fb917f793373cae066142acd89511a875e7797f202422b76c2b14f9f",
-      "approval": "Parent visually accepted for image-only integration and review; no merge or publication approval",
-      "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
-      "limitations": "Styling props are not formula or application evidence. Size is semantically correct but generated label uses mL whereas approved cleanser proof uses ml. Matches parent-accepted packshot capitalization. Not an exact typographic facsimile.",
-      "jobId": "e3b21849-c71a-4a0e-8ea7-d6f263c22b8a",
-      "nativeDimensions": [
-        2560,
-        3200
-      ],
-      "webDimensions": [
-        1600,
-        2000
-      ]
+      "sha256": "45cd93cda5e4b27fcba95384e309c4445e32b51cc9df195ab777bf7918f51efc",
+      "sourceManifest": "creative/editorial-light-final/MANIFEST.json",
+      "sourceManifestSha256": "27aa9bd0714a8fae0c5236a73a7c360c7e94cd2080a244d140d14a7d43ba91ea",
+      "approval": "Parent accepted contact-sheet pixels for LOCAL preview insertion only; release hold and owner publication gate remain",
+      "provenance": "CGI packaging visualization beside an empty glass cylinder on a light grey surface; not a finished-formula photograph",
+      "limitations": "Empty glass is a styling prop, not formula or application evidence. No render edits."
     },
     {
       "id": "hyaluronic-serum",
       "role": "editorial",
       "path": "/images/skincare/new-products-only/hyaluronic-serum/editorial.webp",
-      "sha256": "294bc41e361fb57eb38d6f2fdc65c54c63623b3096a06c1e9fcd149e21b67bdc",
-      "sourceManifest": "editorials/output-manifest.json",
-      "sourceManifestSha256": "18ffd0a2fb917f793373cae066142acd89511a875e7797f202422b76c2b14f9f",
-      "approval": "Parent visually accepted for image-only integration and review; no merge or publication approval",
-      "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
-      "limitations": "Styling props are not formula or application evidence. ",
-      "jobId": "8e8ee079-2077-41b1-8c8f-c0801fa8b1a1",
-      "nativeDimensions": [
-        2560,
-        3200
-      ],
-      "webDimensions": [
-        1600,
-        2000
-      ]
+      "sha256": "ab2198bfc4561f877f694e0aeaa49c490d4354d0e1fc5598cd70484cfccaeb10",
+      "sourceManifest": "creative/editorial-light-final/MANIFEST.json",
+      "sourceManifestSha256": "27aa9bd0714a8fae0c5236a73a7c360c7e94cd2080a244d140d14a7d43ba91ea",
+      "approval": "Parent accepted contact-sheet pixels for LOCAL preview insertion only; release hold and owner publication gate remain",
+      "provenance": "CGI packaging visualization beside an empty glass cylinder on a light grey surface; not a finished-formula photograph",
+      "limitations": "Empty glass is a styling prop, not formula or application evidence. No render edits."
     },
     {
       "id": "peptide-anti-wrinkle-day-cream",
       "role": "editorial",
       "path": "/images/skincare/new-products-only/peptide-anti-wrinkle-day-cream/editorial.webp",
-      "sha256": "f3e849a752a0e99d4fc2d8a5aa2bd2ecc8b60da488486b610c53cab64a107cd4",
-      "sourceManifest": "editorials/output-manifest.json",
-      "sourceManifestSha256": "18ffd0a2fb917f793373cae066142acd89511a875e7797f202422b76c2b14f9f",
-      "approval": "Parent visually accepted for image-only integration and review; no merge or publication approval",
-      "provenance": "Higgsfield GPT Image 2 (gpt_image_2_6), max quality; AI-generated packaging visualization, not a supplier photograph",
-      "limitations": "Styling props are not formula or application evidence. ",
-      "jobId": "1c86d045-7e67-4133-b9f1-c03f88229c09",
-      "nativeDimensions": [
-        2560,
-        3200
-      ],
-      "webDimensions": [
-        1600,
-        2000
-      ]
+      "sha256": "2f0fabebccf95be2eb58c2d52c43a796730e11aae3c4dda0c9d9dcdcbb80791a",
+      "sourceManifest": "creative/editorial-light-final/MANIFEST.json",
+      "sourceManifestSha256": "27aa9bd0714a8fae0c5236a73a7c360c7e94cd2080a244d140d14a7d43ba91ea",
+      "approval": "Parent accepted contact-sheet pixels for LOCAL preview insertion only; release hold and owner publication gate remain",
+      "provenance": "CGI packaging visualization beside an empty glass cylinder on a light grey surface; not a finished-formula photograph",
+      "limitations": "Empty glass is a styling prop, not formula or application evidence. No render edits."
     }
   ],
-  "editorial": "Three parent-accepted Higgsfield editorial WebPs copied unchanged. Styling props described in gallery, zoom and routine. Two independent exact-head reviews and explicit owner release approval remain required."
+  "editorial": "Three parent-accepted editorial-light-final WebPs integrated unchanged for LOCAL preview only. Six rejected page-assets supporting images remain excluded. Release hold, final independent reviews and owner publication approval remain."
 }

@@ -82,9 +82,9 @@ test('each new page has complete product-specific story, ingredients, routine, F
   const editorial=newSkincareImage(p.id,'editorial')!;
   assert.equal(editorial,`/images/skincare/new-products-only/${p.id}/editorial.webp`);
   const editorialHashes:Record<string,string>={
-   'enzyme-gel-cleanser':'d3e6895806280c5b9baaf5d4a1c8b9f506b613d57ac615abbab9db09549d1af0',
-   'hyaluronic-serum':'294bc41e361fb57eb38d6f2fdc65c54c63623b3096a06c1e9fcd149e21b67bdc',
-   'peptide-anti-wrinkle-day-cream':'f3e849a752a0e99d4fc2d8a5aa2bd2ecc8b60da488486b610c53cab64a107cd4',
+   'enzyme-gel-cleanser':'45cd93cda5e4b27fcba95384e309c4445e32b51cc9df195ab777bf7918f51efc',
+   'hyaluronic-serum':'ab2198bfc4561f877f694e0aeaa49c490d4354d0e1fc5598cd70484cfccaeb10',
+   'peptide-anti-wrinkle-day-cream':'2f0fabebccf95be2eb58c2d52c43a796730e11aae3c4dda0c9d9dcdcbb80791a',
   };
   assert.equal(createHash('sha256').update(readFileSync(`public${editorial}`)).digest('hex'),editorialHashes[p.id]);
   for(const art of v.ingredients)if(art.kind==='molecule')assert(existsSync(`public/images/skincare-ingredients/${art.art}.svg`));
