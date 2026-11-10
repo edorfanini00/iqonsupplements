@@ -45,3 +45,14 @@ test('strength and attribution are confined to Retinol Rx content',()=>{
   for(const [id,content] of Object.entries(contentMap))if(id!=='retinol-rx')assert.doesNotMatch(JSON.stringify(content),/0\.75%|Retinol strength as stated/,id);
  }
 });
+
+import {execFileSync} from 'node:child_process';
+import {comingSoonSkincareProduct} from '../lib/new-skincare';
+test('resolved PDP descriptions include Retinol strength and preserve Hyaluronic Serum against PR base',()=>{
+ const catalog={mode:'unavailable' as const,products:[]};
+ const retinol=comingSoonSkincareProduct(catalog,'retinol-rx')!;
+ assert.equal(retinol.description,'A 0.75% encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.');
+ assert.match(retinol.description!,/0\.75% encapsulated retinol/);
+ const base=JSON.parse(execFileSync('git',['show','df9757495ce39135dee0a6fc15bb2a7ae557da0c:lib/new-skincare-range.json'],{encoding:'utf8'}));
+ assert.equal(comingSoonSkincareProduct(catalog,'hyaluronic-serum')!.description,base.find((p:any)=>p.id==='hyaluronic-serum').description);
+});

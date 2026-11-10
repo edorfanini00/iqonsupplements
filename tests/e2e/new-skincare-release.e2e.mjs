@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import os from 'node:os';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {JSDOM} from 'jsdom';
 const root=fileURLToPath(new URL('../..',import.meta.url));
@@ -14,6 +14,7 @@ const expected=JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/approve
 const historical=JSON.parse(fs.readFileSync(path.join(root,'lib/skincare-range.json'),'utf8'));
 const additions=JSON.parse(fs.readFileSync(path.join(root,'lib/new-skincare-range.json'),'utf8'));
 const range=Object.keys(expected).map(id=>[...historical,...additions].find(p=>p.id===id));
+const baseHyaluronic=JSON.parse(execFileSync('git',['show','df9757495ce39135dee0a6fc15bb2a7ae557da0c:lib/new-skincare-range.json'],{cwd:root,encoding:'utf8'})).find(p=>p.id==='hyaluronic-serum');
 const legacy=['anti-aging-cleanser-with-peptides','hydrating-tonic'];
 const www='www.iqondaily.com';
 const work=process.env.RELEASE_EVIDENCE||fs.mkdtempSync(path.join(os.tmpdir(),'iqon-release-'));
@@ -40,6 +41,16 @@ for(const [name,env] of Object.entries({live:{},empty:{FAKE_SHOPIFY:'empty'},una
   const index=name!=='preview';
   for(const p of range){
    const url=`/products/${p.id}`,r=await get(port,url),d=doc(r.body);
+   if(['retinol-rx','hyaluronic-serum'].includes(p.id)){
+    const expectedDescription=p.id==='retinol-rx'
+     ? 'A 0.75% encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.'
+     : baseHyaluronic.description;
+    for(const selector of ['meta[name="description"]','meta[property="og:description"]','meta[name="twitter:description"]']){
+     const actual=d.querySelector(selector)?.getAttribute('content');
+     assert.equal(actual,expectedDescription,`${name}: ${p.id} ${selector}`);
+     if(p.id==='retinol-rx')assert.match(actual,/0\.75% encapsulated retinol/);
+    }
+   }
    assert.equal(r.status,200,url);assert.equal(d.querySelector('h1')?.textContent,p.name);
    assert.equal(d.querySelector('link[rel="canonical"]')?.getAttribute('href'),`https://${www}${url}`);
    assert.equal(d.querySelector('meta[name="robots"]')?.getAttribute('content'),index?'index, follow':'noindex, follow');

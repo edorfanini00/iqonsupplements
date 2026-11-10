@@ -26,5 +26,11 @@
       "summary:\"Encapsulated to help protect retinol and allow gradual release.\"",
       "summary:\"0.75% encapsulated retinol, with niacinamide and squalane alongside it.\""
     ]
+  ],
+  "lib/product-copy.json": [
+    [
+      "\"description\": \"An encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.\"",
+      "\"description\": \"A 0.75% encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.\""
+    ]
   ]
 }
