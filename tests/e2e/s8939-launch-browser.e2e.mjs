@@ -23,6 +23,21 @@ const additions = JSON.parse(fs.readFileSync(path.join(repo, 'lib/new-skincare-r
 const ACTIVE = Object.keys(labels);
 const PRICES = {"enzyme-gel-cleanser":"$55","exfoliating-pads":"$80","hyaluronic-serum":"$90","retinol-rx":"$98.34","hydra-c-ferulic-serum":"$90","peptide-anti-wrinkle-day-cream":"$100","copper-peptide-restore-cream":"$68","firming-peptide-eye-gel":"$76.67"};
 const LEGACY = ['anti-aging-cleanser-with-peptides', 'hydrating-tonic'];
+// Retinol Rx strength copy (PR45) taken from its own exact fixture, not re-typed here.
+const strength = JSON.parse(fs.readFileSync(path.join(repo, 'tests/fixtures/retinol-strength-copy.json'), 'utf8'));
+const strengthAfter = (file, re) => strength[file].map(([, a]) => a.match(re)?.[1]).find(Boolean);
+const RETINOL = {description: strengthAfter('lib/product-copy.json', /^"description": "(.*)"$/), lead: strengthAfter('lib/product-visuals.ts', /^lead: "(.*)"$/), summary: strengthAfter('lib/skincare-visual-content.ts', /^summary:"(.*)"$/)};
+assert.ok(RETINOL.description?.includes('0.75%') && RETINOL.lead?.endsWith('Retinol strength as stated by the formulating laboratory.') && RETINOL.summary?.startsWith('0.75%'));
+async function retinolCopy(page, prefix) {
+  const meta = await page.evaluate(() => Object.fromEntries(['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]'].map(s => [s, document.querySelector(s)?.getAttribute('content')])));
+  record(`${prefix}:metadata-description-og-twitter`, Object.values(meta).length === 3 && Object.values(meta).every(v => v === RETINOL.description), JSON.stringify(meta).slice(0, 160));
+  const lead = (await page.locator('.product-summary-description').first().textContent()).trim();
+  record(`${prefix}:lead-with-attribution`, lead === RETINOL.lead, lead.slice(-70));
+  const fact = await page.locator('.product-fact-art').evaluateAll(n => n.map(e => e.textContent.replace(/\s+/g, ' ')));
+  record(`${prefix}:key-fact`, fact.some(f => f.includes('0.75%') && f.includes('encapsulated retinol')), fact.join('|').slice(0, 120));
+  const summaries = await page.locator('.skin-ingredient-summary').allTextContents();
+  record(`${prefix}:ingredient-summary`, summaries.includes(RETINOL.summary), summaries.join('|').slice(0, 120));
+}
 const matrix = [];
 const record = (id, ok, detail = '') => { matrix.push({id, ok: !!ok, detail}); };
 const blocked = [];
@@ -74,6 +89,11 @@ test('S8939 launch: eight PDPs, legacy holds, mixed cart, code, checkout handoff
       if (label === 'mobile') record(`D-CONT-1:mobile:${id}:image-first`, order.domGalleryFirst && order.gTop < order.hTop && order.hTop < order.bTop, JSON.stringify(order));
       else record(`D-CONT-1:desktop:${id}:gallery-left`, order.domGalleryFirst && order.gLeft < order.hLeft, JSON.stringify(order));
       await shot(page, `pdp-${label}-${id}-top`);
+      if (id === 'retinol-rx') {
+        await retinolCopy(page, `D-CONT-2:${label}:qualified:retinol-rx`);
+        await page.locator('.skin-ingredient-summary').first().scrollIntoViewIfNeeded();
+        await shot(page, `pdp-${label}-retinol-rx-strength`);
+      }
       // Approved INCI and directions, each accordion opened separately.
       for (const [trigger, expected] of [['Ingredients & formulation', labels[id].ingredients], ['How to use', labels[id].directions]]) {
         const button = page.getByRole('button', {name: trigger}).first();
@@ -136,6 +156,7 @@ test('S8939 launch: eight PDPs, legacy holds, mixed cart, code, checkout handoff
       const summary = await pg.locator('.product-summary').textContent();
       const expectHeld = mode === 'down' || id === 'retinol-rx';
       record(`D-HOLD-3:${mode}:${id}`, expectHeld ? /Coming soon/.test(summary) && (await pg.locator('.add-to-bag-row').count()) === 0 : summary.includes(PRICES[id]), summary.slice(0, 80));
+      if (id === 'retinol-rx') await retinolCopy(pg, `D-CONT-2:${mode}:held:retinol-rx`);
       await shot(pg, `failclosed-${mode}-${id}`);
     }
     await pg.goto(`http://localhost:${port}/products/creatine-monohydrate`, {waitUntil: 'networkidle'});

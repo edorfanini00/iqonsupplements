@@ -1,5 +1,5 @@
 {
-  "_comment": "S8939 launch identity. Exact store + handle + supplier SKU -> Shopify product/variant GIDs. Ids are copied ONLY from the proven read-only provisioning manifest (provision/manifest.json, captured 2026-11-10T07:35Z) and eight-sku-provenance.json; null = not yet created/proven, which keeps that product on hold. Approved one-time USD prices per owner decision 2026-11-10. Never edit ids by hand: rebind from the next proven manifest.",
+  "_comment": "S8939 launch identity. Exact store + handle + supplier SKU -> Shopify product/variant GIDs, generated programmatically (never by hand) from the private ops provisioning manifest provision-resume/manifest.json (sha256 fdac7afbb14275166fbae98c413096b102985c8a7d1175b4d151a6e722275de7; state DRAFT_PROVISIONING_COMPLETE_COORDINATED_RELEASE_NOT_EXECUTED; captured 2026-11-10T13:58:42.541252+00:00, completed 2026-11-10T14:05:14.081379+00:00). The five pre-existing ids are unchanged; enzyme-gel-cleanser, hyaluronic-serum and peptide-anti-wrinkle-day-cream were bound from that manifest. That snapshot records all eight as DRAFT and unpublished with no stock written (three new products 0 on hand); it is NOT a fresh live inventory or publication qualification. A configured id is not activation: every product stays Coming soon until a fresh Storefront read proves it ACTIVE, published to this channel, one-time, at the approved price, with positive quantityAvailable. Approved one-time USD prices per owner decision 2026-11-10. Rebind only from the next proven manifest.",
   "store": "nr9zd0-t5.myshopify.com",
   "currency": "USD",
   "products": [
@@ -7,8 +7,8 @@
       "handle": "enzyme-gel-cleanser",
       "supplierSku": "81310702C",
       "approvedPriceUsd": "55.00",
-      "productId": null,
-      "variantId": null
+      "productId": "gid://shopify/Product/10554590560551",
+      "variantId": "gid://shopify/ProductVariant/52574511104295"
     },
     {
       "handle": "exfoliating-pads",
@@ -21,8 +21,8 @@
       "handle": "hyaluronic-serum",
       "supplierSku": "33230103C",
       "approvedPriceUsd": "90.00",
-      "productId": null,
-      "variantId": null
+      "productId": "gid://shopify/Product/10554590789927",
+      "variantId": "gid://shopify/ProductVariant/52574511366439"
     },
     {
       "handle": "retinol-rx",
@@ -42,8 +42,8 @@
       "handle": "peptide-anti-wrinkle-day-cream",
       "supplierSku": "61730172C",
       "approvedPriceUsd": "100.00",
-      "productId": null,
-      "variantId": null
+      "productId": "gid://shopify/Product/10554590855463",
+      "variantId": "gid://shopify/ProductVariant/52574511431975"
     },
     {
       "handle": "copper-peptide-restore-cream",

@@ -108,17 +108,62 @@ const add = (handle, variantId, quantity = 1) => routes.mutateCartResponse(reque
 const update = (lineId, quantity) => routes.mutateCartResponse(request({action: "update", lineId, quantity}));
 const checkout = () => routes.checkoutResponse(request({visitorConsent: consent}, "checkout"));
 
-test("D-MAP-1: committed identity binds only proven ids; the three un-created products stay null", () => {
+// Exact eight bindings from the final DRAFT provisioning manifest (sha256 fdac7afb…de7). The five
+// pre-existing ids are unchanged from the reviewed activation; enzyme-gel-cleanser, hyaluronic-serum and
+// peptide-anti-wrinkle-day-cream (previously null) were bound from it.
+const EXPECTED_IDENTITY = [
+  ["enzyme-gel-cleanser", "81310702C", "55.00", "gid://shopify/Product/10554590560551", "gid://shopify/ProductVariant/52574511104295"],
+  ["exfoliating-pads", "12410503C", "80.00", "gid://shopify/Product/10393655345447", "gid://shopify/ProductVariant/52052013744423"],
+  ["hyaluronic-serum", "33230103C", "90.00", "gid://shopify/Product/10554590789927", "gid://shopify/ProductVariant/52574511366439"],
+  ["retinol-rx", "82730103C", "98.34", "gid://shopify/Product/10393656656167", "gid://shopify/ProductVariant/52052015710503"],
+  ["hydra-c-ferulic-serum", "40730103C", "90.00", "gid://shopify/Product/10393656066343", "gid://shopify/ProductVariant/52052014727463"],
+  ["peptide-anti-wrinkle-day-cream", "61730172C", "100.00", "gid://shopify/Product/10554590855463", "gid://shopify/ProductVariant/52574511431975"],
+  ["copper-peptide-restore-cream", "11530173C", "68.00", "gid://shopify/Product/10393657737511", "gid://shopify/ProductVariant/52052017971495"],
+  ["firming-peptide-eye-gel", "11330052C", "76.67", "gid://shopify/Product/10393657245991", "gid://shopify/ProductVariant/52052016955687"],
+];
+test("D-MAP-1: committed identity binds exactly the eight manifest ids for the exact store", () => {
   assert.equal(committed.store, "nr9zd0-t5.myshopify.com");
+  assert.equal(committed.currency, "USD");
+  assert.deepEqual(Object.keys(committed).sort(), ["_comment", "currency", "products", "store"]);
+  assert.deepEqual(committed.products.map(p => [p.handle, p.supplierSku, p.approvedPriceUsd, p.productId, p.variantId]), EXPECTED_IDENTITY);
+  assert.deepEqual(committed.products.map(p => Object.keys(p).sort()), committed.products.map(() => ["approvedPriceUsd", "handle", "productId", "supplierSku", "variantId"]));
   assert.deepEqual(committed.products.map(p => p.handle), ACTIVE);
   assert.deepEqual(Object.fromEntries(committed.products.map(p => [p.handle, p.approvedPriceUsd])), PRICES);
-  assert.deepEqual(committed.products.filter(p => p.variantId === null).map(p => p.handle), ["enzyme-gel-cleanser", "hyaluronic-serum", "peptide-anti-wrinkle-day-cream"]);
+  for (const column of [0, 1, 3, 4]) assert.equal(new Set(EXPECTED_IDENTITY.map(r => r[column])).size, 8, `unique column ${column}`);
   assert.ok(!committed.products.some(p => LEGACY.includes(p.handle)));
   assert.ok(!JSON.stringify(committed).includes("99000000000"), "no synthetic id leaks into the committed identity");
-  // The committed identity yields bindings only for its own store.
-  assert.equal(launch.launchBindings("nr9zd0-t5.myshopify.com", committed).length, 5);
+  // Provenance names the exact manifest snapshot and its held (not activated) semantics.
+  assert.match(committed._comment, /sha256 fdac7afbb14275166fbae98c413096b102985c8a7d1175b4d151a6e722275de7/);
+  assert.match(committed._comment, /DRAFT_PROVISIONING_COMPLETE_COORDINATED_RELEASE_NOT_EXECUTED/);
+  assert.match(committed._comment, /A configured id is not activation/);
+  // All eight complete bindings, only for its own store.
+  assert.deepEqual(launch.launchBindings("nr9zd0-t5.myshopify.com", committed),
+    EXPECTED_IDENTITY.map(([handle, , price, productId, variantId]) => ({handle, productId, variantId, priceCents: Math.round(Number(price) * 100)})));
   assert.equal(launch.launchBindings("other.myshopify.com", committed).length, 0);
+  assert.equal(launch.launchBindings("NR9ZD0-T5.myshopify.com", committed).length, 0);
   assert.equal(launch.launchBindings(undefined, committed).length, 0);
+});
+
+test("D-MAP-2: all eight ids configured is not activation — DRAFT/unpublished/unstocked provider answers hold every product", () => {
+  const bindings = launch.launchBindings("nr9zd0-t5.myshopify.com", committed);
+  assert.equal(bindings.length, 8);
+  // Storefront nodes() returns null for DRAFT or unpublished products (the manifest state of all eight).
+  const draft = launch.qualifySkincare(bindings, bindings.map(() => null));
+  assert.equal(draft.status, "ok"); assert.equal(draft.qualified.size, 0);
+  const node = (b, over = {}, product = {}) => ({id: b.variantId, title: "Default Title", availableForSale: true, currentlyNotInStock: false, quantityAvailable: 28,
+    price: money((b.priceCents / 100).toFixed(2)), ...over, product: {id: b.productId, handle: b.handle, tags: ["iqon-skincare"], availableForSale: true, requiresSellingPlan: false, ...product}});
+  // Published but at the manifest's opening balances: three new products 0, five existing still need the gated stock write.
+  const zero = launch.qualifySkincare(bindings, bindings.map(b => node(b, {quantityAvailable: 0, availableForSale: false, currentlyNotInStock: true}, {availableForSale: false})));
+  assert.equal(zero.qualified.size, 0);
+  const noInventoryScope = launch.qualifySkincare(bindings, bindings.map(b => node(b, {quantityAvailable: null})));
+  assert.equal(noInventoryScope.qualified.size, 0);
+  // Only a complete qualifying answer for an exact id qualifies that one product; the others stay held.
+  const one = launch.qualifySkincare(bindings, bindings.map((b, i) => i === 3 ? node(b) : null));
+  assert.deepEqual([...one.qualified.keys()], ["retinol-rx"]);
+  assert.equal(one.qualified.get("retinol-rx").variantId, "gid://shopify/ProductVariant/52052015710503");
+  // An answer for a different (e.g. pre-binding) id never qualifies a bound handle.
+  assert.equal(launch.qualifySkincare(bindings, bindings.map(b => node(b, {id: "gid://shopify/ProductVariant/1"}))).qualified.size, 0);
+  assert.equal(launch.qualifySkincare(bindings, bindings.slice(1).map(b => node(b))).status, "unavailable", "short answer is unavailable, not partial");
 });
 
 test("D-HOLD-3: identity collisions disqualify every entry that shares an id", () => {
@@ -150,6 +195,45 @@ test("D-HOLD-1/D-HOLD-4: all eight qualify with live approved prices and approve
   assert.ok(!c.products.some(p => LEGACY.includes(p.id)));
   assert.equal(c.products.find(p => p.id === supplement.handle).available, true);
   assert.equal(BUNDLE_ELIGIBLE_HANDLES.length, 11);
+});
+
+const {productVisuals} = await import(sourceModuleUrl("lib/product-visuals.ts"));
+const {productPresentation} = await import(sourceModuleUrl("lib/product-presentation.ts"));
+const {skincareVisualContent} = await import(sourceModuleUrl("lib/skincare-visual-content.ts"));
+const {pageMetadata} = await import(sourceModuleUrl("lib/seo.ts"));
+const {comingSoonSkincareProduct} = await import(newSkincareUrl);
+const RETINOL_DESCRIPTION = "A 0.75% encapsulated retinol serum with niacinamide and squalane. An evening treatment for the appearance of fine lines and uneven texture.";
+const RETINOL_ATTRIBUTION = "Retinol strength as stated by the formulating laboratory.";
+const COMMERCE_FIELDS = ["available", "pricePending", "price", "currency", "launchQualified", "stockLimit", "variants", "requiresSellingPlan"];
+const withoutCommerce = p => Object.fromEntries(Object.entries(p).filter(([k]) => !COMMERCE_FIELDS.includes(k)));
+
+test("D-CONT-2: qualified activation keeps every approved content field, incl. Retinol 0.75% strength, attribution and metadata", async t => {
+  storefront(t);
+  const c = await routes.getStoreCatalog();
+  const held = {mode: "unavailable", products: []};
+  for (const id of ACTIVE) {
+    const launched = c.products.find(p => p.id === id);
+    assert.equal(launched.launchQualified, true, id);
+    assert.equal(comingSoonSkincareProduct(c, id), undefined, `${id}: qualified page is not informational`);
+    // Only commerce facts differ from the informational page record; all copy/imagery is identical.
+    assert.deepEqual(withoutCommerce(launched), withoutCommerce(comingSoonSkincareProduct(held, id)), id);
+    if (id !== "retinol-rx") assert.doesNotMatch(JSON.stringify(launched), /0\.75%|Retinol strength as stated/, id);
+  }
+  const retinol = c.products.find(p => p.id === "retinol-rx");
+  assert.equal(retinol.price, 98.34); assert.equal(retinol.variants[0].price, 98.34);
+  assert.equal(retinol.description, RETINOL_DESCRIPTION);
+  assert.equal(retinol.ingredients, "0.75% encapsulated retinol, niacinamide and squalane");
+  assert.doesNotMatch(retinol.inci, /0\.75%/, "approved INCI is not rewritten");
+  // Id-keyed visible copy used by the PDP (summary lead, key fact, ingredient explorer).
+  assert.match(productVisuals[retinol.id].lead, /^0\.75% encapsulated retinol /);
+  assert.equal(productVisuals[retinol.id].lead.split(RETINOL_ATTRIBUTION).length - 1, 1);
+  assert.deepEqual([productPresentation[retinol.id].fact, productPresentation[retinol.id].factLabel], ["0.75%", "encapsulated retinol"]);
+  assert.match(skincareVisualContent[retinol.id].ingredients[0].summary, /^0\.75% encapsulated retinol/);
+  // The PDP metadata is built from the qualified record's description (app/products/[slug]/page.tsx).
+  const meta = pageMetadata({path: `/products/${retinol.id}`, title: `${retinol.name} | IQON`, description: retinol.description, image: retinol.image, indexable: true});
+  assert.deepEqual([meta.description, meta.openGraph.description, meta.twitter.description], [RETINOL_DESCRIPTION, RETINOL_DESCRIPTION, RETINOL_DESCRIPTION]);
+  const ld = productJsonLd(retinol, isComingSoon(retinol) || !!retinol.pricePending);
+  assert.equal(ld.name, retinol.name); assert.equal(ld.offers.price, "98.34");
 });
 
 const holdCases = [
