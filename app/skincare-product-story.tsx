@@ -11,7 +11,7 @@ import { SkincareVisualBenefits, SkincareVisualRoutine } from "./skincare-visual
 import { newSkincareFor } from "@/lib/new-skincare";
 import { newSkincareStories, newSkincareVisualContent } from "@/lib/new-skincare-editorial";
 
-export function SkincareProductStory({product:p,comparison}:{product:Product;comparison:Product[]}) {
+export function SkincareProductStory({product:p,comparison,mode}:{product:Product;comparison:Product[];mode?:string}) {
   const story=skincareStories[p.id] || newSkincareStories[p.id];
   const copy=productContent[p.id];
   const skin=skincareRange.find(s=>s.id===p.id)||newSkincareFor(p.id);
@@ -42,7 +42,7 @@ export function SkincareProductStory({product:p,comparison}:{product:Product;com
       <div className="skin-compare-scroll" role="region" aria-label="Compare skincare formulas" tabIndex={0}>
         <table className="skin-compare-table"><caption className="sr-only">Compare {comparison.map(q=>q.name).join(", ")}</caption>
           <thead><tr><th scope="col"><span>AT A GLANCE</span></th>{comparison.map(q=><th key={q.id} scope="col" className={q.id===p.id?"skin-current":""}>
-            <Link href={q.id===p.id?"#overview":`/products/${q.id}`} className="skin-compare-product"><div className="skin-compare-image">{q.id===p.id&&<span className="skin-viewing">YOU’RE VIEWING</span>}<img src={q.image} alt={q.name} width={320} height={400} loading="lazy" decoding="async"/></div><h3>{q.name}</h3><p>{productPrice(q)}<span>{skincareRange.find(s=>s.id===q.id)?.size||newSkincareFor(q.id)?.size}</span></p></Link>
+            <Link href={q.id===p.id?"#overview":`/products/${q.id}`} className="skin-compare-product"><div className="skin-compare-image">{q.id===p.id&&<span className="skin-viewing">YOU’RE VIEWING</span>}<img src={q.image} alt={q.name} width={320} height={400} loading="lazy" decoding="async"/></div><h3>{q.name}</h3><p>{productPrice(q,mode)}<span>{skincareRange.find(s=>s.id===q.id)?.size||newSkincareFor(q.id)?.size}</span></p></Link>
           </th>)}</tr></thead>
           <tbody>{[
             {label:"Focus",value:(q:Product)=>productContent[q.id]?.comparison?.focus||q.descriptor},

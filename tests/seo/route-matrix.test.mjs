@@ -73,7 +73,7 @@ const INFORMATIONAL = ["/products/enzyme-gel-cleanser", "/products/hyaluronic-se
 const PUBLIC = ["/", "/approach", "/help", "/journal", "/journal/reading-a-supplement-label", "/skincare", "/collections/all", "/collections/supplements", "/collections/skincare", "/products/creatine-monohydrate", "/products/anti-aging-cleanser-with-peptides", "/products/daily-travel-kit"];
 const dom = html => new JSDOM(html).window.document;
 const STORE_QUESTION = "Where can I buy IQON products?";
-const STORE_ANSWER = "IQON’s online store is www.iqondaily.com. Browse current products in the supplements collection. IQON skincare is coming soon and is not available to order yet.";
+const STORE_ANSWER = "IQON’s online store is www.iqondaily.com. Browse current products in the supplements collection. IQON skincare isn’t available to order right now.";
 /** In-page links whose target id is not in the server-rendered document. */
 const brokenHashLinks = doc => [...doc.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute("href")).filter(h => h.length > 1 && !doc.getElementById(decodeURIComponent(h.slice(1))));
 /** Exact H1 copy: every `<br>` line break must still read as two words in textContent. */
@@ -396,9 +396,9 @@ test("production, live catalog, canonical and alias hosts", async t => {
   });
   await t.test("collections separate orderable supplements from the skincare preview and link the guides", async () => {
     const all = dom((await get(port, "/collections/all")).body);
-    assert.equal(all.querySelector(".catalog-heading p:last-child").textContent, "Supplements are available to order now. Skincare is shown as a preview and can’t be ordered yet.");
-    assert.deepEqual([...all.querySelectorAll(".catalog-departments a")].map(a => a.textContent), ["Supplements", "Skincare preview"]);
-    assert.equal(all.querySelector('meta[name="description"]').getAttribute("content"), "Shop IQON supplements and preview the skincare collection, coming soon.");
+    assert.equal(all.querySelector(".catalog-heading p:last-child").textContent, "Supplements are available to order now. Skincare isn’t available to order right now.");
+    assert.deepEqual([...all.querySelectorAll(".catalog-departments a")].map(a => a.textContent), ["Supplements", "Skincare"]);
+    assert.equal(all.querySelector('meta[name="description"]').getAttribute("content"), "Shop IQON supplements. Skincare isn’t available to order right now.");
     const supplements = dom((await get(port, "/collections/supplements")).body);
     assert.doesNotMatch(supplements.querySelector(".catalog-heading").textContent, /\d/, "no hardcoded count");
     assert.deepEqual([...supplements.querySelectorAll(".catalog-guides a")].map(a => [a.getAttribute("href"), a.textContent]),

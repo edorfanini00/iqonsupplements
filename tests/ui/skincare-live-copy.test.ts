@@ -32,10 +32,17 @@ it('live: Help links both collections without coming soon wording',()=>{
  expect(links(a)).toEqual([['www.iqondaily.com','https://www.iqondaily.com/'],['supplements collection','/collections/supplements'],['skincare collection','/collections/skincare']]);
  expect(a.textContent).not.toMatch(/coming soon|not available/i);
 });
-it('held: Help keeps the previous answer and links supplements only',()=>{
+it('partial (Review B N2): Help still links both collections when one product is held',()=>{
+ set('live',catalog(activeSkincareIds.filter(id=>id!=='retinol-rx')));render(React.createElement(HelpQuestions));
+ const a=storeAnswer();
+ expect(a.textContent).toBe('IQON’s online store is www.iqondaily.com. Browse current products in the supplements collection and the skincare collection.');
+ expect(links(a)).toEqual([['www.iqondaily.com','https://www.iqondaily.com/'],['supplements collection','/collections/supplements'],['skincare collection','/collections/skincare']]);
+});
+it('held: Help says skincare is unavailable right now and links supplements only',()=>{
  set('live',catalog([]));render(React.createElement(HelpQuestions));
  const a=storeAnswer();
- expect(a.textContent).toBe('IQON’s online store is www.iqondaily.com. Browse current products in the supplements collection. IQON skincare is coming soon and is not available to order yet.');
+ expect(a.textContent).toBe('IQON’s online store is www.iqondaily.com. Browse current products in the supplements collection. IQON skincare isn’t available to order right now.');
+ expect(a.textContent).not.toMatch(/coming soon|\byet\b/i);
  expect(links(a).map(l=>l[1])).toEqual(['https://www.iqondaily.com/','/collections/supplements']);
 });
 it('preview mode: Help copy is the unchanged design preview set',()=>{
@@ -55,24 +62,40 @@ it('live: skincare and all-products headers and the department link describe ski
  expect([...all.querySelectorAll('.catalog-departments a')].map(a=>a.textContent)).toEqual(['Supplements','Skincare']);
  expect(all.querySelector('.catalog-heading')!.textContent).not.toMatch(/coming soon|ahead of launch|preview/i);
 });
-it('partial: a held product keeps an honest note; held: previous copy is unchanged',()=>{
+it('partial (Review B N2): exact skincare and all-products subtitles and department links',()=>{
  set('live',catalog(activeSkincareIds.filter(id=>id!=='retinol-rx')));
- expect(subtitle(render(React.createElement(CollectionPage,{category:'skincare'})).container)).toBe('Shop skincare now. A few products are still coming soon.');
- cleanup();
- set('live',catalog([]));
- expect(subtitle(render(React.createElement(CollectionPage,{category:'skincare'})).container)).toBe('Coming soon. Explore the collection ahead of launch.');
+ expect(subtitle(render(React.createElement(CollectionPage,{category:'skincare'})).container)).toBe('Some skincare products aren’t available to order right now.');
  cleanup();
  const all=render(React.createElement(CollectionPage,{category:'all'})).container;
- expect(subtitle(all)).toBe('Supplements are available to order now. Skincare is shown as a preview and can’t be ordered yet.');
- expect([...all.querySelectorAll('.catalog-departments a')].map(a=>a.textContent)).toEqual(['Supplements','Skincare preview']);
- cleanup();
- set('preview',catalog(activeSkincareIds));
- expect(subtitle(render(React.createElement(CollectionPage,{category:'skincare'})).container)).toBe('Coming soon. Explore the collection ahead of launch.');
+ expect(subtitle(all)).toBe('Supplements and skincare are available to order now. Some skincare products aren’t available right now.');
+ expect([...all.querySelectorAll('.catalog-departments a')].map(a=>a.textContent)).toEqual(['Supplements','Skincare']);
 });
-it('/skincare hero eyebrow drops "Coming soon" only when skincare is orderable',()=>{
+it('held live store: neutral wording, no coming soon or preview',()=>{
+ set('live',catalog([]));
+ expect(subtitle(render(React.createElement(CollectionPage,{category:'skincare'})).container)).toBe('Skincare isn’t available to order right now.');
+ cleanup();
+ const all=render(React.createElement(CollectionPage,{category:'all'})).container;
+ expect(subtitle(all)).toBe('Supplements are available to order now. Skincare isn’t available to order right now.');
+ expect([...all.querySelectorAll('.catalog-departments a')].map(a=>a.textContent)).toEqual(['Supplements','Skincare']);
+ expect(all.querySelector('.catalog-heading')!.textContent).not.toMatch(/coming soon|ahead of launch|preview|\byet\b/i);
+});
+it('preview store: collection copy is byte-identical to main',()=>{
+ // A real preview catalog carries only informational skincare cards (no launched records).
+ for(const products of [catalog([]),withComingSoonSkincareCards([])]){
+  set('preview',products);
+  expect(subtitle(render(React.createElement(CollectionPage,{category:'skincare'})).container)).toBe('Coming soon. Explore the collection ahead of launch.');
+  cleanup();
+  const all=render(React.createElement(CollectionPage,{category:'all'})).container;
+  expect(subtitle(all)).toBe('Find your everyday essentials.');
+  expect([...all.querySelectorAll('.catalog-departments a')].map(a=>a.textContent)).toEqual(['Supplements','Skincare preview']);
+  cleanup();
+ }
+});
+it('/skincare hero eyebrow keeps "Coming soon" only in the preview store',()=>{
  const eyebrow=(products:Product[],mode:string)=>{const c=render(React.createElement(CampaignHero,{skincare:true,skincareState:skincareAvailability(products,mode)})).container.querySelector('.eyebrow')!.textContent;cleanup();return c;};
  expect(eyebrow(catalog(activeSkincareIds),'live')).toBe('IQON / SKINCARE');
- expect(eyebrow(catalog([]),'live')).toBe('IQON / SKINCARE / COMING SOON');
+ expect(eyebrow(catalog(activeSkincareIds.filter(id=>id!=='retinol-rx')),'live')).toBe('IQON / SKINCARE');
+ expect(eyebrow(catalog([]),'live')).toBe('IQON / SKINCARE');
  expect(eyebrow(catalog(activeSkincareIds),'preview')).toBe('IQON / SKINCARE / COMING SOON');
  expect(render(React.createElement(CampaignHero)).container.querySelector('.eyebrow')!.textContent).toBe('IQON / DAILY ESSENTIALS');
 });

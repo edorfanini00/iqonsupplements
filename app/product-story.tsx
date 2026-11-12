@@ -40,13 +40,13 @@ export function comparisonFor(product: Product, products: Product[]) {
     .filter((p): p is Product => Boolean(p)).slice(0, 3);
 }
 
-export function ProductStory({ product: p, products }: { product: Product; products: Product[] }) {
+export function ProductStory({ product: p, products, mode }: { product: Product; products: Product[]; mode?: string }) {
   const content = productContent[p.id];
   if (!content) return null;
   const supplement = supplementDetails[p.id];
   const skin = skincareRange.find(item => item.id === p.id) || newSkincareFor(p.id);
   const comparison = comparisonFor(p, products);
-  if (skin && (skincareStories[p.id] || newSkincareStories[p.id])) return <SkincareProductStory product={p} comparison={comparison}/>;
+  if (skin && (skincareStories[p.id] || newSkincareStories[p.id])) return <SkincareProductStory product={p} comparison={comparison} mode={mode}/>;
   if (supplement && supplementVisualContent[p.id]) return <SupplementProductStory product={p} comparison={comparison}/>;
   const research = content.education;
   const visual = productVisuals[p.id];
@@ -106,7 +106,7 @@ export function ProductStory({ product: p, products }: { product: Product; produ
             {label:"Routine",value:(q:Product)=>productContent[q.id]?.comparison?.routine || "Follow product directions"},
             {label:"Key ingredients",value:(q:Product)=>productContent[q.id]?.comparison?.difference || "See ingredient statement"},
             {label:"Contents",value:(q:Product)=>q.size || supplementDetails[q.id]?.contents || skincareRange.find(item=>item.id===q.id)?.size || "See packaging"},
-            {label:"Price",value:(q:Product)=>productPrice(q)},
+            {label:"Price",value:(q:Product)=>productPrice(q,mode)},
             ...(comparison.some(q=>dailyProductPrice(q)) ? [{label:"Per day*",value:(q:Product)=>dailyProductPrice(q) || "—"}] : [])
           ].map(row=><tr key={row.label}><th scope="row">{row.label}</th>{comparison.map(q=><td className={p.id===q.id?"is-current":""} key={q.id}>{row.value(q)}</td>)}</tr>)}
           <tr className="comparison-actions"><th scope="row"><span className="sr-only">Explore</span></th>{comparison.map(q=><td className={p.id===q.id?"is-current":""} key={q.id}><Link href={p.id===q.id?"#overview":`/products/${q.id}`}>{p.id===q.id?"Back to product":"Explore product"}<ArrowUpRight size={15}/></Link></td>)}</tr></tbody>

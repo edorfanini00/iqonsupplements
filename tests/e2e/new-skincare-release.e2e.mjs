@@ -55,7 +55,8 @@ for(const [name,env] of Object.entries({live:{},empty:{FAKE_SHOPIFY:'empty'},una
    assert.equal(d.querySelector('link[rel="canonical"]')?.getAttribute('href'),`https://${www}${url}`);
    assert.equal(d.querySelector('meta[name="robots"]')?.getAttribute('content'),index?'index, follow':'noindex, follow');
    assert.equal(d.querySelector('meta[property="og:image"]')?.getAttribute('content'),`https://${www}${p.image}`);
-   assert.match(d.querySelector('.product-summary')?.textContent||'',/Coming soon/);
+   // Live store (incl. an empty Shopify response): neutral held label; preview, outage and unconfigured keep "Coming soon".
+   assert.match(d.querySelector('.product-summary')?.textContent||'',['live','empty'].includes(name)?/Unavailable right now/:/Coming soon/);
    assert.equal(d.querySelector('.product-launch-note button')?.disabled,true);
    assert.equal(d.querySelectorAll('.add-to-bag-row,.sticky-purchase,.product-variant-picker').length,0);
    assert.doesNotMatch(d.querySelector('#main')?.textContent||'',/\$0(?:\.00)?\b|local preview only|sample review/i);

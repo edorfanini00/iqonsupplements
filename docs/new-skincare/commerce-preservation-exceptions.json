@@ -20,8 +20,8 @@
     },
     "lib/catalog.ts": {
       "baselineSha256": "899adf096eca34230450ebae1bb449d1a4f5ecd1ab90b92e7f501ca6bd2367fc",
-      "candidateSha256": "31594f52908f11af58e0e0097d373244b663627c55706116fb8c8215fd326fe7",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
+      "candidateSha256": "9b80c62b7f5a64909958200fa38297888f05f694582e2d8fb07fd7a20b52cc39",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs. Review B N3 (11 Nov 2026): productPrice takes an optional store mode; in the live store an active skincare handle that is not orderable reads \"Unavailable right now\" instead of \"Coming soon\". Label wording only: without a live mode the label is unchanged, and isComingSoon/isOrderable are untouched."
     },
     "lib/skincare-range.json": {
       "baselineSha256": "7f21ff066bdbf96959d659b664c143adb9359cf5807e303be79a2638f99608a9",

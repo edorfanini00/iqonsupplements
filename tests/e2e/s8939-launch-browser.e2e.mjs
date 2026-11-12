@@ -189,7 +189,7 @@ test('S8939 launch: eight PDPs, legacy holds, mixed cart, code, checkout handoff
       await pg.goto(`http://localhost:${port}/products/${id}`, {waitUntil: 'networkidle'});
       const summary = await pg.locator('.product-summary').textContent();
       const expectHeld = mode === 'down' || id === 'retinol-rx';
-      record(`D-HOLD-3:${mode}:${id}`, expectHeld ? /Coming soon/.test(summary) && (await pg.locator('.add-to-bag-row').count()) === 0 : summary.includes(PRICES[id]), summary.slice(0, 80));
+      record(`D-HOLD-3:${mode}:${id}`, expectHeld ? /Unavailable right now/.test(summary) && !/Coming soon/.test(summary) && (await pg.locator('.add-to-bag-row').count()) === 0 : summary.includes(PRICES[id]), summary.slice(0, 80));
       if (id === 'retinol-rx') await retinolCopy(pg, `D-CONT-2:${mode}:held:retinol-rx`);
       await shot(pg, `failclosed-${mode}-${id}`);
     }

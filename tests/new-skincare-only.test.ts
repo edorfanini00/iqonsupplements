@@ -59,7 +59,11 @@ test('the shell changes only exact new preview route classification, never exist
  const bundleShell=json('tests/fixtures/skincare-bundle-shell.json').replacements as [string,string][];
  assert.equal(bundleShell.length,3);
  const withBundle=bundleShell.reduce((text,[from,to])=>{assert.equal(text.split(from).length-1,1,`exact authorized shell change: ${from.slice(0,60)}`);return text.replace(from,()=>to);},expected);
- assert.equal(readFileSync('app/store-shell.tsx','utf8'),withBundle);
+ // Exact owner-authorized live label change (11 Nov 2026, Review B N3): price labels receive the store mode only.
+ const liveLabelShell=json('tests/fixtures/skincare-live-label-shell.json').replacements as [string,string][];
+ assert.equal(liveLabelShell.length,4);
+ const withLiveLabel=liveLabelShell.reduce((text,[from,to])=>{assert.equal(text.split(from).length-1,1,`exact authorized shell change: ${from.slice(0,60)}`);return text.replace(from,()=>to);},withBundle);
+ assert.equal(readFileSync('app/store-shell.tsx','utf8'),withLiveLabel);
  for(const id of ids){assert.equal(comingSoonSkincareDepartment(`/products/${id}`),'skincare');assert.equal(comingSoonSkincareDepartment(`/products/${id}/extra`),undefined)}
  for(const p of products)assert.equal(comingSoonSkincareDepartment(`/products/${p.id}`),p.category==='skincare'?'skincare':undefined);
  for(const path of ['/','/account','/checkout','/affiliates','/products/unknown'])assert.equal(comingSoonSkincareDepartment(path),undefined);
