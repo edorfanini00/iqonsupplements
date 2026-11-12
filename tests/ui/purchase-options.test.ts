@@ -88,7 +88,12 @@ it("keeps all eight skincare pages browseable with no purchase controls, even if
   for(const p of skincare){
     const product={...p,available:true,pricePending:false,variants:creatine.variants};
     const {container}=render(React.createElement(ProductPage,{product}));
-    expect(screen.getByRole("button",{name:"Not available to order yet"}).hasAttribute("disabled")).toBe(true);
+    // Live store, unqualified active handle (Review B N3): neutral wording, never "coming soon" or "yet".
+    expect(screen.getByRole("button",{name:"Not available to order"}).hasAttribute("disabled")).toBe(true);
+    expect(container.querySelector(".launch-status")?.textContent).toBe("Unavailable right now");
+    expect(container.querySelector(".product-title-row span")?.textContent).toBe("Unavailable right now");
+    expect(container.querySelector(".product-launch-note")?.textContent).not.toMatch(/coming soon|on its way|\byet\b/i);
+    expect(productPrice(product,"live")).toBe("Unavailable right now");
     expect(screen.queryByRole("button",{name:/Add to bag/})).toBeNull();
     expect(screen.queryByRole("radiogroup",{name:"Bundle quantity"})).toBeNull();
     expect(container.querySelector(".sticky-purchase")).toBeNull();
@@ -226,4 +231,19 @@ it("unapproved skincare, legacy skincare and a coming-soon skincare page never s
  const r=render(React.createElement(ProductPage,{product:held}));
  expect(r.container.querySelector(".bundle-choices")).toBeNull();
  expect(r.container.textContent).not.toMatch(/Bundle and save|save 15%/);
+});
+
+it("preview store keeps the original skincare launch wording byte-identical",()=>{
+  const skincare=products.filter(p=>p.category==="skincare");
+  store.mode="preview";
+  try{
+    for(const p of skincare){
+      const {container}=render(React.createElement(ProductPage,{product:p}));
+      expect(screen.getByRole("button",{name:"Not available to order yet"}).hasAttribute("disabled")).toBe(true);
+      expect(container.querySelector(".launch-status")?.textContent).toBe("Coming soon");
+      expect(container.querySelector(".product-title-row span")?.textContent).toBe("Coming soon");
+      expect(productPrice(p,"preview")).toBe("Coming soon");
+      cleanup();
+    }
+  }finally{store.mode="live";}
 });

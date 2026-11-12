@@ -1,0 +1,21 @@
+{
+  "_comment": "Review B N3, owner decision 2026-11-11: the ONLY authorized app/store-shell.tsx changes on top of the bundle transform. The product card, bag and search price labels pass the store mode to productPrice, so a live, active, non-orderable skincare handle reads \"Unavailable right now\" (preview keeps \"Coming soon\"). Label wording only; no cart, navigation or privacy logic. Each 'before' must occur exactly once.",
+  "replacements": [
+    [
+      "<small>{productPrice(p)}</small></span><but",
+      "<small>{productPrice(p,mode)}</small></span><but"
+    ],
+    [
+      "<small>{p.type} · {productPrice(p)}</small>",
+      "<small>{p.type} · {productPrice(p,mode)}</small>"
+    ],
+    [
+      "\"price-pending\":\"\"}>{productPrice(p)}</span>",
+      "\"price-pending\":\"\"}>{productPrice(p,mode)}</span>"
+    ],
+    [
+      " const {add,busy,ready}=useStore();",
+      " const {add,busy,ready,mode}=useStore();"
+    ]
+  ]
+}

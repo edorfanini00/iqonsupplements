@@ -2,6 +2,7 @@ import { productContent } from "./product-content";
 import { activeSkincareProducts } from "./new-skincare";
 import approvedPrices from "./approved-prices.json";
 import { isComingSoon } from "./commerce-policy";
+import { isActiveSkincareHandle } from "./skincare-identity";
 export type Category = "supplements" | "skincare";
 export type Purchase = "once" | "subscription";
 export type ProductVariant = {id:string; title:string; price:number; currency:string; available:boolean};
@@ -77,7 +78,9 @@ export const products: Product[] = previewProducts.map(p => ({...p, descriptor: 
 
 export const findProduct = (id: string) => products.find(p => p.id === id);
 export const money = (amount: number, currency="USD") => new Intl.NumberFormat("en-US", {style:"currency",currency,maximumFractionDigits:amount % 1 ? 2 : 0}).format(amount);
-export const productPrice = (p: Product) => isComingSoon(p) || p.pricePending ? "Coming soon" : money(p.price, p.currency);
+/** Without a live `mode` the label is the original "Coming soon". In the live store an active skincare handle that
+ * isn't orderable reads "Unavailable right now" (sold out, outage or a single hold), never "Coming soon". */
+export const productPrice = (p: Product, mode?: string) => isComingSoon(p) || p.pricePending ? (mode === "live" && isActiveSkincareHandle(p.id) ? "Unavailable right now" : "Coming soon") : money(p.price, p.currency);
 export const unitPrice = (p: Product, _purchase: Purchase = "once") => p.price;
 // Subscription lines can only come from a bag started before subscriptions were retired; new additions are one time only.
 export type CartItem = {id: string; quantity: number; purchase: Purchase; frequency: string; lineId?:string; variantId?:string; variantTitle?:string; name?:string; image?:string; amount?:number; compareAmount?:number; currency?:string; sellingPlanId?:string; sellingPlanName?:string};

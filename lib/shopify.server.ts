@@ -111,11 +111,14 @@ async function removeUpcomingProducts(cart:ShopifyCart|null,q:SkincareQualificat
   // A successful mutation envelope is not proof that the reserved lines were removed.
   // Validate before any subsequent purchase mutation or checkout handoff.
   if((skincare.some(line=>isHeldSkincareHandle(line.merchandise.product.handle))&&result.cart!.lines.pageInfo.hasNextPage)||result.cart!.lines.nodes.some(line=>isHeldSkincareHandle(line.merchandise.product.handle)&&!allowance(q)(line)))
-    throw new CommerceError("Skincare is coming soon. We couldn’t safely refresh your bag. Please try again.");
-  const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];
+    throw new CommerceError("We couldn’t safely refresh your bag. Please try again.");
+  // Notice wording only: legacy formulas are permanently retired, so they never get the "right now" notice.
+  const legacy=skincare.filter(line=>isLegacySkincareHandle(line.merchandise.product.handle));
+  const notices=[...(skincare.length>legacy.length?[skincareNotice]:[]),...(legacy.length?[legacyNotice(legacy.length)]:[]),...(retired.length?[retiredNotice]:[])];
   return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};
 }
-const skincareNotice="These skincare items are not available to order and have been removed from your bag; supplements can still be ordered.";
+const skincareNotice="These skincare items are not available to order right now and have been removed from your bag.";
+const legacyNotice=(count:number)=>count===1?"This earlier formula is not available to order. It has been removed from your bag.":"These earlier formulas are not available to order. They have been removed from your bag.";
 const retiredNotice="Colon Gentle Cleanse has been discontinued and was removed from your bag. Gut Health replaces it.";
 export async function getCartResponse() {
   try {const raw=await readCart();const q=await qualificationFor(raw);const {cart,removed,notices}=await removeUpcomingProducts(raw,q);return Response.json({...publicCart(cart,allowance(q)),...(removed?{notice:notices.join(" ")}:{})},{headers:responseHeaders});}catch(error){return fail(error);}
@@ -137,7 +140,7 @@ export async function mutateCartResponse(request:Request) {
     const addQualification=skincareAdd?await qualificationFor(null,true):null;
     const addEntry=addQualification?.qualified.get(input.id as string);
     if(addQualification&&(addQualification.status!=="ok"||!addEntry||typeof input.variantId!=="string"||addEntry.variantId!==input.variantId))
-      throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422);
+      throw new CommerceError("This product isn’t available to order right now.",422);
     const raw=await readCart();
     const q=addQualification??await qualificationFor(raw);
     const allowed=allowance(q);
@@ -149,7 +152,7 @@ export async function mutateCartResponse(request:Request) {
       const qualified=skincareAdd?q.qualified.get(input.id as string):undefined;
       const product=qualified?launchedSkincareProduct(qualified):(await readCatalog()).products.find(p=>p.id===input.id);
       const variant=product?.variants?.find(v=>v.id===input.variantId);
-      if(product&&isComingSoon(product)) throw new CommerceError("Skincare is coming soon and cannot be ordered yet.",422,publicCart(current,allowed));
+      if(product&&isComingSoon(product)) throw new CommerceError("This product isn’t available to order right now.",422,publicCart(current,allowed));
       if(!product||!variant||!variant.available||!product.available) throw new CommerceError("This option is currently unavailable.",422);
       // Subscriptions are retired: a new line is always a one time purchase and never carries a selling plan.
       if(input.sellingPlanId!==undefined||(input.purchase!==undefined&&input.purchase!=="once")) throw new CommerceError("Subscriptions are no longer offered. Choose a one time purchase.",422,publicCart(current,allowed));

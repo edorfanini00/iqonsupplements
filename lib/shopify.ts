@@ -87,7 +87,7 @@ export function publicCart(cart:ShopifyCart|null, allowed:LineAllowance=()=>fals
   if(!cart) return {items:[],subtotal:0,currency:"USD",count:0,discountCodes:[],merchandise:0,lineDiscounts:[],orderDiscounts:[],total:0};
   // Never serialize priced informational lines, including mutation error payloads.
   if(cart.lines.nodes.some(line=>isHeldSkincareHandle(line.merchandise.product.handle)&&!allowed(line)))
-    throw new CommerceError("Skincare is coming soon. We couldn’t safely refresh your bag. Please try again.");
+    throw new CommerceError("We couldn’t safely refresh your bag. Please try again.");
   if(cart.lines.pageInfo.hasNextPage) throw new CommerceError("Your bag has too many different items. Please contact the store.");
   const lineSubtotal=(line:ShopifyCart["lines"]["nodes"][number])=>Number((line.cost.subtotalAmount||line.cost.totalAmount).amount);
   return {items:cart.lines.nodes.map(line=>({id:line.merchandise.product.handle,lineId:line.id,
