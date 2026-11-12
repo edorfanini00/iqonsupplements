@@ -36,6 +36,10 @@ test('one product held (e.g. price drift or zero stock): partial copy, still hon
  assert.match(skincareCollectionSubtitle('partial'),/^Shop skincare now\..*coming soon/);
  assert.equal(skincareDepartmentLabel('partial',true),'Skincare');
  assert.doesNotMatch(collectionDescription('skincare','partial'),/ahead of launch/);
+ // Review A N1: a held product means the all-products meta must not claim "every" product.
+ assert.equal(collectionDescription('all','partial'),'Shop IQON supplements and skincare in one place.');
+ assert.doesNotMatch(collectionDescription('all','partial'),/\bevery\b/i);
+ assert.equal(collectionDescription('all','live'),'Shop every IQON supplement and skincare product in one place.');
  for(const copy of [skincareCollectionSubtitle('partial'),allProductsSubtitle('partial',true,true)]) assert.doesNotMatch(copy,DASH,copy);
 });
 
@@ -86,6 +90,7 @@ test('cart and checkout errors stay accurate for genuinely held products and dro
  assert.equal((server.match(/This product isn’t available to order right now\./g)||[]).length,2);
  assert.match(server,/These skincare items are not available to order right now and have been removed from your bag\./);
  assert.match(server,/This earlier formula is not available to order\./);
+ assert.match(server,/"This earlier formula is not available to order\. It has been removed from your bag\."/);
 });
 
 test('Help skincare bundle line: derived from SKINCARE_BUNDLE_TIERS, shown only when skincare is orderable',async()=>{

@@ -112,10 +112,13 @@ async function removeUpcomingProducts(cart:ShopifyCart|null,q:SkincareQualificat
   // Validate before any subsequent purchase mutation or checkout handoff.
   if((skincare.some(line=>isHeldSkincareHandle(line.merchandise.product.handle))&&result.cart!.lines.pageInfo.hasNextPage)||result.cart!.lines.nodes.some(line=>isHeldSkincareHandle(line.merchandise.product.handle)&&!allowance(q)(line)))
     throw new CommerceError("We couldn’t safely refresh your bag. Please try again.");
-  const notices=[...(skincare.length?[skincareNotice]:[]),...(retired.length?[retiredNotice]:[])];
+  // Notice wording only: legacy formulas are permanently retired, so they never get the "right now" notice.
+  const legacy=skincare.filter(line=>isLegacySkincareHandle(line.merchandise.product.handle));
+  const notices=[...(skincare.length>legacy.length?[skincareNotice]:[]),...(legacy.length?[legacyNotice(legacy.length)]:[]),...(retired.length?[retiredNotice]:[])];
   return {cart:result.cart,removed:true,removedLineIds:blocked.map(line=>line.id),notices};
 }
 const skincareNotice="These skincare items are not available to order right now and have been removed from your bag.";
+const legacyNotice=(count:number)=>count===1?"This earlier formula is not available to order. It has been removed from your bag.":"These earlier formulas are not available to order. They have been removed from your bag.";
 const retiredNotice="Colon Gentle Cleanse has been discontinued and was removed from your bag. Gut Health replaces it.";
 export async function getCartResponse() {
   try {const raw=await readCart();const q=await qualificationFor(raw);const {cart,removed,notices}=await removeUpcomingProducts(raw,q);return Response.json({...publicCart(cart,allowance(q)),...(removed?{notice:notices.join(" ")}:{})},{headers:responseHeaders});}catch(error){return fail(error);}

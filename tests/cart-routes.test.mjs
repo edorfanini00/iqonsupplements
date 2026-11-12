@@ -422,3 +422,23 @@ test("checkout passes fresh purpose consent to Shopify, never click IDs or custo
   for(const visitorConsent of [null,[],{marketing:true},{...granted,marketing:"true"},{...granted,email:"bad"}])
     assert.equal((await routes.checkoutResponse(request({visitorConsent},"checkout"))).status,400);
 });
+
+function insertLegacy(state, handle = "anti-aging-cleanser-with-peptides", id = "old-legacy-line") {
+  state.cart.lines.nodes.push({id,quantity:1,cost:{subtotalAmount:money(40),totalAmount:money(40)},merchandise:{id:`gid://shopify/ProductVariant/7${id.length}`,title:"Default Title",product:{handle,title:handle,tags:["iqon-skincare"]}}});
+  state.cart.totalQuantity++;
+}
+test("a legacy formula in an old bag is removed with the earlier formula notice, never a 'right now' notice", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertLegacy(state);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.equal(bag.notice,"This earlier formula is not available to order. It has been removed from your bag.");
+  assert.doesNotMatch(bag.notice,/right now/);
+});
+test("two legacy formulas get the plural notice; legacy plus held skincare gets both notices", async t => {
+  const state=fixture(t);await add(fixtureProducts[0]);insertLegacy(state);insertLegacy(state,"hydrating-tonic","old-legacy-line-2");
+  assert.equal((await (await routes.getCartResponse()).json()).notice,"These earlier formulas are not available to order. They have been removed from your bag.");
+  const mixed=fixture(t);await add(fixtureProducts[0]);insertLegacy(mixed);insertOldSkincare(mixed);
+  const bag=await (await routes.getCartResponse()).json();
+  assert.deepEqual(bag.items.map(i=>i.id),[fixtureProducts[0].handle]);
+  assert.equal(bag.notice,"These skincare items are not available to order right now and have been removed from your bag. This earlier formula is not available to order. It has been removed from your bag.");
+});

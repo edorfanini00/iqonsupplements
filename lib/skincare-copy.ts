@@ -47,6 +47,7 @@ export function skincareHeroEyebrow(state: SkincareAvailability) {
 /** Server metadata for /collections/{all,skincare}, from the same request-scoped catalog the page renders. */
 export function collectionDescription(category: "all" | "skincare", state: SkincareAvailability) {
   if (category === "skincare") return state === "held" ? "Explore the IQON skincare collection ahead of launch." : "Shop the IQON skincare collection. Cleanse, treat and moisturize.";
+  if (state === "partial") return "Shop IQON supplements and skincare in one place.";
   return state === "held" ? "Shop IQON supplements and preview the skincare collection, coming soon." : "Shop every IQON supplement and skincare product in one place.";
 }
 
