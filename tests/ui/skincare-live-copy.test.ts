@@ -76,3 +76,18 @@ it('/skincare hero eyebrow drops "Coming soon" only when skincare is orderable',
  expect(eyebrow(catalog(activeSkincareIds),'preview')).toBe('IQON / SKINCARE / COMING SOON');
  expect(render(React.createElement(CampaignHero)).container.querySelector('.eyebrow')!.textContent).toBe('IQON / DAILY ESSENTIALS');
 });
+
+const SUPPLEMENT_BUNDLE='Yes. Buy 2 eligible IQON supplements and save 10%, or buy 3 or more and save 25%. You can mix and match: every eligible supplement in your bag counts. Savings apply automatically in your bag and at checkout and can’t be combined with discount codes.';
+const bundleAnswer=()=>{fireEvent.click(screen.getByText('Do you offer bundle savings?'));return screen.getByText(/^Yes\. Buy 2 eligible IQON supplements/).textContent;};
+it('live: Help bundle answer keeps the supplement sentence and adds the skincare bundle',()=>{
+ set('live',catalog(activeSkincareIds));render(React.createElement(HelpQuestions));
+ expect(bundleAnswer()).toBe(`${SUPPLEMENT_BUNDLE} Skincare has its own bundle: buy 2 IQON skincare products and save 10%, or buy 3 or more and save 15%. Mix and match any IQON skincare. Supplements and skincare are counted separately. Savings apply automatically in your bag and at checkout.`);
+});
+it('partial: one held product still shows the skincare bundle',()=>{
+ set('live',catalog(activeSkincareIds.filter(id=>id!=='retinol-rx')));render(React.createElement(HelpQuestions));
+ expect(bundleAnswer()).toContain('Skincare has its own bundle');
+});
+it('held: Help bundle answer is the supplement sentence only',()=>{
+ set('live',catalog([]));render(React.createElement(HelpQuestions));
+ expect(bundleAnswer()).toBe(SUPPLEMENT_BUNDLE);
+});

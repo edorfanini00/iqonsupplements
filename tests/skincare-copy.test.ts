@@ -87,3 +87,19 @@ test('cart and checkout errors stay accurate for genuinely held products and dro
  assert.match(server,/These skincare items are not available to order right now and have been removed from your bag\./);
  assert.match(server,/This earlier formula is not available to order\./);
 });
+
+test('Help skincare bundle line: derived from SKINCARE_BUNDLE_TIERS, shown only when skincare is orderable',async()=>{
+ const {skincareBundleHelp}=await import('../lib/skincare-copy');
+ const {SKINCARE_BUNDLE_TIERS,BUNDLE_OFFERS}=await import('../lib/bundle-offer');
+ const [low,high]=[...SKINCARE_BUNDLE_TIERS].sort((a,b)=>a.minQuantity-b.minQuantity);
+ const expected=`Skincare has its own bundle: buy ${low.minQuantity} IQON skincare products and save ${low.percent}%, or buy ${high.minQuantity} or more and save ${high.percent}%. Mix and match any IQON skincare. Supplements and skincare are counted separately. Savings apply automatically in your bag and at checkout.`;
+ for(const state of ['live','partial'] as const) assert.equal(skincareBundleHelp(state),expected,state);
+ assert.equal(skincareBundleHelp('live'),'Skincare has its own bundle: buy 2 IQON skincare products and save 10%, or buy 3 or more and save 15%. Mix and match any IQON skincare. Supplements and skincare are counted separately. Savings apply automatically in your bag and at checkout.','matches the live Shopify discounts read back 11 Nov 2026');
+ assert.equal(skincareBundleHelp('held'),null);
+ // A tier change flows straight into the copy (no hardcoded numbers).
+ assert.match(skincareBundleHelp('live',[{minQuantity:4,percent:20,title:'x'},{minQuantity:2,percent:5,title:'y'}])!,/buy 2 IQON skincare products and save 5%, or buy 4 or more and save 20%\./);
+ const line=skincareBundleHelp('live')!;
+ assert.doesNotMatch(line,/[–—]| - /);assert.doesNotMatch(line,/IQON\s+Daily/i);
+ // No discount code claim unless the skincare terms make one.
+ assert.ok(!/discount code/i.test(BUNDLE_OFFERS.skincare.terms));assert.doesNotMatch(line,/discount code|can.t be combined/i);
+});

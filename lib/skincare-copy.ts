@@ -1,4 +1,5 @@
 import { isComingSoon, isOrderable } from "./commerce-policy";
+import { SKINCARE_BUNDLE_TIERS, type BundleTier } from "./bundle-offer";
 
 /** Customer-facing skincare availability wording, derived only from the catalog the page renders.
  * It never grants purchase eligibility: that stays with isComingSoon / launchQualified and the
@@ -47,4 +48,14 @@ export function skincareHeroEyebrow(state: SkincareAvailability) {
 export function collectionDescription(category: "all" | "skincare", state: SkincareAvailability) {
   if (category === "skincare") return state === "held" ? "Explore the IQON skincare collection ahead of launch." : "Shop the IQON skincare collection. Cleanse, treat and moisturize.";
   return state === "held" ? "Shop IQON supplements and preview the skincare collection, coming soon." : "Shop every IQON supplement and skincare product in one place.";
+}
+
+/** Help "bundle savings" addition, built from the skincare discount tiers so the copy can't drift from the
+ * Shopify discount config. Only shown while skincare is orderable; held skincare gets no bundle line.
+ * Owner decision 11 Nov 2026. No discount code claim: the skincare terms don't state one. */
+export function skincareBundleHelp(state: SkincareAvailability, tiers: readonly BundleTier[] = SKINCARE_BUNDLE_TIERS): string | null {
+  if (state === "held" || !tiers.length) return null;
+  const sorted = [...tiers].sort((a, b) => a.minQuantity - b.minQuantity);
+  const offers = sorted.map((t, i) => `buy ${t.minQuantity}${i === 0 ? " IQON skincare products" : ""}${i === sorted.length - 1 && i > 0 ? " or more" : ""} and save ${t.percent}%`);
+  return `Skincare has its own bundle: ${offers.join(", or ")}. Mix and match any IQON skincare. Supplements and skincare are counted separately. Savings apply automatically in your bag and at checkout.`;
 }
