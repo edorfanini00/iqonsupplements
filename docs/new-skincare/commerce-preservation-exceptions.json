@@ -10,13 +10,13 @@
     },
     "lib/shopify.ts": {
       "baselineSha256": "694998dc5e09df451f923e01430ddc6633430ca9e3abd477a70d09cfdef64449",
-      "candidateSha256": "50c9c5d74f25635ad4e88a95e575f2a0219b3a4aa1d2445954c310946f366cff",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
+      "candidateSha256": "74a20ddbf211625a5d96c6130ae8d102fb9980c7d16578b6eaa5be2b4d86280d",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs. Skincare live copy (11 Nov 2026, fix/skincare-live-copy): customer-facing error wording only; held-product refusals drop launch wording and say the product isn't available to order right now. No guard, condition or status code changed."
     },
     "lib/shopify.server.ts": {
       "baselineSha256": "e300446f8f53b1d06f417fcf901633e20962bd51e752fcda45357dea2b135adc",
-      "candidateSha256": "84280cf3c39b4bb9b26992fd522d5c7fccb5f18635a7f28f1cecee4baa61f964",
-      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs."
+      "candidateSha256": "b7343645fde4582ad0150b4ea972ba3ea6383048c0f5a9a3fcdbf11343a87ac5",
+      "reason": "Owner-authorized invoice eight reconciliation: approved-label content, canonical discovery, exact-handle holds and legacy noindex only. Existing assets and supplement/account/affiliate behavior preserved. S8939 conditional purchase activation (reviewed 60f01ad): exact-handle launch exception only for a fresh, exact Storefront qualification (launchQualified/stockLimit type, qualified-line cart allowance, listed-product/Offer only when qualified); held and legacy defaults unchanged. Regression: tests/skincare-launch-commerce.test.mjs. Skincare live copy (11 Nov 2026, fix/skincare-live-copy): customer-facing error wording only; held-product refusals drop launch wording and say the product isn't available to order right now. No guard, condition or status code changed."
     },
     "lib/catalog.ts": {
       "baselineSha256": "899adf096eca34230450ebae1bb449d1a4f5ecd1ab90b92e7f501ca6bd2367fc",

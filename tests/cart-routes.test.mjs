@@ -387,7 +387,7 @@ test("an old bag with skincare and Colon removes both and shows both notices", a
 test("skincare cannot be added, even when Shopify reports available stock", async t => {
   fixture(t);
   const response=await add(fixtureProducts[2]);
-  assert.equal(response.status,422);assert.match((await response.json()).error,/coming soon/i);
+  assert.equal(response.status,422);assert.match((await response.json()).error,/isn’t available to order right now/);
 });
 
 test("loading an old bag removes skincare and preserves supplements", async t => {

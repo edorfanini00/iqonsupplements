@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Product } from "@/lib/catalog";
 import { localSrcSet, shopifySrcSet } from "@/lib/responsive-images";
+import { skincareHeroEyebrow, type SkincareAvailability } from "@/lib/skincare-copy";
 
 const MOBILE_HERO = "/images/editorial/iqon-coastal-mobile-v32.webp";
 // The mobile frame is inset 8px and 660px tall; below 388px the portrait photograph is cropped by
@@ -9,7 +10,7 @@ const MOBILE_HERO = "/images/editorial/iqon-coastal-mobile-v32.webp";
 const MOBILE_HERO_SIZES = "(max-width:388px) 372px, calc(100vw - 16px)";
 
 /** Shared dimensions keep the two departments steady when switching. */
-export function CampaignHero({ skincare = false, featured }: { skincare?: boolean; featured?: Product }) {
+export function CampaignHero({ skincare = false, featured, skincareState = "held" }: { skincare?: boolean; featured?: Product; skincareState?: SkincareAvailability }) {
   return <section className={`campaign-hero ${skincare ? "campaign-hero-skin" : ""}`}>
     <picture className="campaign-image">{!skincare&&<source media="(max-width:760px)" srcSet={localSrcSet(MOBILE_HERO)} sizes={MOBILE_HERO_SIZES}/>}<img
       src={skincare ? "/images/editorial/iqon-skincare-hero-v29.webp" : "/images/editorial/iqon-coastal-hero-v32.webp"}
@@ -17,7 +18,7 @@ export function CampaignHero({ skincare = false, featured }: { skincare?: boolea
       width={skincare ? 1536 : 1672} height={skincare ? 1024 : 941} fetchPriority="high" />
     </picture>
     <div className="campaign-copy">
-      <p className="eyebrow">IQON / {skincare ? "SKINCARE / COMING SOON" : "DAILY ESSENTIALS"}</p>
+      <p className="eyebrow">{skincare ? skincareHeroEyebrow(skincareState) : "IQON / DAILY ESSENTIALS"}</p>
       <h1>{skincare ? <>A little care.{" "}<br />A lot of you.</> : <>For the life{" "}<br />you want to live.</>}</h1>
       <p>{skincare ? "Cleanse. Treat. Moisturize. A routine that’s yours." : "Everyday essentials, made to fit your life."}</p>
       <Link href={`/collections/${skincare ? "skincare" : "supplements"}`} className="button button-light">Explore {skincare ? "skincare" : "supplements"}<ArrowRight size={18}/></Link>
